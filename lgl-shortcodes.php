@@ -4,7 +4,7 @@
  * Plugin Name: LGL Shortcodes
  * Plugin URI: https://digitallydisruptive.co.uk/
  * Description: A robust, OOP-based plugin to output customized data via shortcodes using a dynamic template routing system.
- * Version: 1.1.0
+ * Version: 1.6.2
  * Author: Digitally Disruptive - Donald Raymundo
  * Author URI: https://digitallydisruptive.co.uk/
  * Text Domain: lgl-shortcodes
@@ -17,7 +17,7 @@ if (! defined('ABSPATH')) {
 // Define a constant for the plugin directory path to ensure reliable file inclusion.
 define('LGL_SHORTCODES_PATH', plugin_dir_path(__FILE__));
 define('LGL_SHORTCODES_URL', plugin_dir_url(__FILE__));
-define('LGL_SHORTCODES_VERSION', '1.6.1');
+define('LGL_SHORTCODES_VERSION', '1.6.2');
 
 if (! class_exists('LGL_Shortcodes')) {
 
@@ -270,6 +270,8 @@ if (! class_exists('LGL_Shortcodes')) {
 			check_ajax_referer('lgl_search_nonce', 'nonce');
 
 			$post_type = isset($_POST['post_type']) ? sanitize_text_field($_POST['post_type']) : 'post';
+			$paged = isset($form_data['paged']) ? intval($form_data['paged']) : 1;
+
 			$form_data = array();
 
 			// Parse serialized form data
@@ -277,10 +279,12 @@ if (! class_exists('LGL_Shortcodes')) {
 				parse_str($_POST['form_data'], $form_data);
 			}
 
+
 			$args = array(
 				'post_type'      => $post_type,
 				'post_status'    => 'publish',
 				'posts_per_page' => 9,
+				'paged'          => $paged,
 				'meta_query'     => array('relation' => 'AND'),
 				'tax_query'      => array('relation' => 'AND')
 			);

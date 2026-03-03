@@ -2,10 +2,6 @@
  * Frontend execution logic for LGL Shortcodes.
  * Handles Select2 initialization and AJAX operations.
  */
-/**
- * Frontend execution logic for LGL Shortcodes.
- * Handles Select2 initialization and AJAX operations.
- */
 (function ($) {
     'use strict';
     $(document).ready(function () {
@@ -13,6 +9,11 @@
         add_to_wishlist();
     });
 
+    /**
+         * Initializes the search form features.
+         * Binds Select2, handles dependent make/model dropdowns, and manages the AJAX submission for search queries.
+         * * @return {void}
+         */
     function search_form() {
         // Initialize Select2 on target classes
         $('.lgl-select2').select2({
@@ -42,6 +43,9 @@
                                 $model_select.append(new Option(item.text, item.id, false, false));
                             });
                             $model_select.prop('disabled', false).trigger('change');
+                            let visibleCount = $('#lgl-results-grid .bt-post').length;
+                            let totalCount = response.data.count;
+                            $('#lgl-results-count').html('Showing ' + visibleCount + ' of ' + totalCount + ' results');
                         }
                     }
                 });
@@ -94,6 +98,11 @@
 
     }
 
+    /**
+         * Binds click events for the wishlist functionality.
+         * Handles AJAX requests to add or remove items from the user's wishlist and triggers toast notifications.
+         * * @return {void}
+         */
     function add_to_wishlist() {
         // Add Notification Container to Body
         $('body').append('<div id="lgl-notification-container"></div>');
