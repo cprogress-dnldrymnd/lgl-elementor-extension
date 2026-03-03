@@ -358,4 +358,41 @@
   font-weight: bold;
   color: var(--lgl-primary); }
 
+#lgl-notification-container {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  pointer-events: none;
+  /* Let clicks pass through */ }
+
+.lgl-toast {
+  background-color: var(--lgl-c-deep-dark-blue);
+  color: var(--lgl-c-pure-white);
+  padding: 16px 24px;
+  border-radius: 6px;
+  font-family: var(--lgl-font-primary);
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  opacity: 0;
+  transform: translateX(100%);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  pointer-events: auto;
+  /* Enable clicks on the toast if needed later */ }
+
+.lgl-toast.show {
+  opacity: 1;
+  transform: translateX(0); }
+
+.lgl-toast-success {
+  border-left: 4px solid var(--lgl-c-electric-blue); }
+
+.lgl-toast-error {
+  border-left: 4px solid #dc3545;
+  /* Standard red for removal/errors */ }
+
 /*# sourceMappingURL=main.css.map */
