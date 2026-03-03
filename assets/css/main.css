@@ -454,6 +454,9 @@
     max-width: 1300px;
     margin-left: auto;
     margin-right: auto; }
+  .single-lgl .lgl-post--meta.lgl-post--meta svg {
+    width: 30px;
+    height: 30px; }
 
 .lgl-post--wrap {
   position: relative;

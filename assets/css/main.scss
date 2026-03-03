@@ -607,6 +607,12 @@
         margin-left: auto;
         margin-right: auto;
     }
+    .lgl-post--meta.lgl-post--meta {
+        svg {
+                width: 30px;
+    height: 30px;
+        }
+    }
 }
 
 .lgl-post--wrap {
