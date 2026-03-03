@@ -15,7 +15,7 @@ if (! defined('ABSPATH')) {
 get_header();
 ?>
 
-<pre>
+<pre style="display: none">
     <?php var_dump(get_post_meta(get_the_ID())); ?>
 </pre>
 
