@@ -64,7 +64,8 @@
         font-weight: 600;
         cursor: pointer;
         transition: background-color 0.3s ease, transform 0.1s ease;
-        width: 100%; }
+        width: 100%;
+        line-height: 1; }
         .lgl-search-container.lgl-search-container.lgl-search-container .lgl-filter-form .lgl-submit-group .lgl-search-submit:hover {
           background-color: var(--lgl-secondary); }
         .lgl-search-container.lgl-search-container.lgl-search-container .lgl-filter-form .lgl-submit-group .lgl-search-submit:active {
