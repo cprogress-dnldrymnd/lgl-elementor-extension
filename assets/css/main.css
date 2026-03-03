@@ -42,6 +42,10 @@
       @media (max-width: 1440px) {
         .lgl-search-container.lgl-search-container.lgl-search-container .lgl-filter-form .lgl-filter-group {
           --width: 16.66666666666667%; } }
+      @media (max-width: 1199px) {
+        .lgl-search-container.lgl-search-container.lgl-search-container .lgl-filter-form .lgl-filter-group {
+          --width: 33.33333333333333%;
+          border-bottom: 1px solid var(--lgl-light-gray); } }
       .lgl-search-container.lgl-search-container.lgl-search-container .lgl-filter-form .lgl-filter-group label {
         font-size: 13px;
         color: var(--lgl-dark-gray);
