@@ -85,7 +85,7 @@ jQuery(document).ready(function ($) {
     }
 
     // Handle Wishlist Click (Delegated for dynamic AJAX elements)
-    $(document).on('click', '.bt-car-wishlist-btn', function (e) {
+    $(document).on('click', '.lgl-wishlist-btn', function (e) {
         e.preventDefault();
 
         let $btn = $(this);
