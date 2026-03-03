@@ -645,6 +645,8 @@
     text-transform: capitalize;
     position: relative;
     transition: all 0.3s; }
+    .lgl-tabs--tbnav.lgl-tabs--tbnav .lgl-nav-item span {
+      position: relative; }
     .lgl-tabs--tbnav.lgl-tabs--tbnav .lgl-nav-item:before {
       background: var(--lgl-color-white);
       transform: scale(0);

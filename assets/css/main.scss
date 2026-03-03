@@ -832,6 +832,9 @@
         text-transform: capitalize;
         position: relative;
         transition: all 0.3s;
+        span {
+                position: relative;
+        }
         &:before {
             background: var(--lgl-color-white);
             transform: scale(0);
