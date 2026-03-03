@@ -72,7 +72,7 @@ if (! class_exists('LGL_Shortcodes')) {
 			// Inject page-attributes support into the caravan CPT
 			add_action('init', array($this, 'add_cpt_support'), 20);
 		}
-		
+
 		/**
 		 * Appends additional feature support to externally registered custom post types.
 		 * Specifically injects 'page-attributes' into the 'caravan' CPT to enable the 
