@@ -32,9 +32,36 @@ if (! class_exists('LGL_Shortcodes')) {
 		 * @return void
 		 */
 		public function __construct()
-		{
-			add_action('init', array($this, 'register_shortcodes'));
-		}
+        {
+            add_action('init', array($this, 'register_shortcodes'));
+            add_action('wp_enqueue_scripts', array($this, 'enqueue_assets'));
+        }
+
+        /**
+         * Enqueues plugin-specific stylesheets and scripts.
+         * Utilizes the wp_enqueue_scripts hook for front-end asset loading.
+         *
+         * @return void
+         */
+        public function enqueue_assets()
+        {
+            // Enqueue main stylesheet
+            wp_enqueue_style(
+                'lgl-main-css',
+                LGL_SHORTCODES_URL . 'assets/css/main.css',
+                array(),
+                '1.1.0'
+            );
+
+            // Enqueue main JavaScript file (footer loaded)
+            wp_enqueue_script(
+                'lgl-main-js',
+                LGL_SHORTCODES_URL . 'assets/js/main.js',
+                array('jquery'),
+                '1.1.0',
+                true
+            );
+        }
 
 		/**
 		 * Registers the defined shortcodes with the WordPress Shortcode API.
