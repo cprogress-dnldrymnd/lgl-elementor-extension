@@ -16,6 +16,7 @@ if (! defined('ABSPATH')) {
 // Define a constant for the plugin directory path to ensure reliable file inclusion.
 define('LGL_SHORTCODES_PATH', plugin_dir_path(__FILE__));
 define('LGL_SHORTCODES_URL', plugin_dir_url(__FILE__));
+define('LGL_SHORTCODES_VERSION', '1.1.2');
 
 if (! class_exists('LGL_Shortcodes')) {
 
@@ -60,7 +61,7 @@ if (! class_exists('LGL_Shortcodes')) {
                 'lgl-main-css',
                 LGL_SHORTCODES_URL . 'assets/css/main.css',
                 array(),
-                '1.1.1'
+                LGL_SHORTCODES_VERSION
             );
 
             // Enqueue main JavaScript file (footer loaded)
@@ -68,7 +69,7 @@ if (! class_exists('LGL_Shortcodes')) {
                 'lgl-main-js',
                 LGL_SHORTCODES_URL . 'assets/js/main.js',
                 array('jquery', 'select2-js'),
-                '1.1.1',
+                LGL_SHORTCODES_VERSION,
                 true
             );
 
