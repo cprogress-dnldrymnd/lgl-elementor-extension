@@ -521,4 +521,8 @@
   font-size: 28px;
   font-weight: bold; }
 
+.lgl-sale-top {
+  display: flex;
+  justify-content: space-between; }
+
 /*# sourceMappingURL=main.css.map */

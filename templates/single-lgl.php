@@ -161,7 +161,10 @@ get_header();
                             <div class="lgl-sale-card">
 
                                 <div class="lgl-sale-top">
-                                    <?php the_terms(get_the_ID(), 'car_condition', '<div class="lgl-sale-body">', ', ', '</div>'); ?>
+
+                                    <div class="condition">
+                                        Used
+                                    </div>
 
                                     <div class="lgl-sale-icon-btn">
                                         <a class="lgl-icon-btn lgl-car-share-btn" href="#">
