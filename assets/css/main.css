@@ -362,7 +362,7 @@
   position: fixed;
   top: 20px;
   right: 20px;
-  z-index: 9999;
+  z-index: 99999;
   display: flex;
   flex-direction: column;
   gap: 10px;
@@ -370,11 +370,10 @@
   /* Let clicks pass through */ }
 
 .lgl-toast {
-  background-color: var(--lgl-c-deep-dark-blue);
-  color: var(--lgl-c-pure-white);
+  background-color: var(--lgl-primary);
+  color: var(--lgl-white);
   padding: 16px 24px;
   border-radius: 6px;
-  font-family: var(--lgl-font-primary);
   font-size: 14px;
   font-weight: 500;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
