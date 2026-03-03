@@ -4,7 +4,7 @@
  * The loop content relies on AJAX injection mapping to partials/result-item.php.
  */
 ?>
-<div class="bt-elwg-cars-grid--default lgl-results-wrapper">
+<div class="bt-elwg-cars-grid--default lgl-results-wrapper lgl-holder">
     <div class="lgls-grid-list-template">
         <div class="bt-filter-scroll-pos"></div>
         <div class="lgl-topbar">

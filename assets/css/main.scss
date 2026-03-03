@@ -2,6 +2,7 @@
 // 1. CSS Variables Implementation (Design System)
 // ==========================================================================
 :root {
+    --primary-font: "DM Sans", sans-serif;
     --secondary-font: "Poppins", sans-serif;
     --lgl-light-blue-gray: #ececec;
     --lgl-white: #ffffff;
@@ -21,6 +22,9 @@
 // ==========================================================================
 // 2. Search Filter Form Styles
 // ==========================================================================
+.lgl-holder {
+    font-family: var(--primary-font);
+}
 .lgl-search-container.lgl-search-container.lgl-search-container {
     padding: 32px;
     border-radius: 8px;

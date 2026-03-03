@@ -30,7 +30,7 @@ $makes = get_terms(array(
 ));
 ?>
 
-<div class="lgl-search-container">
+<div class="lgl-search-container lgl-holder">
     <form id="lgl-search-form" class="lgl-filter-form">
         <input type="hidden" name="post_type" id="lgl_target_post_type" value="<?php echo esc_attr($post_type); ?>">
 
