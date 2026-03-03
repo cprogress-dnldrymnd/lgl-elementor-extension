@@ -27,7 +27,8 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      flex-grow: 1; }
+      width: 14.28%;
+      flex: 0 0 14.28%; }
       .lgl-search-container.lgl-search-container.lgl-search-container .lgl-filter-form .lgl-filter-group label {
         font-size: 13px;
         color: var(--lgl-dark-grey-text);
@@ -119,7 +120,9 @@
     .lgl-search-container.lgl-search-container.lgl-search-container .select2-container--default .select2-selection--single {
       border-radius: 0;
       display: flex;
-      align-items: center; }
+      align-items: center;
+      justify-content: center;
+      gap: 10px; }
       .lgl-search-container.lgl-search-container.lgl-search-container .select2-container--default .select2-selection--single .select2-selection__rendered {
         color: var(--lgl-secondary) !important;
         font-size: 16px;
