@@ -321,9 +321,9 @@
                 position: relative;
 
                 .bt-post--body {
+                    background-color: var(--lgl-accent);
                     color: var(--lgl-secondary);
-                    font-family: "Poppins", Sans-serif;
-                    font-size: 0.8em;
+                    font-size: 16px;
                     font-weight: 600;
                     position: absolute;
                     top: 0;
