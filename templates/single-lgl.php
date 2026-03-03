@@ -35,7 +35,6 @@ get_header();
         $map_link = get_field('car_map_link');
         $map_iframe = get_field('car_map_iframe');
         $features = get_field('car_features');
-        $gallery = get_field('car_gallery');
         $dealer = get_field('car_dealer');
         $body_term = get_the_terms(get_the_ID(), 'car_body');
         $body = !empty($body_term) ? array_pop($body_term) : '';
@@ -63,6 +62,11 @@ get_header();
             }
         }
 
+
+
+        $gallery = get_post_meta(get_the_ID(), '_listing_gallery_ids', true);
+
+
         ?>
         <article <?php post_class('bt-post'); ?>>
             <div class="bt-post--wrap">
@@ -82,9 +86,9 @@ get_header();
 
                                 <?php foreach ($gallery as $key => $item) { ?>
                                     <div class="bt-slider-item-wrap">
-                                        <a href="<?php echo esc_url($item['url'])  ?>" class="bt-slider-item elementor-clickable" data-elementor-lightbox-slideshow="bt-gallery-car">
+                                        <a href="<?php echo esc_url(wp_get_attachment_image_url($item, 'full', false))  ?>" class="bt-slider-item elementor-clickable" data-elementor-lightbox-slideshow="bt-gallery-car">
                                             <div class="bt-cover-image">
-                                                <?php echo '<img src="' . esc_url($item['url']) . '" alt="' . esc_html($item['title']) . '" />'; ?>
+                                                <?php echo '<img src="' . esc_url(wp_get_attachment_image_url($item, 'full', false)) . '" alt="' . esc_html(get_the_title($item)) . '" />'; ?>
                                             </div>
                                         </a>
                                     </div>
@@ -106,7 +110,7 @@ get_header();
                                     <div class="bt-slider-item-wrap">
                                         <div class="bt-slider-item">
                                             <div class="bt-cover-image">
-                                                <?php echo '<img src="' . esc_url($item['url']) . '" alt="' . esc_url($item['title']) . '" />'; ?>
+                                                <?php echo '<img src="' . esc_url(wp_get_attachment_image_url($item, 'medium', false)) . '" alt="' . esc_html(get_the_title($item)) . '" />'; ?>
                                             </div>
                                         </div>
                                     </div>
