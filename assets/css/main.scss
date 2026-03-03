@@ -321,6 +321,10 @@
             }
             .bt-post--inner {
                 border: none;
+                height: 100%;
+                display: flex;
+                flex-direction: column;
+                justify-content: space-between;
             }
 
             .bt-post--infor {

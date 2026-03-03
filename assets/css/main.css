@@ -220,7 +220,11 @@
               width: 18px;
               height: 18px; }
       .lgl-results-wrapper .lgl-grid-layout.lgl-grid-layout .bt-post .bt-post--inner {
-        border: none; }
+        border: none;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between; }
       .lgl-results-wrapper .lgl-grid-layout.lgl-grid-layout .bt-post .bt-post--infor {
         padding: 0;
         display: flex;
