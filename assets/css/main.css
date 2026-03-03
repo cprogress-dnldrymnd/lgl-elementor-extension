@@ -460,5 +460,19 @@
       width: calc(66.66% - 15px); }
     #lgl-primary .lgl-holder .lgl-post--wrap .lgl-post--sidebar {
       width: calc(33.33% - 15px); }
+#lgl-primary .lgl-post--gallery .lgl-cover-image {
+  position: relative;
+  overflow: hidden;
+  background: #cdcdcd;
+  padding-bottom: 66.66%;
+  border-radius: 20px; }
+  #lgl-primary .lgl-post--gallery .lgl-cover-image img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover;
+    margin: 0; }
 
 /*# sourceMappingURL=main.css.map */

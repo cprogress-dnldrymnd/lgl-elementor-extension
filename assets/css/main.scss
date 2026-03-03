@@ -621,4 +621,22 @@
             }
         }
     }
+    .lgl-post--gallery {
+        .lgl-cover-image {
+            position: relative;
+            overflow: hidden;
+            background: #cdcdcd;
+            padding-bottom: 66.66%;
+            border-radius: 20px;
+            img {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100% !important;
+                height: 100% !important;
+                object-fit: cover;
+                margin: 0;
+            }
+        }
+    }
 }
