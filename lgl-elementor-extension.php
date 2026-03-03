@@ -58,21 +58,22 @@ final class LGL_Elementor_Extension
 		add_action('plugins_loaded', [$this, 'load_plugin_framework']);
 	}
 	/**
-     * Load internal plugin framework
-     *
-     * Executes the plugin-level framework load as required. 
-     * Hooked to 'plugins_loaded' to ensure the WordPress environment is fully initialized.
-     *
-     * @return void
-     */
-    public function load_plugin_framework()
-    {
-        // Resolves to: /wp-content/plugins/your-plugin-folder/framework/widget-load.php
-        $framework_path = plugin_dir_path( __FILE__ ) . 'framework/widget-load.php';
-        
-        if (file_exists($framework_path)) {
-            require_once $framework_path;
-        }
+	 * Load internal plugin framework
+	 *
+	 * Executes the plugin-level framework load as required. 
+	 * Hooked to 'plugins_loaded' to ensure the WordPress environment is fully initialized.
+	 *
+	 * @return void
+	 */
+	public function load_plugin_framework()
+	{
+		// Resolves to: /wp-content/plugins/your-plugin-folder/framework/widget-load.php
+		$framework_path = plugin_dir_path(__FILE__) . 'framework/widget-load.php';
+
+		if (file_exists($framework_path)) {
+			require_once $framework_path;
+		}
+	}
 
 	/**
 	 * Register Custom Widgets
