@@ -336,16 +336,18 @@
                 }
 
                 .bt-post--price {
-                    font-size: 22px;
+                    font-size: 20px;
                     font-weight: 700;
                     color: var(--lgl-secondary);
-                    margin-bottom: 8px;
+                    margin-bottom: 0;
                 }
 
                 .bt-post--title {
-                    font-size: 18px;
-                    margin: 0 0 20px 0;
+                    font-size: 24px;
+                    margin: 0;
                     line-height: 1.4;
+                    color: var(--lgl-secondary);
+                    font-weight: 600;
 
                     a {
                         color: var(--lgl-dark-gray);
