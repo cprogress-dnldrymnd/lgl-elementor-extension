@@ -550,7 +550,7 @@
 				param_in = $(this).serialize().split('&');
 
 			var param_ajax = {
-				action: 'clwyd_cars_grid_list_filter',
+				action: 'autoart_cars_grid_list_filter',
 			};
 
 			param_in.forEach(function (param) {

@@ -542,7 +542,7 @@ class Widget_CarsGrid extends Widget_Base
 	protected function render()
 	{
 		$settings = $this->get_settings_for_display();
-		$query_args = clwyd_cars_grid_list_query_args($_GET, $settings['orderby'], $settings['order'], $settings['posts_per_page'], $settings['category'], $settings['category_exclude']);
+		$query_args = autoart_cars_grid_list_query_args($_GET, $settings['orderby'], $settings['order'], $settings['posts_per_page'], $settings['category'], $settings['category_exclude']);
 		$wp_query = new \WP_Query($query_args);
 		$current_page = isset($_GET['current_page']) && $_GET['current_page'] != '' ? $_GET['current_page'] : 1;
 		$total_page = $wp_query->max_num_pages;
