@@ -76,16 +76,17 @@
                 color: var(--lgl-secondary);
                 border: none;
                 padding: 16px 32px;
-                font-weight: 800;
-                font-size: 14px;
-                letter-spacing: 0.5px;
+                font-size: 16px;
+                letter-spacing: 0;
                 text-transform: uppercase;
                 border-radius: 6px;
+                font-weight: 600;
                 cursor: pointer;
                 transition:
                     background-color 0.3s ease,
                     transform 0.1s ease;
                 width: 100%;
+                height: ;
                 &:hover {
                     background-color: var(--lgl-secondary);
                 }
@@ -160,10 +161,8 @@
         width: 100% !important;
 
         .select2-selection--single {
-            height: 50px;
-            border: 1px solid var(--lgl-input-border);
+            height: 70px;
             border-radius: 0;
-            background-color: var(--lgl-soft-grey);
             display: flex;
             align-items: center;
 
