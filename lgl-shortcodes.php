@@ -64,20 +64,6 @@ if (! class_exists('LGL_Shortcodes')) {
 			);
 		}
 
-		/**
-		 * Registers the defined shortcodes with the WordPress Shortcode API.
-		 * Routes callbacks to a unified template rendering method.
-		 *
-		 * @return void
-		 */
-		public function register_shortcodes()
-		{
-			// Registering the original shortcode and the new search shortcode
-			add_shortcode('lgl_search_result', array($this, 'render_lgl_search_result'));
-			add_shortcode('lgl_search', array($this, 'render_lgl_search'));
-		}
-
-
 
 		/**
 		 * Registers the defined shortcodes with the WordPress Shortcode API.
