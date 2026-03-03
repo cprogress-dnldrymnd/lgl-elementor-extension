@@ -118,19 +118,20 @@ function add_to_wishlist() {
         }, 3000);
     }
 
-    // Handle Wishlist Click (Delegated for dynamic AJAX elements)
-    jQuery(document).on('click', '.lgl-wishlist-btn', function (e) {
+    // Handle Wishlist Click
+    jQuery(document).on('click', '.bt-car-wishlist-btn', function (e) {
         e.preventDefault();
 
         let $btn = jQuery(this);
         let postId = $btn.data('id');
+        // Retrieve title from the data attribute as requested
+        let postTitle = $btn.data('title');
 
-        // Prevent multiple clicks
         if ($btn.hasClass('processing')) return;
 
         $btn.addClass('processing');
 
-        jQuery.ajax({
+        $.ajax({
             url: lgl_ajax_obj.ajax_url,
             type: 'POST',
             data: {
@@ -142,15 +143,17 @@ function add_to_wishlist() {
                 if (response.success) {
                     if (response.data.status === 'added') {
                         $btn.addClass('added');
+                        showNotification(postTitle + ' added to wishlist!');
                     } else if (response.data.status === 'removed') {
                         $btn.removeClass('added');
+                        showNotification(postTitle + ' removed from wishlist.', 'error'); // Using error type for styling removal
                     }
                 } else {
-                    alert('Error updating wishlist: ' + (response.data || 'Unknown error.'));
+                    showNotification('Error: ' + (response.data || 'Unknown error.'), 'error');
                 }
             },
             error: function () {
-                alert('A server error occurred. Please try again.');
+                showNotification('A server error occurred.', 'error');
             },
             complete: function () {
                 $btn.removeClass('processing');
