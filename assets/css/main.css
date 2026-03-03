@@ -117,7 +117,6 @@
   .lgl-search-container.lgl-search-container.lgl-search-container .select2-container--default {
     width: 100% !important; }
     .lgl-search-container.lgl-search-container.lgl-search-container .select2-container--default .select2-selection--single {
-      height: 70px;
       border-radius: 0;
       display: flex;
       align-items: center; }
