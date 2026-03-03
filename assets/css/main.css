@@ -21,7 +21,8 @@
     gap: 0;
     align-items: center;
     background: #fff;
-    border-radius: 10px; }
+    border-radius: 10px;
+    overflow: hidden; }
     .lgl-search-container.lgl-search-container.lgl-search-container .lgl-filter-form .lgl-filter-group {
       display: flex;
       flex-direction: column;
