@@ -53,7 +53,7 @@
         .lgl-search-container .lgl-filter-form .lgl-filter-group input[type="text"]::placeholder {
           color: #a0a0a0; }
     .lgl-search-container .lgl-filter-form .lgl-submit-group {
-      margin-top: 8px; }
+      padding: 11px; }
       .lgl-search-container .lgl-filter-form .lgl-submit-group .lgl-search-submit {
         background-color: var(--lgl-accent);
         color: var(--lgl-deep-dark-blue);
@@ -66,7 +66,6 @@
         border-radius: 6px;
         cursor: pointer;
         transition: background-color 0.3s ease, transform 0.1s ease;
-        width: fit-content;
         width: 100%; }
         .lgl-search-container .lgl-filter-form .lgl-submit-group .lgl-search-submit:hover {
           background-color: var(--lgl-deep-dark-blue); }
