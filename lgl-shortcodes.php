@@ -455,3 +455,26 @@ if (! class_exists('LGL_Shortcodes')) {
 	// Instantiate the plugin architecture
 	new LGL_Shortcodes();
 }
+
+/**
+ * Converts a comma-separated string into an array of integer values.
+ *
+ * This function handles whitespace around the commas and ensures 
+ * that the resulting array contains strictly integer types. It uses
+ * array_map with a callback to intval after splitting the string.
+ *
+ * @param string $inputString The comma-separated string to convert.
+ * @return int[] Array of integer values.
+ */
+function convertStringToIntArray(string $inputString): array
+{
+	// Return empty array if the string is empty
+	if (trim($inputString) === '') {
+		return [];
+	}
+
+	// Explode the string by comma, trim whitespace, and convert to integer
+	return array_map(function ($value) {
+		return intval(trim($value));
+	}, explode(',', $inputString));
+}

@@ -64,7 +64,7 @@ get_header();
 
 
 
-        $gallery = get_post_meta(get_the_ID(), '_listing_gallery_ids', true);
+        $gallery = convertStringToIntArray(get_post_meta(get_the_ID(), '_listing_gallery_ids', true));
 
 
         ?>
