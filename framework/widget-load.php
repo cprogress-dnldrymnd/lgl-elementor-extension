@@ -29,19 +29,19 @@ class ElementorWidgets
 	{
 		// FIX: Ensure these match the EXACT folder names in /framework/widgets/
 		$this->widgets = array(
-			'car-loop-item', // Changed from 'Widget_CarLoopItem' to match standard naming
-			'cars-compare',
-			'cars-quick-compare',
-			'cars-search',
-			'cars-search-style-1',
-			'cars-search-style-2',
-			'car-loop-item-style-1',
-			'car-loop-item-style-2',
-			'car-loop-item-style-3',
-			'car-loop-item-style-4',
-			'cars-grid-list',
-			'cars-grid',
-			'cars-wishlist'
+			'Widget_CarLoopItem',
+			'Widget_CarLoopItemStyle1',
+			'Widget_CarLoopItemStyle2',
+			'Widget_CarLoopItemStyle3',
+			'Widget_CarLoopItemStyle4',
+			'Widget_CarsCompare',
+			'Widget_CarsGrid',
+			'Widget_CarsGridList',
+			'Widget_CarsQuickCompare',
+			'Widget_CarsSearch',
+			'Widget_CarsSearchStyle1',
+			'Widget_CarsSearchStyle2',
+			'Widget_CarsWishlist',
 		);
 
 		return $this->widgets;
