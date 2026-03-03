@@ -12,7 +12,7 @@
     --lgl-primary: #003793;
     --lgl-secondary: #001537;
     --lgl-accent: #f6d100;
-    --lgl-input-border: #e4ecff;
+    --lgl-light-gray: #e4ecff;
 }
 
 // ==========================================================================
@@ -66,6 +66,9 @@
                 &::placeholder {
                     color: #a0a0a0;
                 }
+            }
+            &:not(:last-child) {
+                border-right: 1px solid var(--lgl-light-gray);
             }
         }
 
