@@ -663,6 +663,7 @@
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
     padding: 25px;
     color: var(--lgl-white);
+    overflow: hidden;
     .lgl-wishlist-btn {
         &.added {
             color: var(--lgl-secondary) !important;
@@ -708,6 +709,9 @@
 .lgl-sale-top {
     display: flex;
     justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
 }
 
 #lgl-primary {
@@ -731,5 +735,22 @@
 }
 
 .lgl-condition {
-
+    background-color: var(--lgl-accent);
+    color: var(--lgl-secondary);
+    line-height: 1;
+    padding: 10px 10px 10px 0;
+    border-radius: 0 5px 5px 0;
+    font-size: 16px;
+    font-weight: 600;
+    font-family: var(--secondary-font);
+    position: absolute;
+    &:before {
+        content: "";
+        width: 30px;
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: -30px;
+        background-color: var(--lgl-accent);
+    }
 }
