@@ -388,7 +388,7 @@
   transform: translateX(0); }
 
 .lgl-toast-success {
-  border-left: 4px solid var(--lgl-c-electric-blue); }
+  border-left: 4px solid var(--lgl-accent-2); }
 
 .lgl-toast-error {
   border-left: 4px solid #dc3545;
