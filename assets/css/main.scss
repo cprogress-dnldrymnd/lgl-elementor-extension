@@ -866,6 +866,10 @@
 .lgl-title-ss {
     display: flex;
     gap: 16px;
+    margin-top: 0;
+    margin-bottom: 50px;
+    font-size: 22px;
+    font-weight: 600;
     &:before {
         content: "";
         width: 5px;
@@ -891,5 +895,9 @@
         align-items: center;
         justify-content: space-between;
         padding: 15px 0;
+        svg {
+            width: 26px;
+            height: 26px;
+        }
     }
 }

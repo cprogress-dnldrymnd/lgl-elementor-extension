@@ -669,7 +669,11 @@
 
 .lgl-title-ss {
   display: flex;
-  gap: 16px; }
+  gap: 16px;
+  margin-top: 0;
+  margin-bottom: 50px;
+  font-size: 22px;
+  font-weight: 600; }
   .lgl-title-ss:before {
     content: "";
     width: 5px;
@@ -691,5 +695,8 @@
     align-items: center;
     justify-content: space-between;
     padding: 15px 0; }
+    .lgl-meta-list .lgl-meta-item svg {
+      width: 26px;
+      height: 26px; }
 
 /*# sourceMappingURL=main.css.map */
