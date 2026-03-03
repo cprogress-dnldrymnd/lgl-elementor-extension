@@ -609,8 +609,8 @@
     }
     .lgl-post--meta.lgl-post--meta {
         svg {
-                width: 30px;
-    height: 30px;
+            width: 30px;
+            height: 30px;
         }
     }
 }
@@ -749,7 +749,7 @@
     font-size: 16px;
     font-weight: 600;
     font-family: var(--secondary-font);
-        position: relative;
+    position: relative;
     &:before {
         content: "";
         width: 30px;
