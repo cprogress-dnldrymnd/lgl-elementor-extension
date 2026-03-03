@@ -3,7 +3,6 @@
 // ==========================================================================
 :root {
     --lgl-light-blue-grey: #ececec;
-    --lgl-deep-dark-blue: #192a3e;
     --lgl-white: #ffffff;
     --lgl-electric-blue: #007bff;
     --lgl-dark-grey-text: #3d3d3d;
@@ -12,6 +11,7 @@
     --lgl-input-border: #e8ecee;
 
     --lgl-primary: #003793;
+    --lgl-deep-dark-blue: #001537;
     --lgl-accent: #f6d100;
 }
 
@@ -77,7 +77,7 @@
 
             .lgl-search-submit {
                 background-color: var( --lgl-accent);
-                color: var(--lgl-white);
+                color: var(--lgl-deep-dark-blue);
                 border: none;
                 padding: 16px 32px;
                 font-weight: 800;
