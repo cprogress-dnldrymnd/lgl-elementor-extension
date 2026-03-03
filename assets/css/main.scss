@@ -856,3 +856,10 @@
         }
     }
 }
+
+
+.lgl-panel-item {
+    &:not(.lgl-is-active) {
+        display: none;
+    }
+}

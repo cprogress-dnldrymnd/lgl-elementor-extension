@@ -664,4 +664,7 @@
       .lgl-tabs--tbnav.lgl-tabs--tbnav .lgl-nav-item.lgl-is-active:before {
         transform: scale(1); }
 
+.lgl-panel-item:not(.lgl-is-active) {
+  display: none; }
+
 /*# sourceMappingURL=main.css.map */
