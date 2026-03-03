@@ -250,8 +250,7 @@
         .lgl-results-wrapper .lgl-grid-layout.lgl-grid-layout .bt-post .bt-post--infor .bt-post--meta {
           border-top: 1px solid var(--lgl-medium-gray);
           border-bottom: 1px solid var(--lgl-medium-gray);
-          padding: 16px 0;
-          margin-bottom: 20px;
+          padding: 0;
           margin-top: auto; }
           .lgl-results-wrapper .lgl-grid-layout.lgl-grid-layout .bt-post .bt-post--infor .bt-post--meta .bt-post--meta-row {
             display: flex;
