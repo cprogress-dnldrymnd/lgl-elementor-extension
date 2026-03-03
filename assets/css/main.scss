@@ -18,7 +18,7 @@
 // ==========================================================================
 // 2. Search Filter Form Styles
 // ==========================================================================
-.lgl-search-container {
+.lgl-search-container.lgl-search-container.lgl-search-container {
     padding: 32px;
     border-radius: 8px;
     margin-bottom: 40px;
@@ -86,7 +86,6 @@
                     background-color 0.3s ease,
                     transform 0.1s ease;
                 width: 100%;
-                height: ;
                 &:hover {
                     background-color: var(--lgl-secondary);
                 }
