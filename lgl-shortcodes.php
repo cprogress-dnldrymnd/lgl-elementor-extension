@@ -73,49 +73,53 @@ if (! class_exists('LGL_Shortcodes')) {
 
 		/**
 		 * Injects the plugin's custom templates into the WordPress backend 'Post Attributes' dropdown.
+		 * Includes a type-safe check to prevent array_merge fatal errors.
 		 *
-		 * @param array $templates The existing array of templates available for the post type.
+		 * @param mixed $templates The existing templates available for the post type.
 		 * @return array The merged array containing the plugin templates.
 		 */
 		public function register_plugin_templates($templates)
 		{
-			// Merge existing theme templates with our plugin templates
-			$templates = array_merge($templates, $this->custom_templates);
-			return $templates;
+			// Enforce array type before merging to prevent fatal errors
+			if (!is_array($templates)) {
+				$templates = array();
+			}
+
+			return array_merge($templates, $this->custom_templates);
 		}
 
 		/**
-         * Intercepts the WordPress template hierarchy to load the custom file from the plugin directory
-         * if the user has selected it in the backend.
-         *
-         * @param string $template The path to the default template WordPress intends to load.
-         * @return string The overridden template path if conditions are met, otherwise the default.
-         */
-        public function load_plugin_template($template)
-        {
-            global $post;
+		 * Intercepts the WordPress template hierarchy to load the custom file from the plugin directory
+		 * if the user has selected it in the backend. Strictly isolates to singular views.
+		 *
+		 * @param string $template The path to the default template WordPress intends to load.
+		 * @return string The overridden template path if conditions are met, otherwise the default.
+		 */
+		public function load_plugin_template($template)
+		{
+			global $post;
 
-            // Failsafe: return default if no post context exists
-            if (!$post) {
-                return $template;
-            }
+			// Strict context check: Only intercept on singular views where a valid post object exists.
+			if (!is_singular() || !$post) {
+				return $template;
+			}
 
-            // Retrieve the saved template assigned to this specific post
-            $saved_template = get_post_meta($post->ID, '_wp_page_template', true);
+			// Retrieve the saved template assigned to this specific post
+			$saved_template = get_post_meta($post->ID, '_wp_page_template', true);
 
-            // Check if the saved template belongs to our plugin array
-            if (isset($this->custom_templates[$saved_template])) {
-                // Construct path to the plugin's /templates/ directory
-                $plugin_template = LGL_SHORTCODES_PATH . 'templates/' . $saved_template;
+			// Check if the saved template belongs to our plugin array
+			if (isset($this->custom_templates[$saved_template])) {
+				// Construct path to the plugin's /templates/ directory
+				$plugin_template = LGL_SHORTCODES_PATH . 'templates/' . $saved_template;
 
-                // Load plugin template if it exists, otherwise fallback to theme default
-                if (file_exists($plugin_template)) {
-                    return $plugin_template;
-                }
-            }
+				// Load plugin template if it exists, otherwise fallback to theme default
+				if (file_exists($plugin_template)) {
+					return $plugin_template;
+				}
+			}
 
-            return $template;
-        }
+			return $template;
+		}
 
 		/**
 		 * Enqueues plugin-specific stylesheets and scripts.
