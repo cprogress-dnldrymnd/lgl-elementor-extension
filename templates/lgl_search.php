@@ -58,7 +58,6 @@ $makes = get_terms(array(
         </div>
 
         <div class="lgl-filter-group lgl-price-group">
-            <label>Price</label>
             <input type="number" name="price_min" id="lgl_price_min" placeholder="Min Price">
             <input type="number" name="price_max" id="lgl_price_max" placeholder="Max Price">
         </div>
