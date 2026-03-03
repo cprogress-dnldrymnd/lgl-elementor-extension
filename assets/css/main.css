@@ -569,7 +569,7 @@
   font-size: 16px;
   font-weight: 600;
   font-family: var(--secondary-font);
-  position: absolute; }
+  position: relative; }
   .lgl-condition:before {
     content: "";
     width: 30px;
