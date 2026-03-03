@@ -124,9 +124,9 @@ class ElementorWidgets
 	{
 
 		$elements_manager->add_category(
-			'autoart',
+			'clwyd',
 			[
-				'title' => esc_html__('AutoArt', 'autoart')
+				'title' => esc_html__('Clwyd', 'clwyd')
 			]
 		);
 	}
