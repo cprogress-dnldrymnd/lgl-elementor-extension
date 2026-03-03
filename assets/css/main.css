@@ -616,7 +616,8 @@
     border-color: var(--lgl-accent); }
     .lgl-btn.lgl-btn-accent:hover {
       background-color: var(--lgl-secondary);
-      border-color: var(--lgl-secondary); }
+      border-color: var(--lgl-secondary);
+      color: var(--lgl-accent); }
   .lgl-btn.lgl-btn-outline {
     color: var(--lgl-secondary);
     border-color: var(--lgl-secondary); }
