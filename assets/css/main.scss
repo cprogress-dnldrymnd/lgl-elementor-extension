@@ -800,7 +800,7 @@
         &:hover {
             background-color: var(--lgl-secondary);
             border-color: var(--lgl-secondary);
-        color: var(--lgl-accent);
+            color: var(--lgl-accent);
         }
     }
     &.lgl-btn-outline {
@@ -809,6 +809,46 @@
         &:hover {
             background-color: var(--lgl-secondary);
             color: var(--lgl-tertiary);
+        }
+    }
+}
+
+.lgl-tabs--tbnav.lgl-tabs--tbnav {
+    border-radius: 20px 20px 0px 0px;
+    background-color: var(--lgl-secondary);
+    padding: 20px;
+    display: flex;
+    flex-wrap: wrap;
+    .lgl-nav-item {
+        color: #fff;
+        font-family: "DM Sans";
+        font-size: 20px;
+        font-style: normal;
+        font-weight: 700;
+        line-height: normal;
+        padding: 17px 32px;
+        display: inline-block;
+        box-sizing: border-box;
+        text-transform: capitalize;
+        position: relative;
+        transition: all 0.3s;
+        &:before {
+            background: var(--lgl-white);
+            transform: scale(0);
+            content: "";
+            display: block;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            transition: all 0.3s;
+            border-radius: 10px;
+        }
+        &.lgl-is-active {
+            &:before {
+                transform: scale(1);
+            }
         }
     }
 }
