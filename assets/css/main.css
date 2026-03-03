@@ -17,10 +17,12 @@
   padding: 30px; }
   .lgl-search-container .lgl-filter-form {
     display: flex;
-    gap: 24px; }
+    gap: 0;
+    align-items: center; }
     .lgl-search-container .lgl-filter-form .lgl-filter-group {
       display: flex;
-      flex-direction: column; }
+      flex-direction: column;
+      align-items: center; }
       .lgl-search-container .lgl-filter-form .lgl-filter-group label {
         font-size: 13px;
         color: var(--lgl-c-dark-grey-text);

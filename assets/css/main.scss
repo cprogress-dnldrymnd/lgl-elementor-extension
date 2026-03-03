@@ -24,12 +24,12 @@
     padding: 30px;
     .lgl-filter-form {
         display: flex;
-        gap: 24px;
-
+        gap: 0;
+        align-items: center;
         .lgl-filter-group {
             display: flex;
             flex-direction: column;
-
+            align-items: center;
             label {
                 font-size: 13px;
                 color: var(--lgl-c-dark-grey-text);
