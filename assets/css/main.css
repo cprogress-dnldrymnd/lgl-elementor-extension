@@ -474,5 +474,11 @@
     height: 100% !important;
     object-fit: cover;
     margin: 0; }
+#lgl-primary .lgl-post--gallery .lgl-slider-nav {
+  margin-left: -10px;
+  margin-right: -10px; }
+#lgl-primary .lgl-post--gallery .lgl-slider-item {
+  padding-left: 10px;
+  padding-right: 10px; }
 
 /*# sourceMappingURL=main.css.map */
