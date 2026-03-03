@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Template for rendering the search filter form.
  * * Available variables:
@@ -32,7 +33,7 @@ $makes = get_terms(array(
 <div class="lgl-search-container">
     <form id="lgl-search-form" class="lgl-filter-form">
         <input type="hidden" name="post_type" id="lgl_target_post_type" value="<?php echo esc_attr($post_type); ?>">
-        
+
         <div class="lgl-filter-group">
             <label for="lgl_make">Make</label>
             <select name="listing_make" id="lgl_make" class="lgl-select2" data-placeholder="Select Make">
@@ -70,22 +71,26 @@ $makes = get_terms(array(
             </select>
         </div>
 
-        <div class="lgl-filter-group lgl-price-group">
+        <div class="lgl-filter-group">
+            <label for="lgl_berth">Min Price</label>
             <select name="price_min" id="lgl_price_min" class="lgl-select2" data-placeholder="Min Price">
                 <option value="">Min Price</option>
                 <?php foreach ($prices as $price) : ?>
                     <option value="<?php echo esc_attr($price); ?>"><?php echo esc_html('$' . number_format($price, 0)); ?></option>
                 <?php endforeach; ?>
             </select>
-            
-            <select name="price_max" id="lgl_price_max" class="lgl-select2" data-placeholder="Max Price">
-                <option value="">Max Price</option>
-                <?php foreach ($prices as $price) : ?>
-                    <option value="<?php echo esc_attr($price); ?>"><?php echo esc_html('$' . number_format($price, 0)); ?></option>
-                <?php endforeach; ?>
-            </select>
+        </div>
+        <div class="lgl-filter-group">
+            <label for="lgl_berth">Min Price</label>
+            <select name="price_min" id="lgl_price_min" class="lgl-select2" data-placeholder="Min Price"> <select name="price_max" id="lgl_price_max" class="lgl-select2" data-placeholder="Max Price">
+                    <option value="">Max Price</option>
+                    <?php foreach ($prices as $price) : ?>
+                        <option value="<?php echo esc_attr($price); ?>"><?php echo esc_html('$' . number_format($price, 0)); ?></option>
+                    <?php endforeach; ?>
+                </select>
         </div>
 
+      
         <div class="lgl-filter-group lgl-submit-group">
             <button type="submit" class="lgl-search-submit">Search Now</button>
         </div>
