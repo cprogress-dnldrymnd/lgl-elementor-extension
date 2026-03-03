@@ -82,7 +82,7 @@ $makes = get_terms(array(
             </select>
         </div>
 
-        <div class="lgl-filter-grou">
+        <div class="lgl-filter-group">
 
             <select name="price_max" id="lgl_price_max" class="lgl-select2" data-placeholder="Max Price">
                 <option value="">Max Price</option>
