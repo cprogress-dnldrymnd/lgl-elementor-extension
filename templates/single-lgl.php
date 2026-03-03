@@ -36,8 +36,7 @@ $post_id = get_the_ID();
         $dealer = get_field('car_dealer');
         $body_term = get_the_terms($post_id, 'car_body');
         $body = !empty($body_term) ? array_pop($body_term) : '';
-        $condition_term = get_the_terms($post_id, 'car_condition');
-        $condition = !empty($condition_term) ? array_pop($condition_term) : '';
+
         $make_term = get_the_terms($post_id, 'car_make');
         $make = !empty($make_term) ? array_pop($make_term) : '';
         $model_term = get_the_terms($post_id, 'car_model');
@@ -67,6 +66,7 @@ $post_id = get_the_ID();
         $berth = get_post_meta($post_id, 'berth', true);
         $mileage = get_post_meta($post_id, 'mileage', true);
         $year = get_post_meta($post_id, 'year', true);
+        $condition = get_post_meta($post_id, 'condition', true);
 
         ?>
         <article <?php post_class('lgl-post'); ?>>
@@ -163,8 +163,8 @@ $post_id = get_the_ID();
 
                                 <div class="lgl-sale-top">
 
-                                    <div class="condition">
-                                        Used
+                                    <div class="lgl-condition">
+                                        <?php echo esc_html($condition); ?>
                                     </div>
 
                                     <div class="lgl-sale-icon-btn">
