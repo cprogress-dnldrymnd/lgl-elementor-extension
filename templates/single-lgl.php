@@ -61,10 +61,10 @@ get_header();
 
 
         $gallery = convertStringToIntArray(get_post_meta(get_the_ID(), '_listing_gallery_ids', true));
-        $price = get_post_meta($post_id, 'price', true);
-        $berth = get_post_meta($post_id, 'berth', true);
-        $mileage = get_post_meta($post_id, 'mileage', true);
-        $year = get_post_meta($post_id, 'year', true);
+        $price = get_post_meta(get_the_ID(), 'price', true);
+        $berth = get_post_meta(get_the_ID(), 'berth', true);
+        $mileage = get_post_meta(get_the_ID(), 'mileage', true);
+        $year = get_post_meta(get_the_ID(), 'year', true);
 
         ?>
         <article <?php post_class('lgl-post'); ?>>
