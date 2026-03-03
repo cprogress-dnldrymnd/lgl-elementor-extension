@@ -163,7 +163,7 @@ $post_id = get_the_ID();
 
                                 <div class="lgl-sale-top">
 
-                                    <div class="lgl-condition">
+                                    <div class="lgl-condition-tag">
                                         <?php echo esc_html($condition); ?>
                                     </div>
 
