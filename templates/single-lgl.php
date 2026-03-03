@@ -339,7 +339,7 @@ $post_id = get_the_ID();
                     <?php } ?>
                     <?php if (!empty($feature)) { ?>
                         <a href="#bt_panel_interior" class="lgl-nav-item">
-                            <span><?php echo esc_html__('Interior features', 'lgl'); ?></span>
+                            <span><?php echo esc_html__('Features', 'lgl'); ?></span>
                         </a>
                     <?php } ?>
                 
@@ -561,7 +561,7 @@ $post_id = get_the_ID();
                         <div id="bt_panel_interior" class="lgl-panel-item lgl-panel-interior">
                             <div class="lgl-panel-item--inner">
                                 <h3 class="lgl-title-ss">
-                                    <span><?php echo esc_html__('Interior features', 'lgl'); ?></span>
+                                    <span><?php echo esc_html__('Features', 'lgl'); ?></span>
                                 </h3>
                                 <div class="lgl-content-ss">
                                     <?php echo wp_kses_post($feature); ?>
