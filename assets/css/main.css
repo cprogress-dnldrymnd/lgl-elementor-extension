@@ -235,16 +235,18 @@
           font-weight: 700;
           color: var(--lgl-secondary);
           margin-bottom: 0; }
-        .lgl-results-wrapper .lgl-grid-layout.lgl-grid-layout .bt-post .bt-post--infor .bt-post--title a {
-          font-size: 24px;
-          margin: 0;
-          line-height: 1.4;
-          color: var(--lgl-secondary);
-          font-weight: 600;
-          text-decoration: none;
-          transition: color 0.3s ease; }
-          .lgl-results-wrapper .lgl-grid-layout.lgl-grid-layout .bt-post .bt-post--infor .bt-post--title a:hover {
-            color: var(--lgl-electric-blue); }
+        .lgl-results-wrapper .lgl-grid-layout.lgl-grid-layout .bt-post .bt-post--infor .bt-post--title {
+          margin: 0; }
+          .lgl-results-wrapper .lgl-grid-layout.lgl-grid-layout .bt-post .bt-post--infor .bt-post--title a {
+            font-size: 24px;
+            margin: 0;
+            line-height: 1.4;
+            color: var(--lgl-secondary);
+            font-weight: 600;
+            text-decoration: none;
+            transition: color 0.3s ease; }
+            .lgl-results-wrapper .lgl-grid-layout.lgl-grid-layout .bt-post .bt-post--infor .bt-post--title a:hover {
+              color: var(--lgl-electric-blue); }
         .lgl-results-wrapper .lgl-grid-layout.lgl-grid-layout .bt-post .bt-post--infor .bt-post--meta {
           border-top: 1px solid var(--lgl-medium-gray);
           border-bottom: 1px solid var(--lgl-medium-gray);
