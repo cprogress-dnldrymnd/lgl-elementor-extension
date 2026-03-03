@@ -537,3 +537,64 @@
 .lgl-toast-error {
     border-left: 4px solid #dc3545; /* Standard red for removal/errors */
 }
+
+// Pagination Styling mapped to Design System
+.lgl-pagination-wrap {
+    margin-top: 50px;
+    width: 100%;
+    transition: opacity 0.3s ease;
+
+    .page-numbers {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        gap: 12px;
+
+        li {
+            a,
+            span {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                width: 44px;
+                height: 44px;
+                border-radius: 6px;
+                background-color: var(--lgl-soft-gray);
+                color: var(--lgl-secondary);
+                font-weight: 600;
+                font-size: 16px;
+                text-decoration: none;
+                transition: all 0.3s ease;
+                font-family: var(--primary-font);
+
+                &.current {
+                    background-color: var(--lgl-primary);
+                    color: var(--lgl-white);
+                    box-shadow: 0 4px 10px rgba(0, 55, 147, 0.2);
+                }
+
+                &:hover:not(.current) {
+                    background-color: var(--lgl-electric-blue);
+                    color: var(--lgl-white);
+                    transform: translateY(-2px);
+                }
+
+                &.prev,
+                &.next {
+                    width: auto;
+                    padding: 0 16px;
+                    background-color: transparent;
+                    color: var(--lgl-primary);
+
+                    &:hover {
+                        color: var(--lgl-electric-blue);
+                        background-color: transparent;
+                    }
+                }
+            }
+        }
+    }
+}

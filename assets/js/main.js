@@ -11,10 +11,13 @@
 
     /**
          * Initializes the search form features.
-         * Binds Select2, handles dependent make/model dropdowns, and manages the AJAX submission for search queries.
-         * * @return {void}
+         * Binds Select2, handles dependent make/model dropdowns, and manages the AJAX submission and pagination UI.
+         *
+         * @return void
          */
     function search_form() {
+        let currentPage = 1;
+
         // Initialize Select2 on target classes
         $('.lgl-select2').select2({
             width: '100%'
@@ -43,19 +46,43 @@
                                 $model_select.append(new Option(item.text, item.id, false, false));
                             });
                             $model_select.prop('disabled', false).trigger('change');
-                            let visibleCount = $('#lgl-results-grid .bt-post').length;
-                            let totalCount = response.data.count;
-                            $('#lgl-results-count').html('Showing ' + visibleCount + ' of ' + totalCount + ' results');
                         }
                     }
                 });
             }
         });
 
-        // Handle Search Execution
+        // Handle Search Execution (Reset to Page 1 on strict filter changes)
         $('#lgl-search-form, #lgl-sort-order').on('submit change', function (e) {
             if (e.type === 'submit') e.preventDefault();
+            currentPage = 1;
+            execute_search();
+        });
 
+        // Intercept standard WordPress pagination clicks for AJAX handling
+        $(document).on('click', '.lgl-pagination-wrap a.page-numbers', function (e) {
+            e.preventDefault();
+
+            let href = $(this).attr('href');
+            let match = href.match(/paged=(\d+)/);
+
+            if (match) {
+                currentPage = parseInt(match[1], 10);
+                execute_search();
+
+                // UX: Scroll back to top of results when paginating
+                $('html, body').animate({
+                    scrollTop: $('.lgl-results-wrapper').offset().top - 40
+                }, 400);
+            }
+        });
+
+        /**
+         * Compiles form parameters and dispatches the AJAX search payload.
+         *
+         * @return void
+         */
+        function execute_search() {
             // Serialize primary form and combine with sorting value
             let formData = $('#lgl-search-form').serialize() + '&sort_order=' + $('#lgl-sort-order').val();
             let postType = $('#lgl_target_post_type').val();
@@ -63,6 +90,7 @@
             // UI State management
             $('#lgl-loader').show();
             $('#lgl-results-grid').css('opacity', '0.5');
+            $('.lgl-pagination-wrap').css('opacity', '0.5');
 
             $.ajax({
                 url: lgl_ajax_obj.ajax_url,
@@ -71,12 +99,17 @@
                     action: 'lgl_fetch_results',
                     nonce: lgl_ajax_obj.nonce,
                     post_type: postType,
-                    form_data: formData
+                    form_data: formData,
+                    paged: currentPage
                 },
                 success: function (response) {
                     if (response.success) {
                         $('#lgl-results-grid').html(response.data.html);
-                        $('#lgl-results-count').html('Showing ' + response.data.count + ' results');
+                        $('.lgl-pagination-wrap').html(response.data.pagination);
+
+                        // Update UI string dynamically
+                        let visibleCount = $('#lgl-results-grid .bt-post').length;
+                        $('#lgl-results-count').html('Showing ' + visibleCount + ' of ' + response.data.count + ' results');
                     } else {
                         alert('Error fetching results.');
                     }
@@ -87,15 +120,15 @@
                 complete: function () {
                     $('#lgl-loader').hide();
                     $('#lgl-results-grid').css('opacity', '1');
+                    $('.lgl-pagination-wrap').css('opacity', '1');
                 }
             });
-        });
+        }
 
         // Trigger initial search to populate grid on load
         if ($('#lgl-search-form').length) {
-            $('#lgl-search-form').trigger('submit');
+            execute_search();
         }
-
     }
 
     /**
