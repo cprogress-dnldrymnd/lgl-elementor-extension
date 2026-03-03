@@ -3,9 +3,11 @@
  * Handles Select2 initialization and AJAX operations.
  */
 jQuery(document).ready(function ($) {
+    search_form();
+    add_to_wishlist();
+});
 
-
-
+function search_form() {
     // Initialize Select2 on target classes
     $('.lgl-select2').select2({
         width: '100%'
@@ -84,6 +86,38 @@ jQuery(document).ready(function ($) {
         $('#lgl-search-form').trigger('submit');
     }
 
+}
+
+function add_to_wishlist() {
+    // Add Notification Container to Body
+    $('body').append('<div id="lgl-notification-container"></div>');
+
+    /**
+     * Display a toast notification.
+     * @param {string} message - The message to display.
+     * @param {string} type - 'success' or 'error' for styling.
+     */
+    function showNotification(message, type = 'success') {
+        const $container = $('#lgl-notification-container');
+        const $notification = $('<div class="lgl-toast lgl-toast-' + type + '">' + message + '</div>');
+
+        $container.append($notification);
+
+        // Trigger reflow for transition
+        $notification[0].offsetHeight;
+
+        // Show
+        $notification.addClass('show');
+
+        // Remove after 3 seconds
+        setTimeout(function () {
+            $notification.removeClass('show');
+            setTimeout(function () {
+                $notification.remove();
+            }, 300); // Matches CSS transition duration
+        }, 3000);
+    }
+
     // Handle Wishlist Click (Delegated for dynamic AJAX elements)
     $(document).on('click', '.lgl-wishlist-btn', function (e) {
         e.preventDefault();
@@ -123,5 +157,4 @@ jQuery(document).ready(function ($) {
             }
         });
     });
-});
-
+}
