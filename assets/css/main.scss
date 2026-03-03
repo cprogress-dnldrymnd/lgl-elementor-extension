@@ -238,8 +238,8 @@
     // Grid Architecture
     .lgl-grid-layout.lgl-grid-layout {
         display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-        gap: 32px;
+        grid-template-columns: repeat(auto-fill, minmax(418px, 1fr));
+        gap: 24px;
         transition: opacity 0.3s ease; // For AJAX loading state
 
         // Individual Result Card
