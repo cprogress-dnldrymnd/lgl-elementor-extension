@@ -2,35 +2,35 @@
 // 1. CSS Variables Implementation (Design System)
 // ==========================================================================
 :root {
-    --primary-font: "DM Sans", sans-serif;
-    --secondary-font: "Poppins", sans-serif;
-    --lgl-light-blue-gray: #ececec;
-    --lgl-white: #ffffff;
-    --lgl-electric-blue: #007bff;
-    --lgl-soft-gray: #f5f5f5;
+    --lgl-font-primary: "DM Sans", sans-serif;
+    --lgl-font-secondary: "Poppins", sans-serif;
+    --lgl-color-light-blue-gray: #ececec;
+    --lgl-color-white: #ffffff;
+    --lgl-color-electric-blue: #007bff;
+    --lgl-color-soft-gray: #f5f5f5;
 
-    --lgl-primary: #003793;
-    --lgl-secondary: #001537;
-    --lgl-tertiary: #00e6f6;
-    --lgl-accent: #f6d100;
-    --lgl-light-gray: #e4ecff;
-    --lgl-medium-gray: #d9d9d9;
-    --lgl-dark-gray: #555;
-    --lgl-gray: #969696;
-    --lgl-light-blue: #f7faff;
+    --lgl-color-primary: #003793;
+    --lgl-color-secondary: #001537;
+    --lgl-color-tertiary: #00e6f6;
+    --lgl-color-accent: #f6d100;
+    --lgl-color-light-gray: #e4ecff;
+    --lgl-color-medium-gray: #d9d9d9;
+    --lgl-color-dark-gray: #555;
+    --lgl-color-gray: #969696;
+    --lgl-color-light-blue: #f7faff;
 }
 
 // ==========================================================================
 // 2. Search Filter Form Styles
 // ==========================================================================
 .lgl-holder {
-    font-family: var(--primary-font);
+    font-family: var(--lgl-font-primary);
 }
 .lgl-search-container.lgl-search-container.lgl-search-container {
     padding: 32px;
     border-radius: 8px;
     margin-bottom: 40px;
-    background-color: var(--lgl-primary);
+    background-color: var(--lgl-color-primary);
     padding: 30px;
     .lgl-filter-form {
         display: flex;
@@ -53,7 +53,7 @@
             }
             @media (max-width: 1199px) {
                 --width: 33.33333333333333%;
-                border-bottom: 1px solid var(--lgl-light-gray);
+                border-bottom: 1px solid var(--lgl-color-light-gray);
             }
             @media (max-width: 1024px) {
                 --width: 50%;
@@ -63,7 +63,7 @@
             }
             label {
                 font-size: 13px;
-                color: var(--lgl-dark-gray);
+                color: var(--lgl-color-dark-gray);
                 margin-bottom: 8px;
                 font-weight: 500;
                 opacity: 0.8;
@@ -76,14 +76,14 @@
                 width: 100%;
                 padding: 14px 16px;
                 border-radius: 0;
-                color: var(--lgl-dark-gray);
+                color: var(--lgl-color-dark-gray);
                 font-size: 14px;
                 transition:
                     border-color 0.3s ease,
                     box-shadow 0.3s ease;
 
                 &:focus {
-                    border-color: var(--lgl-electric-blue);
+                    border-color: var(--lgl-color-electric-blue);
                     outline: none;
                     box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
                 }
@@ -93,7 +93,7 @@
                 }
             }
             &:not(:last-child) {
-                border-right: 1px solid var(--lgl-light-gray);
+                border-right: 1px solid var(--lgl-color-light-gray);
             }
         }
 
@@ -101,8 +101,8 @@
         .lgl-submit-group {
             padding: 11px;
             .lgl-search-submit {
-                background-color: var(--lgl-accent);
-                color: var(--lgl-secondary);
+                background-color: var(--lgl-color-accent);
+                color: var(--lgl-color-secondary);
                 border: none;
                 padding: 16px 32px;
                 font-size: 16px;
@@ -117,8 +117,8 @@
                 width: 100%;
                 line-height: 1;
                 &:hover {
-                    background-color: var(--lgl-secondary);
-                    color: var(--lgl-white);
+                    background-color: var(--lgl-color-secondary);
+                    color: var(--lgl-color-white);
                 }
 
                 &:active {
@@ -137,7 +137,7 @@
         align-items: center;
 
         .select2-selection__placeholder {
-            color: var(--lgl-secondary);
+            color: var(--lgl-color-secondary);
         }
         @media (max-width: 991px) {
             padding-left: 15px;
@@ -200,7 +200,7 @@
             justify-content: center;
             gap: 10px;
             .select2-selection__rendered {
-                color: var(--lgl-secondary) !important;
+                color: var(--lgl-color-secondary) !important;
                 font-size: 16px;
                 padding-left: 16px;
                 font-weight: 600;
@@ -212,14 +212,14 @@
                 right: 12px;
 
                 b {
-                    border-color: var(--lgl-dark-gray) transparent transparent transparent;
+                    border-color: var(--lgl-color-dark-gray) transparent transparent transparent;
                     border-width: 5px 4px 0 4px;
                 }
             }
         }
 
         &.select2-container--open .select2-selection--single {
-            border-color: var(--lgl-electric-blue);
+            border-color: var(--lgl-color-electric-blue);
         }
     }
 }
@@ -235,13 +235,13 @@
         display: flex;
         justify-content: space-between;
         align-items: center;
-        border-bottom: 1px solid var(--lgl-medium-gray);
+        border-bottom: 1px solid var(--lgl-color-medium-gray);
         padding-bottom: 40px;
         margin-bottom: 50px;
         font-weight: 600;
 
         .lgl-results-block {
-            color: var(--lgl-dark-gray);
+            color: var(--lgl-color-dark-gray);
             font-size: 16px;
         }
 
@@ -250,7 +250,7 @@
             align-items: center;
             gap: 12px;
             font-size: 14px;
-            color: var(--lgl-dark-gray);
+            color: var(--lgl-color-dark-gray);
 
             // Micro-adjustment for Sort Select2
             .select2-container--default .select2-selection--single {
@@ -271,8 +271,8 @@
         }
         // Individual Result Card
         .lgl-post {
-            background-color: var(--lgl-white);
-            border: 1px solid var(--lgl-medium-gray);
+            background-color: var(--lgl-color-white);
+            border: 1px solid var(--lgl-color-medium-gray);
             border-radius: 8px;
             overflow: hidden;
             display: flex;
@@ -315,8 +315,8 @@
                     gap: 8px;
 
                     a {
-                        background: var(--lgl-white);
-                        color: var(--lgl-primary);
+                        background: var(--lgl-color-white);
+                        color: var(--lgl-color-primary);
                         border-radius: 50%;
                         width: 42px;
                         height: 42px;
@@ -329,12 +329,12 @@
                             transform 0.2s ease;
 
                         &:hover {
-                            color: var(--lgl-electric-blue);
+                            color: var(--lgl-color-electric-blue);
                             transform: scale(1.05);
                         }
                         &.added {
-                            color: var(--lgl-tertiary);
-                            background: var(--lgl-secondary);
+                            color: var(--lgl-color-tertiary);
+                            background: var(--lgl-color-secondary);
                         }
 
                         svg {
@@ -360,8 +360,8 @@
                 position: relative;
 
                 .lgl-post--body {
-                    background-color: var(--lgl-accent);
-                    color: var(--lgl-secondary);
+                    background-color: var(--lgl-color-accent);
+                    color: var(--lgl-color-secondary);
                     font-size: 16px;
                     font-weight: 600;
                     position: absolute;
@@ -375,7 +375,7 @@
                 .lgl-post--price {
                     font-size: 20px;
                     font-weight: 700;
-                    color: var(--lgl-secondary);
+                    color: var(--lgl-color-secondary);
                     margin-bottom: 0;
                     @media (max-width: 480px) {
                         font-size: 16px;
@@ -388,13 +388,13 @@
                         font-size: 24px;
                         margin: 0;
                         line-height: 1.4;
-                        color: var(--lgl-secondary);
+                        color: var(--lgl-color-secondary);
                         font-weight: 600;
                         text-decoration: none;
                         transition: color 0.3s ease;
 
                         &:hover {
-                            color: var(--lgl-electric-blue);
+                            color: var(--lgl-color-electric-blue);
                         }
                     }
                     @media (max-width: 480px) {
@@ -407,18 +407,18 @@
                         display: flex;
                         align-items: center;
                         justify-content: center;
-                        background-color: var(--lgl-primary);
+                        background-color: var(--lgl-color-primary);
                         font-weight: 600;
                         text-decoration: none;
                         font-size: 16px;
                         text-transform: uppercase;
                         transition: color 0.3s ease;
-                        color: var(--lgl-tertiary);
+                        color: var(--lgl-color-tertiary);
                         padding: 20px;
                         gap: 13px;
-                        font-family: var(--secondary-font);
+                        font-family: var(--lgl-font-secondary);
                         &:hover {
-                            background-color: var(--lgl-secondary);
+                            background-color: var(--lgl-color-secondary);
                         }
 
                         svg {
@@ -433,8 +433,8 @@
 }
 // Meta Specs (Year, Mileage, Berth)
 .lgl-post--meta.lgl-post--meta {
-    border-top: 1px solid var(--lgl-medium-gray);
-    border-bottom: 1px solid var(--lgl-medium-gray);
+    border-top: 1px solid var(--lgl-color-medium-gray);
+    border-bottom: 1px solid var(--lgl-color-medium-gray);
     padding: 0;
     margin-top: auto; // Push to bottom of flex container
 
@@ -447,7 +447,7 @@
             text-align: center;
 
             &:not(:last-child) {
-                border-right: 1px solid var(--lgl-medium-gray);
+                border-right: 1px solid var(--lgl-color-medium-gray);
             }
         }
 
@@ -455,11 +455,11 @@
             display: flex;
             justify-content: center;
             font-size: 12px;
-            color: var(--lgl-secondary);
+            color: var(--lgl-color-secondary);
             padding: 12px 16px;
             gap: 10px;
             svg {
-                fill: var(--lgl-secondary);
+                fill: var(--lgl-color-secondary);
             }
             .label-val {
                 display: flex;
@@ -473,7 +473,7 @@
             .lgl-label {
                 margin-bottom: 2px;
                 font-size: 12px;
-                color: var(--lgl-gray);
+                color: var(--lgl-color-gray);
                 font-weight: 500;
             }
 
@@ -494,7 +494,7 @@
     text-align: center;
     padding: 40px;
     font-weight: bold;
-    color: var(--lgl-primary);
+    color: var(--lgl-color-primary);
 }
 
 #lgl-notification-container {
@@ -509,8 +509,8 @@
 }
 
 .lgl-toast {
-    background-color: var(--lgl-primary);
-    color: var(--lgl-white);
+    background-color: var(--lgl-color-primary);
+    color: var(--lgl-color-white);
     padding: 16px 24px;
     border-radius: 6px;
     font-size: 14px;
@@ -530,7 +530,7 @@
 }
 
 .lgl-toast-success {
-    border-left: 4px solid var(--lgl-tertiary);
+    border-left: 4px solid var(--lgl-color-tertiary);
 }
 
 .lgl-toast-error {
@@ -561,23 +561,23 @@
                 width: 44px;
                 height: 44px;
                 border-radius: 6px;
-                background-color: var(--lgl-soft-gray);
-                color: var(--lgl-secondary);
+                background-color: var(--lgl-color-soft-gray);
+                color: var(--lgl-color-secondary);
                 font-weight: 600;
                 font-size: 16px;
                 text-decoration: none;
                 transition: all 0.3s ease;
-                font-family: var(--primary-font);
+                font-family: var(--lgl-font-primary);
 
                 &.current {
-                    background-color: var(--lgl-accent);
-                    color: var(--lgl-primary);
+                    background-color: var(--lgl-color-accent);
+                    color: var(--lgl-color-primary);
                     box-shadow: 0 4px 10px rgba(0, 55, 147, 0.2);
                 }
 
                 &:hover:not(.current) {
-                    background-color: var(--lgl-electric-blue);
-                    color: var(--lgl-white);
+                    background-color: var(--lgl-color-electric-blue);
+                    color: var(--lgl-color-white);
                     transform: translateY(-2px);
                 }
 
@@ -586,10 +586,10 @@
                     width: auto;
                     padding: 0 16px;
                     background-color: transparent;
-                    color: var(--lgl-primary);
+                    color: var(--lgl-color-primary);
 
                     &:hover {
-                        color: var(--lgl-electric-blue);
+                        color: var(--lgl-color-electric-blue);
                         background-color: transparent;
                     }
                 }
@@ -599,7 +599,7 @@
 }
 
 .single-lgl {
-    background-color: var(--lgl-light-blue);
+    background-color: var(--lgl-color-light-blue);
     .lgl-holder {
         padding-left: 20px;
         padding-right: 20px;
@@ -664,22 +664,22 @@
     gap: 0px;
 }
 .lgl-sale-card {
-    background: var(--lgl-secondary);
+    background: var(--lgl-color-secondary);
     border-radius: 20px 20px 0px 0px;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
     padding: 25px;
-    color: var(--lgl-white);
+    color: var(--lgl-color-white);
     overflow: hidden;
     .lgl-wishlist-btn {
         &.added {
-            color: var(--lgl-secondary) !important;
-            background: var(--lgl-accent) !important;
+            color: var(--lgl-color-secondary) !important;
+            background: var(--lgl-color-accent) !important;
         }
     }
 }
 .lgl-sale-meta-bottom {
-    background: var(--lgl-white);
-    border: 1px solid var(--lgl-gray);
+    background: var(--lgl-color-white);
+    border: 1px solid var(--lgl-color-gray);
     border-radius: 0px 0px 25px 25px;
     overflow: hidden;
     margin-bottom: 15px;
@@ -694,7 +694,7 @@
         width: 44px !important;
         height: 44px !important;
         min-width: 44px !important;
-        color: var(--lgl-white) !important;
+        color: var(--lgl-color-white) !important;
         padding: 0 !important;
         margin: 0 !important;
         display: inline-flex !important;
@@ -729,28 +729,28 @@
 .lgl-post--part-exchange {
     padding: 24px;
     text-align: center;
-    color: var(--lgl-secondary);
+    color: var(--lgl-color-secondary);
     font-size: 16px;
     line-height: 1;
     font-weight: 600;
 }
 
 .lgl-finance-label {
-    color: var(--lgl-tertiary);
+    color: var(--lgl-color-tertiary);
     font-weight: bold;
     font-size: 16px;
-    font-family: var(--secondary-font);
+    font-family: var(--lgl-font-secondary);
 }
 
 .lgl-condition-tag {
-    background-color: var(--lgl-accent);
-    color: var(--lgl-secondary);
+    background-color: var(--lgl-color-accent);
+    color: var(--lgl-color-secondary);
     line-height: 1;
     padding: 10px 10px 10px 0;
     border-radius: 0 5px 5px 0;
     font-size: 16px;
     font-weight: 600;
-    font-family: var(--secondary-font);
+    font-family: var(--lgl-font-secondary);
     position: relative;
     &:before {
         content: "";
@@ -759,7 +759,7 @@
         top: 0;
         bottom: 0;
         left: -30px;
-        background-color: var(--lgl-accent);
+        background-color: var(--lgl-color-accent);
     }
 }
 .lgl-btn-group {
@@ -769,53 +769,53 @@
 }
 .lgl-btn {
     padding: 20px;
-    font-family: var(--secondary-font);
+    font-family: var(--lgl-font-secondary);
     font-weight: bold;
     border-radius: 10px;
     text-align: center;
     border: 1px solid;
     font-size: 16px;
     &.lgl-btn-secondary {
-        background-color: var(--lgl-secondary);
-        color: var(--lgl-tertiary);
-        border-color: var(--lgl-secondary);
+        background-color: var(--lgl-color-secondary);
+        color: var(--lgl-color-tertiary);
+        border-color: var(--lgl-color-secondary);
         &:hover {
-            background-color: var(--lgl-primary);
-            border-color: var(--lgl-primary);
+            background-color: var(--lgl-color-primary);
+            border-color: var(--lgl-color-primary);
         }
     }
     &.lgl-btn-primary {
-        background-color: var(--lgl-primary);
-        color: var(--lgl-tertiary);
-        border-color: var(--lgl-primary);
+        background-color: var(--lgl-color-primary);
+        color: var(--lgl-color-tertiary);
+        border-color: var(--lgl-color-primary);
         &:hover {
-            background-color: var(--lgl-secondary);
-            border-color: var(--lgl-secondary);
+            background-color: var(--lgl-color-secondary);
+            border-color: var(--lgl-color-secondary);
         }
     }
     &.lgl-btn-accent {
-        background-color: var(--lgl-accent);
-        color: var(--lgl-secondary);
-        border-color: var(--lgl-accent);
+        background-color: var(--lgl-color-accent);
+        color: var(--lgl-color-secondary);
+        border-color: var(--lgl-color-accent);
         &:hover {
-            background-color: var(--lgl-secondary);
-            border-color: var(--lgl-secondary);
-            color: var(--lgl-accent);
+            background-color: var(--lgl-color-secondary);
+            border-color: var(--lgl-color-secondary);
+            color: var(--lgl-color-accent);
         }
     }
     &.lgl-btn-outline {
-        color: var(--lgl-secondary);
-        border-color: var(--lgl-secondary);
+        color: var(--lgl-color-secondary);
+        border-color: var(--lgl-color-secondary);
         &:hover {
-            background-color: var(--lgl-secondary);
-            color: var(--lgl-tertiary);
+            background-color: var(--lgl-color-secondary);
+            color: var(--lgl-color-tertiary);
         }
     }
 }
 
 .lgl-tabs--tbnav.lgl-tabs--tbnav {
     border-radius: 20px 20px 0px 0px;
-    background-color: var(--lgl-secondary);
+    background-color: var(--lgl-color-secondary);
     padding: 20px;
     display: flex;
     flex-wrap: wrap;
@@ -833,7 +833,7 @@
         position: relative;
         transition: all 0.3s;
         &:before {
-            background: var(--lgl-white);
+            background: var(--lgl-color-white);
             transform: scale(0);
             content: "";
             display: block;
@@ -846,7 +846,7 @@
             border-radius: 10px;
         }
         &.lgl-is-active {
-            color: var(--lgl-secondary);
+            color: var(--lgl-color-secondary);
             &:before {
                 transform: scale(1);
             }
