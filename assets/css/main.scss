@@ -846,6 +846,7 @@
             border-radius: 10px;
         }
         &.lgl-is-active {
+            color: var(--lgl-secondary);
             &:before {
                 transform: scale(1);
             }

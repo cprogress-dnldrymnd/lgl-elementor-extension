@@ -657,7 +657,9 @@
       position: absolute;
       transition: all 0.3s;
       border-radius: 10px; }
-    .lgl-tabs--tbnav.lgl-tabs--tbnav .lgl-nav-item.lgl-is-active:before {
-      transform: scale(1); }
+    .lgl-tabs--tbnav.lgl-tabs--tbnav .lgl-nav-item.lgl-is-active {
+      color: var(--lgl-secondary); }
+      .lgl-tabs--tbnav.lgl-tabs--tbnav .lgl-nav-item.lgl-is-active:before {
+        transform: scale(1); }
 
 /*# sourceMappingURL=main.css.map */
