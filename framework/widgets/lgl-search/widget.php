@@ -47,14 +47,7 @@ class Widget_LGLSearch extends Widget_Base {
 				]
 			);
 
-			$this->add_control(
-				'top_search_title', [
-					'label'       => __( 'Title', 'clwyd' ),
-					'type'        => Controls_Manager::TEXT,
-					'label_block' => true,
-					'default'     => 'Top Seach:',
-				]
-			);
+			
 
 			$repeater = new Repeater();
 
@@ -347,7 +340,5 @@ class Widget_LGLSearch extends Widget_Base {
 		<?php
 	}
 
-	protected function content_template() {
-
-	}
+	
 }
