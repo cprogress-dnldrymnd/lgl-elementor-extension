@@ -343,14 +343,12 @@
                 }
 
                 .bt-post--title {
-                    font-size: 24px;
-                    margin: 0;
-                    line-height: 1.4;
-                    color: var(--lgl-secondary);
-                    font-weight: 600;
-
                     a {
-                        color: var(--lgl-dark-gray);
+                        font-size: 24px;
+                        margin: 0;
+                        line-height: 1.4;
+                        color: var(--lgl-secondary);
+                        font-weight: 600;
                         text-decoration: none;
                         transition: color 0.3s ease;
 
