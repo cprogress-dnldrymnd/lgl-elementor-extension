@@ -274,7 +274,8 @@
               .lgl-results-wrapper .lgl-grid-layout.lgl-grid-layout .bt-post .bt-post--infor .bt-post--meta .bt-post--meta-row .bt-post--meta-item .label-val {
                 display: flex;
                 flex-direction: column;
-                gap: 5px; }
+                gap: 5px;
+                line-height: 1; }
               .lgl-results-wrapper .lgl-grid-layout.lgl-grid-layout .bt-post .bt-post--infor .bt-post--meta .bt-post--meta-row .bt-post--meta-item .bt-label {
                 margin-bottom: 2px;
                 font-size: 12px;
