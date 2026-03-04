@@ -81,7 +81,6 @@
 
             $('#lgl-search-form').attr('action', url);
             $('#lgl-search-form').attr('method', 'GET');
-
         });
 
 
