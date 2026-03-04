@@ -156,7 +156,7 @@ if (! class_exists('LGL_Shortcodes')) {
 			}
 
 			// --- TAB 2: Single Page ---
-			add_settings_section('lgl_single_page_section', 'Single Vehicle Additions', null, 'lgl-settings-single-page');
+			add_settings_section('lgl_single_page_section', 'Single Page Settings', null, 'lgl-settings-single-page');
 
 			add_settings_field(
 				'single_vehicle_content',
