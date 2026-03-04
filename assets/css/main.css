@@ -741,7 +741,12 @@
     background: #f6d100;
     border-radius: 999px; }
 
-.lgl-related-posts .lgl-grid-layout.lgl-grid-layout {
-  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); }
+.lgl-related-posts {
+  margin-top: 100px; }
+  .lgl-related-posts .lgl-grid-layout.lgl-grid-layout {
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); }
+  @media (max-width: 1024px) {
+    .lgl-related-posts {
+      margin-top: 50px; } }
 
 /*# sourceMappingURL=main.css.map */

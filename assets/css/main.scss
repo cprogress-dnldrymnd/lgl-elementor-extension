@@ -948,7 +948,11 @@
 }
 
 .lgl-related-posts {
+    margin-top: 100px;
     .lgl-grid-layout.lgl-grid-layout {
         grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    }
+    @media(max-width: 1024px) {
+        margin-top: 50px;
     }
 }
