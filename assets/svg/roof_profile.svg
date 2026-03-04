@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="33.788" height="11.44" viewBox="0 0 33.788 11.44">
+  <defs>
+    <clipPath id="clip-path">
+      <rect id="Rectangle_350" data-name="Rectangle 350" width="33.788" height="11.44" fill="currentColor"/>
+    </clipPath>
+  </defs>
+  <g id="Roof-Profile-Icon" transform="translate(0 0)">
+    <path id="Path_1211" data-name="Path 1211" d="M36.72,3.708,19.953,8.992H36.72Z" transform="translate(-8.808 -1.637)" fill="currentColor"/>
+    <g id="Group_814" data-name="Group 814" transform="translate(0 0)">
+      <g id="Group_813" data-name="Group 813" clip-path="url(#clip-path)">
+        <path id="Path_1212" data-name="Path 1212" d="M31.613,1.418a.708.708,0,0,0,.424-.357.732.732,0,0,0,.05-.553A.708.708,0,0,0,31.73.083a.732.732,0,0,0-.553-.05L7.953,7.355H12.8Z" transform="translate(-3.511 0)" fill="currentColor"/>
+        <path id="Path_1213" data-name="Path 1213" d="M33.693,17.648a1.013,1.013,0,0,0-.335-1.257c-1.988-1.413-3.664-2.223-4.591-2.223H2.789a1.787,1.787,0,0,0-1.614,1l-.91,1.826a4.045,4.045,0,0,0-.264.7H33.671Z" transform="translate(0 -6.254)" fill="currentColor"/>
+      </g>
+    </g>
+  </g>
+</svg>
