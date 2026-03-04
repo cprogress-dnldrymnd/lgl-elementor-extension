@@ -242,7 +242,7 @@
           .lgl-grid-layout.lgl-grid-layout .lgl-post .lgl-post--thumbnail .lgl-post--icon-btn a:hover {
             color: var(--lgl-color-quaternary);
             transform: scale(1.05); }
-          .lgl-grid-layout.lgl-grid-layout .lgl-post .lgl-post--thumbnail .lgl-post--icon-btn a.added {
+          .lgl-grid-layout.lgl-grid-layout .lgl-post .lgl-post--thumbnail .lgl-post--icon-btn a.added, .lgl-grid-layout.lgl-grid-layout .lgl-post .lgl-post--thumbnail .lgl-post--icon-btn a.is-active {
             color: var(--lgl-color-tertiary);
             background: var(--lgl-color-secondary); }
           .lgl-grid-layout.lgl-grid-layout .lgl-post .lgl-post--thumbnail .lgl-post--icon-btn a svg {
@@ -524,9 +524,6 @@
   color: var(--lgl-color-white);
   overflow: hidden; }
   .lgl-sale-card .lgl-wishlist-btn.added {
-    color: var(--lgl-color-secondary) !important;
-    background: var(--lgl-color-accent) !important; }
-  .lgl-sale-card .lgl-compare-btn.is-active {
     color: var(--lgl-color-secondary) !important;
     background: var(--lgl-color-accent) !important; }
 
