@@ -240,7 +240,7 @@ if (! class_exists('LGL_Shortcodes')) {
 					?>
 				</form>
 			</div>
-		<?php
+<?php
 		}
 
 		/**
@@ -376,7 +376,7 @@ if (! class_exists('LGL_Shortcodes')) {
 			return $this->load_template($shortcode_tag, $attributes, $content);
 		}
 
-	
+
 		/**
 		 * Generates the internal HTML payload for the mini wishlist items list.
 		 * Used for initial shortcode rendering and subsequent AJAX refresh states.
@@ -630,172 +630,172 @@ if (! class_exists('LGL_Shortcodes')) {
 		}
 
 		/**
-         * AJAX handler to fetch and render the filtered search results and pagination UI.
-         * Compiles taxonomy and meta queries based on serialized form data.
-         * Implements an MD5-hashed transient cache to store complex query outputs for 1 hour.
-         *
-         * @return void
-         */
-        public function ajax_fetch_results()
-        {
-            check_ajax_referer('lgl_search_nonce', 'nonce');
+		 * AJAX handler to fetch and render the filtered search results and pagination UI.
+		 * Compiles taxonomy and meta queries based on serialized form data.
+		 * Implements an MD5-hashed transient cache to store complex query outputs for 1 hour.
+		 *
+		 * @return void
+		 */
+		public function ajax_fetch_results()
+		{
+			check_ajax_referer('lgl_search_nonce', 'nonce');
 
-            // Generate an MD5 hash of the exact POST payload to create a highly specific cache key
-            $query_hash = md5(wp_json_encode($_POST));
-            $cache_key  = 'lgl_search_' . $query_hash;
+			// Generate an MD5 hash of the exact POST payload to create a highly specific cache key
+			$query_hash = md5(wp_json_encode($_POST));
+			$cache_key  = 'lgl_search_' . $query_hash;
 
-            // Intercept execution and return cached payload if available
-            $cached_response = get_transient($cache_key);
-            if (false !== $cached_response) {
-                wp_send_json_success($cached_response);
-            }
+			// Intercept execution and return cached payload if available
+			$cached_response = get_transient($cache_key);
+			if (false !== $cached_response) {
+				wp_send_json_success($cached_response);
+			}
 
-            $post_type = isset($_POST['post_type']) ? sanitize_text_field($_POST['post_type']) : 'post';
-            $paged     = isset($_POST['paged']) ? max(1, intval($_POST['paged'])) : 1;
-            $form_data = array();
+			$post_type = isset($_POST['post_type']) ? sanitize_text_field($_POST['post_type']) : 'post';
+			$paged     = isset($_POST['paged']) ? max(1, intval($_POST['paged'])) : 1;
+			$form_data = array();
 
-            // Parse serialized form data
-            if (isset($_POST['form_data'])) {
-                parse_str($_POST['form_data'], $form_data);
-            }
+			// Parse serialized form data
+			if (isset($_POST['form_data'])) {
+				parse_str($_POST['form_data'], $form_data);
+			}
 
-            $args = array(
-                'post_type'      => $post_type,
-                'post_status'    => 'publish',
-                'posts_per_page' => 9,
-                'paged'          => $paged,
-                'meta_query'     => array('relation' => 'AND'),
-                'tax_query'      => array('relation' => 'AND')
-            );
+			$args = array(
+				'post_type'      => $post_type,
+				'post_status'    => 'publish',
+				'posts_per_page' => 9,
+				'paged'          => $paged,
+				'meta_query'     => array('relation' => 'AND'),
+				'tax_query'      => array('relation' => 'AND')
+			);
 
-            // Handle Sorting if passed via sort_order dropdown (matching user markup)
-            if (!empty($form_data['sort_order'])) {
-                switch ($form_data['sort_order']) {
-                    case 'date_low':
-                        $args['orderby'] = 'date';
-                        $args['order']   = 'ASC';
-                        break;
-                    case 'price_high':
-                        $args['orderby']  = 'meta_value_num';
-                        $args['meta_key'] = 'price';
-                        $args['order']    = 'DESC';
-                        break;
-                    case 'price_low':
-                        $args['orderby']  = 'meta_value_num';
-                        $args['meta_key'] = 'price';
-                        $args['order']    = 'ASC';
-                        break;
-                    case 'date_high':
-                    default:
-                        $args['orderby'] = 'date';
-                        $args['order']   = 'DESC';
-                        break;
-                }
-            }
+			// Handle Sorting if passed via sort_order dropdown (matching user markup)
+			if (!empty($form_data['sort_order'])) {
+				switch ($form_data['sort_order']) {
+					case 'date_low':
+						$args['orderby'] = 'date';
+						$args['order']   = 'ASC';
+						break;
+					case 'price_high':
+						$args['orderby']  = 'meta_value_num';
+						$args['meta_key'] = 'price';
+						$args['order']    = 'DESC';
+						break;
+					case 'price_low':
+						$args['orderby']  = 'meta_value_num';
+						$args['meta_key'] = 'price';
+						$args['order']    = 'ASC';
+						break;
+					case 'date_high':
+					default:
+						$args['orderby'] = 'date';
+						$args['order']   = 'DESC';
+						break;
+				}
+			}
 
-            // Meta Queries
-            if (!empty($form_data['condition'])) {
-                $args['meta_query'][] = array(
-                    'key'     => 'condition',
-                    'value'   => sanitize_text_field($form_data['condition']),
-                    'compare' => '='
-                );
-            }
+			// Meta Queries
+			if (!empty($form_data['condition'])) {
+				$args['meta_query'][] = array(
+					'key'     => 'condition',
+					'value'   => sanitize_text_field($form_data['condition']),
+					'compare' => '='
+				);
+			}
 
-            if (!empty($form_data['berth'])) {
-                $args['meta_query'][] = array(
-                    'key'     => 'berth',
-                    'value'   => sanitize_text_field($form_data['berth']),
-                    'compare' => '='
-                );
-            }
+			if (!empty($form_data['berth'])) {
+				$args['meta_query'][] = array(
+					'key'     => 'berth',
+					'value'   => sanitize_text_field($form_data['berth']),
+					'compare' => '='
+				);
+			}
 
-            // Price Range (Min/Max)
-            $price_min = !empty($form_data['price_min']) ? floatval($form_data['price_min']) : 0;
-            $price_max = !empty($form_data['price_max']) ? floatval($form_data['price_max']) : 0;
+			// Price Range (Min/Max)
+			$price_min = !empty($form_data['price_min']) ? floatval($form_data['price_min']) : 0;
+			$price_max = !empty($form_data['price_max']) ? floatval($form_data['price_max']) : 0;
 
-            if ($price_min > 0 || $price_max > 0) {
-                $price_query = array(
-                    'key'  => 'price',
-                    'type' => 'NUMERIC'
-                );
-                if ($price_min > 0 && $price_max > 0) {
-                    $price_query['value']   = array($price_min, $price_max);
-                    $price_query['compare'] = 'BETWEEN';
-                } elseif ($price_min > 0) {
-                    $price_query['value']   = $price_min;
-                    $price_query['compare'] = '>=';
-                } else {
-                    $price_query['value']   = $price_max;
-                    $price_query['compare'] = '<=';
-                }
-                $args['meta_query'][] = $price_query;
-            }
+			if ($price_min > 0 || $price_max > 0) {
+				$price_query = array(
+					'key'  => 'price',
+					'type' => 'NUMERIC'
+				);
+				if ($price_min > 0 && $price_max > 0) {
+					$price_query['value']   = array($price_min, $price_max);
+					$price_query['compare'] = 'BETWEEN';
+				} elseif ($price_min > 0) {
+					$price_query['value']   = $price_min;
+					$price_query['compare'] = '>=';
+				} else {
+					$price_query['value']   = $price_max;
+					$price_query['compare'] = '<=';
+				}
+				$args['meta_query'][] = $price_query;
+			}
 
-            // Tax Queries
-            $make_id  = !empty($form_data['listing_make']) ? intval($form_data['listing_make']) : 0;
-            $model_id = !empty($form_data['listing_model']) ? intval($form_data['listing_model']) : 0;
+			// Tax Queries
+			$make_id  = !empty($form_data['listing_make']) ? intval($form_data['listing_make']) : 0;
+			$model_id = !empty($form_data['listing_model']) ? intval($form_data['listing_model']) : 0;
 
-            if ($model_id > 0) {
-                $args['tax_query'][] = array(
-                    'taxonomy' => 'listing-make-model',
-                    'field'    => 'term_id',
-                    'terms'    => $model_id
-                );
-            } elseif ($make_id > 0) {
-                $args['tax_query'][] = array(
-                    'taxonomy' => 'listing-make-model',
-                    'field'    => 'term_id',
-                    'terms'    => $make_id
-                );
-            }
+			if ($model_id > 0) {
+				$args['tax_query'][] = array(
+					'taxonomy' => 'listing-make-model',
+					'field'    => 'term_id',
+					'terms'    => $model_id
+				);
+			} elseif ($make_id > 0) {
+				$args['tax_query'][] = array(
+					'taxonomy' => 'listing-make-model',
+					'field'    => 'term_id',
+					'terms'    => $make_id
+				);
+			}
 
-            // Execute Query
-            $query = new WP_Query($args);
+			// Execute Query
+			$query = new WP_Query($args);
 
-            ob_start();
+			ob_start();
 
-            // Render specific block logic to maintain the exact DOM structure requested.
-            if ($query->have_posts()) {
-                while ($query->have_posts()) {
-                    $query->the_post();
-                    include LGL_SHORTCODES_PATH . 'templates/partials/lgl-grid.php';
-                }
-            } else {
-                echo '<div class="lgl-no-results">No vehicles found matching your criteria.</div>';
-            }
+			// Render specific block logic to maintain the exact DOM structure requested.
+			if ($query->have_posts()) {
+				while ($query->have_posts()) {
+					$query->the_post();
+					include LGL_SHORTCODES_PATH . 'templates/partials/lgl-grid.php';
+				}
+			} else {
+				echo '<div class="lgl-no-results">No vehicles found matching your criteria.</div>';
+			}
 
-            $html = ob_get_clean();
+			$html = ob_get_clean();
 
-            // Construct Pagination HTML payload
-            $pagination_html = '';
-            if ($query->max_num_pages > 1) {
-                $pagination_html = paginate_links(array(
-                    'base'      => '%_%',
-                    'format'    => '?paged=%#%',
-                    'current'   => $paged,
-                    'total'     => $query->max_num_pages,
-                    'prev_text' => '<svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M15 18L9 12L15 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>',
-                    'next_text' => '<svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M9 18L15 12L9 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>',
-                    'type'      => 'list',
-                    'add_args'  => false
-                ));
-            }
-            wp_reset_postdata();
+			// Construct Pagination HTML payload
+			$pagination_html = '';
+			if ($query->max_num_pages > 1) {
+				$pagination_html = paginate_links(array(
+					'base'      => '%_%',
+					'format'    => '?paged=%#%',
+					'current'   => $paged,
+					'total'     => $query->max_num_pages,
+					'prev_text' => '<svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M15 18L9 12L15 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+					'next_text' => '<svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M9 18L15 12L9 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+					'type'      => 'list',
+					'add_args'  => false
+				));
+			}
+			wp_reset_postdata();
 
-            // Package the data array
-            $response_data = array(
-                'html'       => $html,
-                'pagination' => $pagination_html,
-                'count'      => $query->found_posts
-            );
+			// Package the data array
+			$response_data = array(
+				'html'       => $html,
+				'pagination' => $pagination_html,
+				'count'      => $query->found_posts
+			);
 
-            // Save payload to a 1-hour transient
-            set_transient($cache_key, $response_data, HOUR_IN_SECONDS);
+			// Save payload to a 1-hour transient
+			set_transient($cache_key, $response_data, HOUR_IN_SECONDS);
 
-            wp_send_json_success($response_data);
-        }
-		
+			wp_send_json_success($response_data);
+		}
+
 
 		/**
 		 * Purges all cached search result transients from the database.
@@ -827,6 +827,27 @@ if (! class_exists('LGL_Shortcodes')) {
 
 				// Taxonomy changes inherently alter search results, so we cascade the purge
 				$this->clear_lgl_search_cache();
+			}
+		}
+		/**
+		 * Renders raw SVG markup inline into the DOM based on a provided meta key.
+		 * * Constructs the absolute file path utilizing the plugin's root path constant.
+		 * Validates file existence prior to outputting the buffer to prevent IO errors.
+		 * Includes filename sanitization to mitigate directory traversal risks.
+		 *
+		 * @param string $meta_key The meta key used to dynamically locate the target SVG file.
+		 * @return void
+		 */
+		public static function render_inline_svg(string $meta_key): void
+		{
+			// Construct the absolute path to the SVG file based on the current meta key.
+			// Utilizes the plugin's root path constant.
+			$svg_file_path = LGL_SHORTCODES_PATH . 'assets/svg/' . sanitize_file_name($meta_key) . '.svg';
+
+			// Ensure the file exists on the server before attempting to read it
+			if (file_exists($svg_file_path)) {
+				// Output the raw SVG markup inline directly into the DOM
+				echo file_get_contents($svg_file_path);
 			}
 		}
 	}
