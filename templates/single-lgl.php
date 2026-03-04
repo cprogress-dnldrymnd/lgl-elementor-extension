@@ -104,15 +104,37 @@ $post_type = get_post_type();
                 </div>
 
                 <div class="lgl-post--sidebar">
-
-
                     <div class="lgl-sidebar-wrap">
                         <div class="lgl-sidebar-block lgl-sale-block">
 
+                            <?php
+                            // Retrieve global LGL settings payload
+                            $lgl_options = get_option('lgl_settings', array());
+
+                            // Feature Toggles
+                            $disable_wishlist = !empty($lgl_options['disable_wishlist']);
+                            $disable_compare  = !empty($lgl_options['disable_compare']);
+
+                            // Button URLs (fallback to original hash links if empty)
+                            $url_finance = !empty($lgl_options['url_finance_calc']) ? esc_url($lgl_options['url_finance_calc']) : '#lgl-tab-overview';
+                            $url_enquire = !empty($lgl_options['url_enquire_now']) ? esc_url($lgl_options['url_enquire_now']) : '#lgl-tab-overview';
+                            $url_reserve = !empty($lgl_options['url_reserve_now']) ? esc_url($lgl_options['url_reserve_now']) : '#lgl-tab-overview';
+
+                            // Contact Payload
+                            $contact_phone    = !empty($lgl_options['contact_phone']) ? sanitize_text_field($lgl_options['contact_phone']) : '';
+                            $phone_link       = preg_replace('/\D+/', '', $contact_phone);
+
+                            $contact_whatsapp = !empty($lgl_options['contact_whatsapp']) ? sanitize_text_field($lgl_options['contact_whatsapp']) : '';
+                            $whatsapp_link    = preg_replace('/\D+/', '', $contact_whatsapp);
+
+                            $contact_email    = !empty($lgl_options['contact_email']) ? sanitize_email($lgl_options['contact_email']) : '';
+
+                            $contact_address  = !empty($lgl_options['contact_address']) ? sanitize_textarea_field($lgl_options['contact_address']) : '';
+                            $location_url     = 'https://www.google.com/maps/search/?api=1&query=' . urlencode($contact_address);
+                            ?>
+
                             <div class="lgl-sale-card">
-
                                 <div class="lgl-sale-top">
-
                                     <div class="lgl-condition-tag">
                                         <?php echo esc_html($condition); ?>
                                     </div>
@@ -125,18 +147,19 @@ $post_type = get_post_type();
                                             </svg>
                                         </a>
 
-
                                         <?php
-                                        include LGL_SHORTCODES_PATH . 'templates/partials/lgl-button-wishlist.php';
+                                        if (!$disable_wishlist) {
+                                            include LGL_SHORTCODES_PATH . 'templates/partials/lgl-button-wishlist.php';
+                                        }
                                         ?>
 
-
-                                        <a class="lgl-icon-btn lgl-vehicle-compare-btn" href="#" data-id="<?php echo $post_id; ?>">
-                                            <svg width="25" height="25" viewBox="0 0 25 25" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-                                                <path d="M15.75 10.9375L17.3125 12.5L22.6875 7.10938L17.1875 1.5625L15.625 3.125L18.4375 5.9375H3.125V8.125H18.4688L15.75 10.9375ZM9.15625 14.0625L7.59375 12.5L2.21875 17.9688L7.67187 23.4375L9.23437 21.875L6.40625 19.0625H21.875V16.875H6.40625L9.15625 14.0625Z" />
-                                            </svg>
-                                        </a>
-
+                                        <?php if (!$disable_compare) { ?>
+                                            <a class="lgl-icon-btn lgl-vehicle-compare-btn" href="#" data-id="<?php echo esc_attr($post_id); ?>">
+                                                <svg width="25" height="25" viewBox="0 0 25 25" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                                                    <path d="M15.75 10.9375L17.3125 12.5L22.6875 7.10938L17.1875 1.5625L15.625 3.125L18.4375 5.9375H3.125V8.125H18.4688L15.75 10.9375ZM9.15625 14.0625L7.59375 12.5L2.21875 17.9688L7.67187 23.4375L9.23437 21.875L6.40625 19.0625H21.875V16.875H6.40625L9.15625 14.0625Z" />
+                                                </svg>
+                                            </a>
+                                        <?php } ?>
                                     </div>
                                 </div>
 
@@ -155,14 +178,8 @@ $post_type = get_post_type();
                                         <div class="lgl-finance-label"><?php echo esc_html__($sub_title, 'lgl'); ?></div>
                                     </div>
                                 <?php } ?>
-                            </div><!-- /.lgl-sale-card -->
-
-                            <?php
-                            // reuse these values (already in your file)
-                            ?>
-
+                            </div>
                             <div class="lgl-sale-meta-bottom">
-
                                 <?php
                                 include LGL_SHORTCODES_PATH . 'templates/partials/lgl-meta-short.php';
                                 ?>
@@ -173,107 +190,90 @@ $post_type = get_post_type();
                                 </div>
                             </div>
 
-                            <!-- dealer block stays after -->
                             <?php
                             if (!empty($dealer)) {
-                                $d_title = get_the_title($dealer);
-                                $d_link = get_the_permalink($dealer);
-                                $d_avatar = get_field('avatar', $dealer);
-                                $d_location = get_field('location', $dealer);
-                                $d_phone = get_field('phone', $dealer);
-                                $d_message_link = get_field('message_link', $dealer);
+                                $d_title         = get_the_title($dealer);
+                                $d_link          = get_the_permalink($dealer);
+                                $d_avatar        = get_field('avatar', $dealer);
+                                $d_location      = get_field('location', $dealer);
+                                $d_phone         = get_field('phone', $dealer);
+                                $d_message_link  = get_field('message_link', $dealer);
                                 $d_whatsapp_link = get_field('whatsapp_link', $dealer);
                             ?>
-                                <!-- your dealer HTML -->
                             <?php } ?>
 
-                            <!-- ✅ Buttons OUTSIDE the card BUT STILL INSIDE lgl-sale-block -->
                             <div class="lgl-btn-group">
-                                <a class="lgl-btn lgl-btn-secondary" href="#lgl-tab-overview">
+                                <a class="lgl-btn lgl-btn-secondary" href="<?php echo $url_finance; ?>">
                                     <?php echo esc_html__('FINANCE CALCULATOR', 'lgl'); ?>
                                 </a>
 
-                                <a class="lgl-btn lgl-btn-accent" href="#lgl-tab-overview">
+                                <a class="lgl-btn lgl-btn-accent" href="<?php echo $url_enquire; ?>">
                                     <?php echo esc_html__('ENQUIRE NOW', 'lgl'); ?>
                                 </a>
 
-                                <a class="lgl-btn lgl-btn-outline" href="#lgl-tab-overview">
+                                <a class="lgl-btn lgl-btn-outline" href="<?php echo $url_reserve; ?>">
                                     <?php echo esc_html__('RESERVE NOW', 'lgl'); ?>
                                 </a>
                             </div>
 
-                            <?php
-                            // --- Contact info (edit these values) ---
-                            $phone_display = '01978 810091';
-                            $phone_link    = preg_replace('/\D+/', '', $phone_display); // 01978810091
-
-                            $whatsapp_display = '01978 810091';
-                            $whatsapp_link    = preg_replace('/\D+/', '', $whatsapp_display); // same as phone
-
-                            $email = 'sales@clwydcaravans.com';
-                            $location_text = 'Location';
-                            $location_url  = '#'; // put your Google Maps link here
-                            ?>
-
                             <div class="lgl-contact-info">
                                 <h4 class="lgl-contact-title">Contact Information</h4>
-
                                 <ul class="lgl-contact-list">
-                                    <li class="lgl-contact-item">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="17.532" height="17.532" viewBox="0 0 17.532 17.532">
-                                            <path id="download_1_" data-name="download (1)" d="M5.153.747A1.246,1.246,0,0,0,3.672.022L.922.772A1.254,1.254,0,0,0,0,1.978a14,14,0,0,0,14,14,1.254,1.254,0,0,0,1.206-.922l.75-2.75a1.246,1.246,0,0,0-.725-1.481l-3-1.25a1.246,1.246,0,0,0-1.447.362L9.521,11.478A10.561,10.561,0,0,1,4.5,6.456L6.04,5.2A1.247,1.247,0,0,0,6.4,3.75l-1.25-3Z" transform="translate(0.75 0.805)" fill="#001537" stroke="#f7faff" stroke-width="1.5" />
-                                        </svg>
-                                        </span>
-                                        <a href="tel:<?php echo esc_attr($phone_link); ?>">
-                                            <?php echo esc_html($phone_display); ?>
-                                        </a>
-                                    </li>
 
-                                    <li class="lgl-contact-item">
-                                        <span class="lgl-contact-icon">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16.209" viewBox="0 0 16 16.209">
-                                                <path id="Path_172" data-name="Path 172" d="M19.646,30.06a8,8,0,1,0-3.061-2.986L15.567,31.26Zm.425-10.748a.911.911,0,0,1,.62-.239h.244a.765.765,0,0,1,.719.5l.5,1.373a.4.4,0,0,1-.062.382l-.394.492a.688.688,0,0,0-.107.684,5.517,5.517,0,0,0,2.639,2.417.7.7,0,0,0,.8-.128l.436-.436a.4.4,0,0,1,.4-.1l1.322.422a.767.767,0,0,1,.534.73v.336a.928.928,0,0,1-.272.656c-1.287,1.271-3.423.339-4.807-.51A8.039,8.039,0,0,1,20.13,23.5c-1.565-2.362-.614-3.686-.06-4.192Z" transform="translate(-15.5 -15.05)" fill="#25d366" />
+                                    <?php if ($contact_phone) { ?>
+                                        <li class="lgl-contact-item">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="17.532" height="17.532" viewBox="0 0 17.532 17.532">
+                                                <path id="download_1_" data-name="download (1)" d="M5.153.747A1.246,1.246,0,0,0,3.672.022L.922.772A1.254,1.254,0,0,0,0,1.978a14,14,0,0,0,14,14,1.254,1.254,0,0,0,1.206-.922l.75-2.75a1.246,1.246,0,0,0-.725-1.481l-3-1.25a1.246,1.246,0,0,0-1.447.362L9.521,11.478A10.561,10.561,0,0,1,4.5,6.456L6.04,5.2A1.247,1.247,0,0,0,6.4,3.75l-1.25-3Z" transform="translate(0.75 0.805)" fill="#001537" stroke="#f7faff" stroke-width="1.5" />
                                             </svg>
-                                        </span>
-                                        <a target="_blank" rel="nofollow noopener"
-                                            href="https://wa.me/<?php echo esc_attr($whatsapp_link); ?>">
-                                            <?php echo esc_html($whatsapp_display); ?>
-                                        </a>
-                                    </li>
+                                            <a href="tel:<?php echo esc_attr($phone_link); ?>">
+                                                <?php echo esc_html($contact_phone); ?>
+                                            </a>
+                                        </li>
+                                    <?php } ?>
 
-                                    <li class="lgl-contact-item">
-                                        <span class="lgl-contact-icon">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="16.337" height="16.337" viewBox="0 0 16.337 16.337">
-                                                <path id="download" d="M8.15,1.538a.032.032,0,0,1,.038,0L14.7,6.19a.256.256,0,0,1,.108.207v.434L9.3,11.35a1.785,1.785,0,0,1-2.269,0l-5.5-4.518V6.4A.247.247,0,0,1,1.64,6.19ZM1.532,8.813l4.531,3.721a3.319,3.319,0,0,0,4.212,0l4.531-3.721V14.55a.256.256,0,0,1-.255.255H1.787a.256.256,0,0,1-.255-.255ZM8.169,0a1.573,1.573,0,0,0-.909.29L.75,4.943A1.782,1.782,0,0,0,0,6.4V14.55a1.788,1.788,0,0,0,1.787,1.787H14.55a1.788,1.788,0,0,0,1.787-1.787V6.4a1.787,1.787,0,0,0-.747-1.455L9.078.29A1.573,1.573,0,0,0,8.169,0Z" fill="#001537" />
-                                            </svg>
-                                        </span>
-                                        <a href="mailto:<?php echo antispambot(esc_attr($email)); ?>">
-                                            <?php echo esc_html(antispambot($email)); ?>
-                                        </a>
-                                    </li>
+                                    <?php if ($contact_whatsapp) { ?>
+                                        <li class="lgl-contact-item">
+                                            <span class="lgl-contact-icon">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16.209" viewBox="0 0 16 16.209">
+                                                    <path id="Path_172" data-name="Path 172" d="M19.646,30.06a8,8,0,1,0-3.061-2.986L15.567,31.26Zm.425-10.748a.911.911,0,0,1,.62-.239h.244a.765.765,0,0,1,.719.5l.5,1.373a.4.4,0,0,1-.062.382l-.394.492a.688.688,0,0,0-.107.684,5.517,5.517,0,0,0,2.639,2.417.7.7,0,0,0,.8-.128l.436-.436a.4.4,0,0,1,.4-.1l1.322.422a.767.767,0,0,1,.534.73v.336a.928.928,0,0,1-.272.656c-1.287,1.271-3.423.339-4.807-.51A8.039,8.039,0,0,1,20.13,23.5c-1.565-2.362-.614-3.686-.06-4.192Z" transform="translate(-15.5 -15.05)" fill="#25d366" />
+                                                </svg>
+                                            </span>
+                                            <a target="_blank" rel="nofollow noopener" href="https://wa.me/<?php echo esc_attr($whatsapp_link); ?>">
+                                                <?php echo esc_html($contact_whatsapp); ?>
+                                            </a>
+                                        </li>
+                                    <?php } ?>
 
-                                    <li class="lgl-contact-item">
-                                        <span class="lgl-contact-icon">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="15.903" height="19.379" viewBox="0 0 15.903 19.379">
-                                                <path id="Path_1154" data-name="Path 1154" d="M12.952,3A6.952,6.952,0,0,0,6,9.952a5.6,5.6,0,0,0,1.3,3.91l5.648,6.517L18.6,13.862a5.6,5.6,0,0,0,1.3-3.91A6.952,6.952,0,0,0,12.952,3Z" transform="translate(-5 -2)" fill="none" stroke="#000" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" />
-                                            </svg>
-                                        </span>
-                                        <a href="<?php echo esc_url($location_url); ?>">
-                                            <?php echo esc_html($location_text); ?>
-                                        </a>
-                                    </li>
+                                    <?php if ($contact_email) { ?>
+                                        <li class="lgl-contact-item">
+                                            <span class="lgl-contact-icon">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="16.337" height="16.337" viewBox="0 0 16.337 16.337">
+                                                    <path id="download" d="M8.15,1.538a.032.032,0,0,1,.038,0L14.7,6.19a.256.256,0,0,1,.108.207v.434L9.3,11.35a1.785,1.785,0,0,1-2.269,0l-5.5-4.518V6.4A.247.247,0,0,1,1.64,6.19ZM1.532,8.813l4.531,3.721a3.319,3.319,0,0,0,4.212,0l4.531-3.721V14.55a.256.256,0,0,1-.255.255H1.787a.256.256,0,0,1-.255-.255ZM8.169,0a1.573,1.573,0,0,0-.909.29L.75,4.943A1.782,1.782,0,0,0,0,6.4V14.55a1.788,1.788,0,0,0,1.787,1.787H14.55a1.788,1.788,0,0,0,1.787-1.787V6.4a1.787,1.787,0,0,0-.747-1.455L9.078.29A1.573,1.573,0,0,0,8.169,0Z" fill="#001537" />
+                                                </svg>
+                                            </span>
+                                            <a href="mailto:<?php echo antispambot(esc_attr($contact_email)); ?>">
+                                                <?php echo esc_html(antispambot($contact_email)); ?>
+                                            </a>
+                                        </li>
+                                    <?php } ?>
+
+                                    <?php if ($contact_address) { ?>
+                                        <li class="lgl-contact-item">
+                                            <span class="lgl-contact-icon">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="15.903" height="19.379" viewBox="0 0 15.903 19.379">
+                                                    <path id="Path_1154" data-name="Path 1154" d="M12.952,3A6.952,6.952,0,0,0,6,9.952a5.6,5.6,0,0,0,1.3,3.91l5.648,6.517L18.6,13.862a5.6,5.6,0,0,0,1.3-3.91A6.952,6.952,0,0,0,12.952,3Z" transform="translate(-5 -2)" fill="none" stroke="#000" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" />
+                                                </svg>
+                                            </span>
+                                            <a target="_blank" rel="noopener noreferrer" href="<?php echo esc_url($location_url); ?>">
+                                                <?php echo nl2br(esc_html($contact_address)); ?>
+                                            </a>
+                                        </li>
+                                    <?php } ?>
+
                                 </ul>
                             </div>
-
-                            <?php
-                            $safety_tips = get_field('car_safety_tips', 'options');
-                            if (!empty($safety_tips) && (!empty($safety_tips['heading']) || !empty($safety_tips['content']) || !empty($safety_tips['link']))) {
-                            ?>
-                                <!-- safety tips HTML here -->
-                            <?php } ?>
-
-                        </div><!-- /.lgl-sidebar-block.lgl-sale-block -->
-                    </div><!-- /.lgl-sidebar-wrap -->
+                        </div>
+                    </div>
                 </div><!-- /.lgl-post--sidebar -->
             </div>
             <div class="lgl-post--tabs lgl-tabs lgl-tabs-js">
