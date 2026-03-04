@@ -1,11 +1,11 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="35" height="24.639" viewBox="0 0 35 24.639">
   <g id="Caravans-Internal-Width" transform="translate(-473.79 -361)">
     <g id="Group_804" data-name="Group 804" transform="translate(81.79)">
-      <rect id="Rectangle_341" data-name="Rectangle 341" width="35" height="15" rx="1" transform="translate(392 361)" fill="#202020"/>
+      <rect id="Rectangle_341" data-name="Rectangle 341" width="35" height="15" rx="1" transform="translate(392 361)" fill="currentColor"/>
       <g id="Group_803" data-name="Group 803" transform="translate(393.053 380.245)">
         <line id="Line_109" data-name="Line 109" x2="30.836" transform="translate(0.775 2.697)" fill="none" stroke="#000" stroke-width="1"/>
-        <path id="Polygon_3" data-name="Polygon 3" d="M2.7,0l2.7,2.076H0Z" transform="translate(-0.001 5.394) rotate(-90)" fill="#202020"/>
-        <path id="Polygon_4" data-name="Polygon 4" d="M2.7,0l2.7,2.076H0Z" transform="translate(32.762 0) rotate(90)" fill="#202020"/>
+        <path id="Polygon_3" data-name="Polygon 3" d="M2.7,0l2.7,2.076H0Z" transform="translate(-0.001 5.394) rotate(-90)" fill="currentColor"/>
+        <path id="Polygon_4" data-name="Polygon 4" d="M2.7,0l2.7,2.076H0Z" transform="translate(32.762 0) rotate(90)" fill="currentColor"/>
       </g>
       <text id="WIDTH" transform="translate(410 371)" fill="#fff" font-size="7" font-family="SegoeUI-Semibold, Segoe UI" font-weight="600"><tspan x="-11" y="0">WIDTH</tspan></text>
     </g>
