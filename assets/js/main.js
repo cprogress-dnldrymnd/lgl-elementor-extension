@@ -157,7 +157,7 @@
      */
     function initLGLMiniWishlist() {
         const $wrapper = jQuery('.lgl-mini-wishlist-wrapper');
-        const $toggle = jQuery('.lgl-mini-wishlist-toggle');
+        const $toggle = jQuery('.lgl-mini-wishlist-toggle-trigger');
         const $dropdown = jQuery('.lgl-mini-wishlist-dropdown');
         const $content = jQuery('.lgl-mini-wishlist-content');
         const $badge = jQuery('.lgl-wishlist-count');
