@@ -20,6 +20,22 @@ $args = array(
     'post__not_in'   => array($current_post_id), // Prevent querying the currently active listing
 );
 
+// Retrieve 'listing-make-model' term IDs for the current post context
+if ( $current_post_id ) {
+    $term_ids = wp_get_post_terms( $current_post_id, 'listing-make-model', array( 'fields' => 'ids' ) );
+    
+    // Inject tax_query parameter if the current post possesses valid taxonomy terms
+    if ( ! is_wp_error( $term_ids ) && ! empty( $term_ids ) ) {
+        $args['tax_query'] = array(
+            array(
+                'taxonomy' => 'listing-make-model',
+                'field'    => 'term_id',
+                'terms'    => $term_ids,
+            ),
+        );
+    }
+}
+
 $query = new WP_Query($args);
 
 ob_start();
