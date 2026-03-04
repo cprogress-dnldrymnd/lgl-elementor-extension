@@ -108,7 +108,6 @@ if ($active_make) {
             <label for="lgl_model">Model</label>
             <select name="listing_model" id="lgl_model" class="lgl-select2" data-placeholder="Select Model"
                 <?php echo empty($active_make_models) ? 'disabled' : ''; ?>>
-
                 <?php if (empty($active_make_models)) : ?>
                     <option value="">Select Make First</option>
                 <?php else : ?>
@@ -122,8 +121,6 @@ if ($active_make) {
                 <?php endif; ?>
             </select>
         </div>
-
-
 
         <?php if ($post_type != false) { ?>
             <!-- Condition -->
