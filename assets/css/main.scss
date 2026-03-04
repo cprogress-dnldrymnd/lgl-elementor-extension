@@ -699,7 +699,7 @@
         }
     }
     .lgl-compare-btn {
-        &.added {
+        &.is-active {
             color: var(--lgl-color-secondary) !important;
             background: var(--lgl-color-accent) !important;
         }
