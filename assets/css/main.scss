@@ -4,20 +4,22 @@
 :root {
     --lgl-font-primary: "DM Sans", sans-serif;
     --lgl-font-secondary: "Poppins", sans-serif;
-    --lgl-color-light-blue-gray: #ececec;
-    --lgl-color-white: #ffffff;
-    --lgl-color-electric-blue: #007bff;
-    --lgl-color-soft-gray: #f5f5f5;
 
+    --lgl-color-accent: #f6d100;
     --lgl-color-primary: #003793;
     --lgl-color-secondary: #001537;
     --lgl-color-tertiary: #00e6f6;
-    --lgl-color-accent: #f6d100;
+    --lgl-color-quaternary: #007bff;
+
+    --lgl-color-white: #ffffff;
     --lgl-color-light-gray: #e4ecff;
     --lgl-color-medium-gray: #d9d9d9;
+    --lgl-color-soft-gray: #f5f5f5;
     --lgl-color-dark-gray: #555;
     --lgl-color-gray: #969696;
     --lgl-color-light-blue: #f7faff;
+    --lgl-color-light-blue-gray: #ececec;
+
 }
 
 // ==========================================================================
@@ -83,7 +85,7 @@
                     box-shadow 0.3s ease;
 
                 &:focus {
-                    border-color: var(--lgl-color-electric-blue);
+                    border-color: var(--lgl-color-quaternary);
                     outline: none;
                     box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
                 }
@@ -219,7 +221,7 @@
         }
 
         &.select2-container--open .select2-selection--single {
-            border-color: var(--lgl-color-electric-blue);
+            border-color: var(--lgl-color-quaternary);
         }
     }
 }
@@ -330,7 +332,7 @@
                         transform 0.2s ease;
 
                     &:hover {
-                        color: var(--lgl-color-electric-blue);
+                        color: var(--lgl-color-quaternary);
                         transform: scale(1.05);
                     }
                     &.added {
@@ -395,7 +397,7 @@
                     transition: color 0.3s ease;
 
                     &:hover {
-                        color: var(--lgl-color-electric-blue);
+                        color: var(--lgl-color-quaternary);
                     }
                 }
                 @media (max-width: 480px) {
@@ -576,7 +578,7 @@
                 }
 
                 &:hover:not(.current) {
-                    background-color: var(--lgl-color-electric-blue);
+                    background-color: var(--lgl-color-quaternary);
                     color: var(--lgl-color-white);
                     transform: translateY(-2px);
                 }
@@ -589,7 +591,7 @@
                     color: var(--lgl-color-primary);
 
                     &:hover {
-                        color: var(--lgl-color-electric-blue);
+                        color: var(--lgl-color-quaternary);
                         background-color: transparent;
                     }
                 }

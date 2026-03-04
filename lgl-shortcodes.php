@@ -23,7 +23,7 @@ if (! class_exists('LGL_Shortcodes')) {
 
     /**
      * Main class for the LGL Shortcodes plugin.
-     * Manages the registration, parameter parsing, and template routing of all shortcodes.
+     * Manages the registration, parameter parsing, template routing, and backend settings.
      */
     class LGL_Shortcodes
     {
@@ -36,13 +36,16 @@ if (! class_exists('LGL_Shortcodes')) {
 
         /**
          * Initializes the plugin by hooking into the WordPress lifecycle.
+         * Registers shortcodes, assets, AJAX endpoints, template overrides, and admin settings.
          *
          * @return void
          */
         public function __construct()
         {
+            // Frontend Hooks
             add_action('init', array($this, 'register_shortcodes'));
             add_action('wp_enqueue_scripts', array($this, 'enqueue_assets'));
+            add_action('wp_head', array($this, 'inject_dynamic_css'));
 
             // AJAX endpoints for dependent dropdowns and search results
             add_action('wp_ajax_lgl_get_models', array($this, 'ajax_get_models'));
@@ -53,6 +56,203 @@ if (! class_exists('LGL_Shortcodes')) {
 
             // Aggressive override: Force plugin template for specific CPTs, bypassing theme hierarchy
             add_filter('single_template', array($this, 'force_plugin_single_template'), 99999);
+
+            // Backend Settings Hooks
+            add_action('admin_menu', array($this, 'register_admin_menu'));
+            add_action('admin_init', array($this, 'register_plugin_settings'));
+            add_action('admin_enqueue_scripts', array($this, 'admin_enqueue_assets'));
+        }
+
+        /**
+         * Enqueues administrative scripts and styles strictly on the plugin's settings page.
+         * Loads wp-color-picker for the Design Settings tab.
+         *
+         * @param string $hook The current admin page hook.
+         * @return void
+         */
+        public function admin_enqueue_assets($hook)
+        {
+            if ('toplevel_page_lgl-settings' !== $hook) {
+                return;
+            }
+
+            wp_enqueue_style('wp-color-picker');
+            wp_enqueue_script('wp-color-picker');
+            
+            // Inline script to initialize the color picker instances
+            wp_add_inline_script('wp-color-picker', '
+                jQuery(document).ready(function($){
+                    $(".lgl-color-picker").wpColorPicker();
+                });
+            ');
+        }
+
+        /**
+         * Registers the main administrative menu page for the plugin.
+         *
+         * @return void
+         */
+        public function register_admin_menu()
+        {
+            add_menu_page(
+                'LGL Settings',
+                'LGL Settings',
+                'manage_options',
+                'lgl-settings',
+                array($this, 'render_settings_page'),
+                'dashicons-admin-generic',
+                80
+            );
+        }
+
+        /**
+         * Registers settings, sections, and fields via the WordPress Settings API.
+         * Fields are segmented into tab-specific sections for logical rendering.
+         *
+         * @return void
+         */
+        public function register_plugin_settings()
+        {
+            // Register a unified options array to prevent database bloat
+            register_setting('lgl_settings_group', 'lgl_settings');
+
+            // --- TAB 1: Design Settings ---
+            add_settings_section('lgl_design_section', 'Typography and Color Variables', null, 'lgl-settings-design');
+
+            $design_fields = array(
+                'font_primary'     => array('label' => 'Primary Font', 'type' => 'text', 'default' => '"DM Sans", sans-serif'),
+                'font_secondary'   => array('label' => 'Secondary Font', 'type' => 'text', 'default' => '"Poppins", sans-serif'),
+                'color_accent'     => array('label' => 'Accent Color', 'type' => 'color', 'default' => '#f6d100'),
+                'color_primary'    => array('label' => 'Primary Color', 'type' => 'color', 'default' => '#003793'),
+                'color_secondary'  => array('label' => 'Secondary Color', 'type' => 'color', 'default' => '#001537'),
+                'color_tertiary'   => array('label' => 'Tertiary Color', 'type' => 'color', 'default' => '#00e6f6'),
+                'color_quaternary' => array('label' => 'Quaternary Color', 'type' => 'color', 'default' => '#007bff'),
+            );
+
+            foreach ($design_fields as $id => $field) {
+                add_settings_field(
+                    $id,
+                    $field['label'],
+                    array($this, 'render_field'),
+                    'lgl-settings-design',
+                    'lgl_design_section',
+                    array('id' => $id, 'type' => $field['type'], 'default' => $field['default'])
+                );
+            }
+
+            // --- TAB 2: Additional Settings ---
+            add_settings_section('lgl_additional_section', 'Single Vehicle Additions', null, 'lgl-settings-additional');
+
+            add_settings_field(
+                'single_vehicle_content',
+                'Single Vehicle Additional Content',
+                array($this, 'render_field'),
+                'lgl-settings-additional',
+                'lgl_additional_section',
+                array('id' => 'single_vehicle_content', 'type' => 'textarea', 'default' => '')
+            );
+        }
+
+        /**
+         * Universal renderer for settings fields, handling multiple input types dynamically.
+         * Extracts current values from the serialized 'lgl_settings' array.
+         *
+         * @param array $args Field configuration arguments (id, type, default).
+         * @return void
+         */
+        public function render_field($args)
+        {
+            $options = get_option('lgl_settings', array());
+            $id      = $args['id'];
+            $value   = isset($options[$id]) ? $options[$id] : $args['default'];
+
+            switch ($args['type']) {
+                case 'color':
+                    echo sprintf(
+                        '<input type="text" id="lgl_settings[%1$s]" name="lgl_settings[%1$s]" value="%2$s" class="lgl-color-picker" />',
+                        esc_attr($id),
+                        esc_attr($value)
+                    );
+                    break;
+                case 'textarea':
+                    echo sprintf(
+                        '<textarea id="lgl_settings[%1$s]" name="lgl_settings[%1$s]" rows="5" cols="50" class="large-text">%2$s</textarea>',
+                        esc_attr($id),
+                        esc_textarea($value)
+                    );
+                    break;
+                case 'text':
+                default:
+                    echo sprintf(
+                        '<input type="text" id="lgl_settings[%1$s]" name="lgl_settings[%1$s]" value="%2$s" class="regular-text" />',
+                        esc_attr($id),
+                        esc_attr($value)
+                    );
+                    break;
+            }
+        }
+
+        /**
+         * Renders the HTML architecture for the tabbed settings interface.
+         * Utilizes WordPress core CSS classes for native UI compliance.
+         *
+         * @return void
+         */
+        public function render_settings_page()
+        {
+            if (!current_user_can('manage_options')) {
+                return;
+            }
+
+            $active_tab = isset($_GET['tab']) ? sanitize_text_field($_GET['tab']) : 'design';
+            ?>
+            <div class="wrap">
+                <h1>LGL Shortcodes Settings</h1>
+                <h2 class="nav-tab-wrapper">
+                    <a href="?page=lgl-settings&tab=design" class="nav-tab <?php echo $active_tab == 'design' ? 'nav-tab-active' : ''; ?>">Design Settings</a>
+                    <a href="?page=lgl-settings&tab=additional" class="nav-tab <?php echo $active_tab == 'additional' ? 'nav-tab-active' : ''; ?>">Additional Settings</a>
+                </h2>
+
+                <form method="post" action="options.php">
+                    <?php
+                    settings_fields('lgl_settings_group');
+                    if ($active_tab == 'design') {
+                        do_settings_sections('lgl-settings-design');
+                    } else {
+                        do_settings_sections('lgl-settings-additional');
+                    }
+                    submit_button();
+                    ?>
+                </form>
+            </div>
+            <?php
+        }
+
+        /**
+         * Injects customized design settings as native CSS variables into the document head.
+         * Values fall back to the defaults established in your provided image if unset.
+         *
+         * @return void
+         */
+        public function inject_dynamic_css()
+        {
+            $options = get_option('lgl_settings', array());
+
+            $vars = array(
+                '--lgl-font-primary'     => isset($options['font_primary']) ? $options['font_primary'] : '"DM Sans", sans-serif',
+                '--lgl-font-secondary'   => isset($options['font_secondary']) ? $options['font_secondary'] : '"Poppins", sans-serif',
+                '--lgl-color-accent'     => isset($options['color_accent']) ? $options['color_accent'] : '#f6d100',
+                '--lgl-color-primary'    => isset($options['color_primary']) ? $options['color_primary'] : '#003793',
+                '--lgl-color-secondary'  => isset($options['color_secondary']) ? $options['color_secondary'] : '#001537',
+                '--lgl-color-tertiary'   => isset($options['color_tertiary']) ? $options['color_tertiary'] : '#00e6f6',
+                '--lgl-color-quaternary' => isset($options['color_quaternary']) ? $options['color_quaternary'] : '#007bff',
+            );
+
+            echo "<style id='lgl-dynamic-vars'>\n:root {\n";
+            foreach ($vars as $key => $val) {
+                echo "\t{$key}: " . esc_attr($val) . ";\n";
+            }
+            echo "}\n</style>\n";
         }
 
         /**
@@ -200,7 +400,7 @@ if (! class_exists('LGL_Shortcodes')) {
             if ($query->have_posts()) {
                 // Implementing a structural wrapper for front-end DOM manipulation (flexbox/CSS grids)
                 echo '<div class="lgl-related-posts">';
-				echo '<h2 class="lgl-related-heading">Related Vehicles</h2>';
+                echo '<h2 class="lgl-related-heading">Related Vehicles</h2>';
                 echo '<div class="lgl-grid-layout lgl-cols--3">';
                 while ($query->have_posts()) {
                     $query->the_post();
