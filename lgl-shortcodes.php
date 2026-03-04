@@ -229,10 +229,10 @@ if (! class_exists('LGL_Shortcodes')) {
 				'lgl_visibility_section'
 			);
 		}
-
-		/**
+/**
          * Renders the drag-and-drop sortable list for managing field visibility and order.
-         * Incorporates both custom meta fields and taxonomies into a single array structure.
+         * Separates visible and hidden fields, auto-moving hidden fields to the bottom,
+         * disabling their sortability, and optimizing the UI layout.
          *
          * @return void
          */
@@ -266,41 +266,105 @@ if (! class_exists('LGL_Shortcodes')) {
             $missing_fields = array_diff(array_keys($all_fields), $saved_order);
             $current_order  = array_merge($saved_order, $missing_fields);
 
-            echo '<ul id="lgl-field-sortable" style="max-width: 600px; padding: 0; margin: 0; list-style: none;">';
+            // Segregate keys into visible and hidden arrays to enforce bottom-placement on load
+            $visible_keys = array();
+            $hidden_keys  = array();
+
             foreach ($current_order as $key) {
-                // Validate key existence in case a field was deprecated
                 if (!isset($all_fields[$key])) {
                     continue; 
                 }
+                if (!empty($options['hide_field_' . $key])) {
+                    $hidden_keys[] = $key;
+                } else {
+                    $visible_keys[] = $key;
+                }
+            }
 
-                $label = $all_fields[$key];
-                $is_hidden = !empty($options['hide_field_' . $key]) ? checked(1, $options['hide_field_' . $key], false) : '';
+            // Merge arrays: visible fields first, hidden fields stacked at the bottom
+            $final_render_order = array_merge($visible_keys, $hidden_keys);
+
+            echo '<ul id="lgl-field-sortable" style="max-width: 600px; padding: 0; margin: 0; list-style: none;">';
+            
+            foreach ($final_render_order as $key) {
+                $label     = $all_fields[$key];
+                $is_hidden = !empty($options['hide_field_' . $key]);
+                $checked   = $is_hidden ? 'checked="checked"' : '';
                 
-                echo '<li style="background: #fff; border: 1px solid #ccd0d4; padding: 10px 15px; margin-bottom: 8px; cursor: grab; display: flex; align-items: center; box-shadow: 0 1px 1px rgba(0,0,0,.04);">';
-                echo '<span class="dashicons dashicons-menu" style="margin-right: 15px; color: #a7aaad;"></span>';
+                // Dynamic CSS properties based on visibility state
+                $li_class       = $is_hidden ? 'is-hidden' : '';
+                $li_opacity     = $is_hidden ? '0.6' : '1';
+                $handle_cursor  = $is_hidden ? 'not-allowed' : 'grab';
+                $handle_opacity = $is_hidden ? '0.3' : '1';
+
+                echo '<li class="lgl-sortable-item ' . esc_attr($li_class) . '" style="background: #fff; border: 1px solid #ccd0d4; padding: 10px 15px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 1px 1px rgba(0,0,0,.04); opacity: ' . esc_attr($li_opacity) . ';">';
                 
-                // Pushing to an array ensures PHP receives the exact order established in the DOM
+                // Left Column: Drag Handle & Target Field Name
+                echo '<div style="display: flex; align-items: center;">';
+                echo '<span class="dashicons dashicons-menu lgl-drag-handle" style="margin-right: 15px; color: #a7aaad; cursor: ' . esc_attr($handle_cursor) . '; opacity: ' . esc_attr($handle_opacity) . ';"></span>';
+                echo '<strong style="font-weight: 500;">' . esc_html($label) . '</strong>';
+                // Hidden input maintains the order payload during POST
                 echo '<input type="hidden" name="lgl_settings[field_order][]" value="' . esc_attr($key) . '" />';
-                
-                echo '<label style="font-weight: 500;">';
-                echo '<input type="checkbox" name="lgl_settings[hide_field_' . esc_attr($key) . ']" value="1" ' . $is_hidden . ' /> ';
-                echo 'Hide <strong>' . esc_html($label) . '</strong>';
+                echo '</div>';
+
+                // Right Column: Clean Checkbox Toggle
+                echo '<div>';
+                echo '<label style="display: flex; align-items: center; cursor: pointer; color: #50575e;">';
+                echo '<input type="checkbox" class="lgl-hide-toggle" name="lgl_settings[hide_field_' . esc_attr($key) . ']" value="1" ' . $checked . ' style="margin-right: 6px;" /> ';
+                echo 'Hide';
                 echo '</label>';
+                echo '</div>';
+                
                 echo '</li>';
             }
+            
             echo '</ul>';
             
-            // Initialize jQuery UI Sortable on the DOM node
+            // Initialize jQuery UI Sortable and attach event listeners for dynamic DOM mutations
             echo '<script>
                 jQuery(document).ready(function($) {
-                    $("#lgl-field-sortable").sortable({
+                    var $sortableList = $("#lgl-field-sortable");
+
+                    // Initialize sortable, targeting only visible items and using the specific handle
+                    $sortableList.sortable({
                         containment: "parent",
+                        handle: ".lgl-drag-handle",
+                        items: "> li:not(.is-hidden)",
                         cursor: "grabbing",
                         opacity: 0.8
+                    });
+
+                    // Listen for changes on the visibility toggle checkboxes
+                    $sortableList.on("change", ".lgl-hide-toggle", function() {
+                        var $listItem  = $(this).closest("li");
+                        var isChecked  = $(this).is(":checked");
+                        var $handle    = $listItem.find(".lgl-drag-handle");
+
+                        if (isChecked) {
+                            // Apply hidden state: dim opacity, disable drag cursor, and move to bottom
+                            $listItem.addClass("is-hidden").css("opacity", "0.6");
+                            $handle.css({ cursor: "not-allowed", opacity: "0.3" });
+                            $listItem.appendTo($sortableList);
+                        } else {
+                            // Restore visible state: reset opacity, enable drag cursor, and push to the bottom of the active stack
+                            $listItem.removeClass("is-hidden").css("opacity", "1");
+                            $handle.css({ cursor: "grab", opacity: "1" });
+                            
+                            var $firstHidden = $sortableList.children(".is-hidden").first();
+                            if ($firstHidden.length) {
+                                $listItem.insertBefore($firstHidden);
+                            } else {
+                                $listItem.appendTo($sortableList);
+                            }
+                        }
+                        
+                        // Refresh the sortable instance to re-evaluate the "items" exclusion parameter
+                        $sortableList.sortable("refresh");
                     });
                 });
             </script>';
         }
+		
 		/**
 		 * Universal renderer for settings fields, handling multiple input types dynamically.
 		 * Extracts current values from the serialized 'lgl_settings' array.
