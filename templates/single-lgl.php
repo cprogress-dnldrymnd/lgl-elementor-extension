@@ -15,6 +15,7 @@ if (! defined('ABSPATH')) {
 get_header();
 
 $post_id = get_the_ID();
+$post_type = get_post_type();
 ?>
 
 <pre style="display: none">
@@ -32,7 +33,6 @@ $post_id = get_the_ID();
         $year = get_post_meta($post_id, 'year', true);
         $condition = get_post_meta($post_id, 'condition', true);
         $feature = get_post_meta($post_id, 'feature', true);
-
         ?>
         <article <?php post_class('lgl-post'); ?>>
             <div class="lgl-post--wrap">
@@ -396,6 +396,7 @@ $post_id = get_the_ID();
                 </div>
             </div>
         </article>
+        <?= do_shortcode('[lgl_related_vehicles post_type="' . $post_type . '"]') ?>
     </div>
 </main>
 
