@@ -1086,39 +1086,26 @@ if (! class_exists('LGL_Shortcodes')) {
 
 		/**
 		 * Renders raw SVG markup inline into the DOM based on a provided meta key.
-		 * Includes an asset mapping dictionary to safely bypass server-level firewalls
-		 * that block reserved system keywords (like 'class.*').
+		 * Bypasses WordPress core sanitize_file_name() to avoid security filters 
+		 * stripping reserved keywords like 'class'. Uses native regex for safe I/O.
 		 *
 		 * @param string $meta_key The meta key used to dynamically locate the target SVG file.
 		 * @return void
 		 */
 		public static function render_inline_svg(string $meta_key): void
 		{
-			// Normalize the meta key to strict lowercase and sanitize.
-			$safe_filename = strtolower($meta_key);
-
-			// Asset Mapping Dictionary: 
-			// Map problematic database keys to safe physical file names.
-			$asset_map = array(
-				'class' => 'vehicle-class', // Bypasses server rules blocking 'class.*'
-			);
-
-			// Intercept and rewrite the filename if it exists in our map.
-			if (array_key_exists($safe_filename, $asset_map)) {
-				$safe_filename = $asset_map[$safe_filename];
-			}
+			// Lightweight regex: strictly allows alphanumeric characters, dashes, and underscores.
+			// This safely normalizes the filename without triggering aggressive global WP filters.
+			$safe_filename = strtolower(preg_replace('/[^a-zA-Z0-9_-]/', '', $meta_key));
 
 			// Construct the absolute path to the SVG file.
 			$svg_file_path = LGL_SHORTCODES_PATH . 'assets/svg/' . $safe_filename . '.svg';
 
-		
+			// Ensure the file exists on the server before attempting to read the buffer.
 			if (file_exists($svg_file_path)) {
 				// Output the raw SVG markup inline directly into the DOM.
 				echo file_get_contents($svg_file_path);
 			} else {
-				// Inject a silent debug comment into the DOM to verify the exact path being requested.
-				echo "";
-
 				// Provide a native WordPress dashicon fallback to maintain grid layout integrity.
 				echo '<span class="dashicons dashicons-warning" style="margin-right: 8px; color: #a7aaad;" aria-hidden="true"></span>';
 			}
