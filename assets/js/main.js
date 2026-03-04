@@ -300,7 +300,7 @@
     /**
      * Display a toast notification globally.
      * Attached to the window object to prevent ReferenceErrors across different IIFE scopes.
-     * * @param {string} message - The message to display.
+     * @param {string} message - The message to display.
      * @param {string} type - 'success' or 'error' for styling.
      * @return {void}
      */
@@ -442,17 +442,14 @@
             const btn = $(this);
             const postId = btn.attr('data-post-id');
             const postType = btn.attr('data-post-type');
-            const postTitle = btn.attr('data-title') || 'Vehicle';
 
             // Verify if this specific ID exists within its designated vehicle type array
             if (data[postType] && data[postType].includes(postId)) {
                 btn.addClass('is-active');
                 btn.find('.lgl-compare-text').text('Added to Compare');
-                window.showNotification(postTitle + ' added to compare list!');
             } else {
                 btn.removeClass('is-active');
                 btn.find('.lgl-compare-text').text('Compare');
-                window.showNotification(postTitle + ' removed from compare list!');
             }
         });
     }
@@ -469,6 +466,7 @@
         const btn = $(this);
         const targetId = btn.attr('data-post-id');
         const targetType = btn.attr('data-post-type');
+        const postTitle = btn.attr('data-title') || 'Vehicle';
 
         if (!targetId || !targetType) return;
 
@@ -486,9 +484,11 @@
                 return;
             }
             data[targetType].push(targetId);
+            window.showNotification(postTitle + ' added to compare list!', 'success');
         } else {
             // Toggle removal
             data[targetType] = data[targetType].filter(id => id !== targetId);
+            window.showNotification(postTitle + ' removed from compare list!', 'error');
         }
 
         // Commit structure back to stringified storage
