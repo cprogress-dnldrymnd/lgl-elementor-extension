@@ -90,9 +90,23 @@ if ($active_make) {
             </select>
         </div>
 
-        <!-- Condition -->
 
         <?php if ($post_type != false) { ?>
+            <?php
+            //post type select option
+            $options = get_option('lgl_settings', array());
+
+            $pages = [];
+
+            $caravan_page = $options['caravan_page'] ?? false;
+            $motorhome_page = $options['motorhome_page'] ?? false;
+            $campervan_page = $options['campervan_page'] ?? false;
+            ?>
+        <?php } ?>
+
+
+        <?php if ($post_type != false) { ?>
+            <!-- Condition -->
             <div class="lgl-filter-group">
                 <label for="lgl_condition">Condition</label>
                 <select name="condition" id="lgl_condition" class="lgl-select2" data-placeholder="Any Condition">
