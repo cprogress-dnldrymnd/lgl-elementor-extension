@@ -1137,15 +1137,18 @@
     stroke: #d9534f;
 }
 
-.lgl-view-wishlist-link {
+.lgl-view-wishlist-link.lgl-view-wishlist-link {
     display: block;
-    padding: 10px 20px 20px;
+    padding: 20px;
     font-size: 14px;
     color: var(--lgl-color-primary);
     text-decoration: underline;
     font-weight: 500;
+    text-align: center;
 }
-
+.lgl-mini-wishlist-footer {
+    border-top: 1px solid var(--lgl-color-medium-gray);
+}
 .lgl-view-wishlist-link:hover {
     color: var(--lgl-color-quaternary);
 }
