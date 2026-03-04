@@ -19,7 +19,6 @@
     --lgl-color-gray: #969696;
     --lgl-color-light-blue: #f7faff;
     --lgl-color-light-blue-gray: #ececec;
-
 }
 
 // ==========================================================================
@@ -387,10 +386,12 @@
 
             .lgl-post--title {
                 margin: 0;
+                line-height: 1;
+
                 a {
                     font-size: 24px;
                     margin: 0;
-                    line-height: 1.4;
+                    line-height: 1;
                     color: var(--lgl-color-secondary);
                     font-weight: 600;
                     text-decoration: none;
@@ -954,7 +955,7 @@
     .lgl-grid-layout.lgl-grid-layout {
         grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
     }
-    @media(max-width: 1024px) {
+    @media (max-width: 1024px) {
         margin-top: 50px;
     }
 }

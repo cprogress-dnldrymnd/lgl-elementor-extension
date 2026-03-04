@@ -278,11 +278,12 @@
           .lgl-grid-layout.lgl-grid-layout .lgl-post .lgl-post--infor .lgl-post--price {
             font-size: 16px; } }
       .lgl-grid-layout.lgl-grid-layout .lgl-post .lgl-post--infor .lgl-post--title {
-        margin: 0; }
+        margin: 0;
+        line-height: 1; }
         .lgl-grid-layout.lgl-grid-layout .lgl-post .lgl-post--infor .lgl-post--title a {
           font-size: 24px;
           margin: 0;
-          line-height: 1.4;
+          line-height: 1;
           color: var(--lgl-color-secondary);
           font-weight: 600;
           text-decoration: none;
