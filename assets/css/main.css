@@ -704,7 +704,7 @@
 .lgl-meta-list {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 20px; }
+  gap: 20px 40px; }
   .lgl-meta-list .lgl-meta-item {
     display: flex;
     align-items: center;

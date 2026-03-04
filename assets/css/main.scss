@@ -4,7 +4,6 @@
 :root {
     --lgl-font-primary: "DM Sans", sans-serif;
     --lgl-font-secondary: "Poppins", sans-serif;
-
     --lgl-color-accent: #f6d100;
     --lgl-color-primary: #003793;
     --lgl-color-secondary: #001537;
@@ -908,7 +907,7 @@
 .lgl-meta-list {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 20px;
+    gap: 20px 40px;
     .lgl-meta-item {
         display: flex;
         align-items: center;
