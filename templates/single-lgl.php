@@ -139,20 +139,10 @@ $location_url     = 'https://www.google.com/maps/search/?api=1&query=' . urlenco
                                                 <path d="M5.83398 0.836594H3.33398C1.95328 0.836594 0.833984 1.95588 0.833984 3.33659V16.6699C0.833984 18.0507 1.95328 19.1699 3.33398 19.1699H16.6673C18.0481 19.1699 19.1673 18.0507 19.1673 16.6699V14.1699C19.1673 13.7097 18.7942 13.3366 18.334 13.3366C17.8737 13.3366 17.5006 13.7097 17.5006 14.1699V16.6699C17.5006 17.1302 17.1276 17.5033 16.6673 17.5033H3.33398C2.87375 17.5033 2.50065 17.1302 2.50065 16.6699V3.33659C2.50065 2.87635 2.87375 2.50326 3.33398 2.50326H5.83398C6.29422 2.50326 6.66732 2.13016 6.66732 1.66993C6.66732 1.20969 6.29422 0.836594 5.83398 0.836594Z" />
                                             </svg>
                                         </a>
-
                                         <?php
-                                        if (!$disable_wishlist) {
-                                            include LGL_SHORTCODES_PATH . 'templates/partials/lgl-button-wishlist.php';
-                                        }
+                                        include LGL_SHORTCODES_PATH . 'templates/partials/lgl-button-wishlist.php';
+                                        include LGL_SHORTCODES_PATH . 'templates/partials/lgl-button-compare.php';
                                         ?>
-
-                                        <?php if (!$disable_compare) { ?>
-                                            <a class="lgl-icon-btn lgl-vehicle-compare-btn" href="#" data-id="<?php echo esc_attr($post_id); ?>">
-                                                <svg width="25" height="25" viewBox="0 0 25 25" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-                                                    <path d="M15.75 10.9375L17.3125 12.5L22.6875 7.10938L17.1875 1.5625L15.625 3.125L18.4375 5.9375H3.125V8.125H18.4688L15.75 10.9375ZM9.15625 14.0625L7.59375 12.5L2.21875 17.9688L7.67187 23.4375L9.23437 21.875L6.40625 19.0625H21.875V16.875H6.40625L9.15625 14.0625Z" />
-                                                </svg>
-                                            </a>
-                                        <?php } ?>
                                     </div>
                                 </div>
 
