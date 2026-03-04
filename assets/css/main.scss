@@ -4,29 +4,29 @@
 :root {
     --lgl-font-primary: "DM Sans", sans-serif;
     --lgl-font-secondary: "Poppins", sans-serif;
-    --lgl-color-accent: #f6d100;
-    --lgl-color-primary: #003793;
-    --lgl-color-secondary: #001537;
-    --lgl-color-tertiary: #00e6f6;
-    --lgl-color-quaternary: #007bff;
+    --lgl-color-accent: var(--lgl-color-light-gray)f6d100;
+    --lgl-color-primary: var(--lgl-color-light-gray)003793;
+    --lgl-color-secondary: var(--lgl-color-light-gray)001537;
+    --lgl-color-tertiary: var(--lgl-color-light-gray)00e6f6;
+    --lgl-color-quaternary: var(--lgl-color-light-gray)007bff;
 
-    --lgl-color-white: #ffffff;
-    --lgl-color-light-gray: #e4ecff;
-    --lgl-color-medium-gray: #d9d9d9;
-    --lgl-color-soft-gray: #f0f0f0;
-    --lgl-color-dark-gray: #555;
-    --lgl-color-gray: #969696;
-    --lgl-color-light-blue: #f7faff;
-    --lgl-color-light-blue-gray: #ececec;
+    --lgl-color-white: var(--lgl-color-light-gray)ffffff;
+    --lgl-color-light-gray: var(--lgl-color-light-gray)e4ecff;
+    --lgl-color-medium-gray: var(--lgl-color-light-gray)d9d9d9;
+    --lgl-color-soft-gray: var(--lgl-color-light-gray)f0f0f0;
+    --lgl-color-dark-gray: var(--lgl-color-light-gray)555;
+    --lgl-color-gray: var(--lgl-color-light-gray)969696;
+    --lgl-color-light-blue: var(--lgl-color-light-gray)f7faff;
+    --lgl-color-light-blue-gray: var(--lgl-color-light-gray)ececec;
 
-    --lgl-color-success: #28a745;
-    --lgl-color-success-dark: #218838;
+    --lgl-color-success: var(--lgl-color-light-gray)28a745;
+    --lgl-color-success-dark: var(--lgl-color-light-gray)218838;
 
-    --lgl-color-warning: #ffc107;
-    --lgl-color-warning-dark: #e0a800;
+    --lgl-color-warning: var(--lgl-color-light-gray)ffc107;
+    --lgl-color-warning-dark: var(--lgl-color-light-gray)e0a800;
 
-    --lgl-color-error: #dc3545;
-    --lgl-color-error-dark: #c82333;
+    --lgl-color-error: var(--lgl-color-light-gray)dc3545;
+    --lgl-color-error-dark: var(--lgl-color-light-gray)c82333;
 }
 
 // ==========================================================================
@@ -45,7 +45,7 @@
         display: flex;
         gap: 0;
         align-items: center;
-        background: #fff;
+        background: var(--lgl-color-light-gray)fff;
         border-radius: 10px;
         overflow: hidden;
         flex-wrap: wrap;
@@ -98,7 +98,7 @@
                 }
 
                 &::placeholder {
-                    color: #a0a0a0;
+                    color: var(--lgl-color-light-gray)a0a0a0;
                 }
             }
             &:not(:last-child) {
@@ -263,8 +263,8 @@
 
             // Micro-adjustment for Sort Select2
             .select2-container--default .select2-selection--single {
-                background-color: #f1f1f1;
-                border-color: #f1f1f1;
+                background-color: var(--lgl-color-light-gray)f1f1f1;
+                border-color: var(--lgl-color-light-gray)f1f1f1;
             }
         }
     }
@@ -501,7 +501,7 @@
     }
 }
 // Loader State
-#lgl-loader {
+var(--lgl-color-light-gray)lgl-loader {
     display: block;
     text-align: center;
     padding: 40px;
@@ -509,7 +509,7 @@
     color: var(--lgl-color-primary);
 }
 
-#lgl-notification-container {
+var(--lgl-color-light-gray)lgl-notification-container {
     position: fixed;
     top: 40px;
     right: 40px;
@@ -547,7 +547,7 @@
 }
 
 .lgl-toast-error {
-    border-left: 4px solid #dc3545; /* Standard red for removal/errors */
+    border-left: 4px solid var(--lgl-color-light-gray)dc3545; /* Standard red for removal/errors */
 }
 
 // Pagination Styling mapped to Design System
@@ -651,7 +651,7 @@
     .lgl-cover-image {
         position: relative;
         overflow: hidden;
-        background: #cdcdcd;
+        background: var(--lgl-color-light-gray)cdcdcd;
         padding-bottom: 66.66%;
         border-radius: 20px;
         img {
@@ -757,7 +757,7 @@
     margin-bottom: 15px;
 }
 
-#lgl-primary {
+var(--lgl-color-light-gray)lgl-primary {
     padding-top: 50px;
 }
 
@@ -879,7 +879,7 @@
     display: flex;
     flex-wrap: wrap;
     .lgl-nav-item {
-        color: #fff;
+        color: var(--lgl-color-light-gray)fff;
         font-family: "DM Sans";
         font-size: 20px;
         font-style: normal;
@@ -980,7 +980,7 @@
     z-index: 1;
     padding-bottom: 10px;
     font-size: 50px;
-    color: #00235d;
+    color: var(--lgl-color-light-gray)00235d;
     font-family: "Poppins", sans-serif;
     font-weight: 600;
     margin-bottom: 32px;
@@ -991,7 +991,7 @@
         bottom: 0;
         width: 280px;
         height: 8px;
-        background: #f6d100;
+        background: var(--lgl-color-light-gray)f6d100;
         border-radius: 999px;
     }
 }
@@ -1209,7 +1209,7 @@
 }
 
 .lgl-remove-btn:hover svg {
-    stroke: #d9534f;
+    stroke: var(--lgl-color-light-gray)d9534f;
 }
 
 .lgl-view-wishlist-link.lgl-view-wishlist-link {
@@ -1231,7 +1231,7 @@
 .lgl-wishlist-empty {
     padding: 20px 0;
     font-size: 14px;
-    color: #666;
+    color: var(--lgl-color-light-gray)666;
 }
 
 .lgl-no-results {
@@ -1252,8 +1252,8 @@
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
     margin-bottom: 2rem;
-    background: #fff;
-    border: 1px solid #e2e8f0;
+    background: var(--lgl-color-light-gray)fff;
+    border: 1px solid var(--lgl-color-light-gray)e2e8f0;
     border-radius: 8px;
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
 }
@@ -1265,15 +1265,17 @@
     border-collapse: collapse;
     font-family: var(--lgl-font-primary, sans-serif);
     text-align: left;
+    font-size: 16px;
 }
 
 /* Base cell structural padding and borders */
 .lgl-compare-table th,
 .lgl-compare-table td {
-    padding: 1rem;
-    border-bottom: 1px solid #e2e8f0;
-    border-right: 1px solid #e2e8f0;
+    padding: 10px;
+    border-bottom: 1px solid var(--lgl-color-light-gray)e2e8f0;
+    border-right: 1px solid var(--lgl-color-light-gray)e2e8f0;
     vertical-align: middle;
+    line-height: 1;
 }
 
 /* Clean up the far-right border edge */
@@ -1284,9 +1286,9 @@
 
 /* First column styling for the meta field labels */
 .lgl-compare-table tbody th {
-    background-color: #f8fafc;
+    background-color: var(--lgl-color-soft-gray);
     font-weight: 600;
-    color: var(--lgl-color-secondary, #333);
+    color: var(--lgl-color-secondary, var(--lgl-color-light-gray)333);
     width: 20%;
 }
 
@@ -1295,19 +1297,26 @@
     text-align: center;
     vertical-align: top;
     width: 20%;
-    background-color: #fff;
-    padding: 1.5rem 1rem;
+    background-color: var(--lgl-color-light-gray)fff;
+    padding: 15px;
 }
 
 /* Wrapper to isolate thumbnail spacing */
 .lgl-compare-thumbnail {
-    margin-bottom: 1rem;
     position: relative;
+    border-radius: 10px;
+    overflow: hidden;
+    margin: 0;
+    line-height: 1;
+    margin-bottom: 10px;
+    img {
+        width: 100%;
+        aspect-ratio: 4 / 3;
+    }
     .lgl-compare-remove-btn {
         position: absolute;
         top: 0;
         right: 0;
-        transform: translate(50%, -50%);
     }
 }
 
@@ -1328,13 +1337,13 @@
 }
 
 .lgl-compare-title a {
-    color: var(--lgl-color-primary, #003793);
+    color: var(--lgl-color-primary, var(--lgl-color-secondary));
     text-decoration: none;
     transition: color 0.2s ease;
 }
 
 .lgl-compare-title a:hover {
-    color: var(--lgl-color-accent, #f6d100);
+    color: var(--lgl-color-accent, var(--lgl-color-primary));
 }
 
 /* Interactive remove button styling with transition states */
@@ -1344,9 +1353,9 @@
 .lgl-compare-error {
     text-align: center;
     padding: 3rem 1rem;
-    background: #f8fafc;
-    border: 1px dashed #cbd5e1;
+    background: var(--lgl-color-light-gray)f8fafc;
+    border: 1px dashed var(--lgl-color-light-gray)cbd5e1;
     border-radius: 8px;
-    color: #64748b;
+    color: var(--lgl-color-light-gray)64748b;
     font-family: var(--lgl-font-primary, sans-serif);
 }
