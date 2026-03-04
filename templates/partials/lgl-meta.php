@@ -3,120 +3,100 @@ if (class_exists('LGL_Import_Post_Types')) {
 
     $listing_fields = LGL_Import_Post_Types::get_listing_detail_fields();
     $options        = get_option('lgl_settings', array());
-    $exclude_keys   = array();
+    $saved_order    = isset($options['field_order']) && is_array($options['field_order']) ? $options['field_order'] : array();
 
-    // Dynamically compile the exclude list based on backend toggle states
-    $all_possible_fields = array_merge(
-        isset($listing_fields['common']) ? $listing_fields['common'] : array(),
-        isset($listing_fields['motorhome_campervan']) ? $listing_fields['motorhome_campervan'] : array(),
-        isset($listing_fields['caravan']) ? $listing_fields['caravan'] : array()
-    );
+    // 1. Determine valid meta fields and taxonomies strictly based on the current post type
+    $valid_meta_fields = isset($listing_fields['common']) ? $listing_fields['common'] : array();
+    $valid_taxonomies  = array();
 
-    foreach ($all_possible_fields as $meta_key => $label) {
-        if (!empty($options['hide_field_' . $meta_key])) {
-            $exclude_keys[] = $meta_key;
+    if ($post_type !== 'caravan') {
+        if (isset($listing_fields['motorhome_campervan'])) {
+            $valid_meta_fields = array_merge($valid_meta_fields, $listing_fields['motorhome_campervan']);
+        }
+        $valid_taxonomies[] = 'listing-fuel-type';
+        $valid_taxonomies[] = 'listing-gearbox';
+
+        if ($post_type === 'motorhome') {
+            $valid_taxonomies[] = 'listing-chassis';
+        }
+    } else {
+        if (isset($listing_fields['caravan'])) {
+            $valid_meta_fields = array_merge($valid_meta_fields, $listing_fields['caravan']);
         }
     }
 
-    $taxonomies = [];
+    // 2. Build a complete array of all keys valid for this exact post
+    $all_valid_keys = array_merge(array_keys($valid_meta_fields), $valid_taxonomies);
 
-    if (!empty($listing_fields)) {
-        // Access the specific field groupings
-        $common_fields = $listing_fields['common'];
-        
-        if ($post_type != 'caravan') {
-            $motorhome_campervan_fields = $listing_fields['motorhome_campervan'];
-            $common_fields = array_merge($common_fields, $motorhome_campervan_fields);
-            
-            $taxonomies[] = 'listing-fuel-type';
-            if ($post_type == 'motorhome') {
-                $taxonomies[] = 'listing-chassis';
-            }
-            $taxonomies[] = 'listing-gearbox';
-        } else {
-            $caravan_fields = $listing_fields['caravan'];
-            $common_fields = array_merge($common_fields, $caravan_fields);
+    // 3. Establish the final ordered list: Prioritize the saved DB array, then append new/unsaved keys
+    $final_order = array();
+    foreach ($saved_order as $key) {
+        if (in_array($key, $all_valid_keys)) {
+            $final_order[] = $key;
+        }
+    }
+    foreach ($all_valid_keys as $key) {
+        if (!in_array($key, $final_order)) {
+            $final_order[] = $key;
+        }
+    }
+
+    /**
+     * Reusable closure to execute the DOM rendering logic for both meta and taxonomies.
+     * Prevents code duplication while maintaining strict CSS classing logic.
+     * * @param string $key   The taxonomy or meta key.
+     * @param string $label The frontend display label.
+     * @param string $value The extracted value.
+     */
+    $render_item = function ($key, $label, $value) {
+        echo "<div class='lgl-meta-item lgl-{$key}'>";
+        echo "<span class='lgl-meta-icon-label'>";
+
+        // Construct the absolute path to the SVG file.
+        $svg_file_path = LGL_SHORTCODES_PATH . 'assets/svg/' . sanitize_file_name($key) . '.svg';
+        if (file_exists($svg_file_path)) {
+            echo file_get_contents($svg_file_path);
         }
 
-        echo "<div class='lgl-meta-list'>";
-
-        // Iterate over compiled fields and render strictly if not excluded
-        foreach ($common_fields as $meta_key => $label) {
-
-            // Intercept and skip the current iteration if the meta key exists in the exclusion array
-            if (in_array($meta_key, $exclude_keys, true)) {
-                continue;
-            }
-
-            $meta_value = get_post_meta($post_id, $meta_key, true);
-
-            if (!empty($meta_value)) {
-                echo "<div class='lgl-meta-item lgl-{$meta_key}'>";
-                echo "<span class='lgl-meta-icon-label'>";
-
-                echo LGL_Shortcodes::render_inline_svg($meta_key);
-                echo "<span class='lgl-label'>";
-                echo esc_html($label);
-                echo "</span>";
-                echo "</span>";
-
-                echo "<span class='lgl-value'>";
-                echo esc_html($meta_value);
-                echo "</span>";
-
-                echo "</div>";
-            }
-        }
-
-        /**
-         * Iterate over the defined taxonomies array and retrieve associated terms.
-         * Appends each taxonomy as a meta item matching the established DOM structure.
-         */
-        if (!empty($taxonomies)) {
-            foreach ($taxonomies as $taxonomy_slug) {
-                // Retrieve all terms assigned to the current post for this specific taxonomy
-                $terms = get_the_terms($post_id, $taxonomy_slug);
-
-                // Proceed only if terms exist and no WP_Error was returned
-                if ($terms && !is_wp_error($terms)) {
-                    // Fetch the taxonomy object to dynamically retrieve its registered singular label
-                    $tax_obj = get_taxonomy($taxonomy_slug);
-                    $taxonomy_label = $tax_obj ? $tax_obj->labels->singular_name : $taxonomy_slug;
-
-                    // Efficiently extract term names and join them into a comma-separated string for multi-select taxonomies
-                    $term_names = wp_list_pluck($terms, 'name');
-                    $taxonomy_value = join(', ', $term_names);
-
-                    echo "<div class='lgl-meta-item lgl-{$taxonomy_slug}'>";
-                    echo "<span class='lgl-meta-icon-label'>";
-
-                    /**
-                     * Construct the absolute path to the SVG file based on the taxonomy slug.
-                     * Utilizes the plugin's root path constant.
-                     */
-                    $svg_file_path = LGL_SHORTCODES_PATH . 'assets/svg/' . $taxonomy_slug . '.svg';
-
-                    // Ensure the file exists on the server before attempting to read it
-                    if (file_exists($svg_file_path)) {
-                        // Output the raw SVG markup inline directly into the DOM
-                        echo file_get_contents($svg_file_path);
-                    }
-
-                    echo "<span class='lgl-label'>";
-                    echo esc_html($taxonomy_label);
-                    echo "</span>";
-                    echo "</span>";
-
-                    echo "<span class='lgl-value'>";
-                    echo esc_html($taxonomy_value);
-                    echo "</span>";
-
-                    echo "</div>";
-                }
-            }
-        }
-
+        echo "<span class='lgl-label'>" . esc_html($label) . "</span>";
+        echo "</span>";
+        echo "<span class='lgl-value'>" . esc_html($value) . "</span>";
         echo "</div>";
+    };
+
+    echo "<div class='lgl-meta-list'>";
+
+    // 4. Iterate through the natively ordered list and execute routing
+    foreach ($final_order as $key) {
+
+        // Intercept and skip if explicitly hidden in the LGL settings panel
+        if (!empty($options['hide_field_' . $key])) {
+            continue;
+        }
+
+        // Route execution based on field type: Taxonomy
+        if (in_array($key, $valid_taxonomies)) {
+            $terms = get_the_terms($post_id, $key);
+
+            if ($terms && !is_wp_error($terms)) {
+                $tax_obj        = get_taxonomy($key);
+                $taxonomy_label = $tax_obj ? $tax_obj->labels->singular_name : $key;
+                $term_names     = wp_list_pluck($terms, 'name');
+                $value          = join(', ', $term_names);
+
+                $render_item($key, $taxonomy_label, $value);
+            }
+        }
+
+        // Route execution based on field type: Meta Field
+        elseif (array_key_exists($key, $valid_meta_fields)) {
+            $value = get_post_meta($post_id, $key, true);
+
+            if (!empty($value)) {
+                $render_item($key, $valid_meta_fields[$key], $value);
+            }
+        }
     }
+
+    echo "</div>";
 }
-?>
