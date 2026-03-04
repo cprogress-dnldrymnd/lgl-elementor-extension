@@ -229,99 +229,99 @@ if (! class_exists('LGL_Shortcodes')) {
 				'lgl_visibility_section'
 			);
 		}
-/**
-         * Renders the drag-and-drop sortable list for managing field visibility and order.
-         * Separates visible and hidden fields, auto-moving hidden fields to the bottom,
-         * disabling their sortability, and optimizing the UI layout.
-         *
-         * @return void
-         */
-        public function render_field_manager()
-        {
-            $options = get_option('lgl_settings', array());
-            
-            if (!class_exists('LGL_Import_Post_Types')) {
-                echo '<p style="color:red;">LGL Import plugin must be active to fetch and configure field visibility.</p>';
-                return;
-            }
+		/**
+		 * Renders the drag-and-drop sortable list for managing field visibility and order.
+		 * Separates visible and hidden fields, auto-moving hidden fields to the bottom,
+		 * disabling their sortability, and optimizing the UI layout.
+		 *
+		 * @return void
+		 */
+		public function render_field_manager()
+		{
+			$options = get_option('lgl_settings', array());
 
-            $listing_fields = LGL_Import_Post_Types::get_listing_detail_fields();
-            
-            // Compile all possible fields (meta + taxonomies) into a single map
-            $all_fields = array_merge(
-                isset($listing_fields['common']) ? $listing_fields['common'] : array(),
-                isset($listing_fields['motorhome_campervan']) ? $listing_fields['motorhome_campervan'] : array(),
-                isset($listing_fields['caravan']) ? $listing_fields['caravan'] : array()
-            );
+			if (!class_exists('LGL_Import_Post_Types')) {
+				echo '<p style="color:red;">LGL Import plugin must be active to fetch and configure field visibility.</p>';
+				return;
+			}
 
-            // Append explicitly used taxonomies so they can be sorted in the same stack
-            $all_fields['listing-fuel-type'] = __('Fuel Type', 'lgl-shortcodes');
-            $all_fields['listing-chassis']   = __('Chassis', 'lgl-shortcodes');
-            $all_fields['listing-gearbox']   = __('Gearbox', 'lgl-shortcodes');
+			$listing_fields = LGL_Import_Post_Types::get_listing_detail_fields();
 
-            // Extract saved order or fallback to natural array keys on first load
-            $saved_order = isset($options['field_order']) ? $options['field_order'] : array_keys($all_fields);
+			// Compile all possible fields (meta + taxonomies) into a single map
+			$all_fields = array_merge(
+				isset($listing_fields['common']) ? $listing_fields['common'] : array(),
+				isset($listing_fields['motorhome_campervan']) ? $listing_fields['motorhome_campervan'] : array(),
+				isset($listing_fields['caravan']) ? $listing_fields['caravan'] : array()
+			);
 
-            // Ensure newly added fields in future updates automatically drop to the bottom of the list
-            $missing_fields = array_diff(array_keys($all_fields), $saved_order);
-            $current_order  = array_merge($saved_order, $missing_fields);
+			// Append explicitly used taxonomies so they can be sorted in the same stack
+			$all_fields['listing-fuel-type'] = __('Fuel Type', 'lgl-shortcodes');
+			$all_fields['listing-chassis']   = __('Chassis', 'lgl-shortcodes');
+			$all_fields['listing-gearbox']   = __('Gearbox', 'lgl-shortcodes');
 
-            // Segregate keys into visible and hidden arrays to enforce bottom-placement on load
-            $visible_keys = array();
-            $hidden_keys  = array();
+			// Extract saved order or fallback to natural array keys on first load
+			$saved_order = isset($options['field_order']) ? $options['field_order'] : array_keys($all_fields);
 
-            foreach ($current_order as $key) {
-                if (!isset($all_fields[$key])) {
-                    continue; 
-                }
-                if (!empty($options['hide_field_' . $key])) {
-                    $hidden_keys[] = $key;
-                } else {
-                    $visible_keys[] = $key;
-                }
-            }
+			// Ensure newly added fields in future updates automatically drop to the bottom of the list
+			$missing_fields = array_diff(array_keys($all_fields), $saved_order);
+			$current_order  = array_merge($saved_order, $missing_fields);
 
-            // Merge arrays: visible fields first, hidden fields stacked at the bottom
-            $final_render_order = array_merge($visible_keys, $hidden_keys);
+			// Segregate keys into visible and hidden arrays to enforce bottom-placement on load
+			$visible_keys = array();
+			$hidden_keys  = array();
 
-            echo '<ul id="lgl-field-sortable" style="max-width: 600px; padding: 0; margin: 0; list-style: none;">';
-            
-            foreach ($final_render_order as $key) {
-                $label     = $all_fields[$key];
-                $is_hidden = !empty($options['hide_field_' . $key]);
-                $checked   = $is_hidden ? 'checked="checked"' : '';
-                
-                // Dynamic CSS properties based on visibility state
-                $li_class       = $is_hidden ? 'is-hidden' : '';
-                $li_opacity     = $is_hidden ? '0.6' : '1';
-                $handle_cursor  = $is_hidden ? 'not-allowed' : 'grab';
-                $handle_opacity = $is_hidden ? '0.3' : '1';
+			foreach ($current_order as $key) {
+				if (!isset($all_fields[$key])) {
+					continue;
+				}
+				if (!empty($options['hide_field_' . $key])) {
+					$hidden_keys[] = $key;
+				} else {
+					$visible_keys[] = $key;
+				}
+			}
 
-                echo '<li class="lgl-sortable-item ' . esc_attr($li_class) . '" style="background: #fff; border: 1px solid #ccd0d4; padding: 10px 15px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 1px 1px rgba(0,0,0,.04); opacity: ' . esc_attr($li_opacity) . ';">';
-                
-                // Left Column: Drag Handle & Target Field Name
-                echo '<div style="display: flex; align-items: center;">';
-                echo '<span class="dashicons dashicons-menu lgl-drag-handle" style="margin-right: 15px; color: #a7aaad; cursor: ' . esc_attr($handle_cursor) . '; opacity: ' . esc_attr($handle_opacity) . ';"></span>';
-                echo '<strong style="font-weight: 500;">' . esc_html($label) . '</strong>';
-                // Hidden input maintains the order payload during POST
-                echo '<input type="hidden" name="lgl_settings[field_order][]" value="' . esc_attr($key) . '" />';
-                echo '</div>';
+			// Merge arrays: visible fields first, hidden fields stacked at the bottom
+			$final_render_order = array_merge($visible_keys, $hidden_keys);
 
-                // Right Column: Clean Checkbox Toggle
-                echo '<div>';
-                echo '<label style="display: flex; align-items: center; cursor: pointer; color: #50575e;">';
-                echo '<input type="checkbox" class="lgl-hide-toggle" name="lgl_settings[hide_field_' . esc_attr($key) . ']" value="1" ' . $checked . ' style="margin-right: 6px;" /> ';
-                echo 'Hide';
-                echo '</label>';
-                echo '</div>';
-                
-                echo '</li>';
-            }
-            
-            echo '</ul>';
-            
-            // Initialize jQuery UI Sortable and attach event listeners for dynamic DOM mutations
-            echo '<script>
+			echo '<ul id="lgl-field-sortable" style="max-width: 600px; padding: 0; margin: 0; list-style: none;">';
+
+			foreach ($final_render_order as $key) {
+				$label     = $all_fields[$key];
+				$is_hidden = !empty($options['hide_field_' . $key]);
+				$checked   = $is_hidden ? 'checked="checked"' : '';
+
+				// Dynamic CSS properties based on visibility state
+				$li_class       = $is_hidden ? 'is-hidden' : '';
+				$li_opacity     = $is_hidden ? '0.6' : '1';
+				$handle_cursor  = $is_hidden ? 'not-allowed' : 'grab';
+				$handle_opacity = $is_hidden ? '0.3' : '1';
+
+				echo '<li class="lgl-sortable-item ' . esc_attr($li_class) . '" style="background: #fff; border: 1px solid #ccd0d4; padding: 10px 15px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 1px 1px rgba(0,0,0,.04); opacity: ' . esc_attr($li_opacity) . ';">';
+
+				// Left Column: Drag Handle & Target Field Name
+				echo '<div style="display: flex; align-items: center;">';
+				echo '<span class="dashicons dashicons-menu lgl-drag-handle" style="margin-right: 15px; color: #a7aaad; cursor: ' . esc_attr($handle_cursor) . '; opacity: ' . esc_attr($handle_opacity) . ';"></span>';
+				echo '<strong style="font-weight: 500;">' . esc_html($label) . '</strong>';
+				// Hidden input maintains the order payload during POST
+				echo '<input type="hidden" name="lgl_settings[field_order][]" value="' . esc_attr($key) . '" />';
+				echo '</div>';
+
+				// Right Column: Clean Checkbox Toggle
+				echo '<div>';
+				echo '<label style="display: flex; align-items: center; cursor: pointer; color: #50575e;">';
+				echo '<input type="checkbox" class="lgl-hide-toggle" name="lgl_settings[hide_field_' . esc_attr($key) . ']" value="1" ' . $checked . ' style="margin-right: 6px;" /> ';
+				echo 'Hide';
+				echo '</label>';
+				echo '</div>';
+
+				echo '</li>';
+			}
+
+			echo '</ul>';
+
+			// Initialize jQuery UI Sortable and attach event listeners for dynamic DOM mutations
+			echo '<script>
                 jQuery(document).ready(function($) {
                     var $sortableList = $("#lgl-field-sortable");
 
@@ -363,7 +363,7 @@ if (! class_exists('LGL_Shortcodes')) {
                     });
                 });
             </script>';
-        }
+		}
 
 		/**
 		 * Universal renderer for settings fields, handling multiple input types dynamically.
@@ -1087,22 +1087,33 @@ if (! class_exists('LGL_Shortcodes')) {
 		/**
 		 * Renders raw SVG markup inline into the DOM based on a provided meta key.
 		 * Constructs the absolute file path utilizing the plugin's root path constant.
-		 * Validates file existence prior to outputting the buffer to prevent IO errors.
-		 * Includes filename sanitization to mitigate directory traversal risks.
+		 * Normalizes the filename to lowercase to prevent Linux case-sensitivity read errors.
+		 * Validates file existence prior to outputting the buffer to prevent IO errors,
+		 * falling back to a DOM debug comment if the file is missing.
 		 *
 		 * @param string $meta_key The meta key used to dynamically locate the target SVG file.
 		 * @return void
 		 */
 		public static function render_inline_svg(string $meta_key): void
 		{
-			// Construct the absolute path to the SVG file based on the current meta key.
-			// Utilizes the plugin's root path constant.
-			$svg_file_path = LGL_SHORTCODES_PATH . 'assets/svg/' . sanitize_file_name($meta_key) . '.svg';
+			// Normalize the meta key to strict lowercase and sanitize to mitigate directory traversal.
+			// This prevents I/O mismatches if the file is named 'Class.svg' but the key is 'class'.
+			$safe_filename = strtolower(sanitize_file_name($meta_key));
 
-			// Ensure the file exists on the server before attempting to read it
+			// Construct the absolute path to the SVG file.
+			$svg_file_path = LGL_SHORTCODES_PATH . 'assets/svg/' . $safe_filename . '.svg';
+
+			// Ensure the file exists on the server before attempting to read the buffer.
 			if (file_exists($svg_file_path)) {
-				// Output the raw SVG markup inline directly into the DOM
+				// Output the raw SVG markup inline directly into the DOM.
 				echo file_get_contents($svg_file_path);
+			} else {
+				// Inject a silent debug comment into the DOM to verify the exact path being requested.
+				// Inspect the frontend HTML near the missing icon to read this output.
+				echo "";
+
+				// Provide a native WordPress dashicon fallback to maintain grid layout integrity.
+				echo '<span class="dashicons dashicons-warning" style="margin-right: 8px; color: #a7aaad;" aria-hidden="true"></span>';
 			}
 		}
 	}
