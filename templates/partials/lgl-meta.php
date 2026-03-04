@@ -1,7 +1,31 @@
 <?php
-
 $listing_fields = LGL_Shortcodes::get_external_listing_fields();
 
+if (!empty($listing_fields)) {
+    // Access the specific field groupings
+    $common_fields = $listing_fields['common'];
+    $motorhome_campervan_fields = $listing_fields['motorhome_campervan'];
+    echo "<div class='lgl-meta-list'>";
+    // Example iteration over common fields
+    foreach ($common_fields as $meta_key => $label) {
+        $meta_value = get_post_meta($post_id, $meta_key, true);
+        if (!empty($meta_value)) {
+            echo "<div class='lgl-meta-item lgl-{$meta_key}'>";
+            echo "<span class='lgl-meta-icon-label'>";
+            echo "<span class='lgl-label'>";
+            echo esc_html($label);
+            echo "</span>";
+            echo "</span>";
+
+            echo "<span class='lgl-value'>";
+            echo esc_html($meta_value);
+            echo "</span>";
+
+            echo "</div>";
+        }
+    }
+    echo "</div>";
+}
 $schema =  [
     'condition' => [
         'class'    => 'lgl-condition',
@@ -23,7 +47,7 @@ $schema =  [
         'svg'      => '<svg width="17" height="16" viewBox="0 0 17 16" fill="none" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" focusable="false"> <rect width="17" height="16" fill="url(#pattern0_461_3)"></rect> <defs> <pattern id="pattern0_461_3" patternContentUnits="objectBoundingBox" width="1" height="1"> <use xlink:href="#image0_461_3" transform="scale(0.0294118 0.03125)"></use> </pattern> <image id="image0_461_3" width="34" height="32" preserveAspectRatio="none" xlink:href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACIAAAAgCAYAAAB3j6rJAAAABHNCSVQICAgIfAhkiAAAAb9JREFUWEftWL1OwlAUPqeEONrVTWmNxkmfAN5A3Ftk1UUmHcVRJ110FegD6BNYnkAmo7Ho6CiOBuF47i1YpJaSok1M7hmatOfvu19PTvlAiLKctQOI5+zuAtAatB0vMnaSw7BMALzjkCwQ7cKTc/FTOEbWMOx99h1Lf59W4dl5SARkyVoBDe8HuQfQbpxMBmLaeW64zkG6DERYYEayPhB4ZFbmEgEBfAcNlmUuURcIXgZ1OgywBV6j6bdbLOugfdxwUwEiMMQj8OpV+cCwXb7mkwGBJrNQkLlmqcpgDsfquNDLbCEY1iXj2Q43wTNo1yvyec66DQGdFhVRi+diwz9Q6ZRp2QunUo2B2K/s8F9H2Fw+gZ4YxLCeAIPY4VufmbB1BBCa9nB/GaeAjLOrGIljRC6XFO1rN428Gqrx96ScIgjeK8EOC4CMbtK00IxsWgVEkq4YGZ89xYhiJG4fqRlRM/K/ZwTgmvVHMe4Qv+o37Cuutylqiq+v+Jk/LxsQVaT6SsOEqkRknSPtbYLASgPNsIcQWEJyZnqCoqSSclbETZacxeDfANMqQJ/1r4ZRqm/Wht/z+8QinBWg57jC8QnCkuRI6X88sAAAAABJRU5ErkJggg=="></image> </defs> </svg>'
     ],
 
-    
+
 
 ];
 $output = '<div class="lgl-content-ss lgl-meta-list">';
