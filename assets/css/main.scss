@@ -662,6 +662,16 @@
     margin: 0;
     display: grid;
     gap: 0px;
+    .bt-contact-item {
+        font-family: var(--lgl-font-secondary);
+        font-weight: 600;
+        font-size: 16px;
+        color: var(--lgl-color-secondary);
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
 }
 .lgl-sale-card {
     background: var(--lgl-color-secondary);
@@ -911,5 +921,29 @@
     }
     @media (max-width: 767px) {
         grid-template-columns: 1fr;
+    }
+}
+
+.lgl-related-heading {
+    position: relative;
+    text-transform: capitalize;
+    margin: 0;
+    z-index: 1;
+    padding-bottom: 10px;
+    font-size: 50px;
+    color: #00235d;
+    font-family: "Poppins", sans-serif;
+    font-weight: 600;
+    padding-left: 0;
+    margin-left: 0 !important;
+    &:before {
+        content: "";
+        position: absolute;
+        left: 0;
+        bottom: 0;
+        width: 280px;
+        height: 8px;
+        background: #f6d100;
+        border-radius: 999px;
     }
 }
