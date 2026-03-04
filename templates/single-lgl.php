@@ -30,6 +30,7 @@ $post_type = get_post_type();
         $price = get_post_meta($post_id, 'price', true);
         $berth = get_post_meta($post_id, 'berth', true);
         $mileage = get_post_meta($post_id, 'mileage', true);
+        $axles = get_post_meta($post_id, 'axles', true);
         $year = get_post_meta($post_id, 'year', true);
         $condition = get_post_meta($post_id, 'condition', true);
         $feature = get_post_meta($post_id, 'feature', true);

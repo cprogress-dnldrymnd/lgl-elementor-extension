@@ -40,7 +40,7 @@ if (class_exists('LGL_Import_Post_Types')) {
                 echo "<div class='lgl-meta-item lgl-{$meta_key}'>";
                 echo "<span class='lgl-meta-icon-label'>";
 
-               echo LGL_Shortcodes::render_inline_svg($meta_key);
+                echo LGL_Shortcodes::render_inline_svg($meta_key);
                 echo "<span class='lgl-label'>";
                 echo esc_html($label);
                 echo "</span>";
