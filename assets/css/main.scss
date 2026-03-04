@@ -20,6 +20,7 @@
     --lgl-color-light-blue-gray: #ececec;
 
     --lgl-color-success: #28a745;
+    --lgl-color-success-dark: #218838;
 }
 
 // ==========================================================================
@@ -535,7 +536,7 @@
 
 .lgl-toast-success {
     background-color: var(--lgl-color-success);
-    border-left: 4px solid var(--lgl-color-tertiary);
+    border-left: 4px solid var(--lgl-color-success-dark);
 }
 
 .lgl-toast-error {
