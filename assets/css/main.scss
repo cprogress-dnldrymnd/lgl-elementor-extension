@@ -996,8 +996,8 @@
 }
 
 .lgl-mini-wishlist-toggle svg {
-    width: 20px;
-    height: 20px;
+    width: 24px;
+    height: 24px24px;
     color: var(--lgl-color-primary);
 }
 
@@ -1005,8 +1005,8 @@
     position: absolute;
     top: -4px;
     right: -4px;
-    background-color: var(--lgl-color-secondary);
-    color: #fff;
+    background-color: var(--lgl-color-primary);
+    color: var(--lgl-color-white);
     font-size: 11px;
     font-weight: 700;
     width: 20px;
@@ -1015,7 +1015,6 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    border: 2px solid #fff; /* Native masking effect */
 }
 
 /* Dropdown Container */
@@ -1024,7 +1023,7 @@
     top: calc(100% + 15px);
     right: 0;
     width: 320px;
-    background: #efefef; /* Match screenshot dropdown background */
+    background: var(--lgl-color-white); /* Match screenshot dropdown background */
     border-radius: 12px;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
     opacity: 0;
@@ -1032,7 +1031,7 @@
     transform: translateY(-10px);
     transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
     z-index: 9999;
-    border: 1px solid #e0e0e0;
+    border: 1px solid var(--lgl-color-gray);
 }
 
 .lgl-mini-wishlist-dropdown.is-active {
@@ -1044,7 +1043,7 @@
 .lgl-mini-wishlist-header {
     font-size: 18px;
     font-weight: 800;
-    color: var(--lgl-color-primary);
+    color: var(--lgl-color-secondary);
     padding: 20px 20px 10px;
     margin: 0;
 }
@@ -1066,7 +1065,7 @@
     display: flex;
     align-items: center;
     padding: 15px 0;
-    border-bottom: 1px solid #dfdfdf;
+    border-bottom: 1px solid var(--lgl-color-medium-gray);
 }
 
 .lgl-wishlist-item:last-child {
@@ -1101,7 +1100,7 @@
 }
 
 .lgl-wishlist-title a {
-    color: var(--lgl-color-primary);
+    color: var(--lgl-color-secondary);
     text-decoration: none;
     transition: color 0.2s ease;
 }
@@ -1112,7 +1111,7 @@
 
 .lgl-wishlist-price {
     font-size: 14px;
-    color: var(--lgl-color-primary);
+    color: var(--lgl-color-secondary);
     font-weight: 500;
 }
 
@@ -1143,7 +1142,7 @@
     display: block;
     padding: 20px;
     font-size: 14px;
-    color: var(--lgl-color-primary);
+    color: var(--lgl-color-secondary);
     text-decoration: underline;
     font-weight: 500;
     text-align: center;
