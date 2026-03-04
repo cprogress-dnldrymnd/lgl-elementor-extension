@@ -239,14 +239,14 @@ if (! class_exists('LGL_Shortcodes')) {
             // --- TAB 6: Comparison Table Settings ---
             add_settings_section('lgl_pages', 'LGL Pages', null, 'lgl-pages');
 
-            $comparison_fields = array(
+            $lgl_pages_fields = array(
                 'vehicle_comparison_page_id' => array('label' => 'Vehicle Comparison Page', 'type' => 'select_page', 'default' => ''),
                 'caravan_page' => array('label' => 'Caravan Page', 'type' => 'select_page', 'default' => ''),
                 'motorhome_page' => array('label' => 'Motorhome Page', 'type' => 'select_page', 'default' => ''),
 				'campervan_page' => array('label' => 'Campervan Page', 'type' => 'select_page', 'default' => ''),
             );
 
-            foreach ($comparison_fields as $id => $field) {
+            foreach ($lgl_pages_fields as $id => $field) {
                 add_settings_field(
                     $id,
                     $field['label'],
