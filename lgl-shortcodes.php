@@ -4,7 +4,7 @@
  * Plugin Name: LGL Shortcodes
  * Plugin URI: https://digitallydisruptive.co.uk/
  * Description: A robust, OOP-based plugin to output customized data via shortcodes using a dynamic template routing system.
- * Version: 1.6.3
+ * Version: 2.0.9
  * Author: Digitally Disruptive - Donald Raymundo
  * Author URI: https://digitallydisruptive.co.uk/
  * Text Domain: lgl-shortcodes
@@ -17,7 +17,7 @@ if (! defined('ABSPATH')) {
 // Define a constant for the plugin directory path to ensure reliable file inclusion.
 define('LGL_SHORTCODES_PATH', plugin_dir_path(__FILE__));
 define('LGL_SHORTCODES_URL', plugin_dir_url(__FILE__));
-define('LGL_SHORTCODES_VERSION', '2.0.8');
+define('LGL_SHORTCODES_VERSION', '2.0.9');
 
 if (! class_exists('LGL_Shortcodes')) {
 
@@ -53,6 +53,10 @@ if (! class_exists('LGL_Shortcodes')) {
             add_action('wp_ajax_lgl_fetch_results', array($this, 'ajax_fetch_results'));
             add_action('wp_ajax_nopriv_lgl_fetch_results', array($this, 'ajax_fetch_results'));
             add_action('wp_ajax_lgl_add_to_wishlist', array($this, 'ajax_add_to_wishlist'));
+            
+            // New AJAX endpoints for mini wishlist dynamic refresh
+            add_action('wp_ajax_lgl_refresh_mini_wishlist', array($this, 'ajax_refresh_mini_wishlist'));
+            add_action('wp_ajax_nopriv_lgl_refresh_mini_wishlist', array($this, 'ajax_refresh_mini_wishlist'));
 
             // Aggressive override: Force plugin template for specific CPTs, bypassing theme hierarchy
             add_filter('single_template', array($this, 'force_plugin_single_template'), 99999);
@@ -340,6 +344,9 @@ if (! class_exists('LGL_Shortcodes')) {
             
             // Registering the dynamic related vehicles shortcode
             add_shortcode('lgl_related_vehicles', array($this, 'render_related_vehicles_shortcode'));
+
+            // Registering the mini wishlist shortcode for header/menu placement
+            add_shortcode('lgl_mini_wishlist', array($this, 'render_mini_wishlist_shortcode'));
         }
 
         /**
@@ -420,8 +427,119 @@ if (! class_exists('LGL_Shortcodes')) {
         }
 
         /**
+         * Callback handler for the [lgl_mini_wishlist] shortcode.
+         * Renders the heart icon, dynamic badge count, and the dropdown structure.
+         *
+         * @param array  $atts    The array of attributes passed by the user.
+         * @param string $content The enclosed content, if any.
+         * @return string         The buffered HTML payload.
+         */
+        public function render_mini_wishlist_shortcode($atts, $content = null)
+        {
+            $count = 0;
+            if (is_user_logged_in()) {
+                $wishlist = get_user_meta(get_current_user_id(), 'lgl_wishlists', true);
+                $count = is_array($wishlist) ? count($wishlist) : 0;
+            }
+
+            ob_start();
+            ?>
+            <div class="lgl-mini-wishlist-wrapper">
+                <div class="lgl-mini-wishlist-toggle" role="button" tabindex="0">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z" />
+                    </svg>
+                    <span class="lgl-wishlist-count"><?php echo esc_html($count); ?></span>
+                </div>
+                <div class="lgl-mini-wishlist-dropdown">
+                    <h3 class="lgl-mini-wishlist-header">My Wishlist</h3>
+                    <div class="lgl-mini-wishlist-content">
+                        <?php echo $this->get_mini_wishlist_html(); ?>
+                    </div>
+                    <div class="lgl-mini-wishlist-footer">
+                        <a href="/wishlist" class="lgl-view-wishlist-link">View Your Wishlist</a>
+                    </div>
+                </div>
+            </div>
+            <?php
+            return ob_get_clean();
+        }
+
+        /**
+         * Generates the internal HTML payload for the mini wishlist items list.
+         * Used for initial shortcode rendering and subsequent AJAX refresh states.
+         *
+         * @return string The compiled HTML string containing the wishlist list items.
+         */
+        private function get_mini_wishlist_html()
+        {
+            if (!is_user_logged_in()) {
+                return '<div class="lgl-wishlist-empty">Please log in to view your wishlist.</div>';
+            }
+
+            $user_id = get_current_user_id();
+            $wishlist = get_user_meta($user_id, 'lgl_wishlists', true);
+            
+            if (!is_array($wishlist) || empty($wishlist)) {
+                return '<div class="lgl-wishlist-empty">Your wishlist is currently empty.</div>';
+            }
+
+            ob_start();
+            echo '<ul class="lgl-mini-wishlist-items">';
+            
+            foreach ($wishlist as $post_id) {
+                $post = get_post($post_id);
+                if (!$post || $post->post_status !== 'publish') continue;
+                
+                $price = get_post_meta($post_id, 'price', true);
+                $formatted_price = $price ? '$' . number_format((float)$price, 0) : 'N/A';
+                
+                echo '<li class="lgl-wishlist-item" data-post-id="' . esc_attr($post_id) . '">';
+                echo '  <div class="lgl-wishlist-thumb">' . get_the_post_thumbnail($post_id, 'thumbnail') . '</div>';
+                echo '  <div class="lgl-wishlist-info">';
+                echo '      <h4 class="lgl-wishlist-title"><a href="' . get_permalink($post_id) . '">' . esc_html($post->post_title) . '</a></h4>';
+                echo '      <span class="lgl-wishlist-price">' . esc_html($formatted_price) . '</span>';
+                echo '  </div>';
+                echo '  <div class="lgl-wishlist-remove">';
+                echo '      <button class="lgl-remove-btn" data-id="' . esc_attr($post_id) . '" aria-label="Remove from wishlist">';
+                echo '          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#999" stroke-width="2"><path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2M10 11v6M14 11v6"/></svg>';
+                echo '      </button>';
+                echo '  </div>';
+                echo '</li>';
+            }
+            
+            echo '</ul>';
+            return ob_get_clean();
+        }
+
+        /**
+         * AJAX handler to refresh the mini wishlist dropdown content.
+         * Returns JSON payload containing the updated HTML and the new item count.
+         *
+         * @return void
+         */
+        public function ajax_refresh_mini_wishlist()
+        {
+            check_ajax_referer('lgl_search_nonce', 'nonce');
+
+            if (!is_user_logged_in()) {
+                wp_send_json_error('User not logged in.');
+            }
+
+            $html = $this->get_mini_wishlist_html();
+            $wishlist = get_user_meta(get_current_user_id(), 'lgl_wishlists', true);
+            $count = is_array($wishlist) ? count($wishlist) : 0;
+
+            wp_send_json_success(array(
+                'html'  => $html,
+                'count' => $count
+            ));
+        }
+
+        /**
          * AJAX handler to add or remove a post from a user's wishlist.
          * Stores data in the 'lgl_wishlists' user meta field as an array.
+         * Returns the updated count to immediately sync the frontend UI.
          */
         public function ajax_add_to_wishlist()
         {
@@ -459,7 +577,11 @@ if (! class_exists('LGL_Shortcodes')) {
             $updated = update_user_meta($user_id, 'lgl_wishlists', array_values($wishlist)); // array_values re-indexes the array
 
             if ($updated !== false) {
-                wp_send_json_success(array('status' => $status));
+                // Ensure count is passed back to immediately update the mini wishlist UI badge
+                wp_send_json_success(array(
+                    'status' => $status,
+                    'count'  => count($wishlist)
+                ));
             } else {
                 wp_send_json_error('Failed to update database.');
             }

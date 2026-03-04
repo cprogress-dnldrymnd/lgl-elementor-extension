@@ -9,6 +9,7 @@
         add_to_wishlist();
         gallery_slider();
         tabs();
+        initLGLMiniWishlist();
     });
 
 
@@ -147,6 +148,92 @@
         // Trigger initial search to populate grid on load
         if ($('#lgl-search-form').length) {
             execute_search();
+        }
+    }
+
+    /**
+     * Initializes the mini wishlist UI components and binds necessary event listeners.
+     * * @return {void}
+     */
+    function initLGLMiniWishlist() {
+        const $wrapper = jQuery('.lgl-mini-wishlist-wrapper');
+        const $toggle = jQuery('.lgl-mini-wishlist-toggle');
+        const $dropdown = jQuery('.lgl-mini-wishlist-dropdown');
+        const $content = jQuery('.lgl-mini-wishlist-content');
+        const $badge = jQuery('.lgl-wishlist-count');
+
+        if (!$wrapper.length) return;
+
+        /**
+         * Toggles the active state of the mini wishlist dropdown.
+         */
+        $toggle.on('click', function (e) {
+            e.preventDefault();
+            $dropdown.toggleClass('is-active');
+        });
+
+        /**
+         * Closes the dropdown when a click event occurs outside of the wrapper component.
+         */
+        jQuery(document).on('click', function (e) {
+            if (!$wrapper.is(e.target) && $wrapper.has(e.target).length === 0) {
+                $dropdown.removeClass('is-active');
+            }
+        });
+
+        /**
+         * Executes the AJAX request to remove a vehicle from the wishlist 
+         * and delegates DOM updates on success.
+         */
+        $content.on('click', '.lgl-remove-btn', function (e) {
+            e.preventDefault();
+            const $btn = jQuery(this);
+            const postId = $btn.data('id');
+
+            // Apply visual degradation to indicate processing
+            $btn.css('opacity', '0.5').css('pointer-events', 'none');
+
+            jQuery.ajax({
+                url: lgl_ajax_obj.ajax_url,
+                type: 'POST',
+                data: {
+                    action: 'lgl_add_to_wishlist',
+                    post_id: postId,
+                    nonce: lgl_ajax_obj.nonce
+                },
+                success: function (response) {
+                    if (response.success) {
+                        $badge.text(response.data.count);
+                        refreshMiniWishlistHtml();
+                    } else {
+                        $btn.css('opacity', '1').css('pointer-events', 'auto');
+                    }
+                },
+                error: function () {
+                    $btn.css('opacity', '1').css('pointer-events', 'auto');
+                }
+            });
+        });
+
+        /**
+         * Triggers a subsequent AJAX call to refresh the HTML payload of the dropdown 
+         * list to maintain synchronization with the backend state.
+         * * @return {void}
+         */
+        function refreshMiniWishlistHtml() {
+            jQuery.ajax({
+                url: lgl_ajax_obj.ajax_url,
+                type: 'POST',
+                data: {
+                    action: 'lgl_refresh_mini_wishlist',
+                    nonce: lgl_ajax_obj.nonce
+                },
+                success: function (response) {
+                    if (response.success) {
+                        $content.html(response.data.html);
+                    }
+                }
+            });
         }
     }
 
