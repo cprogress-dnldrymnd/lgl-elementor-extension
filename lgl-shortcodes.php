@@ -1136,7 +1136,6 @@ if (! class_exists('LGL_Shortcodes')) {
             if ($query->have_posts()) {
                 while ($query->have_posts()) {
                     $query->the_post();
-                    include LGL_SHORTCODES_PATH . 'templates/partials/lgl-grid.php';
                 }
             } else {
                 echo '<div class="lgl-no-results">No vehicles found matching your criteria.</div>';
