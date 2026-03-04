@@ -1048,11 +1048,22 @@
 }
 
 .lgl-mini-wishlist-header {
-    font-size: 18px;
-    font-weight: 800;
-    color: var(--lgl-color-secondary);
-    padding: 20px 20px 10px;
-    margin: 0;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    justify-content: center;
+    h3 {
+        font-size: 18px;
+        font-weight: 800;
+        color: var(--lgl-color-secondary);
+        padding: 20px 20px 10px;
+        margin: 0;
+    }
+    .lgl-mini-close-wishlist {
+        @media (min-width: 576px) {
+            display: none;
+        }
+    }
 }
 
 .lgl-mini-wishlist-content {

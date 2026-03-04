@@ -16,7 +16,7 @@ ob_start();
     </div>
     <div class="lgl-mini-wishlist-dropdown">
         <div class="lgl-mini-wishlist-header">
-            <h3 class="lgl-mini-wishlist-header">My Wishlist</h3>
+            <h3>My Wishlist</h3>
             <button class="lgl-mini-close-wishlist">
                 X
             </button>
