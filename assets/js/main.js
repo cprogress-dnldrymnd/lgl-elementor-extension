@@ -440,11 +440,13 @@
             const btn = $(this);
             const postId = btn.attr('data-post-id');
             const postType = btn.attr('data-post-type');
+            const postTitle = btn.attr('data-title') || 'Vehicle';
 
             // Verify if this specific ID exists within its designated vehicle type array
             if (data[postType] && data[postType].includes(postId)) {
                 btn.addClass('is-active');
                 btn.find('.lgl-compare-text').text('Added to Compare');
+                showNotification(postTitle + ' added to compare list!');
             } else {
                 btn.removeClass('is-active');
                 btn.find('.lgl-compare-text').text('Compare');
