@@ -1,0 +1,5 @@
+# Ignore Sass cache specifically within your assets/css directory
+/assets/css/.sass-cache/
+
+# Ignore Sass cache globally to catch any instances elsewhere
+.sass-cache/
