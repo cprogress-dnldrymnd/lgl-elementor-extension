@@ -1086,19 +1086,27 @@ if (! class_exists('LGL_Shortcodes')) {
 
 		/**
 		 * Renders raw SVG markup inline into the DOM based on a provided meta key.
-		 * Constructs the absolute file path utilizing the plugin's root path constant.
-		 * Normalizes the filename to lowercase to prevent Linux case-sensitivity read errors.
-		 * Validates file existence prior to outputting the buffer to prevent IO errors,
-		 * falling back to a DOM debug comment if the file is missing.
+		 * Includes an asset mapping dictionary to safely bypass server-level firewalls
+		 * that block reserved system keywords (like 'class.*').
 		 *
 		 * @param string $meta_key The meta key used to dynamically locate the target SVG file.
 		 * @return void
 		 */
 		public static function render_inline_svg(string $meta_key): void
 		{
-			// Normalize the meta key to strict lowercase and sanitize to mitigate directory traversal.
-			// This prevents I/O mismatches if the file is named 'Class.svg' but the key is 'class'.
+			// Normalize the meta key to strict lowercase and sanitize.
 			$safe_filename = strtolower(sanitize_file_name($meta_key));
+
+			// Asset Mapping Dictionary: 
+			// Map problematic database keys to safe physical file names.
+			$asset_map = array(
+				'class' => 'vehicle-class', // Bypasses server rules blocking 'class.*'
+			);
+
+			// Intercept and rewrite the filename if it exists in our map.
+			if (array_key_exists($safe_filename, $asset_map)) {
+				$safe_filename = $asset_map[$safe_filename];
+			}
 
 			// Construct the absolute path to the SVG file.
 			$svg_file_path = LGL_SHORTCODES_PATH . 'assets/svg/' . $safe_filename . '.svg';
@@ -1109,7 +1117,6 @@ if (! class_exists('LGL_Shortcodes')) {
 				echo file_get_contents($svg_file_path);
 			} else {
 				// Inject a silent debug comment into the DOM to verify the exact path being requested.
-				// Inspect the frontend HTML near the missing icon to read this output.
 				echo "";
 
 				// Provide a native WordPress dashicon fallback to maintain grid layout integrity.
