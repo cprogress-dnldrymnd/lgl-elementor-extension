@@ -807,13 +807,14 @@ if (! class_exists('LGL_Shortcodes')) {
 
 		/**
 		 * AJAX handler to process and render the vehicle comparison table.
-		 * Validates array of post IDs and enforces specific metadata extraction 
-		 * based on the dynamically selected post type (Caravan vs Motorhome/Campervan).
+		 * Validates array of post IDs, enforces specific metadata extraction 
+		 * based on the dynamically selected post type, and intelligently drops 
+		 * rows where all compared vehicles lack data.
 		 * * @return void Outputs JSON response with the table HTML.
 		 */
 		public function ajax_get_compare_table()
 		{
-			// Verify security nonce
+			// Verify security nonce for non-destructive read operations
 			if (! isset($_POST['nonce']) || ! wp_verify_nonce(sanitize_key($_POST['nonce']), 'lgl_search_nonce')) {
 				wp_send_json_error('Security validation failed.');
 			}
@@ -869,7 +870,7 @@ if (! class_exists('LGL_Shortcodes')) {
 			// Read UI states for visibility toggles
 			$options = get_option('lgl_settings', array());
 
-			// We must intersect the global saved order with the specific type_fields array
+			// Intersect the global saved order with the specific type_fields array
 			$saved_order = isset($options['field_order']) ? $options['field_order'] : array_keys($type_fields);
 			$visible_fields = array();
 
@@ -892,30 +893,55 @@ if (! class_exists('LGL_Shortcodes')) {
 										<?php echo get_the_post_thumbnail($p->ID, 'medium'); ?>
 									</div>
 									<h4 class="lgl-compare-title"><a href="<?php echo get_permalink($p->ID); ?>"><?php echo esc_html($p->post_title); ?></a></h4>
-									<button class="lgl-btn lgl-color-error lgl-compare-remove-btn" data-post-id="<?php echo esc_attr($p->ID); ?>" data-post-type="<?php echo esc_attr($requested_type); ?>">Remove</button>
+									<button class="lgl-compare-remove-btn" data-post-id="<?php echo esc_attr($p->ID); ?>" data-post-type="<?php echo esc_attr($requested_type); ?>">Remove</button>
 								</th>
 							<?php endforeach; ?>
 						</tr>
 					</thead>
 					<tbody>
-						<?php foreach ($visible_fields as $meta_key => $label): ?>
-							<tr>
-								<th><?php echo esc_html($label); ?></th>
-								<?php
-								foreach ($posts as $p):
-									// Map distinct data extractions: taxonomies vs. metadata
-									if (in_array($meta_key, array('listing-fuel-type', 'listing-chassis', 'listing-gearbox'))) {
-										$terms = get_the_terms($p->ID, $meta_key);
-										$value = ($terms && !is_wp_error($terms)) ? join(', ', wp_list_pluck($terms, 'name')) : '-';
+						<?php
+						foreach ($visible_fields as $meta_key => $label):
+							$row_has_data = false;
+							$row_cells = array();
+
+							// Pass 1: Extract data and evaluate row validity
+							foreach ($posts as $p) {
+								// Map distinct data extractions: taxonomies vs. metadata
+								if (in_array($meta_key, array('listing-fuel-type', 'listing-chassis', 'listing-gearbox'))) {
+									$terms = get_the_terms($p->ID, $meta_key);
+									$value = ($terms && !is_wp_error($terms)) ? join(', ', wp_list_pluck($terms, 'name')) : '';
+								} else {
+									$raw_value = get_post_meta($p->ID, $meta_key, true);
+									// Flatten array structures like multi-selects to prevent Array-to-string conversion errors
+									if (is_array($raw_value)) {
+										$value = implode(', ', array_map('esc_html', $raw_value));
 									} else {
-										$value = get_post_meta($p->ID, $meta_key, true);
-										$value = !empty($value) ? $value : '-';
+										$value = trim($raw_value);
 									}
-								?>
-									<td><?php echo esc_html($value); ?></td>
-								<?php endforeach; ?>
-							</tr>
-						<?php endforeach; ?>
+								}
+
+								// Flag row for rendering if at least one column possesses valid data
+								if (!empty($value) && $value !== '-') {
+									$row_has_data = true;
+								}
+
+								// Queue the cell output, applying the fallback hyphen for empty individual cells
+								$row_cells[] = !empty($value) ? esc_html($value) : '-';
+							}
+
+							// Pass 2: Output DOM nodes only if the row contains actionable data
+							if ($row_has_data):
+						?>
+								<tr>
+									<th><?php echo esc_html($label); ?></th>
+									<?php foreach ($row_cells as $cell_data): ?>
+										<td><?php echo $cell_data; ?></td>
+									<?php endforeach; ?>
+								</tr>
+						<?php
+							endif; // End empty row check
+						endforeach;
+						?>
 					</tbody>
 				</table>
 			</div>
