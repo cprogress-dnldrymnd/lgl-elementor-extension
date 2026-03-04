@@ -53,6 +53,9 @@ if (! class_exists('LGL_Shortcodes')) {
 			add_action('wp_ajax_lgl_fetch_results', array($this, 'ajax_fetch_results'));
 			add_action('wp_ajax_nopriv_lgl_fetch_results', array($this, 'ajax_fetch_results'));
 			add_action('wp_ajax_lgl_add_to_wishlist', array($this, 'ajax_add_to_wishlist'));
+			// New AJAX endpoints for compare inline search
+			add_action('wp_ajax_lgl_search_vehicles_for_compare', array($this, 'ajax_search_vehicles_for_compare'));
+			add_action('wp_ajax_nopriv_lgl_search_vehicles_for_compare', array($this, 'ajax_search_vehicles_for_compare'));
 
 			// New AJAX endpoints for mini wishlist dynamic refresh
 			add_action('wp_ajax_lgl_refresh_mini_wishlist', array($this, 'ajax_refresh_mini_wishlist'));
@@ -758,6 +761,48 @@ if (! class_exists('LGL_Shortcodes')) {
 			} else {
 				wp_send_json_error('Failed to update database.');
 			}
+		}
+
+
+		/**
+		 * AJAX handler to search vehicles by title for the Select2 input on the compare page.
+		 * Enforces strict post_type filtering based on the currently active comparison category.
+		 *
+		 * @return void
+		 */
+		public function ajax_search_vehicles_for_compare()
+		{
+			// Verify security nonce for non-destructive read operations
+			if (! isset($_POST['nonce']) || ! wp_verify_nonce(sanitize_key($_POST['nonce']), 'lgl_search_nonce')) {
+				wp_send_json_error('Security validation failed.');
+			}
+
+			$search_term = isset($_POST['q']) ? sanitize_text_field($_POST['q']) : '';
+			$post_type   = isset($_POST['post_type']) ? sanitize_text_field($_POST['post_type']) : 'caravan';
+
+			// Query strictly for ID and Title to optimize payload size
+			$args = array(
+				'post_type'      => $post_type,
+				'post_status'    => 'publish',
+				'posts_per_page' => 20,
+				's'              => $search_term,
+				'orderby'        => 'title',
+				'order'          => 'ASC'
+			);
+
+			$query = new WP_Query($args);
+			$results = array();
+
+			if ($query->have_posts()) {
+				foreach ($query->posts as $p) {
+					$results[] = array(
+						'id'   => $p->ID,
+						'text' => html_entity_decode(get_the_title($p->ID))
+					);
+				}
+			}
+
+			wp_send_json_success($results);
 		}
 
 		/**
