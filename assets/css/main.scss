@@ -42,11 +42,9 @@
     background-color: var(--lgl-color-primary);
     padding: 30px;
     &.lgl-search-container-bg-secondary {
-    background-color: var(--lgl-color-secondary);
-
+        background-color: var(--lgl-color-secondary);
     }
     .lgl-filter-form {
-       
         display: flex;
         gap: 0;
         align-items: center;
@@ -54,6 +52,17 @@
         border-radius: 10px;
         overflow: hidden;
         flex-wrap: wrap;
+
+        &.lgl-filter-form-no-ajax {
+            @media (min-width: 1200px) {
+                .lgl-filter-group {
+                    --width: calc(calc(100% / 3) - 50px);
+                }
+                .lgl-submit-group {
+                    --width: 50px;
+                }
+            }
+        }
         .lgl-filter-group {
             display: flex;
             flex-direction: column;
