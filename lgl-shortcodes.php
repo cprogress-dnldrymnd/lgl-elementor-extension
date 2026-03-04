@@ -121,6 +121,7 @@ if (! class_exists('LGL_Shortcodes')) {
         /**
          * Registers settings, sections, and fields via the WordPress Settings API.
          * Fields are segmented into tab-specific sections for logical rendering.
+         * Now includes dynamic extraction of import fields for visibility toggling.
          *
          * @return void
          */
@@ -139,11 +140,8 @@ if (! class_exists('LGL_Shortcodes')) {
 
             foreach ($general_fields as $id => $field) {
                 add_settings_field(
-                    $id,
-                    $field['label'],
-                    array($this, 'render_field'),
-                    'lgl-settings-general',
-                    'lgl_general_section',
+                    $id, $field['label'], array($this, 'render_field'),
+                    'lgl-settings-general', 'lgl_general_section',
                     array('id' => $id, 'type' => $field['type'], 'default' => $field['default'])
                 );
             }
@@ -163,11 +161,8 @@ if (! class_exists('LGL_Shortcodes')) {
 
             foreach ($design_fields as $id => $field) {
                 add_settings_field(
-                    $id,
-                    $field['label'],
-                    array($this, 'render_field'),
-                    'lgl-settings-design',
-                    'lgl_design_section',
+                    $id, $field['label'], array($this, 'render_field'),
+                    'lgl-settings-design', 'lgl_design_section',
                     array('id' => $id, 'type' => $field['type'], 'default' => $field['default'])
                 );
             }
@@ -184,11 +179,8 @@ if (! class_exists('LGL_Shortcodes')) {
 
             foreach ($single_page_fields as $id => $field) {
                 add_settings_field(
-                    $id,
-                    $field['label'],
-                    array($this, 'render_field'),
-                    'lgl-settings-single-page',
-                    'lgl_single_page_section',
+                    $id, $field['label'], array($this, 'render_field'),
+                    'lgl-settings-single-page', 'lgl_single_page_section',
                     array('id' => $id, 'type' => $field['type'], 'default' => $field['default'])
                 );
             }
@@ -205,12 +197,39 @@ if (! class_exists('LGL_Shortcodes')) {
 
             foreach ($contact_fields as $id => $field) {
                 add_settings_field(
-                    $id,
-                    $field['label'],
-                    array($this, 'render_field'),
-                    'lgl-settings-contact',
-                    'lgl_contact_section',
+                    $id, $field['label'], array($this, 'render_field'),
+                    'lgl-settings-contact', 'lgl_contact_section',
                     array('id' => $id, 'type' => $field['type'], 'default' => $field['default'])
+                );
+            }
+
+            // --- TAB 5: Field Visibility ---
+            add_settings_section('lgl_visibility_section', 'Frontend Field Visibility (Check to hide)', null, 'lgl-settings-visibility');
+
+            // Safely verify the import class exists before calling its static method to prevent fatals
+            if (class_exists('LGL_Import_Post_Types')) {
+                $listing_fields = LGL_Import_Post_Types::get_listing_detail_fields();
+                
+                // Flatten the multi-dimensional array to easily loop through all possible fields
+                $all_fields = array_merge(
+                    isset($listing_fields['common']) ? $listing_fields['common'] : array(),
+                    isset($listing_fields['motorhome_campervan']) ? $listing_fields['motorhome_campervan'] : array(),
+                    isset($listing_fields['caravan']) ? $listing_fields['caravan'] : array()
+                );
+
+                foreach ($all_fields as $meta_key => $label) {
+                    $field_id = 'hide_field_' . $meta_key;
+                    add_settings_field(
+                        $field_id, $label, array($this, 'render_field'),
+                        'lgl-settings-visibility', 'lgl_visibility_section',
+                        array('id' => $field_id, 'type' => 'checkbox', 'default' => '0')
+                    );
+                }
+            } else {
+                add_settings_field(
+                    'lgl_visibility_error', 'Dependency Missing',
+                    function() { echo '<p style="color:red;">LGL Import plugin must be active to fetch and configure field visibility.</p>'; },
+                    'lgl-settings-visibility', 'lgl_visibility_section'
                 );
             }
         }
@@ -263,7 +282,7 @@ if (! class_exists('LGL_Shortcodes')) {
             }
         }
 
-        /**
+       /**
          * Renders the HTML architecture for the tabbed settings interface.
          * Utilizes client-side JS tab switching to ensure all fields remain in the DOM during save.
          *
@@ -285,6 +304,7 @@ if (! class_exists('LGL_Shortcodes')) {
                     <a href="#design" class="nav-tab <?php echo $active_tab == 'design' ? 'nav-tab-active' : ''; ?>" data-tab="design">Design Settings</a>
                     <a href="#single-page" class="nav-tab <?php echo $active_tab == 'single-page' ? 'nav-tab-active' : ''; ?>" data-tab="single-page">Single Page</a>
                     <a href="#contact" class="nav-tab <?php echo $active_tab == 'contact' ? 'nav-tab-active' : ''; ?>" data-tab="contact">Contact Information</a>
+                    <a href="#visibility" class="nav-tab <?php echo $active_tab == 'visibility' ? 'nav-tab-active' : ''; ?>" data-tab="visibility">Field Visibility</a>
                 </h2>
 
                 <form method="post" action="options.php">
@@ -304,6 +324,10 @@ if (! class_exists('LGL_Shortcodes')) {
 
                     <div id="tab-contact" class="lgl-tab-content" <?php echo $active_tab == 'contact' ? '' : 'style="display:none;"'; ?>>
                         <?php do_settings_sections('lgl-settings-contact'); ?>
+                    </div>
+
+                    <div id="tab-visibility" class="lgl-tab-content" <?php echo $active_tab == 'visibility' ? '' : 'style="display:none;"'; ?>>
+                        <?php do_settings_sections('lgl-settings-visibility'); ?>
                     </div>
 
                     <?php submit_button(); ?>
