@@ -548,7 +548,7 @@
 
 .lgl-toast-error {
     border-left: 4px solid var(--lgl-color-error); /* Standard red for removal/errors */
-    background-color: 4px solid var(--lgl-color-error-dark); /* Standard red for removal/errors */
+    background-color: var(--lgl-color-error-dark); /* Standard red for removal/errors */
 }
 
 // Pagination Styling mapped to Design System
