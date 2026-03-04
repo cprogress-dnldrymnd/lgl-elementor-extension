@@ -67,9 +67,9 @@ if ($active_make) {
 
             // Build vehicle type options from configured pages
             $vehicle_types = array();
-            if ($caravan_page)   $vehicle_types['caravan']   = 'Caravan';
-            if ($motorhome_page) $vehicle_types['motorhome'] = 'Motorhome';
-            if ($campervan_page) $vehicle_types['campervan'] = 'Campervan';
+            if ($caravan_page)   $vehicle_types[get_the_permalink($caravan_page)]   = 'Caravan';
+            if ($motorhome_page) $vehicle_types[get_the_permalink($motorhome_page)] = 'Motorhome';
+            if ($campervan_page) $vehicle_types[get_the_permalink($campervan_page)] = 'Campervan';
             ?>
 
             <!-- Leisure Vehicle Type -->
