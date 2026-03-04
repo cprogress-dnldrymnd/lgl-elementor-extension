@@ -892,7 +892,7 @@ if (! class_exists('LGL_Shortcodes')) {
 										<?php echo get_the_post_thumbnail($p->ID, 'medium'); ?>
 									</div>
 									<h4 class="lgl-compare-title"><a href="<?php echo get_permalink($p->ID); ?>"><?php echo esc_html($p->post_title); ?></a></h4>
-									<button class="lgl-compare-remove-btn" data-post-id="<?php echo esc_attr($p->ID); ?>" data-post-type="<?php echo esc_attr($requested_type); ?>">Remove</button>
+									<button class="lgl-btn lgl-color-error lgl-compare-remove-btn" data-post-id="<?php echo esc_attr($p->ID); ?>" data-post-type="<?php echo esc_attr($requested_type); ?>">Remove</button>
 								</th>
 							<?php endforeach; ?>
 						</tr>

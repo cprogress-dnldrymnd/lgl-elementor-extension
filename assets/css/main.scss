@@ -21,6 +21,12 @@
 
     --lgl-color-success: #28a745;
     --lgl-color-success-dark: #218838;
+
+    --lgl-color-warning: #ffc107;
+    --lgl-color-warning-dark: #e0a800;
+
+    --lgl-color-error: #dc3545;
+    --lgl-color-error-dark: #c82333;
 }
 
 // ==========================================================================
@@ -701,7 +707,7 @@
     }
     .lgl-compare-btn {
         &.is-active {
-                color: var(--lgl-color-secondary) !important;
+            color: var(--lgl-color-secondary) !important;
             background: var(--lgl-color-accent) !important;
         }
     }
@@ -838,6 +844,24 @@
         &:hover {
             background-color: var(--lgl-color-secondary);
             color: var(--lgl-color-tertiary);
+        }
+    }
+    &.lgl-btn-error {
+        background-color: var(--lgl-color-error);
+        color: var(--lgl-color-white);
+        border-color: var(--lgl-color-error);
+        &:hover {
+            background-color: var(--lgl-color-error-dark);
+            border-color: var(--lgl-color-error-dark);
+        }
+    }
+    &.lgl-btn-warning {
+        background-color: var(--lgl-color-warning);
+        color: var(--lgl-color-secondary);
+        border-color: var(--lgl-color-warning);
+        &:hover {
+            background-color: var(--lgl-color-warning-dark);
+            border-color: var(--lgl-color-warning-dark);
         }
     }
 }
@@ -1300,22 +1324,6 @@
 }
 
 /* Interactive remove button styling with transition states */
-.lgl-compare-remove-btn {
-    background-color: transparent;
-    color: #ef4444;
-    border: 1px solid #ef4444;
-    padding: 0.5rem 1rem;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 0.875rem;
-    font-weight: 500;
-    transition: all 0.2s ease;
-}
-
-.lgl-compare-remove-btn:hover {
-    background-color: #ef4444;
-    color: #fff;
-}
 
 /* Feedback states for empty or error payloads injected by LocalStorage logic */
 .lgl-compare-empty,

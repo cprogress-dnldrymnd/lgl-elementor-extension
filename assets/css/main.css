@@ -15,7 +15,11 @@
   --lgl-color-light-blue: #f7faff;
   --lgl-color-light-blue-gray: #ececec;
   --lgl-color-success: #28a745;
-  --lgl-color-success-dark: #218838; }
+  --lgl-color-success-dark: #218838;
+  --lgl-color-warning: #ffc107;
+  --lgl-color-warning-dark: #e0a800;
+  --lgl-color-error: #dc3545;
+  --lgl-color-error-dark: #c82333; }
 
 .lgl-holder {
   font-family: var(--lgl-font-primary); }
@@ -646,6 +650,20 @@
     .lgl-btn.lgl-btn-outline:hover {
       background-color: var(--lgl-color-secondary);
       color: var(--lgl-color-tertiary); }
+  .lgl-btn.lgl-btn-error {
+    background-color: var(--lgl-color-error);
+    color: var(--lgl-color-white);
+    border-color: var(--lgl-color-error); }
+    .lgl-btn.lgl-btn-error:hover {
+      background-color: var(--lgl-color-error-dark);
+      border-color: var(--lgl-color-error-dark); }
+  .lgl-btn.lgl-btn-warning {
+    background-color: var(--lgl-color-warning);
+    color: var(--lgl-color-secondary);
+    border-color: var(--lgl-color-warning); }
+    .lgl-btn.lgl-btn-warning:hover {
+      background-color: var(--lgl-color-warning-dark);
+      border-color: var(--lgl-color-warning-dark); }
 
 .lgl-tabs--tbnav.lgl-tabs--tbnav {
   border-radius: 20px 20px 0px 0px;
@@ -1044,21 +1062,6 @@
   color: var(--lgl-color-accent, #f6d100); }
 
 /* Interactive remove button styling with transition states */
-.lgl-compare-remove-btn {
-  background-color: transparent;
-  color: #ef4444;
-  border: 1px solid #ef4444;
-  padding: 0.5rem 1rem;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 0.875rem;
-  font-weight: 500;
-  transition: all 0.2s ease; }
-
-.lgl-compare-remove-btn:hover {
-  background-color: #ef4444;
-  color: #fff; }
-
 /* Feedback states for empty or error payloads injected by LocalStorage logic */
 .lgl-compare-empty,
 .lgl-compare-error {
