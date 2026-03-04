@@ -190,17 +190,6 @@ $post_type = get_post_type();
                                 </div>
                             </div>
 
-                            <?php
-                            if (!empty($dealer)) {
-                                $d_title         = get_the_title($dealer);
-                                $d_link          = get_the_permalink($dealer);
-                                $d_avatar        = get_field('avatar', $dealer);
-                                $d_location      = get_field('location', $dealer);
-                                $d_phone         = get_field('phone', $dealer);
-                                $d_message_link  = get_field('message_link', $dealer);
-                                $d_whatsapp_link = get_field('whatsapp_link', $dealer);
-                            ?>
-                            <?php } ?>
 
                             <div class="lgl-btn-group">
                                 <a class="lgl-btn lgl-btn-secondary" href="<?php echo $url_finance; ?>">
