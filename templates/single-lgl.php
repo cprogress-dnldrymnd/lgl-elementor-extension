@@ -25,7 +25,7 @@ $post_id = get_the_ID();
     <div class="lgl-holder">
         <?php
 
-        $gallery = self::convertStringToIntArray(get_post_meta($post_id, '_listing_gallery_ids', true));
+        $gallery = LGL_Shortcodes::convertStringToIntArray(get_post_meta($post_id, '_listing_gallery_ids', true));
         $price = get_post_meta($post_id, 'price', true);
         $berth = get_post_meta($post_id, 'berth', true);
         $mileage = get_post_meta($post_id, 'mileage', true);
