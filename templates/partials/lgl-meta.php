@@ -14,13 +14,12 @@ if (class_exists('LGL_Import_Post_Types')) {
         $motorhome_campervan_fields = $listing_fields['motorhome_campervan'];
         if ($post_type != 'caravan') {
             $common_fields = array_merge($common_fields, $motorhome_campervan_fields);
-        } else {
             $taxonomies[] = 'listing-fuel-type';
             if ($post_type == 'motorhome') {
                 $taxonomies[] = 'listing-chassis';
             }
             $taxonomies[] = 'listing-gearbox';
-        }
+        } 
 
         echo "<div class='lgl-meta-list'>";
 
