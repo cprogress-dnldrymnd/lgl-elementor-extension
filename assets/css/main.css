@@ -730,8 +730,7 @@
   color: #00235d;
   font-family: "Poppins", sans-serif;
   font-weight: 600;
-  padding-left: 0;
-  margin-left: 0 !important; }
+  margin-bottom: 32px; }
   .lgl-related-heading:before {
     content: "";
     position: absolute;
