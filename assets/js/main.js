@@ -23,7 +23,7 @@
             });
         }
     }
-    
+
     /**
      * Initializes the search form features.
      * Binds Select2, handles dependent make/model dropdowns, and manages the AJAX submission and pagination UI.
@@ -73,6 +73,17 @@
             currentPage = 1;
             execute_search();
         });
+
+
+        //search redirect
+        $('#vehicle_type').on('change', function () {
+            let url = $(this).val();
+
+            $('#lgl-search-form').attr('action', url);
+            $('#lgl-search-form').attr('method', 'GET');
+
+        });
+
 
         // Intercept standard WordPress pagination clicks for AJAX handling
         $(document).on('click', '.lgl-pagination-wrap a.page-numbers', function (e) {
@@ -304,7 +315,7 @@
      * @param {string} type - 'success' or 'error' for styling.
      * @return {void}
      */
-    window.showNotification = function(message, type = 'success') {
+    window.showNotification = function (message, type = 'success') {
         const $container = $('#lgl-notification-container');
         const $notification = $('<div class="lgl-toast lgl-toast-' + type + '">' + message + '</div>');
 
