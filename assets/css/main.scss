@@ -698,6 +698,12 @@
             background: var(--lgl-color-accent) !important;
         }
     }
+    .lgl-compare-btn {
+        &.added {
+            color: var(--lgl-color-secondary) !important;
+            background: var(--lgl-color-accent) !important;
+        }
+    }
 }
 .lgl-sale-meta-bottom {
     background: var(--lgl-color-white);
