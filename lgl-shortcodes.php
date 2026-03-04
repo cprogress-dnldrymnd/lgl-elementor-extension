@@ -671,7 +671,7 @@ if (! class_exists('LGL_Shortcodes')) {
         {
             // Set default shortcode attributes. Post type default is 'post'.
             $attributes = shortcode_atts(array(
-                'post_type' => 'caravan'
+                'post_type' => false
             ), $atts, $shortcode_tag);
 
             // Hand over execution to the template loader

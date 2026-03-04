@@ -91,58 +91,62 @@ if ($active_make) {
         </div>
 
         <!-- Condition -->
-        <div class="lgl-filter-group">
-            <label for="lgl_condition">Condition</label>
-            <select name="condition" id="lgl_condition" class="lgl-select2" data-placeholder="Any Condition">
-                <option value="">Any Condition</option>
-                <?php foreach ($conditions as $cond) : ?>
-                    <option value="<?php echo esc_attr($cond); ?>"
-                        <?php selected($active_condition, $cond); ?>>
-                        <?php echo esc_html($cond); ?>
-                    </option>
-                <?php endforeach; ?>
-            </select>
-        </div>
 
-        <!-- Berth -->
-        <div class="lgl-filter-group">
-            <label for="lgl_berth">Berth</label>
-            <select name="berth" id="lgl_berth" class="lgl-select2" data-placeholder="Any Berth">
-                <option value="">Any Berth</option>
-                <?php foreach ($berths as $berth) : ?>
-                    <option value="<?php echo esc_attr($berth); ?>"
-                        <?php selected($active_berth, $berth); ?>>
-                        <?php echo esc_html($berth); ?>
-                    </option>
-                <?php endforeach; ?>
-            </select>
-        </div>
+        <?php if ($post_type === false) { ?>
+            <div class="lgl-filter-group">
+                <label for="lgl_condition">Condition</label>
+                <select name="condition" id="lgl_condition" class="lgl-select2" data-placeholder="Any Condition">
+                    <option value="">Any Condition</option>
+                    <?php foreach ($conditions as $cond) : ?>
+                        <option value="<?php echo esc_attr($cond); ?>"
+                            <?php selected($active_condition, $cond); ?>>
+                            <?php echo esc_html($cond); ?>
+                        </option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
 
-        <!-- Min Price -->
-        <div class="lgl-filter-group">
-            <select name="price_min" id="lgl_price_min" class="lgl-select2" data-placeholder="Min Price">
-                <option value="">Min Price</option>
-                <?php foreach ($prices as $price) : ?>
-                    <option value="<?php echo esc_attr($price); ?>"
-                        <?php selected((float) $active_price_min, $price); ?>>
-                        <?php echo esc_html('$' . number_format($price, 0)); ?>
-                    </option>
-                <?php endforeach; ?>
-            </select>
-        </div>
+            <!-- Berth -->
+            <div class="lgl-filter-group">
+                <label for="lgl_berth">Berth</label>
+                <select name="berth" id="lgl_berth" class="lgl-select2" data-placeholder="Any Berth">
+                    <option value="">Any Berth</option>
+                    <?php foreach ($berths as $berth) : ?>
+                        <option value="<?php echo esc_attr($berth); ?>"
+                            <?php selected($active_berth, $berth); ?>>
+                            <?php echo esc_html($berth); ?>
+                        </option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
 
-        <!-- Max Price -->
-        <div class="lgl-filter-group">
-            <select name="price_max" id="lgl_price_max" class="lgl-select2" data-placeholder="Max Price">
-                <option value="">Max Price</option>
-                <?php foreach ($prices as $price) : ?>
-                    <option value="<?php echo esc_attr($price); ?>"
-                        <?php selected((float) $active_price_max, $price); ?>>
-                        <?php echo esc_html('$' . number_format($price, 0)); ?>
-                    </option>
-                <?php endforeach; ?>
-            </select>
-        </div>
+            <!-- Min Price -->
+            <div class="lgl-filter-group">
+                <select name="price_min" id="lgl_price_min" class="lgl-select2" data-placeholder="Min Price">
+                    <option value="">Min Price</option>
+                    <?php foreach ($prices as $price) : ?>
+                        <option value="<?php echo esc_attr($price); ?>"
+                            <?php selected((float) $active_price_min, $price); ?>>
+                            <?php echo esc_html('$' . number_format($price, 0)); ?>
+                        </option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+
+            <!-- Max Price -->
+            <div class="lgl-filter-group">
+                <select name="price_max" id="lgl_price_max" class="lgl-select2" data-placeholder="Max Price">
+                    <option value="">Max Price</option>
+                    <?php foreach ($prices as $price) : ?>
+                        <option value="<?php echo esc_attr($price); ?>"
+                            <?php selected((float) $active_price_max, $price); ?>>
+                            <?php echo esc_html('$' . number_format($price, 0)); ?>
+                        </option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+
+        <?php } ?>
 
         <div class="lgl-filter-group lgl-submit-group">
             <button type="submit" class="lgl-search-submit">Search Now</button>
