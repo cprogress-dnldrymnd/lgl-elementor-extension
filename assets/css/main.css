@@ -404,7 +404,7 @@
 .lgl-toast-error {
   border-left: 4px solid var(--lgl-color-error);
   /* Standard red for removal/errors */
-  border-left: 4px solid var(--lgl-color-error-dark);
+  background-color: 4px solid var(--lgl-color-error-dark);
   /* Standard red for removal/errors */ }
 
 .lgl-pagination-wrap {
