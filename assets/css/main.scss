@@ -1507,8 +1507,8 @@
 
 // --- Non-color local variables (layout/animation only)
 $transition-base: 0.2s ease;
-$aspect-ratio:    16 / 10;
-$border-radius:   16px;
+$aspect-ratio: 16 / 10;
+$border-radius: 16px;
 
 // --- Block
 .lgl-compare-duo {
@@ -1533,6 +1533,7 @@ $border-radius:   16px;
     &__vehicle {
         display: flex;
         flex-direction: column;
+        padding: clamp(10px, 2vw, 30px);
     }
 
     // --- Image link
@@ -1548,6 +1549,7 @@ $border-radius:   16px;
                 height: 100%;
                 object-fit: cover;
                 transition: transform 0.3s ease;
+                border-radius: 20px;
             }
         }
 
@@ -1645,22 +1647,32 @@ $border-radius:   16px;
         position: relative;
         z-index: 1;
         padding: 0 4px;
-
+        content: "";
+        position: absolute;
+        left: 50%;
+        top: 0;
+        bottom: 0;
+        width: 1px;
+        background-color: var(--lgl-color-light-gray);
+        transform: translateX(-50%);
         span {
             display: flex;
             align-items: center;
             justify-content: center;
-            width: 40px;
-            height: 40px;
+            width: 50px;
+            height: 50px;
             border-radius: 50%;
             background: var(--lgl-color-accent);
-            color: var(--lgl-color-secondary);
+            color: var(--lgl-color-white);
             font-size: 0.78rem;
             font-weight: 800;
             text-transform: uppercase;
             letter-spacing: 0.03em;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
             flex-shrink: 0;
+        }
+        &:before {
+            content: "";
         }
     }
 
@@ -1680,7 +1692,9 @@ $border-radius:   16px;
         text-transform: uppercase;
         text-decoration: none;
         border-radius: 0;
-        transition: background $transition-base, color $transition-base;
+        transition:
+            background $transition-base,
+            color $transition-base;
         border: none;
         cursor: pointer;
 
