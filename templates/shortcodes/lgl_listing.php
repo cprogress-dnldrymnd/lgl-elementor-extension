@@ -12,7 +12,3 @@ if ($post_type) {
     echo $results['html'];
     echo '</div>';
 }
-echo '<pre>';
-var_dump(get_post_meta(6883));
-var_dump($results['args']);
-echo '</pre>';
