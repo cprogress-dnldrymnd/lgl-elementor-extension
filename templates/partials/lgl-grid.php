@@ -20,7 +20,8 @@ $title = get_the_title();
 $disable_wishlist = !empty($lgl_options['disable_wishlist']);
 $disable_compare  = !empty($lgl_options['disable_compare']);
 ?>
-
+<?=  $disable_wishlist ?>
+<?=  $disable_compare ?>
 <article <?php post_class('lgl-post car type-car status-publish has-post-thumbnail hentry ' . $style); ?>>
     <div class="lgl-post--inner">
         <div class="lgl-post--thumbnail">
