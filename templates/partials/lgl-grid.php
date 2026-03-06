@@ -17,10 +17,9 @@ $year = get_post_meta($post_id, 'year', true);
 $link = get_the_permalink();
 $title = get_the_title();
 
-
 ?>
 
-<article <?php post_class('lgl-post car type-car status-publish has-post-thumbnail hentry'); ?>>
+<article <?php post_class('lgl-post car type-car status-publish has-post-thumbnail hentry ' . $style); ?>>
     <div class="lgl-post--inner">
         <div class="lgl-post--thumbnail">
             <div class="lgl-post--featured">
