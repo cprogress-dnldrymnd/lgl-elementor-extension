@@ -5,7 +5,7 @@ if ($post_type) {
         paged: 1,
         posts_per_page: 6
     );
-    echo '<div class="lgl-grid-layout lgl-cols--3 lgl-layout-default" id="lgl-results-grid">';
+    echo '<div class="lgl-grid-layout lgl-cols--3 lgl-layout-default">';
     echo $results['html'];
     echo '</div>';
 }
