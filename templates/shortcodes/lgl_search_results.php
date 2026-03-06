@@ -14,39 +14,38 @@ $show_search = ! (strtolower((string) $search) === 'false' || $search === false 
 $grid_limit  = $show_search ? 9 : 6;
 ?>
 <div class="lgl-elwg-cars-grid--default lgl-results-wrapper lgl-holder">
+    <input type="hidden" name="search" value="<?= esc_attr($search) ?>">
+    <input type="hidden" name="post_type" id="lgl_target_post_type" value="<?php echo esc_attr($post_type); ?>">
     <div class="lgls-grid-list-template">
         <div class="lgl-filter-scroll-pos"></div>
-
         <?php if ($show_search) : ?>
-        <div class="lgl-topbar">
-            <div class="lgl-col-left">
-                <div class="lgl-results-block" id="lgl-results-count">
-                    Awaiting Search...
+            <div class="lgl-topbar">
+                <div class="lgl-col-left">
+                    <div class="lgl-results-block" id="lgl-results-count">
+                        Awaiting Search...
+                    </div>
+                </div>
+
+                <div class="lgl-col-right">
+                    <form class="lgl-filter-form-sortview" id="lgl-sort-form" action="" method="get">
+                        <input type="hidden" name="orderby" value="date">
+                        <input type="hidden" name="order" value="desc">
+                        <div class="lgl-sort-block">
+                            <span class="lgl-sort-title">Sort by:</span>
+                            <div class="lgl-sort-field">
+                                <select name="sort_order" id="lgl-sort-order" class="lgl-select2" style="width: 220px;">
+                                    <option value="date_high" selected="selected">Date: newest first</option>
+                                    <option value="date_low">Date: oldest first</option>
+                                    <option value="mileage_high">Mileage: highest first</option>
+                                    <option value="mileage_low">Mileage: lowest first</option>
+                                    <option value="price_high">Price: highest first</option>
+                                    <option value="price_low">Price: lower first</option>
+                                </select>
+                            </div>
+                        </div>
+                    </form>
                 </div>
             </div>
-
-            <div class="lgl-col-right">
-                <form class="lgl-filter-form-sortview" id="lgl-sort-form" action="" method="get">
-                    <input type="hidden" name="orderby" value="date">
-                    <input type="hidden" name="order" value="desc">
-                    <input type="hidden" name="search" value="<?= esc_attr($search) ?>">
-                    <input type="hidden" name="post_type" id="lgl_target_post_type" value="<?php echo esc_attr($post_type); ?>">
-                    <div class="lgl-sort-block">
-                        <span class="lgl-sort-title">Sort by:</span>
-                        <div class="lgl-sort-field">
-                            <select name="sort_order" id="lgl-sort-order" class="lgl-select2" style="width: 220px;">
-                                <option value="date_high" selected="selected">Date: newest first</option>
-                                <option value="date_low">Date: oldest first</option>
-                                <option value="mileage_high">Mileage: highest first</option>
-                                <option value="mileage_low">Mileage: lowest first</option>
-                                <option value="price_high">Price: highest first</option>
-                                <option value="price_low">Price: lower first</option>
-                            </select>
-                        </div>
-                    </div>
-                </form>
-            </div>
-        </div>
         <?php endif; ?>
 
         <div class="lgl-filter-results">
