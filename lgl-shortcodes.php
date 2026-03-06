@@ -1167,7 +1167,7 @@ if (! class_exists('LGL_Shortcodes')) {
                 parse_str($_POST['form_data'], $form_data);
             }
 
-            $response_data = $this->get_search_results_data($post_type, $form_data, $paged, $posts_per_page);
+            $response_data = $this::get_search_results_data($post_type, $form_data, $paged, $posts_per_page);
 
             if (! $is_admin) {
                 set_transient($cache_key, $response_data, HOUR_IN_SECONDS);
@@ -1190,7 +1190,7 @@ if (! class_exists('LGL_Shortcodes')) {
          *     @type int    $count       Total number of matched posts.
          * }
          */
-        public function get_search_results_data($post_type = 'post', $form_data = array(), $paged = 1, $posts_per_page = 9)
+        public static function get_search_results_data($post_type = 'post', $form_data = array(), $paged = 1, $posts_per_page = 9)
         {
             $args = array(
                 'post_type'      => $post_type,
