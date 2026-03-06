@@ -142,20 +142,10 @@ jQuery(document).ready(function($) {
 
         let allData = JSON.parse(localStorage.getItem(STATE_KEY_DATA)) || {};
 
-        // Ensure the type bucket exists
-        if (!allData[preload.type]) {
-            allData[preload.type] = [];
-        }
-
-        // Merge incoming IDs — add only those not already present, respecting the 4-vehicle cap
-        preload.ids.forEach(function (id) {
-            const sid = id.toString();
-            if (!allData[preload.type].includes(sid)) {
-                if (allData[preload.type].length < 4) {
-                    allData[preload.type].push(sid);
-                }
-            }
-        });
+        // Replace the bucket for this post type with exactly the IDs from the URL param,
+        // discarding any previously stored vehicles for this type.
+        // Other post type buckets (caravan / motorhome / campervan) are left untouched.
+        allData[preload.type] = preload.ids.map(id => id.toString());
 
         localStorage.setItem(STATE_KEY_DATA, JSON.stringify(allData));
 
