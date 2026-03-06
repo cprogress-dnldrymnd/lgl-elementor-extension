@@ -10,7 +10,7 @@ if ($post_type) {
     );
     if ($is_carousel) {
         echo '<div class="vehicle-slider-holder">';
-        echo '<div class="vehicle-slider-jr">';
+        echo '<div class="vehicle-slider-js">';
     } else {
         echo '<div class="lgl-grid-layout lgl-cols--3 lgl-layout-default ">';
     }
@@ -20,3 +20,17 @@ if ($post_type) {
     }
     echo '</div>';
 }
+?>
+<?php if ($is_carousel) { ?>
+<script>
+    $('.vehicle-slider-js').slick({
+        slidesToShow: 1,
+        slidesToScroll: 1,
+        fade: true,
+        arrows: false,
+        prevArrow: '<button type=\"button\" class=\"slick-prev\">Prev</button>',
+        nextArrow: '<button type=\"button\" class=\"slick-next\">Next</button>'
+    });
+</script>
+
+<?php }?>
