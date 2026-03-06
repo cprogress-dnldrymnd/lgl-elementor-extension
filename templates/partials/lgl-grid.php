@@ -61,14 +61,18 @@ $disable_compare  = !empty($lgl_options['disable_compare']);
             include LGL_SHORTCODES_PATH . 'templates/partials/lgl-meta-short.php';
             ?>
 
-            <div class="lgl-post--readmore">
-                <a href="<?php echo esc_url($link); ?>">
-                    View Details
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M4 12H20M20 12L16 8M20 12L16 16" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"></path>
-                    </svg>
-                </a>
-            </div>
+            <?php if ($style == 'style-1') { ?>
+
+                <div class="lgl-post--readmore">
+                    <a href="<?php echo esc_url($link); ?>">
+                        View Details
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M4 12H20M20 12L16 8M20 12L16 16" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"></path>
+                        </svg>
+                    </a>
+                </div>
+
+            <?php } ?>
         </div>
     </div>
 </article>
