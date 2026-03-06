@@ -111,7 +111,7 @@ if (!current_user_can('manage_options')) {
                 array('name' => 'post_id_1', 'default' => '—', 'description' => 'Required. Post ID of the first vehicle.'),
                 array('name' => 'post_id_2', 'default' => '—', 'description' => 'Required. Post ID of the second vehicle.'),
             ),
-            'notes' => 'Both vehicles must be published. The "Compare Now" button links to <strong>LGL Settings → LGL Pages → Vehicle Comparison Page</strong> with both IDs as <code>?compare=ID1,ID2</code>.',
+            'notes' => '<span>Both vehicles must be published. The "Compare Now" button links to <strong>LGL Settings → LGL Pages → Vehicle Comparison Page</strong> with both IDs as <code>?compare=ID1,ID2</code>.</span>',
         ),
 
         array(
@@ -349,7 +349,7 @@ if (!current_user_can('manage_options')) {
                 array('name' => 'Featured Motorhomes', 'type' => 'Multi-select (searchable)', 'default' => '(none)', 'description' => 'Select one or more published Motorhomes to mark as featured.'),
                 array('name' => 'Featured Campervans', 'type' => 'Multi-select (searchable)', 'default' => '(none)', 'description' => 'Select one or more published Campervans to mark as featured.'),
             ),
-            'notes' => 'Saving this page automatically syncs the <code>is_featured</code> post meta on all affected vehicles. The star toggle in the WP admin post list also updates this setting in real time.',
+            'notes' => '<span>Saving this page automatically syncs the <code>is_featured</code> post meta on all affected vehicles. The star toggle in the WP admin post list also updates this setting in real time.</span>',
         ),
 
     );
