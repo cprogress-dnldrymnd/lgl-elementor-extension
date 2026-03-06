@@ -4,7 +4,7 @@ if ($post_type) {
         post_type: explode(',', $post_type),
         paged: 1,
         posts_per_page: $limit,
-        is_featured: $is_carousel,
+        is_carousel: $is_carousel,
         style: $style,
         is_featured: $is_featured
     );
