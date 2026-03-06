@@ -393,8 +393,8 @@
     function vehicle_slider() {
         //vehicle slider
         jQuery('.vehicle-slider-js').slick({
-            slidesToShow: 1,
-            slidesToScroll: 4,
+            slidesToShow: 4,
+            slidesToScroll: 1,
             fade: true,
             arrows: false,
             prevArrow: '<button type=\"button\" class=\"slick-prev\">Prev</button>',
