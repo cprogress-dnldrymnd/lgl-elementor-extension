@@ -656,7 +656,7 @@ if (! class_exists('LGL_Shortcodes')) {
             add_shortcode('lgl_mini_wishlist', array($this, 'render_shortcode'));
             add_shortcode('lgl_compare', array($this, 'render_shortcode'));
             add_shortcode('lgl_mini_compare', array($this, 'render_shortcode'));
-            add_shortcode('lgl_listing_grid', array($this, 'render_shortcode'));
+            add_shortcode('lgl_listing', array($this, 'render_shortcode'));
         }
 
         /**
