@@ -21,16 +21,3 @@ if ($post_type) {
     echo '</div>';
 }
 ?>
-<?php if ($is_carousel) { ?>
-<script>
-    jQuery('.vehicle-slider-js').slick({
-        slidesToShow: 1,
-        slidesToScroll: 1,
-        fade: true,
-        arrows: false,
-        prevArrow: '<button type=\"button\" class=\"slick-prev\">Prev</button>',
-        nextArrow: '<button type=\"button\" class=\"slick-next\">Next</button>'
-    });
-</script>
-
-<?php }?>

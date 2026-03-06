@@ -8,7 +8,7 @@
     $(document).ready(function () {
         search_form();
         add_to_wishlist();
-        gallery_slider();
+        vehicle_slider();
         tabs();
         initLGLMiniWishlist();
         sharevehicle();
@@ -390,7 +390,16 @@
         });
     }
 
-    function gallery_slider() {
+    function vehicle_slider() {
+        //vehicle slider
+        jQuery('.vehicle-slider-js').slick({
+            slidesToShow: 1,
+            slidesToScroll: 4,
+            fade: true,
+            arrows: false,
+            prevArrow: '<button type=\"button\" class=\"slick-prev\">Prev</button>',
+            nextArrow: '<button type=\"button\" class=\"slick-next\">Next</button>'
+        });
         /* Gallery Slider */
         if ($('.js-gallery-slider').length > 0) {
             $('.js-gallery-slider-for').slick({
