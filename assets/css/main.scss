@@ -1206,7 +1206,11 @@
     overflow-y: auto;
     padding: 0 20px;
 }
-
+.lgl-wishlist-page {
+    .lgl-mini-wishlist-content {
+        max-height: unset;
+    }
+}
 /* List Items */
 .lgl-mini-wishlist-items {
     list-style: none;
