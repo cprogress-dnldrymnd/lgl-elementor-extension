@@ -1384,11 +1384,21 @@
     font-family: var(--lgl-font-primary, sans-serif);
 }
 
-.vehicle-slider-js .slick-slide {
-    margin: 0 15px;
-}
+.vehicle-slider-js {
+    .slick-list {
+        margin: 0 -15px;
 
-/* 2. Apply a negative margin to the list container to pull the edges flush */
-.vehicle-slider-js .slick-list {
-    margin: 0 -15px;
+        .slick-slide {
+            margin: 0 15px;
+            display: flex;
+            height: auto;
+            float: none;
+            > div {
+                height: 100%;
+            }
+        }
+    }
+    .slick-track {
+        display: flex !important;
+    }
 }
