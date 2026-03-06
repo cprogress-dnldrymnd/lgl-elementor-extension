@@ -392,24 +392,31 @@
 
     function vehicle_slider() {
         //vehicle slider
-        jQuery('.vehicle-slider-js').slick({
+        $('.vehicle-slider-js').slick({
             slidesToShow: 4,
             slidesToScroll: 4,
-            fade: true,
+            fade: false, // Disabled to allow standard inline block layout for multiple slides
             arrows: true,
-            prevArrow: '<button type=\"button\" class=\"slick-prev\">Prev</button>',
-            nextArrow: '<button type=\"button\" class=\"slick-next\">Next</button>'
+
         });
         /* Gallery Slider */
         if ($('.js-gallery-slider').length > 0) {
             $('.js-gallery-slider-for').slick({
-                slidesToShow: 1,
+                slidesToShow: 4,
                 slidesToScroll: 1,
-                fade: true,
-                arrows: false,
-                asNavFor: '.js-gallery-slider-nav',
-                prevArrow: '<button type=\"button\" class=\"slick-prev\">Prev</button>',
-                nextArrow: '<button type=\"button\" class=\"slick-next\">Next</button>'
+                arrows: true,
+                focusOnSelect: true,
+                asNavFor: '.js-gallery-slider-for',
+                responsive: [
+                    {
+                        breakpoint: 600,
+                        settings: {
+                            slidesToShow: 3
+                        }
+                    }
+                ],
+                prevArrow: '<button type="button" class="slick-prev">Prev</button>',
+                nextArrow: '<button type="button" class="slick-next">Next</button>'
             });
             $('.js-gallery-slider-nav').slick({
                 slidesToShow: 4,
