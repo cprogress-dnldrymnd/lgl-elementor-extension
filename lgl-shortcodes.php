@@ -4,7 +4,7 @@
  * Plugin Name: LGL Shortcodes
  * Plugin URI: https://digitallydisruptive.co.uk/
  * Description: A robust, OOP-based plugin to output customized data via shortcodes using a dynamic template routing system.
- * Version: 2.4.0
+ * Version: 2.5.6
  * Author: Digitally Disruptive - Donald Raymundo
  * Author URI: https://digitallydisruptive.co.uk/
  * Text Domain: lgl-shortcodes
@@ -73,6 +73,10 @@ if (! class_exists('LGL_Shortcodes')) {
             add_action('admin_init', array($this, 'register_plugin_settings'));
             add_action('admin_enqueue_scripts', array($this, 'admin_enqueue_assets'));
 
+            // Hooks for auto-syncing Featured Vehicles post meta upon settings save
+            add_action('update_option_lgl_settings', array($this, 'sync_featured_vehicles_meta'), 10, 2);
+            add_action('add_option_lgl_settings', array($this, 'sync_featured_vehicles_meta_on_add'), 10, 2);
+
             // Cache Invalidation Hooks for specific CPTs
             add_action('save_post_caravan', array($this, 'clear_lgl_search_cache'));
             add_action('save_post_motorhome', array($this, 'clear_lgl_search_cache'));
@@ -81,6 +85,64 @@ if (! class_exists('LGL_Shortcodes')) {
             // Cache Invalidation Hooks for taxonomy modifications
             add_action('saved_term', array($this, 'clear_lgl_taxonomy_cache'), 10, 3);
             add_action('delete_term', array($this, 'clear_lgl_taxonomy_cache'), 10, 3);
+        }
+
+        /**
+         * Bootstraps meta synchronization when the settings option is created for the very first time.
+         * * @param string $option Option name
+         * @param array $value   New option payload
+         * @return void
+         */
+        public function sync_featured_vehicles_meta_on_add($option, $value)
+        {
+            $this->sync_featured_vehicles_meta(array(), $value);
+        }
+
+        /**
+         * Intercepts settings updates to calculate diffs between old and new featured vehicles.
+         * Mutates post meta `is_featured` directly to ensure DB sync state matches LGL settings.
+         *
+         * @param array $old_value The prior settings array.
+         * @param array $new_value The incoming settings array payload.
+         * @return void
+         */
+        public function sync_featured_vehicles_meta($old_value, $new_value)
+        {
+            $cpt_keys = array('featured_caravan', 'featured_motorhome', 'featured_campervan');
+            $old_ids  = array();
+            $new_ids  = array();
+
+            // Aggregate IDs across all vehicle types for batch processing
+            foreach ($cpt_keys as $key) {
+                if (!empty($old_value[$key]) && is_array($old_value[$key])) {
+                    $old_ids = array_merge($old_ids, $old_value[$key]);
+                }
+                if (!empty($new_value[$key]) && is_array($new_value[$key])) {
+                    $new_ids = array_merge($new_ids, $new_value[$key]);
+                }
+            }
+
+            // Sanitize to strict integers
+            $old_ids = array_map('intval', $old_ids);
+            $new_ids = array_map('intval', $new_ids);
+
+            // Compute isolation states: what needs deletion, what needs insertion
+            $removed_ids = array_diff($old_ids, $new_ids);
+            $added_ids   = array_diff($new_ids, $old_ids);
+
+            // Strip featured flag
+            foreach ($removed_ids as $id) {
+                if ($id > 0) {
+                    update_post_meta($id, 'is_featured', 'false');
+                }
+            }
+
+            // Apply featured flag
+            foreach ($added_ids as $id) {
+                if ($id > 0) {
+                    update_post_meta($id, 'is_featured', 'true');
+                }
+            }
         }
 
         /**
@@ -256,6 +318,26 @@ if (! class_exists('LGL_Shortcodes')) {
                     array('id' => $id, 'type' => $field['type'], 'default' => $field['default'])
                 );
             }
+
+            // --- TAB 7: Featured Vehicles (New Module) ---
+            add_settings_section('lgl_featured_section', 'Select Featured Vehicles for Frontend Carousels', null, 'lgl-settings-featured');
+
+            $featured_fields = array(
+                'featured_caravan'   => array('label' => 'Featured Caravans', 'type' => 'multi_select_cpt', 'post_type' => 'caravan', 'default' => array()),
+                'featured_motorhome' => array('label' => 'Featured Motorhomes', 'type' => 'multi_select_cpt', 'post_type' => 'motorhome', 'default' => array()),
+                'featured_campervan' => array('label' => 'Featured Campervans', 'type' => 'multi_select_cpt', 'post_type' => 'campervan', 'default' => array()),
+            );
+
+            foreach ($featured_fields as $id => $field) {
+                add_settings_field(
+                    $id,
+                    $field['label'],
+                    array($this, 'render_field'),
+                    'lgl-settings-featured',
+                    'lgl_featured_section',
+                    array('id' => $id, 'type' => $field['type'], 'post_type' => $field['post_type'], 'default' => $field['default'])
+                );
+            }
         }
 
         /**
@@ -397,9 +479,9 @@ if (! class_exists('LGL_Shortcodes')) {
         /**
          * Universal renderer for settings fields, handling multiple input types dynamically.
          * Extracts current values from the serialized 'lgl_settings' array.
-         * Includes native handling for boolean checkbox toggles and page dropdowns.
+         * Includes native handling for boolean checkbox toggles, page dropdowns, and CPT multi-selects.
          *
-         * @param array $args Field configuration arguments (id, type, default).
+         * @param array $args Field configuration arguments (id, type, default, post_type).
          * @return void
          */
         public function render_field($args)
@@ -441,6 +523,28 @@ if (! class_exists('LGL_Shortcodes')) {
                         'selected'          => $value,
                     ));
                     break;
+                case 'multi_select_cpt':
+                    // Native HTML multi-select for querying explicit custom post types efficiently
+                    $post_type = isset($args['post_type']) ? $args['post_type'] : 'post';
+                    $posts = get_posts(array(
+                        'post_type'      => $post_type,
+                        'posts_per_page' => -1,
+                        'post_status'    => 'publish',
+                        'orderby'        => 'title',
+                        'order'          => 'ASC'
+                    ));
+
+                    // Cast to array to prevent in_array() type errors
+                    $current_values = is_array($value) ? $value : array();
+
+                    echo '<select id="lgl_settings[' . esc_attr($id) . ']" name="lgl_settings[' . esc_attr($id) . '][]" multiple="multiple" style="width: 100%; max-width: 400px; height: 150px;">';
+                    foreach ($posts as $p) {
+                        $selected = in_array($p->ID, $current_values) ? 'selected="selected"' : '';
+                        echo '<option value="' . esc_attr($p->ID) . '" ' . $selected . '>' . esc_html($p->post_title) . '</option>';
+                    }
+                    echo '</select>';
+                    echo '<p class="description">Hold CTRL (Windows) or CMD (Mac) to select multiple vehicles.</p>';
+                    break;
                 case 'text':
                 default:
                     echo sprintf(
@@ -476,6 +580,7 @@ if (! class_exists('LGL_Shortcodes')) {
                     <a href="#contact" class="nav-tab <?php echo $active_tab == 'contact' ? 'nav-tab-active' : ''; ?>" data-tab="contact">Contact Information</a>
                     <a href="#visibility" class="nav-tab <?php echo $active_tab == 'visibility' ? 'nav-tab-active' : ''; ?>" data-tab="visibility">Field Visibility</a>
                     <a href="#lgl-pages" class="nav-tab <?php echo $active_tab == 'lgl-pages' ? 'nav-tab-active' : ''; ?>" data-tab="lgl-pages">LGL Pages</a>
+                    <a href="#featured" class="nav-tab <?php echo $active_tab == 'featured' ? 'nav-tab-active' : ''; ?>" data-tab="featured">Featured Vehicles</a>
                 </h2>
 
                 <form method="post" action="options.php">
@@ -503,6 +608,10 @@ if (! class_exists('LGL_Shortcodes')) {
 
                     <div id="tab-lgl-pages" class="lgl-tab-content" <?php echo $active_tab == 'lgl-pages' ? '' : 'style="display:none;"'; ?>>
                         <?php do_settings_sections('lgl-pages'); ?>
+                    </div>
+
+                    <div id="tab-featured" class="lgl-tab-content" <?php echo $active_tab == 'featured' ? '' : 'style="display:none;"'; ?>>
+                        <?php do_settings_sections('lgl-settings-featured'); ?>
                     </div>
 
                     <?php submit_button(); ?>
@@ -689,8 +798,6 @@ if (! class_exists('LGL_Shortcodes')) {
             // Hand over execution to the template loader
             return $this->load_template($shortcode_tag, $attributes, $content);
         }
-
-
 
         /**
          * Generates the internal HTML payload for the mini wishlist items list.
@@ -1195,9 +1302,9 @@ if (! class_exists('LGL_Shortcodes')) {
          * @param int    $paged         The current page number.
          * @param int    $posts_per_page Number of results to return per page.
          * @return array {
-         *     @type string $html        Rendered grid item HTML.
-         *     @type string $pagination  Rendered pagination HTML.
-         *     @type int    $count       Total number of matched posts.
+         * @type string $html        Rendered grid item HTML.
+         * @type string $pagination  Rendered pagination HTML.
+         * @type int    $count       Total number of matched posts.
          * }
          */
         public static function get_search_results_data($post_type = 'caravan', $form_data = array(), $paged = 1, $posts_per_page = 9, $is_carousel = false, $style = 'style-1')
