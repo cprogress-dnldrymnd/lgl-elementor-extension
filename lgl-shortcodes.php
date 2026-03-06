@@ -674,6 +674,7 @@ if (! class_exists('LGL_Shortcodes')) {
             $attributes = shortcode_atts(array(
                 'post_type' => false,
                 'search' => true,
+                'limit' => 9,
             ), $atts, $shortcode_tag);
 
             // Hand over execution to the template loader
