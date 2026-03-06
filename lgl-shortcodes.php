@@ -98,6 +98,10 @@ if (! class_exists('LGL_Shortcodes')) {
 
             // AJAX endpoint for the star toggle
             add_action('wp_ajax_lgl_toggle_featured_status', array($this, 'ajax_toggle_featured_status'));
+
+            // Hooks for Single Post Edit Screen Featured Meta Box
+            add_action('add_meta_boxes', array($this, 'add_featured_meta_box'));
+            add_action('save_post', array($this, 'save_featured_meta_box'));
         }
 
         /**
@@ -1703,6 +1707,146 @@ if (! class_exists('LGL_Shortcodes')) {
                 'post_id'    => $post_id,
                 'new_status' => $new_status
             ));
+        }
+
+        /**
+         * Registers a side meta box on the single post edit screen for the custom post types.
+         * Provides a dedicated UI for toggling the featured status.
+         *
+         * @return void
+         */
+        public function add_featured_meta_box()
+        {
+            $lgl_cpts = array('caravan', 'motorhome', 'campervan');
+            foreach ($lgl_cpts as $cpt) {
+                add_meta_box(
+                    'lgl_featured_meta_box',
+                    'Featured Vehicle',
+                    array($this, 'render_featured_meta_box'),
+                    $cpt,
+                    'side',
+                    'high'
+                );
+            }
+        }
+
+        /**
+         * Renders the interactive star toggle inside the meta box.
+         * Binds the visual state to a hidden input field to ensure the payload is passed 
+         * synchronously when the user clicks the native "Update" button.
+         *
+         * @param WP_Post $post The current post object.
+         * @return void
+         */
+        public function render_featured_meta_box($post)
+        {
+            // Security nonce for the save routine
+            wp_nonce_field('lgl_save_featured_meta', 'lgl_featured_meta_nonce');
+
+            $is_featured = get_post_meta($post->ID, 'is_featured', true);
+            $is_active   = ($is_featured === 'true');
+            $class       = $is_active ? 'dashicons-star-filled' : 'dashicons-star-empty';
+            $color       = $is_active ? '#f39c12' : '#b5bcc2';
+
+            // Hidden input to hold the payload for standard form submission
+            echo '<input type="hidden" id="lgl_is_featured_input" name="lgl_is_featured" value="' . ($is_active ? 'true' : 'false') . '" />';
+
+            // Interactive UI
+            echo '<div style="display: flex; align-items: center; gap: 8px; padding: 10px 0;">';
+            echo '<a href="#" id="lgl-meta-star-toggle" style="color: ' . esc_attr($color) . '; text-decoration: none; outline: none; box-shadow: none;">';
+            echo '<span class="dashicons ' . esc_attr($class) . '" style="font-size: 24px; width: 24px; height: 24px;"></span>';
+            echo '</a>';
+            echo '<span id="lgl-meta-star-label" style="font-weight: 500; color: #50575e;">' . ($is_active ? 'Currently Featured' : 'Not Featured') . '</span>';
+            echo '</div>';
+
+            // Client-side state mutation
+            echo "<script>
+                jQuery(document).ready(function($) {
+                    $('#lgl-meta-star-toggle').on('click', function(e) {
+                        e.preventDefault();
+                        var \$icon  = $(this).find('.dashicons');
+                        var \$input = $('#lgl_is_featured_input');
+                        var \$label = $('#lgl-meta-star-label');
+                        var isFeatured = \$input.val() === 'true';
+
+                        if (isFeatured) {
+                            \$icon.removeClass('dashicons-star-filled').addClass('dashicons-star-empty');
+                            $(this).css('color', '#b5bcc2');
+                            \$input.val('false');
+                            \$label.text('Not Featured');
+                        } else {
+                            \$icon.removeClass('dashicons-star-empty').addClass('dashicons-star-filled');
+                            $(this).css('color', '#f39c12');
+                            \$input.val('true');
+                            \$label.text('Currently Featured');
+                        }
+                    });
+                });
+            </script>";
+        }
+
+        /**
+         * Intercepts the native post save lifecycle to update the 'is_featured' post meta.
+         * Runs array diff logic against the global lgl_settings payload to ensure the 
+         * Select2 frontend carousels remain perfectly synchronized.
+         *
+         * @param int $post_id The ID of the post being saved.
+         * @return void
+         */
+        public function save_featured_meta_box($post_id)
+        {
+            // Abort if nonce is missing or invalid
+            if (!isset($_POST['lgl_featured_meta_nonce']) || !wp_verify_nonce($_POST['lgl_featured_meta_nonce'], 'lgl_save_featured_meta')) {
+                return;
+            }
+
+            // Abort on auto-saves
+            if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) {
+                return;
+            }
+
+            // Verify user permissions
+            if (!current_user_can('edit_post', $post_id)) {
+                return;
+            }
+
+            // Ensure we are only operating on our target CPTs
+            $post_type = get_post_type($post_id);
+            if (!in_array($post_type, array('caravan', 'motorhome', 'campervan'))) {
+                return;
+            }
+
+            // Extract new status from the hidden input
+            $new_status = isset($_POST['lgl_is_featured']) && $_POST['lgl_is_featured'] === 'true' ? 'true' : 'false';
+
+            // 1. Update Post Meta
+            update_post_meta($post_id, 'is_featured', $new_status);
+
+            // 2. Synchronize with global LGL Settings array
+            $options = get_option('lgl_settings', array());
+            $setting_key = 'featured_' . $post_type;
+
+            if (!isset($options[$setting_key]) || !is_array($options[$setting_key])) {
+                $options[$setting_key] = array();
+            }
+
+            // Sanitize existing array values to strict integers
+            $options[$setting_key] = array_map('intval', $options[$setting_key]);
+
+            if ($new_status === 'true') {
+                // Append ID to settings if not present
+                if (!in_array($post_id, $options[$setting_key], true)) {
+                    $options[$setting_key][] = $post_id;
+                }
+            } else {
+                // Strip ID from settings if present
+                $options[$setting_key] = array_diff($options[$setting_key], array($post_id));
+            }
+
+            // Re-index array to prevent JSON object conversion in the database
+            $options[$setting_key] = array_values($options[$setting_key]);
+
+            update_option('lgl_settings', $options);
         }
     }
 
