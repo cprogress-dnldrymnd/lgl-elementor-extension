@@ -331,6 +331,7 @@ if (! class_exists('LGL_Shortcodes')) {
 
             $lgl_pages_fields = array(
                 'vehicle_comparison_page_id' => array('label' => 'Vehicle Comparison Page', 'type' => 'select_page', 'default' => ''),
+                'wishlist_page_id' => array('label' => 'Wishlist Page', 'type' => 'select_page', 'default' => ''),
                 'caravan_page' => array('label' => 'Caravan Page', 'type' => 'select_page', 'default' => ''),
                 'motorhome_page' => array('label' => 'Motorhome Page', 'type' => 'select_page', 'default' => ''),
                 'campervan_page' => array('label' => 'Campervan Page', 'type' => 'select_page', 'default' => ''),
@@ -796,6 +797,7 @@ if (! class_exists('LGL_Shortcodes')) {
             add_shortcode('lgl_mini_compare', array($this, 'render_shortcode'));
             add_shortcode('lgl_listing', array($this, 'render_shortcode'));
             add_shortcode('lgl_compare_duo', array($this, 'render_shortcode'));
+            add_shortcode('lgl_wishlist', array($this, 'render_shortcode'));
         }
 
         /**
