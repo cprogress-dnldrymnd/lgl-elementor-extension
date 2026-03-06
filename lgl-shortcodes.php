@@ -820,6 +820,7 @@ if (! class_exists('LGL_Shortcodes')) {
                 $attributes_arr['limit'] = 9;
                 $attributes_arr['is_carousel'] = false;
                 $attributes_arr['style'] = 'style-1';
+                $attributes_arr['is_featured'] = false;
             }
 
             $attributes = shortcode_atts($attributes_arr, $atts, $shortcode_tag);
@@ -1336,7 +1337,7 @@ if (! class_exists('LGL_Shortcodes')) {
          * @type int    $count       Total number of matched posts.
          * }
          */
-        public static function get_search_results_data($post_type = 'caravan', $form_data = array(), $paged = 1, $posts_per_page = 9, $is_carousel = false, $style = 'style-1')
+        public static function get_search_results_data($post_type = 'caravan', $form_data = array(), $paged = 1, $posts_per_page = 9, $is_carousel = false, $style = 'style-1', $is_featured = false)
         {
             $args = array(
                 'post_type'      => $post_type,
@@ -1395,6 +1396,14 @@ if (! class_exists('LGL_Shortcodes')) {
                 $args['meta_query'][] = array(
                     'key'     => 'berth',
                     'value'   => sanitize_text_field($form_data['berth']),
+                    'compare' => '=',
+                );
+            }
+
+            if ($is_featured) {
+                $args['meta_query'][] = array(
+                    'key'     => 'is_featured',
+                    'value'   => true,
                     'compare' => '=',
                 );
             }
