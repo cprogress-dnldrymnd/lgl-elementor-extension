@@ -795,6 +795,7 @@ if (! class_exists('LGL_Shortcodes')) {
             add_shortcode('lgl_compare', array($this, 'render_shortcode'));
             add_shortcode('lgl_mini_compare', array($this, 'render_shortcode'));
             add_shortcode('lgl_listing', array($this, 'render_shortcode'));
+            add_shortcode('lgl_compare_duo', array($this, 'render_shortcode'));
         }
 
         /**
@@ -821,6 +822,11 @@ if (! class_exists('LGL_Shortcodes')) {
                 $attributes_arr['is_carousel'] = false;
                 $attributes_arr['style'] = 'style-1';
                 $attributes_arr['is_featured'] = false;
+            }
+
+            if ($shortcode_tag == 'lgl_compare_duo') {
+                $attributes_arr['post_id_1'] = 0;
+                $attributes_arr['post_id_2'] = 0;
             }
 
             $attributes = shortcode_atts($attributes_arr, $atts, $shortcode_tag);
