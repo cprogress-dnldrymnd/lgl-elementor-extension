@@ -1,7 +1,7 @@
 <?php
 if ($post_type) {
     $results = LGL_Shortcodes::get_search_results_data(
-        post_type: $post_type,
+        post_type: explode(',', $post_type),
         paged: 1,
         posts_per_page: $limit,
         is_carousel: $is_carousel,
