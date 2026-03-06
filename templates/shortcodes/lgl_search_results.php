@@ -30,6 +30,7 @@ $grid_limit  = $show_search ? 9 : 6;
                     <input type="hidden" name="orderby" value="date">
                     <input type="hidden" name="order" value="desc">
                     <input type="hidden" name="search" value="<?= esc_attr($search) ?>">
+                    <input type="hidden" name="post_type" id="lgl_target_post_type" value="<?php echo esc_attr($post_type); ?>">
                     <div class="lgl-sort-block">
                         <span class="lgl-sort-title">Sort by:</span>
                         <div class="lgl-sort-field">
