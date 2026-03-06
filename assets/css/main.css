@@ -312,25 +312,6 @@
       @media (max-width: 480px) {
         .lgl-post.lgl-post.lgl-post .lgl-post--infor .lgl-post--title {
           font-size: 20px; } }
-    .lgl-post.lgl-post.lgl-post .lgl-post--infor .lgl-post--readmore a {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background-color: var(--lgl-color-primary);
-      font-weight: 600;
-      text-decoration: none;
-      font-size: 16px;
-      text-transform: uppercase;
-      transition: color 0.3s ease;
-      color: var(--lgl-color-tertiary);
-      padding: 20px;
-      gap: 13px;
-      font-family: var(--lgl-font-secondary); }
-      .lgl-post.lgl-post.lgl-post .lgl-post--infor .lgl-post--readmore a:hover {
-        background-color: var(--lgl-color-secondary); }
-      .lgl-post.lgl-post.lgl-post .lgl-post--infor .lgl-post--readmore a svg {
-        width: 20px;
-        height: 20px; }
   .lgl-post.lgl-post.lgl-post.style-2 {
     border: none; }
     .lgl-post.lgl-post.lgl-post.style-2 .lgl-post--inner {
@@ -376,6 +357,26 @@
       background-color: var(--lgl-color-white);
       border-radius: 0 10px 10px 0;
       width: 80%; }
+
+.lgl-post--readmore.lgl-post--readmore.lgl-post--readmore a {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--lgl-color-primary);
+  font-weight: 600;
+  text-decoration: none;
+  font-size: 16px;
+  text-transform: uppercase;
+  transition: color 0.3s ease;
+  color: var(--lgl-color-tertiary);
+  padding: 20px;
+  gap: 13px;
+  font-family: var(--lgl-font-secondary); }
+  .lgl-post--readmore.lgl-post--readmore.lgl-post--readmore a:hover {
+    background-color: var(--lgl-color-secondary); }
+  .lgl-post--readmore.lgl-post--readmore.lgl-post--readmore a svg {
+    width: 20px;
+    height: 20px; }
 
 .lgl-post--meta.lgl-post--meta {
   border-top: 1px solid var(--lgl-color-medium-gray);
@@ -1215,7 +1216,8 @@
   .lgl-compare-duo__vehicle {
     display: flex;
     flex-direction: column;
-    padding: clamp(10px, 2vw, 30px); }
+    padding: clamp(10px, 2vw, 30px);
+    gap: 10px; }
   .lgl-compare-duo__image-link {
     display: block; }
     .lgl-compare-duo__image-link .lgl-cover-image {
@@ -1234,7 +1236,6 @@
     aspect-ratio: 1.6;
     background: var(--lgl-color-medium-gray); }
   .lgl-compare-duo__body {
-    padding: 18px 20px 24px;
     display: flex;
     flex-direction: column;
     gap: 6px;
@@ -1270,11 +1271,18 @@
     display: flex;
     align-items: center;
     gap: 5px;
-    color: var(--lgl-color-dark-gray);
+    color: var(--lgl-color-gray);
     font-size: 0.85rem; }
     .lgl-compare-duo__meta-item svg {
       flex-shrink: 0;
-      color: var(--lgl-color-gray); }
+      color: var(--lgl-color-secondary);
+      width: 25px;
+      height: 25px;
+      flex: 0 0 25px; }
+  .lgl-compare-duo__meta-label-value {
+    display: flex;
+    flex-direction: column;
+    gap: 5px; }
   .lgl-compare-duo__meta-label {
     font-weight: 500;
     color: var(--lgl-color-gray); }
@@ -1302,7 +1310,8 @@
       text-transform: uppercase;
       letter-spacing: 0.03em;
       box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
-      flex-shrink: 0; }
+      flex-shrink: 0;
+      position: relative; }
     .lgl-compare-duo__vs:before {
       content: "";
       position: absolute;
@@ -1312,32 +1321,6 @@
       width: 1px;
       background-color: var(--lgl-color-light-gray);
       transform: translateX(-50%); }
-  .lgl-compare-duo__cta {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    width: 100%;
-    padding: 16px 24px;
-    background: var(--lgl-color-secondary);
-    color: var(--lgl-color-accent);
-    font-weight: 700;
-    font-size: 0.95rem;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    text-decoration: none;
-    border-radius: 0;
-    transition: background 0.2s ease, color 0.2s ease;
-    border: none;
-    cursor: pointer; }
-    .lgl-compare-duo__cta svg {
-      transition: transform 0.2s ease; }
-    .lgl-compare-duo__cta:hover {
-      background: var(--lgl-color-accent);
-      color: var(--lgl-color-secondary);
-      text-decoration: none; }
-      .lgl-compare-duo__cta:hover svg {
-        transform: translateX(4px); }
 
 @container (max-width: 540px) {
   .lgl-compare-duo__vehicles {

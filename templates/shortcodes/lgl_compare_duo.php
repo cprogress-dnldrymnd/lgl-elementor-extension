@@ -102,8 +102,10 @@ $render_vehicle_col = function (array $v) {
                         <?php
                         echo LGL_Shortcodes::render_inline_svg('year');
                         ?>
-                        <span class="lgl-compare-duo__meta-label"><?php esc_html_e('Year', 'lgl-shortcodes'); ?></span>
-                        <span class="lgl-compare-duo__meta-value"><?php echo esc_html($v['year']); ?></span>
+                        <span class="lgl-compare-duo__meta-label-value">
+                            <span class="lgl-compare-duo__meta-label"><?php esc_html_e('Year', 'lgl-shortcodes'); ?></span>
+                            <span class="lgl-compare-duo__meta-value"><?php echo esc_html($v['year']); ?></span>
+                        </span>
                     </div>
                 <?php endif; ?>
             </div>
@@ -126,14 +128,15 @@ $render_vehicle_col = function (array $v) {
 
             <?php $render_vehicle_col($v2); ?>
         </div>
+        <div class=" lgl-post--readmore">
+            <a href="<?php echo esc_url(add_query_arg(['compare' => implode(',', [$id_1, $id_2])], $compare_url)); ?>">
+                <?php esc_html_e('Compare Now', 'lgl-shortcodes'); ?>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                    <path d="M4 12H20M20 12L16 8M20 12L16 16" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+            </a>
+        </div>
 
-        <a href="<?php echo esc_url(add_query_arg(['compare' => implode(',', [$id_1, $id_2])], $compare_url)); ?>"
-            class="lgl-btn lgl-compare-duo__cta">
-            <?php esc_html_e('Compare Now', 'lgl-shortcodes'); ?>
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                <path d="M4 12H20M20 12L16 8M20 12L16 16" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
-            </svg>
-        </a>
 
     </div>
 
