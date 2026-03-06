@@ -1456,3 +1456,26 @@
         display: flex !important;
     }
 }
+
+.vehicle-slider-holder {
+    .slick-arrow {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 56px;
+        height: 56px;
+        padding: 0;
+        border-radius: 50%;
+        background-color: #ffffff4d;
+
+        &.slick-prev {
+            left: 20px;
+        }
+        &.slick-right {
+            right: 20px;
+        }
+        &:hover {
+            background-color: var(--lgl-color-white);
+        }
+    }
+}
