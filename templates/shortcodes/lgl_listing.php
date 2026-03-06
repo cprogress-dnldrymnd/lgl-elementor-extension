@@ -15,3 +15,5 @@ if ($post_type) {
 echo '<pre>';
 var_dump(get_post_meta(6883));
 echo '</pre>';
+
+echo get_post_meta(6883, 'is_featured', true);
