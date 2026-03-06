@@ -43,7 +43,7 @@ if (!current_user_can('manage_options')) {
                 array('name' => 'post_type',   'default' => '—',       'description' => 'Required. The vehicle type to display. Accepts: <code>caravan</code>, <code>motorhome</code>, <code>campervan</code>. Supports comma-separated values e.g. <code>"caravan,motorhome"</code>.'),
                 array('name' => 'limit',       'default' => '9',       'description' => 'Number of vehicles to display per page.'),
                 array('name' => 'is_carousel', 'default' => 'false',   'description' => 'Set to <code>true</code> to render vehicles in a horizontal slider instead of a grid.'),
-                array('name' => 'style',       'default' => 'style-1', 'description' => 'Card style variant. Currently supports <code>style-1</code>.'),
+                array('name' => 'style',       'default' => 'style-1', 'description' => 'Card style variant. Currently supports <code>style-1</code> & <code>style-2</code>.'),
                 array('name' => 'is_featured', 'default' => 'false',   'description' => 'Set to <code>true</code> to display only vehicles marked as featured in LGL Settings.'),
             ),
         ),
