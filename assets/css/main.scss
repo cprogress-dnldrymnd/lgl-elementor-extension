@@ -475,7 +475,7 @@
             }
         }
         .lgl-post--infor {
-            position: absolute;;
+            position: absolute;
         }
     }
 }
@@ -1411,6 +1411,7 @@
             float: none;
             > div {
                 height: 100%;
+                width: 100%;
                 > div {
                     height: 100%;
                     > .lgl-post {
