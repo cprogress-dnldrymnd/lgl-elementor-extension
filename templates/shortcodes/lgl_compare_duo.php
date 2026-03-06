@@ -89,10 +89,9 @@ $render_vehicle_col = function (array $v) {
             <div class="lgl-compare-duo__meta">
                 <?php if (!empty($v['berth'])): ?>
                     <div class="lgl-compare-duo__meta-item">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                            <circle cx="12" cy="7" r="4"></circle>
-                        </svg>
+                        <?php
+                        echo LGL_Shortcodes::render_inline_svg('berth');
+                        ?>
                         <span class="lgl-compare-duo__meta-label"><?php esc_html_e('Berth', 'lgl-shortcodes'); ?></span>
                         <span class="lgl-compare-duo__meta-value"><?php echo esc_html($v['berth']); ?></span>
                     </div>
@@ -100,12 +99,9 @@ $render_vehicle_col = function (array $v) {
 
                 <?php if (!empty($v['year'])): ?>
                     <div class="lgl-compare-duo__meta-item">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-                            <line x1="16" y1="2" x2="16" y2="6"></line>
-                            <line x1="8" y1="2" x2="8" y2="6"></line>
-                            <line x1="3" y1="10" x2="21" y2="10"></line>
-                        </svg>
+                        <?php
+                        echo LGL_Shortcodes::render_inline_svg('year');
+                        ?>
                         <span class="lgl-compare-duo__meta-label"><?php esc_html_e('Year', 'lgl-shortcodes'); ?></span>
                         <span class="lgl-compare-duo__meta-value"><?php echo esc_html($v['year']); ?></span>
                     </div>
