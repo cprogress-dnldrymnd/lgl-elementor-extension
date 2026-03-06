@@ -8,7 +8,15 @@ if ($post_type) {
         style: $style,
         is_featured: $is_featured
     );
-    echo '<div class="lgl-grid-layout lgl-cols--3 lgl-layout-default">';
+    if ($is_carousel) {
+        echo '<div class="swiper swiper-vehicles">';
+        echo '<div class="swiper swiper-wrapper">';
+    } else {
+        echo '<div class="lgl-grid-layout lgl-cols--3 lgl-layout-default ">';
+    }
     echo $results['html'];
+    if ($is_carousel) {
+        echo '</div>';
+    }
     echo '</div>';
 }
