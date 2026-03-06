@@ -147,7 +147,7 @@ if (! class_exists('LGL_Shortcodes')) {
 
         /**
          * Enqueues administrative scripts and styles strictly on the plugin's settings page.
-         * Loads wp-color-picker and jQuery UI Sortable for dynamic layout building.
+         * Loads wp-color-picker, jQuery UI Sortable, and Select2 for dynamic layout building.
          *
          * @param string $hook The current admin page hook.
          * @return void
@@ -164,10 +164,21 @@ if (! class_exists('LGL_Shortcodes')) {
             // Enqueue native WP drag-and-drop sortable library
             wp_enqueue_script('jquery-ui-sortable');
 
-            // Inline script to initialize the color picker instances
+            // Enqueue Select2 dependencies for the admin UI
+            wp_enqueue_style('select2', LGL_SHORTCODES_URL . 'assets/libs/select2/select2.min.css');
+            wp_enqueue_script('select2', LGL_SHORTCODES_URL . 'assets/libs/select2/select2.min.js', array('jquery'), '4.1.0', true);
+
+            // Inline script to initialize the color picker and Select2 instances
             wp_add_inline_script('wp-color-picker', '
                 jQuery(document).ready(function($){
                     $(".lgl-color-picker").wpColorPicker();
+                    
+                    if ($.fn.select2) {
+                        $(".lgl-select2-cpt").select2({
+                            placeholder: "Search and select vehicles...",
+                            allowClear: true
+                        });
+                    }
                 });
             ');
         }
@@ -537,13 +548,14 @@ if (! class_exists('LGL_Shortcodes')) {
                     // Cast to array to prevent in_array() type errors
                     $current_values = is_array($value) ? $value : array();
 
-                    echo '<select id="lgl_settings[' . esc_attr($id) . ']" name="lgl_settings[' . esc_attr($id) . '][]" multiple="multiple" style="width: 100%; max-width: 400px; height: 150px;">';
+                    // Implemented lgl-select2-cpt class for Select2 initialization
+                    echo '<select id="lgl_settings[' . esc_attr($id) . ']" name="lgl_settings[' . esc_attr($id) . '][]" class="lgl-select2-cpt" multiple="multiple" style="width: 100%; max-width: 600px;">';
                     foreach ($posts as $p) {
                         $selected = in_array($p->ID, $current_values) ? 'selected="selected"' : '';
                         echo '<option value="' . esc_attr($p->ID) . '" ' . $selected . '>' . esc_html($p->post_title) . '</option>';
                     }
                     echo '</select>';
-                    echo '<p class="description">Hold CTRL (Windows) or CMD (Mac) to select multiple vehicles.</p>';
+                    echo '<p class="description">Search and select the vehicles you wish to feature.</p>';
                     break;
                 case 'text':
                 default:
