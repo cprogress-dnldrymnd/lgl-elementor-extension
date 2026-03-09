@@ -147,7 +147,7 @@ $sub_title = get_post_meta($post_id, 'sub_title', true);
                                 <div class="lgl-sale-price">
                                     <?php
                                     if (!empty($price)) {
-                                        echo '$' . number_format($price, 0);
+                                        echo esc_html(LGL_Shortcodes::format_price($price));
                                     } else {
                                         echo '<span class="lgl-call-price">' . esc_html__('Call for price', 'lgl') . '</span>';
                                     }

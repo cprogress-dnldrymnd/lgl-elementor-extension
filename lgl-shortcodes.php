@@ -243,6 +243,21 @@ if (! class_exists('LGL_Shortcodes')) {
                 'disable_compare'  => array('label' => 'Disable Compare', 'type' => 'checkbox', 'default' => '0'),
             );
 
+            $general_fields = array(
+                'disable_wishlist'  => array('label' => 'Disable Wishlist',  'type' => 'checkbox', 'default' => '0'),
+                'disable_compare'   => array('label' => 'Disable Compare',   'type' => 'checkbox', 'default' => '0'),
+                'currency_symbol'   => array('label' => 'Currency Symbol',   'type' => 'text',     'default' => '$'),
+                'currency_position' => array(
+                    'label' => 'Currency Position',
+                    'type' => 'select',
+                    'default' => 'before',
+                    'options' => array(
+                        'before' => 'Before price (e.g. £10,000)',
+                        'after'  => 'After price (e.g. 10,000£)',
+                    )
+                ),
+            );
+
             foreach ($general_fields as $id => $field) {
                 add_settings_field(
                     $id,
@@ -526,6 +541,16 @@ if (! class_exists('LGL_Shortcodes')) {
             $value   = isset($options[$id]) ? $options[$id] : $args['default'];
 
             switch ($args['type']) {
+                case 'select':
+                    $options_list = isset($args['options']) ? $args['options'] : array();
+                    echo sprintf('<select id="lgl_settings[%1$s]" name="lgl_settings[%1$s]">', esc_attr($id));
+                    foreach ($options_list as $opt_val => $opt_label) {
+                        $selected = selected($value, $opt_val, false);
+                        echo sprintf('<option value="%s" %s>%s</option>', esc_attr($opt_val), $selected, esc_html($opt_label));
+                    }
+                    echo '</select>';
+                    break;
+
                 case 'checkbox':
                     $is_checked = !empty($value) ? checked(1, $value, false) : '';
                     echo sprintf(
@@ -1876,6 +1901,22 @@ if (! class_exists('LGL_Shortcodes')) {
             $options[$setting_key] = array_values($options[$setting_key]);
 
             update_option('lgl_settings', $options);
+        }
+
+        /**
+         * Formats a numeric price using the currency symbol and position from plugin settings.
+         *
+         * @param  int|float|string $price  Raw price value.
+         * @param  int              $decimals Number of decimal places (default 0).
+         * @return string           Formatted price string, e.g. "£10,000" or "10,000 kr".
+         */
+        public static function format_price($price, int $decimals = 0): string
+        {
+            $options  = get_option('lgl_settings', array());
+            $symbol   = isset($options['currency_symbol'])   ? $options['currency_symbol']   : '$';
+            $position = isset($options['currency_position']) ? $options['currency_position'] : 'before';
+            $number   = number_format((float) $price, $decimals);
+            return $position === 'after' ? $number . $symbol : $symbol . $number;
         }
         /**
          * Renders the Documentation submenu page.

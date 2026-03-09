@@ -50,7 +50,7 @@ $disable_compare  = !empty($lgl_options['disable_compare']);
 
             <div class="lgl-post--info-inner">
                 <div class="lgl-post--price">
-                    $<?php echo esc_html(number_format((float)$price, 2)); ?>
+                    <?php echo esc_html(LGL_Shortcodes::format_price($price, 2)); ?>
                 </div>
                 <h3 class="lgl-post--title">
                     <a href="<?php echo esc_url($link); ?>"><?php echo esc_html($title); ?></a>
