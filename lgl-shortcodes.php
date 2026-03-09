@@ -265,7 +265,12 @@ if (! class_exists('LGL_Shortcodes')) {
                     array($this, 'render_field'),
                     'lgl-settings-general',
                     'lgl_general_section',
-                    array('id' => $id, 'type' => $field['type'], 'default' => $field['default'])
+                    array(
+                        'id'      => $id,
+                        'type'    => $field['type'],
+                        'default' => $field['default'],
+                        'options' => isset($field['options']) ? $field['options'] : array(),
+                    )
                 );
             }
 
