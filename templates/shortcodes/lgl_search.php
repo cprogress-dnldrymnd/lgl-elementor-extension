@@ -158,7 +158,7 @@ if ($active_make) {
                     <?php foreach ($prices as $price) : ?>
                         <option value="<?php echo esc_attr($price); ?>"
                             <?php selected((float) $active_price_min, $price); ?>>
-                            <?php echo esc_html('$' . number_format($price, 0)); ?>
+                            <?php echo esc_html( LGL_Shortcodes::format_price( $price ) ); ?>
                         </option>
                     <?php endforeach; ?>
                 </select>
@@ -171,7 +171,7 @@ if ($active_make) {
                     <?php foreach ($prices as $price) : ?>
                         <option value="<?php echo esc_attr($price); ?>"
                             <?php selected((float) $active_price_max, $price); ?>>
-                            <?php echo esc_html('$' . number_format($price, 0)); ?>
+                            <?php echo esc_html( LGL_Shortcodes::format_price( $price ) ); ?>
                         </option>
                     <?php endforeach; ?>
                 </select>
