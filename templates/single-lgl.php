@@ -52,7 +52,9 @@ $feature = get_post_meta($post_id, 'feature', true);
 $sub_title = get_post_meta($post_id, 'sub_title', true);
 
 ?>
-
+<pre>
+    <?php var_dump(get_post_meta()); ?>
+</pre>
 
 <main id="lgl-primary" class="lgl-site-main single-lgl">
     <div class="lgl-holder">
