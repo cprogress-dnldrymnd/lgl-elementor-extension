@@ -1161,7 +1161,11 @@ if (! class_exists('LGL_Shortcodes')) {
                                 }
 
                                 // Queue the cell output, applying the fallback hyphen for empty individual cells
-                                $row_cells[] = !empty($value) ? esc_html($value) : '-';
+                                if (!empty($value)) {
+                                    $row_cells[] = ($meta_key === 'price') ? esc_html(LGL_Shortcodes::format_price($value)) : esc_html($value);
+                                } else {
+                                    $row_cells[] = '-';
+                                }
                             }
 
                             // Pass 2: Output DOM nodes only if the row contains actionable data
