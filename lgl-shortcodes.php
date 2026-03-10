@@ -834,6 +834,7 @@ if (! class_exists('LGL_Shortcodes')) {
             add_shortcode('lgl_listing', array($this, 'render_shortcode'));
             add_shortcode('lgl_compare_duo', array($this, 'render_shortcode'));
             add_shortcode('lgl_wishlist', array($this, 'render_shortcode'));
+            add_shortcode('lgl_finance_specialist', array($this, 'render_shortcode'));
         }
 
         /**
