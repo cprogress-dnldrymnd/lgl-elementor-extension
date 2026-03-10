@@ -562,21 +562,20 @@
 /**
  * Initializes the Finance Specialist range slider module.
  * Binds DOM nodes and attaches event listeners to synchronize the slider's 
- * internal value with the frontend UI, applying currency formatting in real-time.
+ * internal value with the frontend UI, applying currency formatting, dynamic track fill,
+ * and routing parameter injection for cross-page filtering.
  * * @return {void}
  */
 const initFinanceSlider = () => {
     const slider = document.querySelector('.lgl-budget-slider');
     const output = document.querySelector('.lgl-slider-output');
+    const actionButtons = document.querySelectorAll('.lgl-btn-finance');
 
     // Terminate execution if the required DOM nodes are not present on the current page
-    if (!slider || !output) {
-        return;
-    }
+    if (!slider || !output) return;
 
     /**
      * Formats a raw numeric string or integer into a localized string with comma separators.
-     * Utilizes the 'en-GB' locale to match the GBP (£) structure in the UI.
      * * @param {number|string} value - The raw numerical value extracted from the range input.
      * @return {string} The formatted numerical string (e.g., "25,000").
      */
@@ -586,21 +585,69 @@ const initFinanceSlider = () => {
     };
 
     /**
+     * Calculates the active percentage of the slider and updates the CSS custom property
+     * to dynamically paint the track background using a linear gradient.
+     * * @param {HTMLInputElement} sliderElement - The range input DOM node.
+     * @return {void}
+     */
+    const updateSliderFill = (sliderElement) => {
+        const min = parseFloat(sliderElement.min) || 0;
+        const max = parseFloat(sliderElement.max) || 100;
+        const val = parseFloat(sliderElement.value);
+        
+        const percentage = ((val - min) / (max - min)) * 100;
+        
+        // Mutate the inline CSS variable to drive the linear-gradient color stop
+        sliderElement.style.setProperty('--lgl-slider-fill', `${percentage}%`);
+    };
+
+    /**
+     * Appends or updates the 'price_max' query parameter on all target action buttons.
+     * Utilizes the native URL API to safely parse and rebuild the href attribute.
+     * * @param {string|number} value - The current value of the budget slider.
+     * @return {void}
+     */
+    const updateActionLinks = (value) => {
+        if (!actionButtons.length) return;
+
+        actionButtons.forEach(button => {
+            try {
+                // button.href resolves to the absolute URL, preventing parsing errors
+                const url = new URL(button.href);
+                
+                // Inject or overwrite the specific query parameter
+                url.searchParams.set('price_max', value);
+                
+                // Reconstruct and assign the modified URL string
+                button.href = url.toString();
+            } catch (error) {
+                console.error('LGL Finance Slider: Invalid URL encountered on action button.', error);
+            }
+        });
+    };
+
+    /**
      * Event handler callback for the slider 'input' event.
-     * Mutates the DOM text content to reflect the currently selected value.
+     * Mutates the DOM text content, triggers track fill recalculation, and syncs URLs.
      * * @param {Event} e - The native DOM input event.
      * @return {void}
      */
     const handleSliderInput = (e) => {
-        // Use textContent instead of innerHTML to prevent XSS and improve rendering performance
-        output.textContent = formatCurrency(e.target.value);
+        const currentValue = e.target.value;
+        
+        output.textContent = formatCurrency(currentValue);
+        updateSliderFill(e.target);
+        updateActionLinks(currentValue);
     };
 
-    // Attach the event listener for continuous real-time DOM updates during interaction
+    // Attach the event listener for continuous real-time DOM updates
     slider.addEventListener('input', handleSliderInput);
 
-    // Bootstrap the initial output display on DOM load to synchronize with the hardcoded HTML value attribute
-    output.textContent = formatCurrency(slider.value);
+    // Bootstrap initial DOM state and URL parameters upon load
+    const initialValue = slider.value;
+    output.textContent = formatCurrency(initialValue);
+    updateSliderFill(slider);
+    updateActionLinks(initialValue);
 };
 
 // Defer module execution until the HTML document has been completely parsed
