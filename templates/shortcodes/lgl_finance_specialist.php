@@ -71,11 +71,11 @@ $start_index = floor($max_index / 2);
         </div>
 
         <div class="lgl-finance-actions">
-            <a href="<?php echo esc_url($url_motorhome); ?>" class="lgl-btn lgl-btn-primary lgl-btn-finance">SEARCH MOTORHOMES</a>
+            <a href="<?php echo esc_url($url_motorhome); ?>" class="lgl-btn lgl-btn-accent lgl-btn-finance">SEARCH MOTORHOMES</a>
             <a href="<?php echo esc_url($url_caravan); ?>" class="lgl-btn lgl-btn-secondary lgl-btn-finance">SEARCH CARAVANS</a>
             
             <?php if (!empty($options['campervan_page'])): ?>
-                <a href="<?php echo esc_url($url_campervan); ?>" class="lgl-btn lgl-btn-secondary lgl-btn-finance">SEARCH CAMPERVANS</a>
+                <a href="<?php echo esc_url($url_campervan); ?>" class="lgl-btn lgl-btn-primray lgl-btn-finance">SEARCH CAMPERVANS</a>
             <?php endif; ?>
         </div>
         
