@@ -350,9 +350,17 @@
         left: 0;
         right: 0;
         z-index: 2; }
+        @media (max-width: 767px) {
+          .lgl-post.lgl-post.lgl-post.style-2 .lgl-post--inner .lgl-post--infor .lgl-post--info-inner {
+            padding: 40px 20px 20px; } }
         .lgl-post.lgl-post.lgl-post.style-2 .lgl-post--inner .lgl-post--infor .lgl-post--price,
         .lgl-post.lgl-post.lgl-post.style-2 .lgl-post--inner .lgl-post--infor .lgl-post--title a {
           color: var(--lgl-color-white); }
+        .lgl-post.lgl-post.lgl-post.style-2 .lgl-post--inner .lgl-post--infor .lgl-post--body {
+          padding-left: 36px; }
+          @media (max-width: 767px) {
+            .lgl-post.lgl-post.lgl-post.style-2 .lgl-post--inner .lgl-post--infor .lgl-post--body {
+              padding-left: 20px; } }
     .lgl-post.lgl-post.lgl-post.style-2 .lgl-post--meta.lgl-post--meta.lgl-post--meta {
       background-color: var(--lgl-color-white);
       border-radius: 0 10px 10px 0;

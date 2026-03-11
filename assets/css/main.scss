@@ -479,9 +479,20 @@
                 left: 0;
                 right: 0;
                 z-index: 2;
+                .lgl-post--info-inner {
+                    @media (max-width: 767px) {
+                        padding: 40px 20px 20px;
+                    }
+                }
                 .lgl-post--price,
                 .lgl-post--title a {
                     color: var(--lgl-color-white);
+                }
+                .lgl-post--body {
+                    padding-left: 36px;
+                    @media (max-width: 767px) {
+                        padding-left: 20px;
+                    }
                 }
             }
         }
