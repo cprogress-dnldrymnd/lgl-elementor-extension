@@ -1490,20 +1490,24 @@
         display: flex;
         align-items: center;
         justify-content: center;
+        --offset: 20px;
         svg {
             transition: 400ms;
             width: 30px;
             height: 30px;
         }
         &.slick-prev {
-            left: 20px;
+            left: var(--offset);
         }
         &.slick-next {
-            right: 20px;
+            right: var(--offset);
         }
         &:hover {
             background-color: var(--lgl-color-white);
             color: var(--lgl-color-primary);
+        }
+        @media (max-width: 767px) {
+            --offset: 10px;
         }
     }
 }
