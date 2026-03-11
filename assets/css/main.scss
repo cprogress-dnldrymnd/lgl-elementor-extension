@@ -7,6 +7,7 @@
     --lgl-color-accent: #f6d100;
     --lgl-color-primary: #003793;
     --lgl-color-secondary: #001537;
+
     --lgl-color-tertiary: #00e6f6;
     --lgl-color-quaternary: #007bff;
 
@@ -459,8 +460,9 @@
                         bottom: 0;
                         left: 0;
                         right: 0;
-                        background-color: var(--lgl-color-black);
-                        opacity: 0.5;
+                        background: transparent linear-gradient(180deg, #00000000 0%, var(--lgl-color-secondary) 100%)
+                            0% 0%;
+                        opacity: 1;
                         z-index: 3;
                     }
                 }
@@ -1073,7 +1075,7 @@
     z-index: 1;
     padding-bottom: 10px;
     font-size: 50px;
-    color: #00235d;
+    color: var(--lgl-color-secondary);
     font-family: "Poppins", sans-serif;
     font-weight: 600;
     margin-bottom: 32px;
