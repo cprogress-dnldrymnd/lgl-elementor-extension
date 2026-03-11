@@ -399,7 +399,7 @@
             arrows: true,
             responsive: [
                 {
-                    breakpoint: 0,
+                    breakpoint: 1,
                     settings: {
                         slidesToShow: 1
                     }
@@ -596,7 +596,7 @@ const initFinanceSlider = () => {
         const min = parseInt(sliderElement.min, 10);
         const max = parseInt(sliderElement.max, 10);
         const val = parseInt(sliderElement.value, 10);
-        
+
         const percentage = ((val - min) / (max - min)) * 100;
         sliderElement.style.setProperty('--lgl-slider-fill', `${percentage}%`);
     };
@@ -628,7 +628,7 @@ const initFinanceSlider = () => {
         // e.target.value is the array index, not the actual price
         const index = parseInt(e.target.value, 10);
         const actualPrice = priceData[index];
-        
+
         output.textContent = formatCurrency(actualPrice);
         updateSliderFill(e.target);
         updateActionLinks(actualPrice);
@@ -640,7 +640,7 @@ const initFinanceSlider = () => {
     // Bootstrap initial DOM state
     const initialIndex = parseInt(slider.value, 10);
     const initialPrice = priceData[initialIndex];
-    
+
     output.textContent = formatCurrency(initialPrice);
     updateSliderFill(slider);
     updateActionLinks(initialPrice);
