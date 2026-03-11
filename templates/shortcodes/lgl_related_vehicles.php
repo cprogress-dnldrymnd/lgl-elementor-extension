@@ -24,11 +24,11 @@ $args = array(
 );
 
 // Retrieve 'listing-make-model' term IDs for the current post context
-if ( $current_post_id ) {
-    $term_ids = wp_get_post_terms( $current_post_id, 'listing-make-model', array( 'fields' => 'ids' ) );
-    
+if ($current_post_id) {
+    $term_ids = wp_get_post_terms($current_post_id, 'listing-make-model', array('fields' => 'ids'));
+
     // Inject tax_query parameter if the current post possesses valid taxonomy terms
-    if ( ! is_wp_error( $term_ids ) && ! empty( $term_ids ) ) {
+    if (! is_wp_error($term_ids) && ! empty($term_ids)) {
         $args['tax_query'] = array(
             array(
                 'taxonomy' => 'listing-make-model',
@@ -51,6 +51,7 @@ if ($query->have_posts()) {
     while ($query->have_posts()) {
         $query->the_post();
         // Invoke existing isolated template logic to adhere to the DRY principle
+        $style = 'style-1';
         include LGL_SHORTCODES_PATH . 'templates/partials/lgl-grid.php';
     }
     echo '</div>';
