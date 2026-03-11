@@ -496,7 +496,7 @@
                         padding-left: 20px;
                     }
                 }
-                @media(max-width: 767px) {
+                @media (max-width: 767px) {
                     bottom: 20px;
                 }
             }
@@ -720,9 +720,11 @@
             height: 30px;
         }
     }
-    .lgl-post.lgl-post.lgl-post {
-        border: none;
-        background-color: transparent;
+    > .lgl-holder {
+        > .lgl-post.lgl-post.lgl-post {
+            border: none;
+            background-color: transparent;
+        }
     }
 }
 

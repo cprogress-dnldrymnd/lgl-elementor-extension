@@ -541,7 +541,7 @@
   .single-lgl.single-lgl.single-lgl .lgl-post--meta.lgl-post--meta svg {
     width: 30px;
     height: 30px; }
-  .single-lgl.single-lgl.single-lgl .lgl-post.lgl-post.lgl-post {
+  .single-lgl.single-lgl.single-lgl > .lgl-holder > .lgl-post.lgl-post.lgl-post {
     border: none;
     background-color: transparent; }
 
