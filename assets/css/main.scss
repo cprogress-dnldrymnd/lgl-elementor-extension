@@ -472,7 +472,7 @@
                             right: 0;
                             background: transparent
                                 linear-gradient(180deg, #00000000 0%, var(--lgl-color-secondary) 100%) 0% 0%;
-                            opacity: 1;
+                            opacity: 0.8;
                             z-index: 3;
                         }
                     }
@@ -525,7 +525,9 @@
         .lgl-post--meta.lgl-post--meta.lgl-post--meta {
             background-color: var(--lgl-color-white);
             border-radius: 0 10px 10px 0;
-            width: 80%;
+            @media (min-width: 481px) {
+                width: 80%;
+            }
         }
     }
 }
