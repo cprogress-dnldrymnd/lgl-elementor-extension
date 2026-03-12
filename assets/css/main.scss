@@ -492,6 +492,15 @@
                 .lgl-post--title a {
                     color: var(--lgl-color-white);
                 }
+                .lgl-post--title a {
+                    font-size: 22px;
+                    overflow: hidden;
+                    display: -webkit-box;
+                    -webkit-line-clamp: 2; /* number of lines to show */
+                    line-clamp: 2;
+                    -webkit-box-orient: vertical;
+                    line-height: 1.3;
+                }
                 .lgl-post--body {
                     padding-left: 36px;
                     @media (max-width: 767px) {
