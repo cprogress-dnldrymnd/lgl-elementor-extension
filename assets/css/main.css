@@ -1221,23 +1221,25 @@
     padding: 0;
     border-radius: 50%;
     background-color: #ffffff4d;
+    border: 1px solid var(--lgl-color-secondary);
     z-index: 3;
     transition: 400ms;
     display: flex;
     align-items: center;
     justify-content: center;
-    --offset: 0; }
+    color: var(--lgl-color-secondary);
+    --offset: -60px; }
     .vehicle-slider-holder .slick-arrow svg {
       transition: 400ms;
-      width: 30px;
-      height: 30px; }
+      width: 20px;
+      height: 20px; }
     .vehicle-slider-holder .slick-arrow.slick-prev {
       left: var(--offset); }
     .vehicle-slider-holder .slick-arrow.slick-next {
       right: var(--offset); }
     .vehicle-slider-holder .slick-arrow:hover {
-      background-color: var(--lgl-color-white);
-      color: var(--lgl-color-primary); }
+      background-color: var(--lgl-color-secondary);
+      color: var(--lgl-color-white); }
     @media (max-width: 767px) {
       .vehicle-slider-holder .slick-arrow {
         --offset: 10px; } }
