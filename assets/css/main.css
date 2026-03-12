@@ -1209,34 +1209,38 @@
 .vehicle-slider-js .slick-track {
   display: flex !important; }
 
-.vehicle-slider-holder .slick-arrow {
-  position: absolute;
-  top: 50px;
-  width: 56px;
-  height: 56px;
-  padding: 0;
-  border-radius: 50%;
-  background-color: #ffffff4d;
-  z-index: 3;
-  transition: 400ms;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  --offset: 20px; }
-  .vehicle-slider-holder .slick-arrow svg {
+.vehicle-slider-holder {
+  padding-left: 60px;
+  padding-right: 60px; }
+  .vehicle-slider-holder .slick-arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 45px;
+    height: 45px;
+    padding: 0;
+    border-radius: 50%;
+    background-color: #ffffff4d;
+    z-index: 3;
     transition: 400ms;
-    width: 30px;
-    height: 30px; }
-  .vehicle-slider-holder .slick-arrow.slick-prev {
-    left: var(--offset); }
-  .vehicle-slider-holder .slick-arrow.slick-next {
-    right: var(--offset); }
-  .vehicle-slider-holder .slick-arrow:hover {
-    background-color: var(--lgl-color-white);
-    color: var(--lgl-color-primary); }
-  @media (max-width: 767px) {
-    .vehicle-slider-holder .slick-arrow {
-      --offset: 10px; } }
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    --offset: 0; }
+    .vehicle-slider-holder .slick-arrow svg {
+      transition: 400ms;
+      width: 30px;
+      height: 30px; }
+    .vehicle-slider-holder .slick-arrow.slick-prev {
+      left: var(--offset); }
+    .vehicle-slider-holder .slick-arrow.slick-next {
+      right: var(--offset); }
+    .vehicle-slider-holder .slick-arrow:hover {
+      background-color: var(--lgl-color-white);
+      color: var(--lgl-color-primary); }
+    @media (max-width: 767px) {
+      .vehicle-slider-holder .slick-arrow {
+        --offset: 10px; } }
 
 .lgl-compare-duo {
   container-type: inline-size; }
