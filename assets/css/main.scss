@@ -1488,6 +1488,10 @@
 
 .vehicle-slider-js {
     .slick-list {
+        margin: 0 -15px;
+        .slick-track {
+            overflow: hidden;
+        }
         .slick-slide {
             padding-left: 7.5px;
             padding-right: 7.5px;
