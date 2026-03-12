@@ -1192,23 +1192,27 @@
   color: #64748b;
   font-family: var(--lgl-font-primary, sans-serif); }
 
-.vehicle-slider-js .slick-list .slick-track {
-  gap: 30px; }
-.vehicle-slider-js .slick-list .slick-slide {
-  display: flex;
-  height: auto;
-  float: none; }
-  .vehicle-slider-js .slick-list .slick-slide > div {
-    height: 100%;
-    width: 100%; }
-    .vehicle-slider-js .slick-list .slick-slide > div > div {
-      height: 100%; }
-      .vehicle-slider-js .slick-list .slick-slide > div > div > .lgl-post {
-        height: 100%; }
-.vehicle-slider-js .slick-track {
-  display: flex !important; }
-  .vehicle-slider-js .slick-track:before, .vehicle-slider-js .slick-track:after {
-    content: none !important; }
+.vehicle-slider-js {
+  display: flex; }
+  .vehicle-slider-js .slick-list {
+    margin: 0 -15px; }
+    .vehicle-slider-js .slick-list .slick-track {
+      overflow: hidden; }
+    .vehicle-slider-js .slick-list .slick-slide {
+      margin-left: 15px;
+      margin-right: 15px;
+      display: flex;
+      height: auto;
+      float: none; }
+      .vehicle-slider-js .slick-list .slick-slide > div {
+        height: 100%;
+        width: 100%; }
+        .vehicle-slider-js .slick-list .slick-slide > div > div {
+          height: 100%; }
+          .vehicle-slider-js .slick-list .slick-slide > div > div > .lgl-post {
+            height: 100%; }
+  .vehicle-slider-js .slick-track {
+    display: flex !important; }
 
 .vehicle-slider-holder {
   padding-left: 60px;

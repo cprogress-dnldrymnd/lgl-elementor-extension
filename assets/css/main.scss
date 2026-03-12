@@ -1487,11 +1487,15 @@
 }
 
 .vehicle-slider-js {
+    display: flex;
     .slick-list {
+        margin: 0 -15px;
         .slick-track {
-            gap: 30px;
+            overflow: hidden;
         }
         .slick-slide {
+            margin-left: 15px;
+            margin-right: 15px;
             display: flex;
             height: auto;
             float: none;
@@ -1509,9 +1513,6 @@
     }
     .slick-track {
         display: flex !important;
-        &:before, &:after {
-            content: none !important;
-        }
     }
 }
 
