@@ -1207,6 +1207,8 @@
         height: 100%; }
 .vehicle-slider-js .slick-track {
   display: flex !important; }
+  .vehicle-slider-js .slick-track:before, .vehicle-slider-js .slick-track:after {
+    content: none !important; }
 
 .vehicle-slider-holder {
   padding-left: 60px;

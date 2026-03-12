@@ -1509,6 +1509,9 @@
     }
     .slick-track {
         display: flex !important;
+        &:before, &:after {
+            content: none !important;
+        }
     }
 }
 
