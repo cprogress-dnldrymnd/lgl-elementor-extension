@@ -1488,13 +1488,10 @@
 
 .vehicle-slider-js {
     .slick-list {
-        margin: 0 -15px;
         .slick-track {
-            overflow: hidden;
+            gap: 30px;
         }
         .slick-slide {
-            margin-left: 15px;
-            margin-right: 15px;
             display: flex;
             height: auto;
             float: none;
