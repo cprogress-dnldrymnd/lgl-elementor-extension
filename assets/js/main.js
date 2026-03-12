@@ -408,8 +408,8 @@
                     }
                 },
                 {
-                    // Triggers at min-width: 1025px
-                    breakpoint: 1024,
+                    // Triggers at min-width: 1300px
+                    breakpoint: 1300,
                     settings: {
                         slidesToShow: 3,
                         slidesToScroll: 3,
