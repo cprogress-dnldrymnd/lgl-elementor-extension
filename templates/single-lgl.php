@@ -172,17 +172,17 @@ $sub_title = get_post_meta($post_id, 'sub_title', true);
 
                             <div class="lgl-btn-group">
                                 <?php if ($url_finance) { ?>
-                                    <a class="lgl-btn lgl-btn-secondary" href="<?php echo $url_finance; ?>">
+                                    <a class="lgl-btn lgl-btn-secondary" id="lgl-finance-button" href="<?php echo $url_finance; ?>">
                                         <?php echo esc_html__('FINANCE CALCULATOR', 'lgl'); ?>
                                     </a>
                                 <?php } ?>
                                 <?php if ($url_enquire) { ?>
-                                    <a class="lgl-btn lgl-btn-accent" href="<?php echo $url_enquire; ?>">
+                                    <a class="lgl-btn lgl-btn-accent" id="lgl-enquire-button" href="<?php echo $url_enquire; ?>">
                                         <?php echo esc_html__('ENQUIRE NOW', 'lgl'); ?>
                                     </a>
                                 <?php } ?>
                                 <?php if ($url_reserve) { ?>
-                                    <a class="lgl-btn lgl-btn-outline" href="<?php echo $url_reserve; ?>">
+                                    <a class="lgl-btn lgl-btn-outline" id="lgl-reserve-button" href="<?php echo $url_reserve; ?>">
                                         <?php echo esc_html__('RESERVE NOW', 'lgl'); ?>
                                     </a>
                                 <?php } ?>
