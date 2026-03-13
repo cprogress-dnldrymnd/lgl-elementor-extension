@@ -50,6 +50,7 @@
             border-radius: 0;
             .lgl-filter-form .lgl-filter-group {
                 width: 100%;
+                border: 1px solid var(--lgl-color-light-gray);
             }
         }
     }
@@ -179,9 +180,7 @@
         .select2-selection__placeholder {
             color: var(--lgl-color-secondary);
         }
-        @media (max-width: 991px) {
-            padding-left: 15px;
-        }
+ 
 
         @media (max-width: 767px) {
             min-height: 48px;
