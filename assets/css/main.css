@@ -35,10 +35,10 @@
     .lgl-search-container.lgl-search-container.lgl-search-container:not(.lgl-search-container-bg-secondary) {
       padding: 0;
       background-color: transparent;
-      border-radius: 0; }
+      border-radius: 0;
+      border: 1px solid var(--lgl-color-light-gray); }
       .lgl-search-container.lgl-search-container.lgl-search-container:not(.lgl-search-container-bg-secondary) .lgl-filter-form .lgl-filter-group {
-        width: 100%;
-        border: 1px solid var(--lgl-color-light-gray); } }
+        width: 100%; } }
   .lgl-search-container.lgl-search-container.lgl-search-container.lgl-search-container-bg-secondary {
     background-color: var(--lgl-color-secondary); }
   .lgl-search-container.lgl-search-container.lgl-search-container .lgl-filter-form {
@@ -1402,5 +1402,7 @@
     grid-template-rows: auto auto auto; }
   .lgl-compare-duo__vs {
     padding: 10px 0; } }
+.lgl-offcanvas-close {
+  padding: 0 !important; }
 
 /*# sourceMappingURL=main.css.map */

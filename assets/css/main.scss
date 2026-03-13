@@ -48,9 +48,10 @@
             padding: 0;
             background-color: transparent;
             border-radius: 0;
+                border: 1px solid var(--lgl-color-light-gray);
+
             .lgl-filter-form .lgl-filter-group {
                 width: 100%;
-                border: 1px solid var(--lgl-color-light-gray);
             }
         }
     }
@@ -1785,4 +1786,9 @@ $border-radius: 16px;
             padding: 10px 0;
         }
     }
+}
+
+
+.lgl-offcanvas-close {
+    padding: 0 !important;
 }
