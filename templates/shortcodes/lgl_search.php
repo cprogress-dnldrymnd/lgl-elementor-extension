@@ -254,7 +254,8 @@ if ($active_make) {
 }
 </style>
 
-<!-- ① Mobile trigger button -->
+<?php if ($post_type) : ?>
+<!-- ① Mobile trigger button (only when a post_type is set) -->
 <button type="button"
         class="lgl-search-mobile-toggle"
         aria-expanded="false"
@@ -268,9 +269,13 @@ if ($active_make) {
 
 <!-- ② Backdrop (mobile only, fades in behind panel) -->
 <div class="lgl-search-offcanvas-backdrop" id="lgl-search-backdrop" aria-hidden="true"></div>
+<?php endif; ?>
 
 <!-- ③ Offcanvas — static on desktop, fixed sliding panel on mobile.
-        The form lives here once; no duplication, no ID conflicts. -->
+        The form lives here once; no duplication, no ID conflicts.
+        When no post_type is set, the offcanvas chrome is skipped entirely
+        and the form renders as a plain inline container. -->
+<?php if ($post_type) : ?>
 <div class="lgl-search-offcanvas"
      id="lgl-search-offcanvas"
      role="dialog"
@@ -287,8 +292,8 @@ if ($active_make) {
         </button>
     </div>
 
-    <!-- Body (padding only applied on mobile via .lgl-offcanvas-body) -->
     <div class="lgl-offcanvas-body">
+<?php endif; ?>
 
         <div class="lgl-search-container lgl-holder <?= $post_type == false ? 'lgl-search-container-bg-secondary' : '' ?>">
             <form id="lgl-search-form" class="lgl-filter-form <?= $post_type == false ? 'lgl-filter-form-no-ajax' : 'lgl-filter-form-ajax' ?>">
@@ -433,6 +438,7 @@ if ($active_make) {
             </form>
         </div>
 
+    <?php if ($post_type) : ?>
     </div><!-- /.lgl-offcanvas-body -->
 </div><!-- /.lgl-search-offcanvas -->
 
@@ -474,3 +480,4 @@ if ($active_make) {
     });
 })();
 </script>
+<?php endif; ?>
