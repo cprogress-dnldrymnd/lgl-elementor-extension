@@ -889,6 +889,13 @@ if (! class_exists('LGL_Shortcodes')) {
                 $attributes_arr['post_id_2'] = 0;
             }
 
+            if ($shortcode_tag == 'lgl_finance_specialist') {
+                $attributes_arr['style'] = 'style-1';
+            }
+
+
+
+
             $attributes = shortcode_atts($attributes_arr, $atts, $shortcode_tag);
 
             // Hand over execution to the template loader
