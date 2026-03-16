@@ -32,6 +32,7 @@
      */
     function search_form() {
         let currentPage = 1;
+        let isUpdatingFilters = false;
 
         // Initialize Select2 on target classes
         $('.lgl-select2').select2({
@@ -89,60 +90,12 @@
 
 
         //search redirect + dynamic make loading
-        $('#lgl_post_type').on('change', function () {
-            const url       = $(this).val();
-            const $makeSelect  = $('#lgl_make');
-            const $modelSelect = $('#lgl_model');
-
-            // Always reset both dependent dropdowns first
-            $makeSelect.empty()
-                .append('<option value="">Select Vehicle Type First</option>')
-                .prop('disabled', true)
-                .trigger('change'); // notify Select2
-
-            $modelSelect.empty()
-                .append('<option value="">Select Make First</option>')
-                .prop('disabled', true)
-                .trigger('change');
-
-            // Point the form at the correct results page
-            if (url) {
-                $('#lgl-search-form').attr('action', url).attr('method', 'GET');
-            }
-
-            if (!url) return;
-
-            // Derive the post_type slug from the destination URL's path segment
-            // e.g. /caravans/ → we pass it as a POST param; the backend resolves the slug.
-            // We read the hidden input the PHP template sets on non-global search forms;
-            // for the global form we derive post_type by reading the select option text.
-            const selectedText = $(this).find('option:selected').text().trim().toLowerCase();
-            // Normalise: "Caravan" → "caravan", "Motorhome" → "motorhome" etc.
-            const postTypeSlug = selectedText.replace(/s$/, ''); // strip trailing 's' if present
-
-            $.ajax({
-                url: lgl_ajax_obj.ajax_url,
-                type: 'POST',
-                data: {
-                    action: 'lgl_get_makes',
-                    nonce:  lgl_ajax_obj.nonce,
-                    post_type: postTypeSlug
-                },
-                success: function (response) {
-                    if (response.success && response.data.length > 0) {
-                        $makeSelect.empty().append('<option value="">All Makes</option>');
-                        $.each(response.data, function (i, item) {
-                            $makeSelect.append(new Option(item.text, item.id, false, false));
-                        });
-                        $makeSelect.prop('disabled', false).trigger('change');
-                    } else {
-                        // No makes for this type – keep disabled with a helpful label
-                        $makeSelect.empty()
-                            .append('<option value="">No Makes Available</option>')
-                            .trigger('change');
-                    }
-                }
-            });
+        $('#lgl-search-form.lgl-filter-form-ajax, #lgl-sort-order').on('submit change', function (e) {
+            if (e.type === 'submit') e.preventDefault();
+            if (isUpdatingFilters) return; // Ignore events fired by our own repopulation
+            currentPage = 1;
+            execute_search();
+            update_filter_options();
         });
 
 
@@ -170,6 +123,87 @@
                 scrollTop: $('.lgl-results-wrapper').offset().top - 40
             }, 400);
         });
+
+        /**
+         * Fetches valid filter options for the current filter state and repopulates
+         * condition, berth, and price dropdowns so impossible combinations are impossible.
+         */
+        function update_filter_options() {
+            const postType = $('#lgl_target_post_type').val();
+            if (!postType) return; // Global search form — no post_type locked in yet
+
+            const formData = $('#lgl-search-form').serialize();
+
+            $.ajax({
+                url: lgl_ajax_obj.ajax_url,
+                type: 'POST',
+                data: {
+                    action: 'lgl_get_filter_options',
+                    nonce: lgl_ajax_obj.nonce,
+                    post_type: postType,
+                    form_data: formData,
+                },
+                success: function (response) {
+                    if (!response.success) return;
+                    const d = response.data;
+
+                    isUpdatingFilters = true;
+
+                    _repopulate_select('#lgl_condition', d.conditions, 'Any Condition');
+                    _repopulate_select('#lgl_berth', d.berths, 'Any Berth');
+                    _repopulate_price_select('#lgl_price_min', d.prices, 'Min Price');
+                    _repopulate_price_select('#lgl_price_max', d.prices, 'Max Price');
+
+                    isUpdatingFilters = false;
+                }
+            });
+        }
+
+        /**
+         * Rebuilds a plain-value select (condition, berth) with only the provided values.
+         * Preserves the current selection if it is still valid; resets to "" otherwise.
+         */
+        function _repopulate_select(selector, values, placeholder) {
+            const $el = $(selector);
+            const current = $el.val();
+
+            $el.empty().append(new Option(placeholder, ''));
+
+            let stillValid = false;
+            $.each(values, function (i, val) {
+                if (String(val) === String(current)) stillValid = true;
+                $el.append(new Option(val, val, false, String(val) === String(current)));
+            });
+
+            if (current && !stillValid) {
+                $el.val('');
+            }
+
+            $el.trigger('change'); // Refresh Select2 display
+        }
+
+        /**
+         * Rebuilds a price select with {value, label} objects.
+         * Preserves the current selection if it is still in the new price list.
+         */
+        function _repopulate_price_select(selector, prices, placeholder) {
+            const $el = $(selector);
+            const current = parseFloat($el.val()) || 0;
+
+            $el.empty().append(new Option(placeholder, ''));
+
+            let stillValid = false;
+            $.each(prices, function (i, item) {
+                if (item.value === current) stillValid = true;
+                $el.append(new Option(item.label, item.value, false, item.value === current));
+            });
+
+            if (current && !stillValid) {
+                $el.val('');
+            }
+
+            $el.trigger('change'); // Refresh Select2 display
+        }
 
         /**
          * Compiles form parameters and dispatches the AJAX search payload.
@@ -224,8 +258,11 @@
         // Trigger initial search to populate grid on load
         if ($('#lgl-search-form').length) {
             execute_search();
+            update_filter_options();
         }
     }
+
+
 
     /**
      * Initializes the mini wishlist UI components and binds necessary event listeners.

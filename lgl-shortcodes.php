@@ -17,7 +17,7 @@ if (! defined('ABSPATH')) {
 // Define a constant for the plugin directory path to ensure reliable file inclusion.
 define('LGL_SHORTCODES_PATH', plugin_dir_path(__FILE__));
 define('LGL_SHORTCODES_URL', plugin_dir_url(__FILE__));
-define('LGL_SHORTCODES_VERSION', '3.2.6'); // Update this version number with each release for cache busting.
+define('LGL_SHORTCODES_VERSION', '3.2.7'); // Update this version number with each release for cache busting.
 
 if (! class_exists('LGL_Shortcodes')) {
 
@@ -58,6 +58,11 @@ if (! class_exists('LGL_Shortcodes')) {
             // New AJAX endpoints for compare inline search
             add_action('wp_ajax_lgl_search_vehicles_for_compare', array($this, 'ajax_search_vehicles_for_compare'));
             add_action('wp_ajax_nopriv_lgl_search_vehicles_for_compare', array($this, 'ajax_search_vehicles_for_compare'));
+
+
+
+            add_action('wp_ajax_lgl_get_filter_options',        array($this, 'ajax_get_filter_options'));
+            add_action('wp_ajax_nopriv_lgl_get_filter_options', array($this, 'ajax_get_filter_options'));
 
             // New AJAX endpoints for mini wishlist dynamic refresh
             add_action('wp_ajax_lgl_refresh_mini_wishlist', array($this, 'ajax_refresh_mini_wishlist'));
@@ -1488,6 +1493,134 @@ if (! class_exists('LGL_Shortcodes')) {
             }
 
             wp_send_json_success($results);
+        }
+
+        /**
+         * AJAX handler that returns valid filter options (condition, berth, price)
+         * for the vehicles that match the current filter state.
+         * Called on every filter change so dropdowns never show impossible combinations.
+         *
+         * @return void
+         */
+        public function ajax_get_filter_options()
+        {
+            check_ajax_referer('lgl_search_nonce', 'nonce');
+
+            $post_type = isset($_POST['post_type']) ? sanitize_text_field($_POST['post_type']) : '';
+            if (empty($post_type)) {
+                wp_send_json_error('No post type provided.');
+            }
+
+            $form_data = array();
+            if (isset($_POST['form_data'])) {
+                parse_str($_POST['form_data'], $form_data);
+            }
+
+            // Build the same query as the main search to find matching post IDs
+            $args = array(
+                'post_type'      => $post_type,
+                'post_status'    => 'publish',
+                'posts_per_page' => -1,
+                'fields'         => 'ids',
+                'meta_query'     => array('relation' => 'AND'),
+                'tax_query'      => array('relation' => 'AND'),
+            );
+
+            if (!empty($form_data['condition'])) {
+                $args['meta_query'][] = array(
+                    'key'     => 'condition',
+                    'value'   => sanitize_text_field($form_data['condition']),
+                    'compare' => '=',
+                );
+            }
+
+            if (!empty($form_data['berth'])) {
+                $args['meta_query'][] = array(
+                    'key'     => 'berth',
+                    'value'   => sanitize_text_field($form_data['berth']),
+                    'compare' => '=',
+                );
+            }
+
+            $price_min = !empty($form_data['price_min']) ? floatval($form_data['price_min']) : 0;
+            $price_max = !empty($form_data['price_max']) ? floatval($form_data['price_max']) : 0;
+            if ($price_min > 0 || $price_max > 0) {
+                $price_query = array('key' => 'price', 'type' => 'NUMERIC');
+                if ($price_min > 0 && $price_max > 0) {
+                    $price_query['value']   = array($price_min, $price_max);
+                    $price_query['compare'] = 'BETWEEN';
+                } elseif ($price_min > 0) {
+                    $price_query['value']   = $price_min;
+                    $price_query['compare'] = '>=';
+                } else {
+                    $price_query['value']   = $price_max;
+                    $price_query['compare'] = '<=';
+                }
+                $args['meta_query'][] = $price_query;
+            }
+
+            $make_id  = !empty($form_data['listing_make'])  ? intval($form_data['listing_make'])  : 0;
+            $model_id = !empty($form_data['listing_model']) ? intval($form_data['listing_model']) : 0;
+            if ($model_id > 0) {
+                $args['tax_query'][] = array(
+                    'taxonomy'         => 'listing-make-model',
+                    'field'            => 'term_id',
+                    'terms'            => $model_id,
+                );
+            } elseif ($make_id > 0) {
+                $args['tax_query'][] = array(
+                    'taxonomy'         => 'listing-make-model',
+                    'field'            => 'term_id',
+                    'terms'            => $make_id,
+                    'include_children' => true,
+                );
+            }
+
+            $matching_ids = get_posts($args);
+
+            $conditions = array();
+            $berths     = array();
+            $prices     = array();
+
+            if (!empty($matching_ids)) {
+                global $wpdb;
+                $ids_in = implode(',', array_map('intval', $matching_ids));
+
+                $conditions = $wpdb->get_col(
+                    "SELECT DISTINCT meta_value FROM {$wpdb->postmeta}
+             WHERE post_id IN ({$ids_in}) AND meta_key = 'condition' AND meta_value != ''
+             ORDER BY meta_value ASC"
+                );
+
+                $berths_raw = $wpdb->get_col(
+                    "SELECT DISTINCT meta_value FROM {$wpdb->postmeta}
+             WHERE post_id IN ({$ids_in}) AND meta_key = 'berth' AND meta_value != ''
+             ORDER BY CAST(meta_value AS UNSIGNED) ASC"
+                );
+                $berths = $berths_raw;
+
+                $prices_raw = $wpdb->get_col(
+                    "SELECT DISTINCT meta_value FROM {$wpdb->postmeta}
+             WHERE post_id IN ({$ids_in}) AND meta_key = 'price' AND meta_value != ''
+             ORDER BY CAST(meta_value AS DECIMAL(15,2)) ASC"
+                );
+                $price_objects = array();
+                foreach ($prices_raw as $p) {
+                    if (is_numeric($p)) {
+                        $price_objects[] = array(
+                            'value' => (float) $p,
+                            'label' => self::format_price((float) $p),
+                        );
+                    }
+                }
+                $prices = $price_objects;
+            }
+
+            wp_send_json_success(array(
+                'conditions' => $conditions,
+                'berths'     => $berths,
+                'prices'     => $prices,
+            ));
         }
 
         /**
