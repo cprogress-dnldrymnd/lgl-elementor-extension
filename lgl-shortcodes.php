@@ -17,7 +17,7 @@ if (! defined('ABSPATH')) {
 // Define a constant for the plugin directory path to ensure reliable file inclusion.
 define('LGL_SHORTCODES_PATH', plugin_dir_path(__FILE__));
 define('LGL_SHORTCODES_URL', plugin_dir_url(__FILE__));
-define('LGL_SHORTCODES_VERSION', '3.2.9'); // Update this version number with each release for cache busting.
+define('LGL_SHORTCODES_VERSION', '3.3.0'); // Update this version number with each release for cache busting.
 
 if (! class_exists('LGL_Shortcodes')) {
 
@@ -55,7 +55,8 @@ if (! class_exists('LGL_Shortcodes')) {
             add_action('wp_ajax_lgl_fetch_results', array($this, 'ajax_fetch_results'));
             add_action('wp_ajax_nopriv_lgl_fetch_results', array($this, 'ajax_fetch_results'));
             add_action('wp_ajax_lgl_add_to_wishlist', array($this, 'ajax_add_to_wishlist'));
-            // New AJAX endpoints for compare inline search
+            add_action('wp_ajax_lgl_update_account',         array($this, 'ajax_lgl_update_account'));
+            add_action('wp_ajax_nopriv_lgl_update_account',  array($this, 'ajax_lgl_update_account'));
             add_action('wp_ajax_lgl_search_vehicles_for_compare', array($this, 'ajax_search_vehicles_for_compare'));
             add_action('wp_ajax_nopriv_lgl_search_vehicles_for_compare', array($this, 'ajax_search_vehicles_for_compare'));
 
@@ -360,6 +361,7 @@ if (! class_exists('LGL_Shortcodes')) {
             $lgl_pages_fields = array(
                 'vehicle_comparison_page_id' => array('label' => 'Vehicle Comparison Page', 'type' => 'select_page', 'default' => ''),
                 'wishlist_page_id' => array('label' => 'Wishlist Page', 'type' => 'select_page', 'default' => ''),
+                'my_account_page_id'         => array('label' => 'My Account Page',          'type' => 'select_page', 'default' => ''),
                 'caravan_page' => array('label' => 'Caravan Page', 'type' => 'select_page', 'default' => ''),
                 'motorhome_page' => array('label' => 'Motorhome Page', 'type' => 'select_page', 'default' => ''),
                 'campervan_page' => array('label' => 'Campervan Page', 'type' => 'select_page', 'default' => ''),
@@ -863,6 +865,7 @@ if (! class_exists('LGL_Shortcodes')) {
             add_shortcode('lgl_compare_duo', array($this, 'render_shortcode'));
             add_shortcode('lgl_wishlist', array($this, 'render_shortcode'));
             add_shortcode('lgl_finance_specialist', array($this, 'render_shortcode'));
+            add_shortcode('lgl_my_account', array($this, 'render_shortcode'));
         }
 
         /**
@@ -2346,6 +2349,103 @@ if (! class_exists('LGL_Shortcodes')) {
             } else {
                 echo '<div class="wrap"><p>' . esc_html__('Documentation template not found.', 'lgl-shortcodes') . '</p></div>';
             }
+        }
+
+        /**
+         * AJAX handler to update the current user's account details.
+         * Handles first name, last name, email address, and optional password change.
+         * Requires the user to supply their current password when changing their password.
+         *
+         * @return void  Sends JSON and exits.
+         */
+        public function ajax_lgl_update_account()
+        {
+
+            // Security: verify the shared plugin nonce
+            check_ajax_referer('lgl_search_nonce', 'nonce');
+
+            // Must be logged in
+            if (! is_user_logged_in()) {
+                wp_send_json_error(array('message' => __('You must be logged in to update your account.', 'lgl-shortcodes')));
+            }
+
+            $user_id    = get_current_user_id();
+            $user       = get_userdata($user_id);
+
+            // ── Sanitise inputs ──────────────────────────────────────────────────────
+            $first_name       = sanitize_text_field(wp_unslash($_POST['first_name']       ?? ''));
+            $last_name        = sanitize_text_field(wp_unslash($_POST['last_name']        ?? ''));
+            $email            = sanitize_email(wp_unslash($_POST['email']                 ?? ''));
+            $current_password = wp_unslash($_POST['current_password'] ?? '');
+            $new_password     = wp_unslash($_POST['new_password']     ?? '');
+            $new_password2    = wp_unslash($_POST['new_password2']    ?? '');
+
+            // ── Validate required fields ─────────────────────────────────────────────
+            if (empty($first_name) || empty($last_name)) {
+                wp_send_json_error(array('message' => __('First name and last name are required.', 'lgl-shortcodes')));
+            }
+
+            if (! is_email($email)) {
+                wp_send_json_error(array('message' => __('Please enter a valid email address.', 'lgl-shortcodes')));
+            }
+
+            // ── Email uniqueness check ───────────────────────────────────────────────
+            if ($email !== $user->user_email) {
+                $existing = get_user_by('email', $email);
+                if ($existing && (int) $existing->ID !== $user_id) {
+                    wp_send_json_error(array('message' => __('This email address is already in use by another account.', 'lgl-shortcodes')));
+                }
+            }
+
+            // ── Password change validation ───────────────────────────────────────────
+            $change_password = ! empty($new_password);
+
+            if ($change_password) {
+                if (empty($current_password)) {
+                    wp_send_json_error(array('message' => __('Please enter your current password to set a new one.', 'lgl-shortcodes')));
+                }
+
+                if (! wp_check_password($current_password, $user->user_pass, $user_id)) {
+                    wp_send_json_error(array('message' => __('Your current password is incorrect.', 'lgl-shortcodes')));
+                }
+
+                if ($new_password !== $new_password2) {
+                    wp_send_json_error(array('message' => __('New passwords do not match.', 'lgl-shortcodes')));
+                }
+
+                if (strlen($new_password) < 6) {
+                    wp_send_json_error(array('message' => __('New password must be at least 6 characters long.', 'lgl-shortcodes')));
+                }
+            }
+
+            // ── Build update args ────────────────────────────────────────────────────
+            $update_args = array(
+                'ID'         => $user_id,
+                'first_name' => $first_name,
+                'last_name'  => $last_name,
+                'user_email' => $email,
+            );
+
+            if ($change_password) {
+                $update_args['user_pass'] = $new_password;
+            }
+
+            // ── Persist changes ──────────────────────────────────────────────────────
+            $result = wp_update_user($update_args);
+
+            if (is_wp_error($result)) {
+                wp_send_json_error(array('message' => $result->get_error_message()));
+            }
+
+            // Re-authenticate the session cookie when the password was changed so the
+            // user isn't logged out immediately after saving.
+            if ($change_password) {
+                wp_set_auth_cookie($user_id, true);
+            }
+
+            wp_send_json_success(array(
+                'message' => __('Your account details have been updated successfully.', 'lgl-shortcodes'),
+            ));
         }
     }
 

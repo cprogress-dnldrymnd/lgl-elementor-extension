@@ -1531,5 +1531,350 @@
   /* Lock body scroll while panel is open */
   body.lgl-offcanvas-open {
     overflow: hidden; } }
+/* =============================================================================
+   LGL MY ACCOUNT — Styles
+   Add to:  assets/css/main.css  (or enqueue as a separate stylesheet)
+   ============================================================================= */
+/* ── Shared wrapper ─────────────────────────────────────────────────────────── */
+.lgl-account-wrap {
+  font-family: var(--lgl-font-primary, "DM Sans", sans-serif);
+  color: var(--lgl-color-secondary, #001537);
+  max-width: 1100px;
+  margin: 0 auto; }
+
+/* ── Notices ────────────────────────────────────────────────────────────────── */
+.lgl-account-notice {
+  padding: 12px 16px;
+  border-radius: 6px;
+  font-size: 0.925rem;
+  margin-bottom: 20px;
+  border-left: 4px solid transparent; }
+
+.lgl-account-notice--success {
+  background: #ecfdf5;
+  border-left-color: #10b981;
+  color: #065f46; }
+
+.lgl-account-notice--error {
+  background: #fef2f2;
+  border-left-color: #ef4444;
+  color: #991b1b; }
+
+/* ═══════════════════════════════════════════════════════════════════════════════
+   GUEST VIEW — Login / Register
+   ═══════════════════════════════════════════════════════════════════════════════ */
+.lgl-account-guest {
+  max-width: 520px;
+  margin: 40px auto; }
+
+/* Auth tab buttons */
+.lgl-auth-tabs {
+  display: flex;
+  gap: 0;
+  border-bottom: 2px solid #e5e7eb;
+  margin-bottom: 28px; }
+
+.lgl-auth-tab {
+  padding: 12px 28px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: #6b7280;
+  text-decoration: none;
+  border-bottom: 3px solid transparent;
+  margin-bottom: -2px;
+  transition: color 0.2s, border-color 0.2s; }
+
+.lgl-auth-tab:hover {
+  color: var(--lgl-color-primary, #003793); }
+
+.lgl-auth-tab.lgl-is-active {
+  color: var(--lgl-color-primary, #003793);
+  border-bottom-color: var(--lgl-color-primary, #003793); }
+
+/* Auth panels */
+.lgl-auth-panel {
+  display: none; }
+
+.lgl-auth-panel.lgl-is-active {
+  display: block; }
+
+/* ── Shared form elements ────────────────────────────────────────────────────── */
+.lgl-auth-form,
+.lgl-account-form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px; }
+
+.lgl-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px; }
+
+.lgl-form-group label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--lgl-color-secondary, #001537); }
+
+.lgl-form-group input[type="text"],
+.lgl-form-group input[type="email"],
+.lgl-form-group input[type="password"] {
+  padding: 10px 14px;
+  border: 1.5px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  font-family: inherit;
+  color: var(--lgl-color-secondary, #001537);
+  background: #fff;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  outline: none;
+  width: 100%;
+  box-sizing: border-box; }
+
+.lgl-form-group input:focus {
+  border-color: var(--lgl-color-primary, #003793);
+  box-shadow: 0 0 0 3px rgba(0, 55, 147, 0.12); }
+
+/* Row: two columns */
+.lgl-form-row-split {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px; }
+
+@media (max-width: 540px) {
+  .lgl-form-row-split {
+    grid-template-columns: 1fr; } }
+/* Row: remember + forgot */
+.lgl-form-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px; }
+
+.lgl-checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.875rem;
+  cursor: pointer; }
+
+.lgl-forgot-link {
+  font-size: 0.875rem;
+  color: var(--lgl-color-quaternary, #007bff);
+  text-decoration: none; }
+
+.lgl-forgot-link:hover {
+  text-decoration: underline; }
+
+/* Buttons */
+.lgl-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 11px 28px;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  border: none;
+  transition: background 0.2s, transform 0.1s;
+  text-decoration: none; }
+
+.lgl-btn--primary {
+  background: var(--lgl-color-primary, #003793);
+  color: #fff; }
+
+.lgl-btn--primary:hover {
+  background: var(--lgl-color-secondary, #001537);
+  transform: translateY(-1px); }
+
+.lgl-btn--primary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none; }
+
+/* ═══════════════════════════════════════════════════════════════════════════════
+   AUTHENTICATED MEMBER VIEW
+   ═══════════════════════════════════════════════════════════════════════════════ */
+.lgl-account-member {
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  gap: 40px;
+  align-items: start;
+  padding: 20px 0 40px; }
+
+@media (max-width: 768px) {
+  .lgl-account-member {
+    grid-template-columns: 1fr;
+    gap: 24px; } }
+/* ── Sidebar navigation ──────────────────────────────────────────────────────── */
+.lgl-account-nav {
+  display: flex;
+  flex-direction: column;
+  background: #fff;
+  border: 1.5px solid #e5e7eb;
+  border-radius: 10px;
+  overflow: hidden;
+  position: sticky;
+  top: 100px; }
+
+@media (max-width: 768px) {
+  .lgl-account-nav {
+    flex-direction: row;
+    flex-wrap: wrap;
+    position: static; } }
+.lgl-account-nav__item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 20px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #4b5563;
+  text-decoration: none;
+  border-left: 3px solid transparent;
+  transition: background 0.18s, color 0.18s, border-color 0.18s; }
+
+.lgl-account-nav__item:not(:last-child) {
+  border-bottom: 1px solid #f3f4f6; }
+
+.lgl-account-nav__item svg {
+  flex-shrink: 0;
+  opacity: 0.7; }
+
+.lgl-account-nav__item:hover {
+  background: #f8faff;
+  color: var(--lgl-color-primary, #003793); }
+
+.lgl-account-nav__item--active {
+  background: #f0f4ff;
+  color: var(--lgl-color-primary, #003793);
+  border-left-color: var(--lgl-color-primary, #003793); }
+
+.lgl-account-nav__item--active svg {
+  opacity: 1; }
+
+.lgl-account-nav__item--logout {
+  color: #ef4444;
+  margin-top: auto; }
+
+.lgl-account-nav__item--logout:hover {
+  background: #fff5f5;
+  color: #dc2626; }
+
+@media (max-width: 768px) {
+  .lgl-account-nav__item {
+    border-left: none;
+    border-bottom: 3px solid transparent;
+    flex: 1 1 auto;
+    justify-content: center;
+    padding: 12px 10px; }
+
+  .lgl-account-nav__item--active {
+    border-bottom-color: var(--lgl-color-primary, #003793);
+    border-left: none; }
+
+  .lgl-account-nav__item span {
+    display: none; } }
+/* ── Content panels ──────────────────────────────────────────────────────────── */
+.lgl-account-content {
+  min-width: 0;
+  /* prevent overflow in grid */ }
+
+.lgl-account-panel__title {
+  font-family: var(--lgl-font-secondary, "Poppins", sans-serif);
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--lgl-color-secondary, #001537);
+  margin: 0 0 8px; }
+
+.lgl-account-panel__intro {
+  color: #6b7280;
+  margin-bottom: 30px;
+  font-size: 0.95rem;
+  line-height: 1.6; }
+
+/* ── Dashboard cards ─────────────────────────────────────────────────────────── */
+.lgl-dashboard-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 20px;
+  margin-top: 24px; }
+
+.lgl-dashboard-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  padding: 22px;
+  background: #fff;
+  border: 1.5px solid #e5e7eb;
+  border-radius: 10px;
+  text-decoration: none;
+  color: inherit;
+  transition: border-color 0.2s, box-shadow 0.2s, transform 0.15s; }
+
+.lgl-dashboard-card:hover {
+  border-color: var(--lgl-color-primary, #003793);
+  box-shadow: 0 6px 24px rgba(0, 55, 147, 0.1);
+  transform: translateY(-2px); }
+
+.lgl-dashboard-card__icon {
+  width: 52px;
+  height: 52px;
+  border-radius: 10px;
+  background: #f0f4ff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: var(--lgl-color-primary, #003793); }
+
+.lgl-dashboard-card__body h3 {
+  font-family: var(--lgl-font-secondary, "Poppins", sans-serif);
+  font-size: 1rem;
+  font-weight: 700;
+  margin: 0 0 4px;
+  color: var(--lgl-color-secondary, #001537); }
+
+.lgl-dashboard-card__body p {
+  font-size: 0.85rem;
+  color: #6b7280;
+  margin: 0; }
+
+/* ── Account Details form ────────────────────────────────────────────────────── */
+.lgl-fieldset {
+  border: 1.5px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 24px;
+  background: #fff; }
+
+.lgl-fieldset__legend {
+  font-family: var(--lgl-font-secondary, "Poppins", sans-serif);
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--lgl-color-secondary, #001537);
+  padding: 0 8px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap; }
+
+.lgl-fieldset__legend-hint {
+  font-weight: 400;
+  color: #9ca3af;
+  font-size: 0.8rem;
+  font-family: var(--lgl-font-primary, "DM Sans", sans-serif); }
+
+.lgl-form-actions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-top: 8px; }
+
+.lgl-account-saving {
+  font-size: 0.875rem;
+  color: #6b7280;
+  font-style: italic; }
 
 /*# sourceMappingURL=main.css.map */
