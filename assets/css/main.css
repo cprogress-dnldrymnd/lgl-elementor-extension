@@ -1894,8 +1894,7 @@
   text-decoration: none;
   transition: opacity 0.18s; }
 
-.lgl-mini-account a:hover {
-  opacity: 0.8;
+.lgl-mini-account a:hover, .lgl-mini-account a:active, .lgl-mini-account a:focus {
   color: var(--lgl-color-accent); }
 
 .lgl-mini-account__divider {

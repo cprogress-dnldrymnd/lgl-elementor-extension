@@ -2369,9 +2369,12 @@ $border-radius: 16px;
     transition: opacity 0.18s;
 }
 
-.lgl-mini-account a:hover {
-    opacity: 0.8;
-    color: var(--lgl-color-accent);
+.lgl-mini-account a {
+    &:hover,
+    &:active,
+    &:focus {
+        color: var(--lgl-color-accent);
+    }
 }
 
 .lgl-mini-account__divider {
