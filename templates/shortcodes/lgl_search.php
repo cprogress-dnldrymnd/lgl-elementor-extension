@@ -168,9 +168,9 @@ if ($active_make) {
                     $campervan_page = $options['campervan_page'] ?? false;
 
                     $vehicle_types = array();
-                    if ($caravan_page)   $vehicle_types[get_the_permalink($caravan_page)]   = 'Caravan';
-                    if ($motorhome_page) $vehicle_types[get_the_permalink($motorhome_page)] = 'Motorhome';
-                    if ($campervan_page) $vehicle_types[get_the_permalink($campervan_page)] = 'Campervan';
+                    if ($caravan_page)   $vehicle_types[] = array('url' => get_the_permalink($caravan_page),   'label' => 'Caravan',   'slug' => 'caravan');
+                    if ($motorhome_page) $vehicle_types[] = array('url' => get_the_permalink($motorhome_page), 'label' => 'Motorhome', 'slug' => 'motorhome');
+                    if ($campervan_page) $vehicle_types[] = array('url' => get_the_permalink($campervan_page), 'label' => 'Campervan', 'slug' => 'campervan');
                     ?>
 
                     <?php if (!empty($vehicle_types)) : ?>
@@ -178,10 +178,11 @@ if ($active_make) {
                             <label for="lgl_vehicle_type">Leisure Vehicle Type</label>
                             <select name="post_type" id="lgl_post_type" class="lgl-select2" data-placeholder="Leisure Vehicle Type" required>
                                 <option value="">Leisure Vehicle Type</option>
-                                <?php foreach ($vehicle_types as $type_key => $type_label) : ?>
-                                    <option value="<?php echo esc_attr($type_key); ?>"
-                                        <?php selected($active_post_type, $type_key); ?>>
-                                        <?php echo esc_html($type_label); ?>
+                                <?php foreach ($vehicle_types as $type) : ?>
+                                    <option value="<?php echo esc_attr($type['url']); ?>"
+                                        data-post-type="<?php echo esc_attr($type['slug']); ?>"
+                                        <?php selected($active_post_type, $type['url']); ?>>
+                                        <?php echo esc_html($type['label']); ?>
                                     </option>
                                 <?php endforeach; ?>
                             </select>
