@@ -909,6 +909,18 @@
   display: inline-block;
   font-family: var(--lgl-font-primary); }
 
+.lgl-wishlist-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 4px;
+  font-size: 12px;
+  color: var(--lgl-color-secondary); }
+  .lgl-wishlist-meta span {
+    background: var(--lgl-color-soft-gray);
+    padding: 2px 6px;
+    border-radius: 4px; }
+
 .lgl-mini-wishlist-toggle {
   display: flex;
   align-items: center;
