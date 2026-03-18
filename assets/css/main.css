@@ -1867,7 +1867,6 @@
   gap: 10px;
   background-color: var(--lgl-color-primary, #003793);
   border-radius: 6px;
-  padding: 9px 18px;
   font-family: var(--lgl-font-primary, "DM Sans", sans-serif);
   font-size: 0.9rem;
   font-weight: 600;
