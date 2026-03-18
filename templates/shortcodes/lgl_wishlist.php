@@ -46,7 +46,6 @@ $wishlist = is_array($wishlist) ? array_values(array_filter(array_map('intval', 
 
             <div class="lgl-wishlist-table">
 
-                {{-- Header row --}}
                 <div class="lgl-wishlist-table__head">
                     <div class="lgl-wt-col lgl-wt-col--thumb"></div>
                     <div class="lgl-wt-col lgl-wt-col--title"><?php esc_html_e('Vehicle', 'lgl-shortcodes'); ?></div>
