@@ -1939,11 +1939,17 @@ $border-radius: 16px;
    ============================================================================= */
 
 /* ── Shared wrapper ─────────────────────────────────────────────────────────── */
-.lgl-account-wrap {
+.lgl-account-wrap.lgl-account-wrap {
     font-family: var(--lgl-font-primary, "DM Sans", sans-serif);
     color: var(--lgl-color-secondary, #001537);
     max-width: 1100px;
     margin: 0 auto;
+    .lgl-account-panel__title {
+        max-width: 100%;
+    }
+    .lgl-mini-wishlist-content {
+        padding: 0;
+    }
 }
 
 /* ── Notices ────────────────────────────────────────────────────────────────── */

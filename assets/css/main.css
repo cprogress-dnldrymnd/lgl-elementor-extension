@@ -1536,11 +1536,15 @@
    Add to:  assets/css/main.css  (or enqueue as a separate stylesheet)
    ============================================================================= */
 /* ── Shared wrapper ─────────────────────────────────────────────────────────── */
-.lgl-account-wrap {
+.lgl-account-wrap.lgl-account-wrap {
   font-family: var(--lgl-font-primary, "DM Sans", sans-serif);
   color: var(--lgl-color-secondary, #001537);
   max-width: 1100px;
   margin: 0 auto; }
+  .lgl-account-wrap.lgl-account-wrap .lgl-account-panel__title {
+    max-width: 100%; }
+  .lgl-account-wrap.lgl-account-wrap .lgl-mini-wishlist-content {
+    padding: 0; }
 
 /* ── Notices ────────────────────────────────────────────────────────────────── */
 .lgl-account-notice {
