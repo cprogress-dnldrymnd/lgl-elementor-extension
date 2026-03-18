@@ -1321,35 +1321,35 @@
         align-self: start;
         padding-top: 2px;
     }
+}
 
-    .lgl-remove-btn {
-        width: 28px;
-        height: 28px;
-        border-radius: 50%;
-        background: var(--lgl-color-soft-gray) !important;
-        border: none;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-        transition: background 0.2s ease;
-        padding: 0;
+.lgl-remove-btn.lgl-remove-btn.lgl-remove-btn {
+    padding: 0;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: var(--lgl-color-soft-gray) !important;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background 0.2s ease;
+    padding: 0;
+
+    svg {
+        stroke: #aaa;
+        transition: stroke 0.2s ease;
+    }
+
+    &:hover {
+        background: #fdecea !important;
 
         svg {
-            stroke: #aaa;
-            transition: stroke 0.2s ease;
-        }
-
-        &:hover {
-            background: #fdecea !important;
-
-            svg {
-                stroke: #d9534f;
-            }
+            stroke: #d9534f;
         }
     }
 }
-
 .lgl-mini-wishlist-header {
     display: flex;
     gap: 10px;
@@ -1417,7 +1417,9 @@
     color: var(--lgl-color-primary);
     text-decoration: none;
     text-align: center;
-    transition: background 0.2s ease, color 0.2s ease;
+    transition:
+        background 0.2s ease,
+        color 0.2s ease;
     border-radius: 0 0 12px 12px;
 
     &:hover {
@@ -2553,10 +2555,21 @@ $wt-cols: 110px 1fr 120px 110px 80px 80px 50px;
             }
         }
 
-        .lgl-wt-col--thumb  { grid-area: thumb; align-self: start; }
-        .lgl-wt-col--title  { grid-area: title; }
-        .lgl-wt-col--price  { grid-area: price; font-size: 14px; }
-        .lgl-wt-col--remove { grid-area: remove; align-self: start; }
+        .lgl-wt-col--thumb {
+            grid-area: thumb;
+            align-self: start;
+        }
+        .lgl-wt-col--title {
+            grid-area: title;
+        }
+        .lgl-wt-col--price {
+            grid-area: price;
+            font-size: 14px;
+        }
+        .lgl-wt-col--remove {
+            grid-area: remove;
+            align-self: start;
+        }
 
         .lgl-wt-col--condition,
         .lgl-wt-col--year,

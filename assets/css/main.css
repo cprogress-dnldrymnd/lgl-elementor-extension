@@ -1028,25 +1028,27 @@
     margin-left: 0;
     align-self: start;
     padding-top: 2px; }
-  .lgl-mini-wishlist-dropdown .lgl-remove-btn {
-    width: 28px;
-    height: 28px;
-    border-radius: 50%;
-    background: var(--lgl-color-soft-gray) !important;
-    border: none;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: background 0.2s ease;
-    padding: 0; }
-    .lgl-mini-wishlist-dropdown .lgl-remove-btn svg {
-      stroke: #aaa;
-      transition: stroke 0.2s ease; }
-    .lgl-mini-wishlist-dropdown .lgl-remove-btn:hover {
-      background: #fdecea !important; }
-      .lgl-mini-wishlist-dropdown .lgl-remove-btn:hover svg {
-        stroke: #d9534f; }
+
+.lgl-remove-btn.lgl-remove-btn.lgl-remove-btn {
+  padding: 0;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--lgl-color-soft-gray) !important;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.2s ease;
+  padding: 0; }
+  .lgl-remove-btn.lgl-remove-btn.lgl-remove-btn svg {
+    stroke: #aaa;
+    transition: stroke 0.2s ease; }
+  .lgl-remove-btn.lgl-remove-btn.lgl-remove-btn:hover {
+    background: #fdecea !important; }
+    .lgl-remove-btn.lgl-remove-btn.lgl-remove-btn:hover svg {
+      stroke: #d9534f; }
 
 .lgl-mini-wishlist-header {
   display: flex;
