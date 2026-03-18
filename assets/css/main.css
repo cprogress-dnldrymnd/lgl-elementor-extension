@@ -1916,4 +1916,9 @@
   align-items: center;
   gap: 7px; }
 
+.lgl-mini-account__signin {
+  display: flex;
+  align-items: center;
+  gap: 5px; }
+
 /*# sourceMappingURL=main.css.map */
