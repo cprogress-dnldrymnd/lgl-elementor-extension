@@ -980,7 +980,8 @@
     overflow: hidden;
     flex-shrink: 0;
     margin-right: 0;
-    position: relative; }
+    position: relative;
+    height: 100%; }
     .lgl-mini-wishlist-dropdown .lgl-wishlist-thumb img {
       width: 100%;
       height: 100%;
@@ -1009,7 +1010,8 @@
   .lgl-mini-wishlist-dropdown .lgl-wishlist-price {
     font-size: 13px;
     font-weight: 700;
-    color: var(--lgl-color-primary); }
+    color: var(--lgl-color-primary);
+    line-height: 1.2; }
   .lgl-mini-wishlist-dropdown .lgl-wishlist-meta {
     display: flex;
     flex-wrap: wrap;
