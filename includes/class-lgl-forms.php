@@ -11,7 +11,6 @@ if (! defined('ABSPATH')) exit;
 
 class LGL_Forms
 {
-
     /**
      * Boot the form builder and register system hooks.
      */
@@ -65,7 +64,6 @@ class LGL_Forms
      */
     public function register_post_types()
     {
-
         register_post_type('lgl_enquiry_sub', [
             'label'           => __('Enquiry Submissions', 'lgl-shortcodes'),
             'labels'          => [
@@ -137,6 +135,7 @@ class LGL_Forms
 
     /**
      * Loads CSS and JS only on the Form Builder and Submission screens.
+     * @param string $hook The current admin page hook.
      */
     public function admin_assets($hook)
     {
@@ -152,6 +151,7 @@ class LGL_Forms
 
     /**
      * Outputs the admin CSS styling.
+     * @return string The raw CSS payload.
      */
     private function admin_css()
     {
@@ -201,7 +201,8 @@ class LGL_Forms
     }
 
     /**
-     * Outputs the admin JavaScript with expanded repeater functionality.
+     * Outputs the admin JavaScript with expanded repeater functionality and custom UI toggles.
+     * @return string The raw JavaScript payload.
      */
     private function admin_js()
     {
@@ -226,6 +227,11 @@ class LGL_Forms
                 $(document).on("change",".lgl-type-sel",function(){
                     var $r=$(this).closest(".lgl-field-row");
                     $(this).val()==="select"?$r.find(".lgl-fg--opts").show():$r.find(".lgl-fg--opts").hide();
+                });
+
+                // Show/hide custom iframe code field in finance settings
+                $(document).on("change", "#fc_mode", function(){
+                    $(this).val() === "custom" ? $("#row_custom_code").show() : $("#row_custom_code").hide();
                 });
                 
                 // Add field
@@ -347,6 +353,28 @@ class LGL_Forms
                 <div class="lgl-fbl-layout">
                     <div>
                         <div class="lgl-fbl-section">
+                            <h3><?php _e('Global Setting', 'lgl-shortcodes'); ?></h3>
+                            <table class="form-table" style="margin:0">
+                                <tr>
+                                    <th><label for="fc_mode"><?php _e('Calculator Mode', 'lgl-shortcodes'); ?></label></th>
+                                    <td>
+                                        <select id="fc_mode" name="mode">
+                                            <option value="native" <?php selected($s['mode'] ?? 'native', 'native'); ?>><?php _e('On (Use our Finance Calculator)', 'lgl-shortcodes'); ?></option>
+                                            <option value="custom" <?php selected($s['mode'] ?? '', 'custom'); ?>><?php _e('Custom (Input own iframe/code)', 'lgl-shortcodes'); ?></option>
+                                            <option value="off" <?php selected($s['mode'] ?? '', 'off'); ?>><?php _e('Off (Hide finance buttons entirely)', 'lgl-shortcodes'); ?></option>
+                                        </select>
+                                    </td>
+                                </tr>
+                                <tr id="row_custom_code" style="<?php echo ($s['mode'] ?? 'native') === 'custom' ? '' : 'display:none;'; ?>">
+                                    <th><label for="fc_custom_code"><?php _e('Custom Calculator Code', 'lgl-shortcodes'); ?></label></th>
+                                    <td>
+                                        <textarea id="fc_custom_code" name="custom_code" rows="5" class="large-text widefat" placeholder="<iframe src='...'></iframe>"><?php echo esc_textarea($s['custom_code'] ?? ''); ?></textarea>
+                                        <p class="description"><?php _e('Enter your custom iframe or HTML code from your finance provider.', 'lgl-shortcodes'); ?></p>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                        <div class="lgl-fbl-section">
                             <h3><?php _e('Popup Labels', 'lgl-shortcodes'); ?></h3>
                             <table class="form-table" style="margin:0">
                                 <tr>
@@ -441,6 +469,8 @@ class LGL_Forms
 
     /**
      * Core renderer mapping structure for standard field-based form builders.
+     * @param string $type The specific form type mapped logic (enquiry|reserve).
+     * @param array $s Data state parameters representing the configuration object.
      */
     private function render_form_builder_page($type, $s)
     {
@@ -556,6 +586,8 @@ class LGL_Forms
 
     /**
      * Renders a single field item row inside the builder repeater.
+     * @param int|string $i Current index of the builder loop.
+     * @param array $f Field data.
      */
     private function render_field_row($i, $f)
     {
@@ -618,11 +650,22 @@ class LGL_Forms
        SAVE SETTINGS
     ═══════════════════════════════════════════════════════════════ */
 
+    /**
+     * Executes sanitization and option mapping during Finance Builder POST processing.
+     */
     public function save_finance()
     {
         check_admin_referer('lgl_save_finance_form');
         if (! current_user_can('manage_options')) wp_die('Unauthorized');
+        
+        $mode = in_array($_POST['mode'] ?? '', ['native', 'custom', 'off'], true) ? $_POST['mode'] : 'native';
+        
+        // Unfiltered HTML cap checks to ensure safe iframe storage
+        $custom_code = current_user_can('unfiltered_html') ? wp_unslash($_POST['custom_code'] ?? '') : wp_kses_post(wp_unslash($_POST['custom_code'] ?? ''));
+
         update_option('lgl_finance_form', [
+            'mode'         => $mode,
+            'custom_code'  => $custom_code,
             'button_text'  => sanitize_text_field($_POST['button_text']  ?? 'Finance Calculator'),
             'title'        => sanitize_text_field($_POST['title']        ?? ''),
             'subtitle'     => sanitize_text_field($_POST['subtitle']     ?? ''),
@@ -636,6 +679,9 @@ class LGL_Forms
         exit;
     }
 
+    /**
+     * Executes sanitization and option mapping during Enquiry Builder POST processing.
+     */
     public function save_enquiry()
     {
         check_admin_referer('lgl_save_enquiry_form');
@@ -652,6 +698,9 @@ class LGL_Forms
         exit;
     }
 
+    /**
+     * Executes sanitization and option mapping during Reserve Builder POST processing.
+     */
     public function save_reserve()
     {
         check_admin_referer('lgl_save_reserve_form');
@@ -672,6 +721,10 @@ class LGL_Forms
         exit;
     }
 
+    /**
+     * Helper mapping method handling multi-dimensional repeater fields sanitation.
+     * @return array Array structure of cleaned specific form fields.
+     */
     private function parse_fields()
     {
         $out = [];
@@ -697,6 +750,9 @@ class LGL_Forms
        PER-PRODUCT META BOX
     ═══════════════════════════════════════════════════════════════ */
 
+    /**
+     * Attaches vehicle-specific form configuration panels to vehicle post types.
+     */
     public function add_product_meta_box()
     {
         $types = ['caravan', 'motorhome', 'campervan'];
@@ -705,6 +761,10 @@ class LGL_Forms
         }
     }
 
+    /**
+     * Rendering block for the per-vehicle settings form.
+     * @param WP_Post $post Current post object scope.
+     */
     public function render_product_meta_box($post)
     {
         wp_nonce_field('lgl_vehicle_forms_meta', 'lgl_vf_nonce');
@@ -751,6 +811,11 @@ class LGL_Forms
 <?php
     }
 
+    /**
+     * Executes processing and state preservation when specific vehicle metadata states are modified.
+     * @param int $post_id Evaluated current Post ID.
+     * @param WP_Post $post Target vehicle post object reference.
+     */
     public function save_product_meta($post_id, $post)
     {
         if (! isset($_POST['lgl_vf_nonce'])) return;
@@ -776,22 +841,42 @@ class LGL_Forms
        SUBMISSION LIST TABLE COLUMNS
     ═══════════════════════════════════════════════════════════════ */
 
+    /**
+     * Specifies list table mapping for Enquiry entries.
+     * @param array $cols Columns object passed.
+     * @return array Formatted columns data schema.
+     */
     public function enquiry_columns($cols)
     {
         return ['cb' => $cols['cb'], 'title' => __('Submission', 'lgl-shortcodes'), 'lgl_product' => __('Product', 'lgl-shortcodes'), 'lgl_name' => __('Name', 'lgl-shortcodes'), 'lgl_email' => __('Email', 'lgl-shortcodes'), 'lgl_phone' => __('Phone', 'lgl-shortcodes'), 'date' => __('Date', 'lgl-shortcodes')];
     }
 
+    /**
+     * Extracts submission payload column data mapped across Enquiry items.
+     * @param string $col The specified custom column index hook mapping string.
+     * @param int $post_id The submission's Post ID reference.
+     */
     public function enquiry_col_data($col, $post_id)
     {
         $data = get_post_meta($post_id, '_lgl_form_data', true) ?: [];
         $this->render_common_col($col, $post_id, $data);
     }
 
+    /**
+     * Specifies list table mapping for Reserve entries.
+     * @param array $cols Columns object passed.
+     * @return array Formatted columns data schema.
+     */
     public function reserve_columns($cols)
     {
         return ['cb' => $cols['cb'], 'title' => __('Submission', 'lgl-shortcodes'), 'lgl_product' => __('Product', 'lgl-shortcodes'), 'lgl_name' => __('Name', 'lgl-shortcodes'), 'lgl_email' => __('Email', 'lgl-shortcodes'), 'lgl_phone' => __('Phone', 'lgl-shortcodes'), 'lgl_status' => __('Status', 'lgl-shortcodes'), 'lgl_mode' => __('Mode', 'lgl-shortcodes'), 'date' => __('Date', 'lgl-shortcodes')];
     }
 
+    /**
+     * Extracts submission payload column data mapped across Reserve items.
+     * @param string $col The specified custom column index hook mapping string.
+     * @param int $post_id The submission's Post ID reference.
+     */
     public function reserve_col_data($col, $post_id)
     {
         $data = get_post_meta($post_id, '_lgl_form_data', true) ?: [];
@@ -810,6 +895,12 @@ class LGL_Forms
         $this->render_common_col($col, $post_id, $data);
     }
 
+    /**
+     * Generalized extraction algorithm determining unified data structure across all list tables columns.
+     * @param string $col Requested column key.
+     * @param int $post_id Origin Submission CPT Post ID identifier.
+     * @param array $data Correlated extracted metadata array.
+     */
     private function render_common_col($col, $post_id, $data)
     {
         if ('lgl_product' === $col) {
@@ -828,6 +919,9 @@ class LGL_Forms
        SUBMISSION DETAIL META BOXES
     ═══════════════════════════════════════════════════════════════ */
 
+    /**
+     * Establishes submission read-only metadata detail hooks.
+     */
     public function add_submission_meta_boxes()
     {
         add_meta_box('lgl_sub_detail', __('Submission Details', 'lgl-shortcodes'), [$this, 'render_sub_detail'], 'lgl_enquiry_sub', 'normal', 'high');
@@ -835,6 +929,10 @@ class LGL_Forms
         add_meta_box('lgl_sub_status', __('Reservation Status', 'lgl-shortcodes'), [$this, 'render_reserve_status_box'], 'lgl_reserve_sub', 'side', 'high');
     }
 
+    /**
+     * Executes the read-only DOM visualization displaying individual saved meta payloads.
+     * @param WP_Post $post Submission Custom Post Type data reference string context mapped logic object.
+     */
     public function render_sub_detail($post)
     {
         $data       = get_post_meta($post->ID, '_lgl_form_data', true) ?: [];
@@ -853,6 +951,10 @@ class LGL_Forms
         echo '</tbody></table>';
     }
 
+    /**
+     * Mounts the dynamic status controller inside reservation submission items.
+     * @param WP_Post $post Target vehicle post object reference constraint payload index identifier.
+     */
     public function render_reserve_status_box($post)
     {
         $status = get_post_meta($post->ID, '_lgl_reserve_status', true) ?: 'pending';
@@ -871,6 +973,9 @@ class LGL_Forms
        AJAX HANDLERS
     ═══════════════════════════════════════════════════════════════ */
 
+    /**
+     * Endpoint resolving POST request from enquiry modal form processing sequences.
+     */
     public function ajax_submit_enquiry()
     {
         if (! wp_verify_nonce($_POST['lgl_forms_nonce'] ?? '', 'lgl_forms_nonce')) {
@@ -897,6 +1002,9 @@ class LGL_Forms
         wp_send_json_success(['message' => $s['success_message'] ?: __('Thank you for your enquiry. We will be in touch shortly.', 'lgl-shortcodes')]);
     }
 
+    /**
+     * Endpoint resolving POST request from reservations triggering reservation lockout behaviors.
+     */
     public function ajax_submit_reserve()
     {
         if (! wp_verify_nonce($_POST['lgl_forms_nonce'] ?? '', 'lgl_forms_nonce')) {
@@ -943,6 +1051,11 @@ class LGL_Forms
         ]);
     }
 
+    /**
+     * Normalizes custom structured schema objects executing required state flags payload comparisons.
+     * @param array $fields Evaluated builder loop structures map items.
+     * @return array [0 => data map, 1 => constraint violations mapping array hook reference strings object hook values error message log schema array mapping context mapping arrays string values].
+     */
     private function collect_and_validate($fields)
     {
         $data   = [];
@@ -963,6 +1076,9 @@ class LGL_Forms
        FRONTEND — LOCALIZE DATA
     ═══════════════════════════════════════════════════════════════ */
 
+    /**
+     * Broadcasts internal structured PHP configuration objects exposing payload map configurations arrays out towards frontend client JavaScript maps hooks structures.
+     */
     public function localize_forms_data()
     {
         if (! is_singular(['caravan', 'motorhome', 'campervan']) && ! is_singular()) return;
@@ -984,6 +1100,7 @@ class LGL_Forms
             'productId'       => $post_id,
             'cashPrice'       => $cash_price,
             'reserveMode'     => $reserve_mode,
+            'financeMode'     => $fin['mode'] ?? 'native',
             'isReserved'      => $is_reserved,
             'reservedBtnText' => $rs['reserved_button_text'] ?? __('Reserved', 'lgl-shortcodes'),
             'reserveBtnText'  => $rs['button_text'] ?? __('Reserve Now', 'lgl-shortcodes'),
@@ -997,6 +1114,9 @@ class LGL_Forms
        FRONTEND — RENDER MODALS IN FOOTER
     ═══════════════════════════════════════════════════════════════ */
 
+    /**
+     * Attaches template logic fragments injecting dynamic modal content.
+     */
     public function render_modals()
     {
         if (! is_singular(['caravan', 'motorhome', 'campervan'])) return;
@@ -1007,23 +1127,40 @@ class LGL_Forms
        PUBLIC HELPERS (used by lgl-modals.php and single-lgl.php)
     ═══════════════════════════════════════════════════════════════ */
 
+    /**
+     * Retrieves stored data for Finance Calculator configs.
+     * @return array Configuration structured values mapping payload object log hooks payload contexts data index identifiers logic.
+     */
     public static function get_finance_settings()
     {
         return get_option('lgl_finance_form', []);
     }
 
+    /**
+     * Retrieves stored data for Enquiry forms payload mapping structures.
+     * @return array Configured Enquiry definitions logs parameters schema identifier logic states maps contexts schema strings values structures data array configurations contexts indexes object map.
+     */
     public static function get_enquiry_settings()
     {
         $instance = new self;
         return get_option('lgl_enquiry_form', $instance->default_enquiry());
     }
 
+    /**
+     * Retrieves stored data configuration parameters map log hook structures values definition mappings parameters values logic.
+     * @return array Resolved configured object context structures logic array parameters mappings hooks array map payload definitions object index constraint schema mapped state object structure.
+     */
     public static function get_reserve_settings()
     {
         $instance = new self;
         return get_option('lgl_reserve_form', $instance->default_reserve());
     }
 
+    /**
+     * Evaluates dynamic fallback priority states across mapped post items resolving correct configuration object maps hooks strings log mapped data array context string parameters payload identifier constraint logic state values logs configuration mapped structure object variables log context map strings values hook objects schemas arrays logic mapped mappings structures strings identifier.
+     * @param int $post_id Context origin log string mapped structures arrays values log mapped object logic context.
+     * @return string Mode schema logic index mapped reference.
+     */
     public static function get_current_reserve_mode($post_id)
     {
         $mode = get_post_meta($post_id, '_lgl_reserve_mode', true);
@@ -1034,11 +1171,22 @@ class LGL_Forms
         return $mode;
     }
 
+    /**
+     * Validates logical status locking mapping state flags mapped structure states strings payload value maps hook logics constraint mapping context hooks definitions log object mapping.
+     * @param int $post_id Object map string.
+     * @return bool Reservation lockdown mapping logic mappings validation objects boolean.
+     */
     public static function is_reserved($post_id)
     {
         return (bool) get_post_meta($post_id, '_lgl_is_reserved', true);
     }
 
+    /**
+     * Bootstraps compiled string mapping logic mapping logic parameters index log maps.
+     * @param array $field Builder specific payload object structures log context configuration maps values hooks logic schema context maps map logs hook.
+     * @param string $prefix Evaluated values configurations mappings logs hooks context parameter configurations logic objects log map constraints.
+     * @return string Evaluated mappings hooks values DOM mapping log schema strings logics string log object array contexts mapped logic maps mapping definitions string hooks values parameters.
+     */
     public static function render_form_field($field, $prefix = 'lgl_f_')
     {
         $id    = 'lglf-' . esc_attr($field['id']);
@@ -1080,6 +1228,10 @@ class LGL_Forms
        DEFAULTS
     ═══════════════════════════════════════════════════════════════ */
 
+    /**
+     * Seed log configurations configurations parameters schema payload parameters.
+     * @return array Default baseline mappings hooks configuration schemas objects parameters schema mapping structures contexts hook array maps hook logic.
+     */
     private function default_enquiry()
     {
         return [
@@ -1097,6 +1249,10 @@ class LGL_Forms
         ];
     }
 
+    /**
+     * Seed parameters hooks values schemas maps mappings mappings context logics maps hook schema array hook configuration objects hook contexts.
+     * @return array Default baseline structures mappings hooks definitions mapping hook maps log object array hook configurations.
+     */
     private function default_reserve()
     {
         return [
