@@ -379,8 +379,10 @@ class LGL_Email_Builder
             if (!$activeEditor.length) return;
             
             var html = $activeEditor.val();
-            var siteName = document.title.split("-")[0].trim() || "Website Name";
             var currentYear = new Date().getFullYear();
+            
+            // Read the clean site name pushed from PHP, strict fallback if empty
+            var siteName = $("#lgl-site-name").val() || "Website";
 
             // Inject body merge tags
             html = html.replace(/\{\{([^}]+)\}\}/g, function(m, tag){
@@ -616,7 +618,7 @@ class LGL_Email_Builder
 
                         <input type="hidden" id="lgl-global-header-template" value="<?php echo esc_attr($global_settings['header']); ?>">
                         <input type="hidden" id="lgl-global-footer-template" value="<?php echo esc_attr($global_settings['footer']); ?>">
-                        <input type="hidden" id="lgl-site-name" value="<?php echo esc_attr(get_bloginfo('name')); ?>">
+                        <input type="hidden" id="lgl-site-name" value="<?php echo esc_attr(get_option('blogname')); ?>">
 
                         <div class="lgl-eb-tab-panels">
 
@@ -876,7 +878,7 @@ class LGL_Email_Builder
             'product_url'     => $product_id ? get_permalink($product_id) : '',
             'product_price'   => $price ? LGL_Shortcodes::format_price($price) : '',
             'product_type'    => $product_id ? get_post_type($product_id) : '',
-            'site_name'       => get_bloginfo('name'),
+            'site_name'       => get_option('blogname'), // Clean DB output
             'site_url'        => home_url(),
             'admin_email'     => get_option('admin_email'),
             'date'            => wp_date(get_option('date_format')),
@@ -1007,7 +1009,7 @@ class LGL_Email_Builder
      */
     public static function wrap_html(string $subject, string $body): string
     {
-        $site = esc_html(get_bloginfo('name'));
+        $site = esc_html(get_option('blogname')); // Clean DB Output
         $year = date('Y');
 
         if (stripos($body, '<html') !== false || stripos($body, '<!DOCTYPE') !== false) {
