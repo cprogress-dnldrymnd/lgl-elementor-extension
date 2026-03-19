@@ -179,18 +179,12 @@
             });
         });
 
-        // Handle Search Execution (Reset to Page 1 on strict filter changes)
+        // Single handler — isUpdatingFilters guard prevents execute_search() from
+        // firing while _repopulate_select() programmatically updates dropdowns,
+        // which is what was causing 0-result combinations.
         $('#lgl-search-form.lgl-filter-form-ajax, #lgl-sort-order').on('submit change', function (e) {
             if (e.type === 'submit') e.preventDefault();
-            currentPage = 1;
-            execute_search();
-        });
-
-
-        //search redirect + dynamic make loading
-        $('#lgl-search-form.lgl-filter-form-ajax, #lgl-sort-order').on('submit change', function (e) {
-            if (e.type === 'submit') e.preventDefault();
-            if (isUpdatingFilters) return; // Ignore events fired by our own repopulation
+            if (isUpdatingFilters) return;
             currentPage = 1;
             execute_search();
             update_filter_options();
