@@ -607,7 +607,7 @@ class LGL_Email_Builder
                 </form>
             </div>
         </div>
-<?php
+    <?php
     }
 
     /**
@@ -655,10 +655,10 @@ class LGL_Email_Builder
         $ar_body         = $email_settings['auto_reply_body']    ?? '';
         $global_settings = self::get_global_email_settings();
         $test_nonce      = wp_create_nonce('lgl_email_builder');
-?>
+    ?>
         <div class="lgl-eb-wrap">
             <div class="lgl-eb-master-layout">
-                
+
                 <div class="lgl-eb-builder-column">
                     <div class="lgl-eb-tabs">
                         <div class="lgl-eb-tab active"><?php _e('📬 Admin Notification', 'lgl-shortcodes'); ?></div>
@@ -670,11 +670,11 @@ class LGL_Email_Builder
                         <input type="hidden" name="action" value="<?php echo esc_attr($action); ?>">
                         <input type="hidden" name="form_type" value="<?php echo esc_attr($type); ?>">
                         <input type="hidden" id="lgl-eb-nonce-value" value="<?php echo esc_attr($test_nonce); ?>">
-                        
+
                         <input type="hidden" id="lgl-global-header-template" value="<?php echo esc_attr($global_settings['header']); ?>">
                         <input type="hidden" id="lgl-global-footer-template" value="<?php echo esc_attr($global_settings['footer']); ?>">
                         <input type="hidden" id="lgl-site-name" value="<?php echo esc_attr(get_option('blogname')); ?>">
-                        
+
                         <input type="hidden" id="lgl-color-bg" value="<?php echo esc_attr($global_settings['color_bg']); ?>">
                         <input type="hidden" id="lgl-color-body-bg" value="<?php echo esc_attr($global_settings['color_body_bg']); ?>">
                         <input type="hidden" id="lgl-color-text" value="<?php echo esc_attr($global_settings['color_text']); ?>">
@@ -802,7 +802,8 @@ class LGL_Email_Builder
                     </div>
                 </div>
 
-            </div></div>
+            </div>
+        </div>
 <?php
     }
 
@@ -941,7 +942,13 @@ class LGL_Email_Builder
     {
         $price = $product_id ? get_post_meta($product_id, 'price', true) : '';
 
-        return array_merge($form_data, [
+        $lgl_options    = get_option('lgl_settings', []);
+        $contact_values = [];
+        foreach (self::get_contact_tag_definitions() as $key => $label) {
+            $contact_values[$key] = $lgl_options[$key] ?? '';
+        }
+
+        return array_merge($form_data, $contact_values, [
             'product_title'   => $product_id ? html_entity_decode(get_the_title($product_id), ENT_QUOTES) : '',
             'product_url'     => $product_id ? get_permalink($product_id) : '',
             'product_price'   => $price ? LGL_Shortcodes::format_price($price) : '',
@@ -1091,7 +1098,7 @@ class LGL_Email_Builder
         }
 
         $global_settings = self::get_global_email_settings();
-        
+
         $header = str_replace(['{{site_name}}', '{{year}}'], [$site, $year], $global_settings['header']);
         $footer = str_replace(['{{site_name}}', '{{year}}'], [$site, $year], $global_settings['footer']);
 
@@ -1162,7 +1169,7 @@ HTML;
      */
     private function system_tags(): array
     {
-        return [
+        $tags = [
             '{{first_name}}'    => 'First name',
             '{{last_name}}'     => 'Last name',
             '{{email}}'         => 'Email address',
@@ -1177,6 +1184,42 @@ HTML;
             '{{date}}'          => 'Submission date',
             '{{time}}'          => 'Submission time',
         ];
+
+        // Dynamically append contact information tags from LGL Settings
+        foreach (self::get_contact_tag_definitions() as $key => $label) {
+            $tags['{{' . $key . '}}'] = $label;
+        }
+
+        return $tags;
+    }
+
+    /**
+     * Returns a map of contact field settings keys to their display labels.
+     * Reads lgl_settings so any field saved under Contact Information
+     * automatically appears as a {{merge_tag}} in the Site group.
+     *
+     * @return array  [ 'settings_key' => 'Display Label' ]
+     */
+    private static function get_contact_tag_definitions(): array
+    {
+        $definitions = [
+            'contact_phone'    => 'Phone Number',
+            'contact_whatsapp' => 'WhatsApp Number',
+            'contact_email'    => 'Contact Email Address',
+            'contact_address'  => 'Contact Address',
+        ];
+
+        // Only surface tags whose values are actually saved in settings
+        $options = get_option('lgl_settings', []);
+        $active  = [];
+        foreach ($definitions as $key => $label) {
+            if (!empty($options[$key])) {
+                $active[$key] = $label;
+            }
+        }
+
+        // Fall back to the full list on a fresh install before settings are saved
+        return !empty($active) ? $active : $definitions;
     }
 
     /**
@@ -1207,7 +1250,10 @@ HTML;
                 $groups['Submitter'][$tag] = $label;
             } elseif (str_starts_with($tag, '{{product_')) {
                 $groups['Vehicle'][$tag] = $label;
-            } elseif (in_array($tag, ['{{site_name}}', '{{site_url}}', '{{admin_email}}', '{{date}}', '{{time}}'], true)) {
+            } elseif (in_array($tag, array_merge(
+                ['{{site_name}}', '{{site_url}}', '{{admin_email}}', '{{date}}', '{{time}}'],
+                array_map(fn($k) => '{{' . $k . '}}', array_keys(self::get_contact_tag_definitions()))
+            ), true)) {
                 $groups['Site'][$tag] = $label;
             } elseif (! in_array($tag, $system_keys, true)) {
                 $groups['Form Fields'][$tag] = $label;
