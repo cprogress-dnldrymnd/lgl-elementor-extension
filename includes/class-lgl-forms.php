@@ -395,28 +395,68 @@ class LGL_Forms
                             <h3><?php _e('Financial Parameters', 'lgl-shortcodes'); ?></h3>
                             <table class="form-table" style="margin:0">
                                 <tr>
-                                    <th><label for="fc_apr"><?php _e('Representative APR (%)', 'lgl-shortcodes'); ?></label></th>
-                                    <td><input type="number" id="fc_apr" name="apr" value="<?php echo esc_attr($s['apr'] ?? '10.90'); ?>" step="0.01" min="0" class="small-text"> %
-                                        <p class="description"><?php _e('Used for monthly repayment calculations.', 'lgl-shortcodes'); ?></p>
+                                    <th><label for="fc_calc_type"><?php _e('Calculation Type', 'lgl-shortcodes'); ?></label></th>
+                                    <td>
+                                        <select id="fc_calc_type" name="calculation_type">
+                                            <option value="apr" <?php selected($s['calculation_type'] ?? 'apr', 'apr'); ?>><?php _e('APR (Primary)', 'lgl-shortcodes'); ?></option>
+                                            <option value="flat" <?php selected($s['calculation_type'] ?? '', 'flat'); ?>><?php _e('Flat Rate', 'lgl-shortcodes'); ?></option>
+                                        </select>
                                     </td>
                                 </tr>
                                 <tr>
-                                    <th><label for="fc_fee"><?php _e('Option to Purchase Fee (£)', 'lgl-shortcodes'); ?></label></th>
+                                    <th><label for="fc_apr"><?php _e('APR Rate (%)', 'lgl-shortcodes'); ?></label></th>
+                                    <td><input type="number" id="fc_apr" name="apr_rate" value="<?php echo esc_attr($s['apr_rate'] ?? '10.90'); ?>" step="0.01" min="0" class="small-text"> %
+                                        <p class="description"><?php _e('Used for calculations (apr_rate).', 'lgl-shortcodes'); ?></p>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th><label for="fc_rep_apr"><?php _e('Representative APR', 'lgl-shortcodes'); ?></label></th>
+                                    <td><input type="text" id="fc_rep_apr" name="representative_apr" value="<?php echo esc_attr($s['representative_apr'] ?? '10.9% APR Representative'); ?>" class="regular-text">
+                                        <p class="description"><?php _e('String output for display only.', 'lgl-shortcodes'); ?></p>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th><label for="fc_finance_provider"><?php _e('Finance Provider', 'lgl-shortcodes'); ?></label></th>
+                                    <td><input type="text" id="fc_finance_provider" name="finance_provider" value="<?php echo esc_attr($s['finance_provider'] ?? ''); ?>" class="regular-text"></td>
+                                </tr>
+                                <tr>
+                                    <th><label for="fc_dur"><?php _e('Term Options', 'lgl-shortcodes'); ?></label></th>
+                                    <td><textarea id="fc_dur" name="term_options" rows="4" class="large-text"><?php echo esc_textarea($s['term_options'] ?? "24\n36\n48\n60"); ?></textarea>
+                                        <p class="description"><?php _e('Enter term options in months (one per line). e.g. "24", "36", "48".', 'lgl-shortcodes'); ?></p>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th><label for="fc_def_term"><?php _e('Default Term', 'lgl-shortcodes'); ?></label></th>
+                                    <td><input type="number" id="fc_def_term" name="default_term" value="<?php echo esc_attr($s['default_term'] ?? '60'); ?>" step="1" min="1" class="small-text">
+                                        <p class="description"><?php _e('Default term in months.', 'lgl-shortcodes'); ?></p>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th><label for="fc_def_deposit"><?php _e('Default Deposit (£)', 'lgl-shortcodes'); ?></label></th>
+                                    <td>£ <input type="number" id="fc_def_deposit" name="default_deposit" value="<?php echo esc_attr($s['default_deposit'] ?? '500'); ?>" step="1" min="0" class="small-text"></td>
+                                </tr>
+                                <tr>
+                                    <th><label for="fc_min_deposit"><?php _e('Minimum Deposit (£)', 'lgl-shortcodes'); ?></label></th>
+                                    <td>£ <input type="number" id="fc_min_deposit" name="min_deposit" value="<?php echo esc_attr($s['min_deposit'] ?? '100'); ?>" step="1" min="0" class="small-text"></td>
+                                </tr>
+                                <tr>
+                                    <th><label for="fc_fee"><?php _e('Purchase Fee (£)', 'lgl-shortcodes'); ?></label></th>
                                     <td>£ <input type="number" id="fc_fee" name="purchase_fee" value="<?php echo esc_attr($s['purchase_fee'] ?? '10'); ?>" step="1" min="0" class="small-text">
-                                        <p class="description"><?php _e('Added to the final payment (e.g. £10 Option To Purchase Fee).', 'lgl-shortcodes'); ?></p>
+                                        <p class="description"><?php _e('Added to the final payment.', 'lgl-shortcodes'); ?></p>
                                     </td>
                                 </tr>
                                 <tr>
-                                    <th><label for="fc_dur"><?php _e('Duration Options', 'lgl-shortcodes'); ?></label></th>
-                                    <td><textarea id="fc_dur" name="durations" rows="6" class="large-text"><?php echo esc_textarea($s['durations'] ?? "1 Year\n2 Years\n3 Years\n4 Years\n5 Years"); ?></textarea>
-                                        <p class="description"><?php _e('One option per line. e.g. "1 Year", "18 Months".', 'lgl-shortcodes'); ?></p>
+                                    <th><label for="fc_admin_fee"><?php _e('Admin Fee (£)', 'lgl-shortcodes'); ?></label></th>
+                                    <td>£ <input type="number" id="fc_admin_fee" name="admin_fee" value="<?php echo esc_attr($s['admin_fee'] ?? '0'); ?>" step="1" min="0" class="small-text">
+                                        <p class="description"><?php _e('Optional admin fee.', 'lgl-shortcodes'); ?></p>
                                     </td>
                                 </tr>
                             </table>
                         </div>
                         <div class="lgl-fbl-section">
-                            <h3><?php _e('Disclaimer', 'lgl-shortcodes'); ?></h3>
-                            <textarea name="disclaimer" rows="4" class="large-text widefat"><?php echo esc_textarea($s['disclaimer'] ?? 'Finance examples are for illustration purposes only. The figures shown are based on assumptions and may not reflect the exact terms you are offered. All finance is subject to status, affordability checks, credit approval and terms & conditions. *Final payment includes £10 Option To Purchase Fee.'); ?></textarea>
+                            <h3><?php _e('Disclaimer (Legal / Compliance)', 'lgl-shortcodes'); ?></h3>
+                            <textarea name="disclaimer_text" rows="4" class="large-text widefat"><?php echo esc_textarea($s['disclaimer_text'] ?? 'Finance examples are for illustration purposes only. The figures shown are based on assumptions and may not reflect the exact terms you are offered. All finance is subject to status, affordability checks, credit approval and terms & conditions.'); ?></textarea>
+                            <p class="description"><?php _e('Must include statements like "Finance subject to status" and "Illustration purposes only" for UK compliance.', 'lgl-shortcodes'); ?></p>
                         </div>
                     </div>
                     <div>
@@ -427,18 +467,17 @@ class LGL_Forms
                         </div>
                         <div class="lgl-fbl-section">
                             <h3><?php _e('Calculated Outputs', 'lgl-shortcodes'); ?></h3>
-                            <p class="description"><?php _e('These fields are auto-calculated — not editable:', 'lgl-shortcodes'); ?></p>
+                            <p class="description"><?php _e('These fields are auto-calculated on the frontend based on the spec:', 'lgl-shortcodes'); ?></p>
                             <ul class="lgl-help-list">
                                 <li>Cash Price</li>
                                 <li>Deposit</li>
-                                <li>Total Amount of Credit</li>
-                                <li>Agreement Duration</li>
+                                <li>Total Amount of Credit (Amount Financed)</li>
+                                <li>Agreement Duration (Term)</li>
                                 <li>Monthly Repayments of</li>
                                 <li>Total Amount Repayable</li>
                                 <li>Purchase Fee</li>
-                                <li>Interest Rate (flat)</li>
+                                <li>Interest Rate</li>
                                 <li>Representative APR</li>
-                                <li>Monthly Payment*</li>
                             </ul>
                         </div>
                     </div>
@@ -659,20 +698,28 @@ class LGL_Forms
         if (! current_user_can('manage_options')) wp_die('Unauthorized');
         
         $mode = in_array($_POST['mode'] ?? '', ['native', 'custom', 'off'], true) ? $_POST['mode'] : 'native';
+        $calc = in_array($_POST['calculation_type'] ?? '', ['apr', 'flat'], true) ? $_POST['calculation_type'] : 'apr';
         
         // Unfiltered HTML cap checks to ensure safe iframe storage
         $custom_code = current_user_can('unfiltered_html') ? wp_unslash($_POST['custom_code'] ?? '') : wp_kses_post(wp_unslash($_POST['custom_code'] ?? ''));
 
         update_option('lgl_finance_form', [
-            'mode'         => $mode,
-            'custom_code'  => $custom_code,
-            'button_text'  => sanitize_text_field($_POST['button_text']  ?? 'Finance Calculator'),
-            'title'        => sanitize_text_field($_POST['title']        ?? ''),
-            'subtitle'     => sanitize_text_field($_POST['subtitle']     ?? ''),
-            'apr'          => sanitize_text_field($_POST['apr']          ?? '10.90'),
-            'purchase_fee' => sanitize_text_field($_POST['purchase_fee'] ?? '10'),
-            'durations'    => sanitize_textarea_field($_POST['durations']    ?? ''),
-            'disclaimer'   => sanitize_textarea_field($_POST['disclaimer']   ?? ''),
+            'mode'               => $mode,
+            'custom_code'        => $custom_code,
+            'button_text'        => sanitize_text_field($_POST['button_text']        ?? 'Finance Calculator'),
+            'title'              => sanitize_text_field($_POST['title']              ?? ''),
+            'subtitle'           => sanitize_text_field($_POST['subtitle']           ?? ''),
+            'calculation_type'   => $calc,
+            'apr_rate'           => sanitize_text_field($_POST['apr_rate']           ?? '10.90'),
+            'representative_apr' => sanitize_text_field($_POST['representative_apr'] ?? '10.9% APR Representative'),
+            'finance_provider'   => sanitize_text_field($_POST['finance_provider']   ?? ''),
+            'term_options'       => sanitize_textarea_field($_POST['term_options']   ?? ''),
+            'default_term'       => sanitize_text_field($_POST['default_term']       ?? '60'),
+            'default_deposit'    => sanitize_text_field($_POST['default_deposit']    ?? '500'),
+            'min_deposit'        => sanitize_text_field($_POST['min_deposit']        ?? '100'),
+            'purchase_fee'       => sanitize_text_field($_POST['purchase_fee']       ?? '10'),
+            'admin_fee'          => sanitize_text_field($_POST['admin_fee']          ?? '0'),
+            'disclaimer_text'    => sanitize_textarea_field($_POST['disclaimer_text'] ?? ''),
         ]);
         
         wp_redirect(admin_url('admin.php?page=lgl-form-builder&tab=finance&saved=1'));
@@ -1091,22 +1138,29 @@ class LGL_Forms
         $cash_price   = (float) get_post_meta($post_id, 'price', true);
         if (! $reserve_mode) $reserve_mode = $rs['default_reserve_mode'] ?? 'form_only';
 
-        $dur_raw   = $fin['durations'] ?? "1 Year\n2 Years\n3 Years\n4 Years\n5 Years";
+        $dur_raw   = $fin['term_options'] ?? "24\n36\n48\n60";
         $durations = array_values(array_filter(array_map('trim', explode("\n", $dur_raw))));
 
         wp_localize_script('lgl-forms-js', 'lglForms', [
-            'ajaxUrl'         => admin_url('admin-ajax.php'),
-            'nonce'           => wp_create_nonce('lgl_forms_nonce'),
-            'productId'       => $post_id,
-            'cashPrice'       => $cash_price,
-            'reserveMode'     => $reserve_mode,
-            'financeMode'     => $fin['mode'] ?? 'native',
-            'isReserved'      => $is_reserved,
-            'reservedBtnText' => $rs['reserved_button_text'] ?? __('Reserved', 'lgl-shortcodes'),
-            'reserveBtnText'  => $rs['button_text'] ?? __('Reserve Now', 'lgl-shortcodes'),
-            'apr'             => (float) ($fin['apr'] ?? 10.90),
-            'purchaseFee'     => (float) ($fin['purchase_fee'] ?? 10),
-            'durations'       => $durations,
+            'ajaxUrl'           => admin_url('admin-ajax.php'),
+            'nonce'             => wp_create_nonce('lgl_forms_nonce'),
+            'productId'         => $post_id,
+            'cashPrice'         => $cash_price,
+            'reserveMode'       => $reserve_mode,
+            'financeMode'       => $fin['mode'] ?? 'native',
+            'isReserved'        => $is_reserved,
+            'reservedBtnText'   => $rs['reserved_button_text'] ?? __('Reserved', 'lgl-shortcodes'),
+            'reserveBtnText'    => $rs['button_text'] ?? __('Reserve Now', 'lgl-shortcodes'),
+            'calculationType'   => $fin['calculation_type'] ?? 'apr',
+            'aprRate'           => (float) ($fin['apr_rate'] ?? 10.90),
+            'representativeApr' => $fin['representative_apr'] ?? '10.9% APR Representative',
+            'financeProvider'   => $fin['finance_provider'] ?? '',
+            'durations'         => $durations,
+            'defaultTerm'       => (int) ($fin['default_term'] ?? 60),
+            'defaultDeposit'    => (float) ($fin['default_deposit'] ?? 500),
+            'minDeposit'        => (float) ($fin['min_deposit'] ?? 100),
+            'purchaseFee'       => (float) ($fin['purchase_fee'] ?? 10),
+            'adminFee'          => (float) ($fin['admin_fee'] ?? 0),
         ]);
     }
 
