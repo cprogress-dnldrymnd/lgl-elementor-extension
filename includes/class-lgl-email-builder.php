@@ -1314,8 +1314,19 @@ $(document).ready(function() {
 
         $global_settings = self::get_global_email_settings();
 
-        $header = str_replace(['{{site_name}}', '{{year}}'], [$site, $year], $global_settings['header']);
-        $footer = str_replace(['{{site_name}}', '{{year}}'], [$site, $year], $global_settings['footer']);
+       $lgl_options = get_option('lgl_settings', []);
+
+        // Build a full search/replace array: site tags + all contact info tags
+        $tag_search  = ['{{site_name}}', '{{year}}'];
+        $tag_replace = [$site, $year];
+
+        foreach (self::get_contact_tag_definitions() as $key => $label) {
+            $tag_search[]  = '{{' . $key . '}}';
+            $tag_replace[] = $lgl_options[$key] ?? '';
+        }
+
+        $header = str_replace($tag_search, $tag_replace, $global_settings['header']);
+        $footer = str_replace($tag_search, $tag_replace, $global_settings['footer']);
 
         $bg         = esc_attr($global_settings['color_bg']);
         $body_bg    = esc_attr($global_settings['color_body_bg']);
