@@ -18,8 +18,11 @@ $reserved  = LGL_Forms::is_reserved($post_id);
 $fin_mode  = $fin['mode'] ?? 'native';
 
 // Build duration <option> list for native mode
-$dur_raw   = $fin['durations'] ?? "1 Year\n2 Years\n3 Years\n4 Years\n5 Years";
+$dur_raw   = $fin['term_options'] ?? "24\n36\n48\n60";
 $durations = array_values(array_filter(array_map('trim', explode("\n", $dur_raw))));
+$def_term  = trim($fin['default_term'] ?? '60');
+$def_dep   = (float) ($fin['default_deposit'] ?? 500);
+$min_dep   = (float) ($fin['min_deposit'] ?? 100);
 ?>
 
 <div class="lgl-modal-overlay" id="lgl-modal-overlay"></div>
@@ -48,14 +51,14 @@ $durations = array_values(array_filter(array_map('trim', explode("\n", $dur_raw)
                         <label for="lgl-fc-deposit"><?php _e('Deposit', 'lgl-shortcodes'); ?> <span class="lgl-form-req">(Required)</span></label>
                         <div class="lgl-fc-input-wrap">
                             <span class="lgl-fc-prefix">£</span>
-                            <input type="number" id="lgl-fc-deposit" placeholder="100" min="0" step="100" class="lgl-fc-input">
+                            <input type="number" id="lgl-fc-deposit" value="<?php echo esc_attr($def_dep); ?>" min="<?php echo esc_attr($min_dep); ?>" step="10" class="lgl-fc-input">
                         </div>
                     </div>
                     <div class="lgl-fc-field">
                         <label for="lgl-fc-duration"><?php _e('Duration', 'lgl-shortcodes'); ?></label>
                         <select id="lgl-fc-duration" class="lgl-fc-input">
                             <?php foreach ($durations as $d) : ?>
-                                <option value="<?php echo esc_attr($d); ?>"><?php echo esc_html($d); ?></option>
+                                <option value="<?php echo esc_attr($d); ?>" <?php selected($def_term, $d); ?>><?php echo esc_html($d); ?></option>
                             <?php endforeach; ?>
                         </select>
                     </div>
@@ -80,7 +83,7 @@ $durations = array_values(array_filter(array_map('trim', explode("\n", $dur_raw)
                     </div>
                 </div>
 
-                <p class="lgl-fc-disclaimer"><?php echo esc_html($fin['disclaimer'] ?? ''); ?></p>
+                <p class="lgl-fc-disclaimer"><?php echo esc_html($fin['disclaimer_text'] ?? ''); ?></p>
             <?php endif; ?>
 
         </div>
