@@ -298,14 +298,14 @@
             }
         }
         @media (max-width: 480px) {
-            flex-direction: column;
-            align-items: flex-end;
+            flex-direction: column-reverse;
+            align-items: flex-start;
             gap: 20px;
             .lgl-col-right {
                 width: 100%;
+                text-align: right;
             }
             .lgl-filter-form-sortview {
-                margin-left: auto;
                 display: -webkit-inline-box;
             }
         }
