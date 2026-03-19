@@ -2019,7 +2019,7 @@
 
 .reserved-tag {
   position: absolute;
-  z-index: 1;
+  z-index: 3;
   left: 0;
   top: 20px;
   background-color: var(--lgl-color-error);
