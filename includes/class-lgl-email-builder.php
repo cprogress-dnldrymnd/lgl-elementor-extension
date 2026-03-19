@@ -1,4 +1,5 @@
 <?php
+
 /**
  * LGL Email Builder — Visual email template editor with merge tag support.
  * Hooks into LGL_Forms to replace the basic notify_admin() with rich HTML emails.
@@ -12,61 +13,66 @@
  *   - Auto-reply to submitter (subject + HTML body, toggled on/off)
  *   - Merge tag reference panel with one-click insertion
  */
-if ( ! defined( 'ABSPATH' ) ) exit;
+if (! defined('ABSPATH')) exit;
 
-class LGL_Email_Builder {
+class LGL_Email_Builder
+{
 
-	/* ═══════════════════════════════════════════════════════════════
+    /* ═══════════════════════════════════════════════════════════════
 	   BOOT
 	═══════════════════════════════════════════════════════════════ */
 
-	public function __construct() {
-		add_action( 'admin_menu',            [ $this, 'add_submenu_pages' ] );
-		add_action( 'admin_enqueue_scripts', [ $this, 'admin_assets' ] );
-		add_action( 'admin_post_lgl_save_enquiry_email', [ $this, 'save_email_settings' ] );
-		add_action( 'admin_post_lgl_save_reserve_email', [ $this, 'save_email_settings' ] );
-	}
+    public function __construct()
+    {
+        add_action('admin_menu',            [$this, 'add_submenu_pages']);
+        add_action('admin_enqueue_scripts', [$this, 'admin_assets']);
+        add_action('admin_post_lgl_save_enquiry_email', [$this, 'save_email_settings']);
+        add_action('admin_post_lgl_save_reserve_email', [$this, 'save_email_settings']);
+    }
 
-	/* ═══════════════════════════════════════════════════════════════
+    /* ═══════════════════════════════════════════════════════════════
 	   MENU
 	═══════════════════════════════════════════════════════════════ */
 
-	public function add_submenu_pages() {
-		add_submenu_page(
-			'lgl-settings',
-			__( 'Enquiry Email Builder', 'lgl-shortcodes' ),
-			__( 'Enquiry Emails', 'lgl-shortcodes' ),
-			'manage_options',
-			'lgl-enquiry-email',
-			[ $this, 'render_enquiry_email_page' ]
-		);
-		add_submenu_page(
-			'lgl-settings',
-			__( 'Reserve Email Builder', 'lgl-shortcodes' ),
-			__( 'Reserve Emails', 'lgl-shortcodes' ),
-			'manage_options',
-			'lgl-reserve-email',
-			[ $this, 'render_reserve_email_page' ]
-		);
-	}
+    public function add_submenu_pages()
+    {
+        add_submenu_page(
+            'lgl-settings',
+            __('Enquiry Email Builder', 'lgl-shortcodes'),
+            __('Enquiry Emails', 'lgl-shortcodes'),
+            'manage_options',
+            'lgl-enquiry-email',
+            [$this, 'render_enquiry_email_page']
+        );
+        add_submenu_page(
+            'lgl-settings',
+            __('Reserve Email Builder', 'lgl-shortcodes'),
+            __('Reserve Emails', 'lgl-shortcodes'),
+            'manage_options',
+            'lgl-reserve-email',
+            [$this, 'render_reserve_email_page']
+        );
+    }
 
-	/* ═══════════════════════════════════════════════════════════════
+    /* ═══════════════════════════════════════════════════════════════
 	   ASSETS
 	═══════════════════════════════════════════════════════════════ */
 
-	public function admin_assets( $hook ) {
-		$pages = [
-			'lgl-settings_page_lgl-enquiry-email',
-			'lgl-settings_page_lgl-reserve-email',
-		];
-		if ( ! in_array( $hook, $pages, true ) ) return;
+    public function admin_assets($hook)
+    {
+        $pages = [
+            'lgl-settings_page_lgl-enquiry-email',
+            'lgl-settings_page_lgl-reserve-email',
+        ];
+        if (! in_array($hook, $pages, true)) return;
 
-		wp_add_inline_style( 'wp-admin', $this->admin_css() );
-		wp_add_inline_script( 'jquery', $this->admin_js() );
-	}
+        wp_add_inline_style('wp-admin', $this->admin_css());
+        wp_add_inline_script('jquery', $this->admin_js());
+    }
 
-	private function admin_css(): string {
-		return '
+    private function admin_css(): string
+    {
+        return '
 		/* ── Email Builder Layout ── */
 		.lgl-eb-wrap { max-width: 1200px; }
 		.lgl-eb-layout { display: grid; grid-template-columns: 1fr 300px; gap: 24px; margin-top: 20px; }
@@ -255,10 +261,11 @@ class LGL_Email_Builder {
 
 		@media (max-width: 1024px) { .lgl-eb-layout { grid-template-columns: 1fr; } }
 		';
-	}
+    }
 
-	private function admin_js(): string {
-		return '
+    private function admin_js(): string
+    {
+        return '
 		(function($){
 			// ── Insert merge tag into the focused textarea ──
 			var $lastFocus = null;
@@ -295,7 +302,7 @@ class LGL_Email_Builder {
 			});
 
 			// ── Recipient type ──
-			$(document).on("change", 'input[name="recipient_type"]', function(){
+			$(document).on("change", "input[name="recipient_type"]", function(){
 				$(this).val() === "custom" || $(this).val() === "both"
 					? $("#lgl-custom-email-row").addClass("is-visible")
 					: $("#lgl-custom-email-row").removeClass("is-visible");
@@ -356,387 +363,401 @@ class LGL_Email_Builder {
 			}
 		})(jQuery);
 		';
-	}
+    }
 
-	/* ═══════════════════════════════════════════════════════════════
+    /* ═══════════════════════════════════════════════════════════════
 	   PAGE RENDERERS
 	═══════════════════════════════════════════════════════════════ */
 
-	public function render_enquiry_email_page() {
-		$form_settings = get_option( 'lgl_enquiry_form', [] );
-		$email_settings = get_option( 'lgl_enquiry_email', $this->default_email( 'enquiry' ) );
-		$this->render_page( 'enquiry', $form_settings, $email_settings );
-	}
+    public function render_enquiry_email_page()
+    {
+        $form_settings = get_option('lgl_enquiry_form', []);
+        $email_settings = get_option('lgl_enquiry_email', $this->default_email('enquiry'));
+        $this->render_page('enquiry', $form_settings, $email_settings);
+    }
 
-	public function render_reserve_email_page() {
-		$form_settings = get_option( 'lgl_reserve_form', [] );
-		$email_settings = get_option( 'lgl_reserve_email', $this->default_email( 'reserve' ) );
-		$this->render_page( 'reserve', $form_settings, $email_settings );
-	}
+    public function render_reserve_email_page()
+    {
+        $form_settings = get_option('lgl_reserve_form', []);
+        $email_settings = get_option('lgl_reserve_email', $this->default_email('reserve'));
+        $this->render_page('reserve', $form_settings, $email_settings);
+    }
 
-	private function render_page( string $type, array $form_settings, array $email_settings ) {
-		if ( ! current_user_can( 'manage_options' ) ) return;
+    private function render_page(string $type, array $form_settings, array $email_settings)
+    {
+        if (! current_user_can('manage_options')) return;
 
-		if ( isset( $_GET['saved'] ) ) {
-			echo '<div class="notice notice-success is-dismissible"><p>' . __( 'Email settings saved.', 'lgl-shortcodes' ) . '</p></div>';
-		}
+        if (isset($_GET['saved'])) {
+            echo '<div class="notice notice-success is-dismissible"><p>' . __('Email settings saved.', 'lgl-shortcodes') . '</p></div>';
+        }
 
-		$action     = "lgl_save_{$type}_email";
-		$all_tags   = $this->get_merge_tags( $form_settings['fields'] ?? [] );
-		$subject    = $email_settings['subject']           ?? '';
-		$body       = $email_settings['body']              ?? '';
-		$rec_type   = $email_settings['recipient_type']    ?? 'admin';
-		$custom_email = $email_settings['custom_email']   ?? '';
-		$auto_reply   = ! empty( $email_settings['auto_reply_enabled'] );
-		$ar_subject   = $email_settings['auto_reply_subject'] ?? '';
-		$ar_body      = $email_settings['auto_reply_body']    ?? '';
-		$title        = $type === 'enquiry' ? __( 'Enquiry Email Builder', 'lgl-shortcodes' ) : __( 'Reserve Email Builder', 'lgl-shortcodes' );
-		?>
-		<div class="wrap lgl-eb-wrap">
-			<h1><?php echo esc_html( $title ); ?></h1>
+        $action     = "lgl_save_{$type}_email";
+        $all_tags   = $this->get_merge_tags($form_settings['fields'] ?? []);
+        $subject    = $email_settings['subject']           ?? '';
+        $body       = $email_settings['body']              ?? '';
+        $rec_type   = $email_settings['recipient_type']    ?? 'admin';
+        $custom_email = $email_settings['custom_email']   ?? '';
+        $auto_reply   = ! empty($email_settings['auto_reply_enabled']);
+        $ar_subject   = $email_settings['auto_reply_subject'] ?? '';
+        $ar_body      = $email_settings['auto_reply_body']    ?? '';
+        $title        = $type === 'enquiry' ? __('Enquiry Email Builder', 'lgl-shortcodes') : __('Reserve Email Builder', 'lgl-shortcodes');
+?>
+        <div class="wrap lgl-eb-wrap">
+            <h1><?php echo esc_html($title); ?></h1>
 
-			<div class="lgl-eb-tabs">
-				<div class="lgl-eb-tab active"><?php _e( '📬 Admin Notification', 'lgl-shortcodes' ); ?></div>
-				<div class="lgl-eb-tab"><?php _e( '↩️ Auto-Reply to Submitter', 'lgl-shortcodes' ); ?></div>
-				<div class="lgl-eb-tab"><?php _e( '🔍 Preview', 'lgl-shortcodes' ); ?></div>
-			</div>
+            <div class="lgl-eb-tabs">
+                <div class="lgl-eb-tab active"><?php _e('📬 Admin Notification', 'lgl-shortcodes'); ?></div>
+                <div class="lgl-eb-tab"><?php _e('↩️ Auto-Reply to Submitter', 'lgl-shortcodes'); ?></div>
+                <div class="lgl-eb-tab"><?php _e('🔍 Preview', 'lgl-shortcodes'); ?></div>
+            </div>
 
-			<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
-				<?php wp_nonce_field( "lgl_save_{$type}_email", 'lgl_eb_nonce' ); ?>
-				<input type="hidden" id="lgl_eb_nonce" value="<?php echo esc_attr( wp_create_nonce( "lgl_save_{$type}_email" ) ); ?>">
-				<input type="hidden" name="action" value="<?php echo esc_attr( $action ); ?>">
-				<input type="hidden" name="form_type" value="<?php echo esc_attr( $type ); ?>">
+            <form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>">
+                <?php wp_nonce_field("lgl_save_{$type}_email", 'lgl_eb_nonce'); ?>
+                <input type="hidden" id="lgl_eb_nonce" value="<?php echo esc_attr(wp_create_nonce("lgl_save_{$type}_email")); ?>">
+                <input type="hidden" name="action" value="<?php echo esc_attr($action); ?>">
+                <input type="hidden" name="form_type" value="<?php echo esc_attr($type); ?>">
 
-				<div class="lgl-eb-tab-panels">
+                <div class="lgl-eb-tab-panels">
 
-					<!-- ── TAB 1: Admin notification ── -->
-					<div class="lgl-eb-tab-content active">
-						<div class="lgl-eb-layout">
-							<div class="lgl-eb-main">
+                    <!-- ── TAB 1: Admin notification ── -->
+                    <div class="lgl-eb-tab-content active">
+                        <div class="lgl-eb-layout">
+                            <div class="lgl-eb-main">
 
-								<!-- Recipient settings -->
-								<div class="lgl-eb-section">
-									<h3><?php _e( 'Recipients', 'lgl-shortcodes' ); ?></h3>
-									<div class="lgl-eb-recipient-opts">
-										<label>
-											<input type="radio" name="recipient_type" value="admin" <?php checked( $rec_type, 'admin' ); ?>>
-											<?php _e( 'Site admin email', 'lgl-shortcodes' ); ?>
-											<code style="font-size:11px;background:#f6f7f7;padding:1px 6px;border-radius:2px;border:1px solid #e0e0e0;"><?php echo esc_html( get_option( 'admin_email' ) ); ?></code>
-										</label>
-										<label>
-											<input type="radio" name="recipient_type" value="custom" <?php checked( $rec_type, 'custom' ); ?>>
-											<?php _e( 'Custom email address', 'lgl-shortcodes' ); ?>
-										</label>
-										<label>
-											<input type="radio" name="recipient_type" value="both" <?php checked( $rec_type, 'both' ); ?>>
-											<?php _e( 'Both (admin + custom)', 'lgl-shortcodes' ); ?>
-										</label>
-									</div>
-									<div id="lgl-custom-email-row" <?php echo in_array( $rec_type, ['custom','both'], true ) ? 'class="is-visible"' : ''; ?>>
-										<div class="lgl-eb-row">
-											<label><?php _e( 'Custom email address', 'lgl-shortcodes' ); ?></label>
-											<input type="email" name="custom_email" value="<?php echo esc_attr( $custom_email ); ?>" placeholder="sales@example.com">
-										</div>
-									</div>
-								</div>
+                                <!-- Recipient settings -->
+                                <div class="lgl-eb-section">
+                                    <h3><?php _e('Recipients', 'lgl-shortcodes'); ?></h3>
+                                    <div class="lgl-eb-recipient-opts">
+                                        <label>
+                                            <input type="radio" name="recipient_type" value="admin" <?php checked($rec_type, 'admin'); ?>>
+                                            <?php _e('Site admin email', 'lgl-shortcodes'); ?>
+                                            <code style="font-size:11px;background:#f6f7f7;padding:1px 6px;border-radius:2px;border:1px solid #e0e0e0;"><?php echo esc_html(get_option('admin_email')); ?></code>
+                                        </label>
+                                        <label>
+                                            <input type="radio" name="recipient_type" value="custom" <?php checked($rec_type, 'custom'); ?>>
+                                            <?php _e('Custom email address', 'lgl-shortcodes'); ?>
+                                        </label>
+                                        <label>
+                                            <input type="radio" name="recipient_type" value="both" <?php checked($rec_type, 'both'); ?>>
+                                            <?php _e('Both (admin + custom)', 'lgl-shortcodes'); ?>
+                                        </label>
+                                    </div>
+                                    <div id="lgl-custom-email-row" <?php echo in_array($rec_type, ['custom', 'both'], true) ? 'class="is-visible"' : ''; ?>>
+                                        <div class="lgl-eb-row">
+                                            <label><?php _e('Custom email address', 'lgl-shortcodes'); ?></label>
+                                            <input type="email" name="custom_email" value="<?php echo esc_attr($custom_email); ?>" placeholder="sales@example.com">
+                                        </div>
+                                    </div>
+                                </div>
 
-								<!-- Subject line -->
-								<div class="lgl-eb-section">
-									<h3><?php _e( 'Subject Line', 'lgl-shortcodes' ); ?></h3>
-									<div class="lgl-eb-subject-tags">
-										<?php foreach ( $this->subject_tags( $all_tags ) as $tag => $label ) : ?>
-											<button type="button" class="lgl-eb-insert-tag" data-tag="<?php echo esc_attr( $tag ); ?>" title="<?php echo esc_attr( $label ); ?>"><?php echo esc_html( $tag ); ?></button>
-										<?php endforeach; ?>
-									</div>
-									<div class="lgl-eb-row">
-										<input type="text" name="subject" id="lgl-eb-subject" class="lgl-eb-subject-input" value="<?php echo esc_attr( $subject ); ?>" placeholder="<?php echo esc_attr( $type === 'enquiry' ? 'New Enquiry: {{first_name}} {{last_name}} — {{product_title}}' : 'New Reservation: {{first_name}} {{last_name}} — {{product_title}}' ); ?>">
-									</div>
-								</div>
+                                <!-- Subject line -->
+                                <div class="lgl-eb-section">
+                                    <h3><?php _e('Subject Line', 'lgl-shortcodes'); ?></h3>
+                                    <div class="lgl-eb-subject-tags">
+                                        <?php foreach ($this->subject_tags($all_tags) as $tag => $label) : ?>
+                                            <button type="button" class="lgl-eb-insert-tag" data-tag="<?php echo esc_attr($tag); ?>" title="<?php echo esc_attr($label); ?>"><?php echo esc_html($tag); ?></button>
+                                        <?php endforeach; ?>
+                                    </div>
+                                    <div class="lgl-eb-row">
+                                        <input type="text" name="subject" id="lgl-eb-subject" class="lgl-eb-subject-input" value="<?php echo esc_attr($subject); ?>" placeholder="<?php echo esc_attr($type === 'enquiry' ? 'New Enquiry: {{first_name}} {{last_name}} — {{product_title}}' : 'New Reservation: {{first_name}} {{last_name}} — {{product_title}}'); ?>">
+                                    </div>
+                                </div>
 
-								<!-- Body -->
-								<div class="lgl-eb-section">
-									<h3><?php _e( 'Email Body', 'lgl-shortcodes' ); ?> <span style="font-size:11px;font-weight:400;color:#8c8f94;">(HTML supported)</span></h3>
-									<?php $this->render_tag_toolbar( $all_tags, 'lgl-eb-body' ); ?>
-									<textarea name="body" id="lgl-eb-body" class="lgl-eb-textarea"><?php echo esc_textarea( $body ?: $this->default_admin_body( $type ) ); ?></textarea>
-								</div>
+                                <!-- Body -->
+                                <div class="lgl-eb-section">
+                                    <h3><?php _e('Email Body', 'lgl-shortcodes'); ?> <span style="font-size:11px;font-weight:400;color:#8c8f94;">(HTML supported)</span></h3>
+                                    <?php $this->render_tag_toolbar($all_tags, 'lgl-eb-body'); ?>
+                                    <textarea name="body" id="lgl-eb-body" class="lgl-eb-textarea"><?php echo esc_textarea($body ?: $this->default_admin_body($type)); ?></textarea>
+                                </div>
 
-								<!-- Test send -->
-								<div class="lgl-eb-section">
-									<h3><?php _e( 'Send Test Email', 'lgl-shortcodes' ); ?></h3>
-									<p class="description"><?php _e( 'Sends a preview with placeholder values substituted for merge tags.', 'lgl-shortcodes' ); ?></p>
-									<div class="lgl-eb-test-row">
-										<input type="email" id="lgl-eb-test-email" placeholder="your@email.com" value="<?php echo esc_attr( get_option('admin_email') ); ?>">
-										<button type="button" id="lgl-eb-send-test" class="button"><?php _e( 'Send Test', 'lgl-shortcodes' ); ?></button>
-										<span class="lgl-eb-test-msg" id="lgl-eb-test-msg"></span>
-									</div>
-								</div>
+                                <!-- Test send -->
+                                <div class="lgl-eb-section">
+                                    <h3><?php _e('Send Test Email', 'lgl-shortcodes'); ?></h3>
+                                    <p class="description"><?php _e('Sends a preview with placeholder values substituted for merge tags.', 'lgl-shortcodes'); ?></p>
+                                    <div class="lgl-eb-test-row">
+                                        <input type="email" id="lgl-eb-test-email" placeholder="your@email.com" value="<?php echo esc_attr(get_option('admin_email')); ?>">
+                                        <button type="button" id="lgl-eb-send-test" class="button"><?php _e('Send Test', 'lgl-shortcodes'); ?></button>
+                                        <span class="lgl-eb-test-msg" id="lgl-eb-test-msg"></span>
+                                    </div>
+                                </div>
 
-							</div>
+                            </div>
 
-							<!-- Sidebar -->
-							<div class="lgl-eb-sidebar">
-								<?php $this->render_tag_reference( $all_tags ); ?>
-							</div>
-						</div>
-					</div>
+                            <!-- Sidebar -->
+                            <div class="lgl-eb-sidebar">
+                                <?php $this->render_tag_reference($all_tags); ?>
+                            </div>
+                        </div>
+                    </div>
 
-					<!-- ── TAB 2: Auto-reply ── -->
-					<div class="lgl-eb-tab-content">
-						<div class="lgl-eb-layout">
-							<div class="lgl-eb-main">
-								<div class="lgl-eb-section">
-									<h3><?php _e( 'Auto-Reply Settings', 'lgl-shortcodes' ); ?></h3>
-									<div class="lgl-eb-toggle-row">
-										<input type="checkbox" id="lgl-eb-auto-reply-toggle" name="auto_reply_enabled" value="1" <?php checked( $auto_reply ); ?>>
-										<label for="lgl-eb-auto-reply-toggle" style="font-weight:600;font-size:13px;cursor:pointer;"><?php _e( 'Send an automatic reply to the person who submitted this form', 'lgl-shortcodes' ); ?></label>
-									</div>
-									<p class="description"><?php _e( 'Requires the form to have an <code>email</code> field. Merge tag: <code>{{email}}</code>', 'lgl-shortcodes' ); ?></p>
-								</div>
+                    <!-- ── TAB 2: Auto-reply ── -->
+                    <div class="lgl-eb-tab-content">
+                        <div class="lgl-eb-layout">
+                            <div class="lgl-eb-main">
+                                <div class="lgl-eb-section">
+                                    <h3><?php _e('Auto-Reply Settings', 'lgl-shortcodes'); ?></h3>
+                                    <div class="lgl-eb-toggle-row">
+                                        <input type="checkbox" id="lgl-eb-auto-reply-toggle" name="auto_reply_enabled" value="1" <?php checked($auto_reply); ?>>
+                                        <label for="lgl-eb-auto-reply-toggle" style="font-weight:600;font-size:13px;cursor:pointer;"><?php _e('Send an automatic reply to the person who submitted this form', 'lgl-shortcodes'); ?></label>
+                                    </div>
+                                    <p class="description"><?php _e('Requires the form to have an <code>email</code> field. Merge tag: <code>{{email}}</code>', 'lgl-shortcodes'); ?></p>
+                                </div>
 
-								<div id="lgl-eb-autoreply-section" class="lgl-eb-collapsible <?php echo $auto_reply ? 'is-open' : ''; ?>">
-									<div class="lgl-eb-section">
-										<h3><?php _e( 'Auto-Reply Subject', 'lgl-shortcodes' ); ?></h3>
-										<div class="lgl-eb-subject-tags">
-											<?php foreach ( $this->subject_tags( $all_tags ) as $tag => $label ) : ?>
-												<button type="button" class="lgl-eb-insert-tag" data-tag="<?php echo esc_attr( $tag ); ?>"><?php echo esc_html( $tag ); ?></button>
-											<?php endforeach; ?>
-										</div>
-										<div class="lgl-eb-row">
-											<input type="text" name="auto_reply_subject" class="lgl-eb-subject-input" value="<?php echo esc_attr( $ar_subject ); ?>" placeholder="<?php esc_attr_e( 'Thank you for your enquiry, {{first_name}}', 'lgl-shortcodes' ); ?>">
-										</div>
-									</div>
+                                <div id="lgl-eb-autoreply-section" class="lgl-eb-collapsible <?php echo $auto_reply ? 'is-open' : ''; ?>">
+                                    <div class="lgl-eb-section">
+                                        <h3><?php _e('Auto-Reply Subject', 'lgl-shortcodes'); ?></h3>
+                                        <div class="lgl-eb-subject-tags">
+                                            <?php foreach ($this->subject_tags($all_tags) as $tag => $label) : ?>
+                                                <button type="button" class="lgl-eb-insert-tag" data-tag="<?php echo esc_attr($tag); ?>"><?php echo esc_html($tag); ?></button>
+                                            <?php endforeach; ?>
+                                        </div>
+                                        <div class="lgl-eb-row">
+                                            <input type="text" name="auto_reply_subject" class="lgl-eb-subject-input" value="<?php echo esc_attr($ar_subject); ?>" placeholder="<?php esc_attr_e('Thank you for your enquiry, {{first_name}}', 'lgl-shortcodes'); ?>">
+                                        </div>
+                                    </div>
 
-									<div class="lgl-eb-section">
-										<h3><?php _e( 'Auto-Reply Body', 'lgl-shortcodes' ); ?></h3>
-										<?php $this->render_tag_toolbar( $all_tags, 'lgl-eb-ar-body' ); ?>
-										<textarea name="auto_reply_body" id="lgl-eb-ar-body" class="lgl-eb-textarea"><?php echo esc_textarea( $ar_body ?: $this->default_autoreply_body( $type ) ); ?></textarea>
-									</div>
-								</div>
-							</div>
+                                    <div class="lgl-eb-section">
+                                        <h3><?php _e('Auto-Reply Body', 'lgl-shortcodes'); ?></h3>
+                                        <?php $this->render_tag_toolbar($all_tags, 'lgl-eb-ar-body'); ?>
+                                        <textarea name="auto_reply_body" id="lgl-eb-ar-body" class="lgl-eb-textarea"><?php echo esc_textarea($ar_body ?: $this->default_autoreply_body($type)); ?></textarea>
+                                    </div>
+                                </div>
+                            </div>
 
-							<div class="lgl-eb-sidebar">
-								<?php $this->render_tag_reference( $all_tags ); ?>
-							</div>
-						</div>
-					</div>
+                            <div class="lgl-eb-sidebar">
+                                <?php $this->render_tag_reference($all_tags); ?>
+                            </div>
+                        </div>
+                    </div>
 
-					<!-- ── TAB 3: Preview ── -->
-					<div class="lgl-eb-tab-content">
-						<div class="lgl-eb-section">
-							<h3><?php _e( 'Admin Email Preview', 'lgl-shortcodes' ); ?></h3>
-							<p class="description"><?php _e( 'Preview uses placeholder values for merge tags. Click the button to refresh.', 'lgl-shortcodes' ); ?></p>
-							<button type="button" id="lgl-eb-preview-btn" class="button button-secondary lgl-eb-preview-btn"><?php _e( '⟳ Refresh Preview', 'lgl-shortcodes' ); ?></button>
-							<iframe id="lgl-eb-preview-frame" title="Email Preview" style="display:none;"></iframe>
-						</div>
-					</div>
+                    <!-- ── TAB 3: Preview ── -->
+                    <div class="lgl-eb-tab-content">
+                        <div class="lgl-eb-section">
+                            <h3><?php _e('Admin Email Preview', 'lgl-shortcodes'); ?></h3>
+                            <p class="description"><?php _e('Preview uses placeholder values for merge tags. Click the button to refresh.', 'lgl-shortcodes'); ?></p>
+                            <button type="button" id="lgl-eb-preview-btn" class="button button-secondary lgl-eb-preview-btn"><?php _e('⟳ Refresh Preview', 'lgl-shortcodes'); ?></button>
+                            <iframe id="lgl-eb-preview-frame" title="Email Preview" style="display:none;"></iframe>
+                        </div>
+                    </div>
 
-				</div><!-- /.lgl-eb-tab-panels -->
+                </div><!-- /.lgl-eb-tab-panels -->
 
-				<?php submit_button( __( 'Save Email Settings', 'lgl-shortcodes' ) ); ?>
-			</form>
-		</div>
-		<?php
-	}
+                <?php submit_button(__('Save Email Settings', 'lgl-shortcodes')); ?>
+            </form>
+        </div>
+<?php
+    }
 
-	/* ═══════════════════════════════════════════════════════════════
+    /* ═══════════════════════════════════════════════════════════════
 	   TAG TOOLBAR (inserted above a textarea)
 	═══════════════════════════════════════════════════════════════ */
 
-	private function render_tag_toolbar( array $all_tags, string $textarea_id ) {
-		$groups = $this->grouped_tags( $all_tags );
-		echo '<div class="lgl-eb-tag-toolbar" data-for="' . esc_attr( $textarea_id ) . '">';
-		foreach ( $groups as $group_label => $tags ) {
-			echo '<span class="lgl-tag-group-label">' . esc_html( $group_label ) . '</span>';
-			foreach ( $tags as $tag => $label ) {
-				printf(
-					'<button type="button" class="lgl-eb-insert-tag" data-tag="%s" title="%s">%s</button>',
-					esc_attr( $tag ),
-					esc_attr( $label ),
-					esc_html( $tag )
-				);
-			}
-		}
-		echo '</div>';
-	}
+    private function render_tag_toolbar(array $all_tags, string $textarea_id)
+    {
+        $groups = $this->grouped_tags($all_tags);
+        echo '<div class="lgl-eb-tag-toolbar" data-for="' . esc_attr($textarea_id) . '">';
+        foreach ($groups as $group_label => $tags) {
+            echo '<span class="lgl-tag-group-label">' . esc_html($group_label) . '</span>';
+            foreach ($tags as $tag => $label) {
+                printf(
+                    '<button type="button" class="lgl-eb-insert-tag" data-tag="%s" title="%s">%s</button>',
+                    esc_attr($tag),
+                    esc_attr($label),
+                    esc_html($tag)
+                );
+            }
+        }
+        echo '</div>';
+    }
 
-	/* ═══════════════════════════════════════════════════════════════
+    /* ═══════════════════════════════════════════════════════════════
 	   TAG REFERENCE SIDEBAR
 	═══════════════════════════════════════════════════════════════ */
 
-	private function render_tag_reference( array $all_tags ) {
-		$groups = $this->grouped_tags( $all_tags );
-		echo '<div class="lgl-eb-section">';
-		echo '<h3>' . __( 'Merge Tag Reference', 'lgl-shortcodes' ) . '</h3>';
-		echo '<p class="description" style="margin-bottom:12px;font-size:11px;">' . __( 'Click a tag to insert it into the last active editor.', 'lgl-shortcodes' ) . '</p>';
+    private function render_tag_reference(array $all_tags)
+    {
+        $groups = $this->grouped_tags($all_tags);
+        echo '<div class="lgl-eb-section">';
+        echo '<h3>' . __('Merge Tag Reference', 'lgl-shortcodes') . '</h3>';
+        echo '<p class="description" style="margin-bottom:12px;font-size:11px;">' . __('Click a tag to insert it into the last active editor.', 'lgl-shortcodes') . '</p>';
 
-		foreach ( $groups as $group_label => $tags ) {
-			echo '<h4 style="margin:14px 0 6px;font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:#8c8f94;">' . esc_html( $group_label ) . '</h4>';
-			echo '<ul class="lgl-eb-tag-ref">';
-			foreach ( $tags as $tag => $label ) {
-				printf(
-					'<li><code data-tag="%s">%s</code><span class="lgl-tag-desc">%s</span></li>',
-					esc_attr( $tag ),
-					esc_html( $tag ),
-					esc_html( $label )
-				);
-			}
-			echo '</ul>';
-		}
-		echo '</div>';
-	}
+        foreach ($groups as $group_label => $tags) {
+            echo '<h4 style="margin:14px 0 6px;font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:#8c8f94;">' . esc_html($group_label) . '</h4>';
+            echo '<ul class="lgl-eb-tag-ref">';
+            foreach ($tags as $tag => $label) {
+                printf(
+                    '<li><code data-tag="%s">%s</code><span class="lgl-tag-desc">%s</span></li>',
+                    esc_attr($tag),
+                    esc_html($tag),
+                    esc_html($label)
+                );
+            }
+            echo '</ul>';
+        }
+        echo '</div>';
+    }
 
-	/* ═══════════════════════════════════════════════════════════════
+    /* ═══════════════════════════════════════════════════════════════
 	   SAVE
 	═══════════════════════════════════════════════════════════════ */
 
-	public function save_email_settings() {
-		$form_type = sanitize_key( $_POST['form_type'] ?? '' );
-		check_admin_referer( "lgl_save_{$form_type}_email", 'lgl_eb_nonce' );
-		if ( ! current_user_can( 'manage_options' ) ) wp_die( 'Unauthorized' );
+    public function save_email_settings()
+    {
+        $form_type = sanitize_key($_POST['form_type'] ?? '');
+        check_admin_referer("lgl_save_{$form_type}_email", 'lgl_eb_nonce');
+        if (! current_user_can('manage_options')) wp_die('Unauthorized');
 
-		$allowed_recipients = [ 'admin', 'custom', 'both' ];
-		$rec_type = sanitize_text_field( $_POST['recipient_type'] ?? 'admin' );
+        $allowed_recipients = ['admin', 'custom', 'both'];
+        $rec_type = sanitize_text_field($_POST['recipient_type'] ?? 'admin');
 
-		update_option( "lgl_{$form_type}_email", [
-			'subject'             => sanitize_text_field( $_POST['subject']             ?? '' ),
-			'body'                => wp_kses_post( $_POST['body']                       ?? '' ),
-			'recipient_type'      => in_array( $rec_type, $allowed_recipients, true ) ? $rec_type : 'admin',
-			'custom_email'        => sanitize_email( $_POST['custom_email']             ?? '' ),
-			'auto_reply_enabled'  => ! empty( $_POST['auto_reply_enabled'] ),
-			'auto_reply_subject'  => sanitize_text_field( $_POST['auto_reply_subject']  ?? '' ),
-			'auto_reply_body'     => wp_kses_post( $_POST['auto_reply_body']            ?? '' ),
-		] );
+        update_option("lgl_{$form_type}_email", [
+            'subject'             => sanitize_text_field($_POST['subject']             ?? ''),
+            'body'                => wp_kses_post($_POST['body']                       ?? ''),
+            'recipient_type'      => in_array($rec_type, $allowed_recipients, true) ? $rec_type : 'admin',
+            'custom_email'        => sanitize_email($_POST['custom_email']             ?? ''),
+            'auto_reply_enabled'  => ! empty($_POST['auto_reply_enabled']),
+            'auto_reply_subject'  => sanitize_text_field($_POST['auto_reply_subject']  ?? ''),
+            'auto_reply_body'     => wp_kses_post($_POST['auto_reply_body']            ?? ''),
+        ]);
 
-		wp_redirect( admin_url( "admin.php?page=lgl-{$form_type}-email&saved=1" ) );
-		exit;
-	}
+        wp_redirect(admin_url("admin.php?page=lgl-{$form_type}-email&saved=1"));
+        exit;
+    }
 
 	/* ═══════════════════════════════════════════════════════════════
 	   STATIC: PROCESS & SEND EMAILS
 	   Called from LGL_Forms::ajax_submit_enquiry / ajax_submit_reserve
 	═══════════════════════════════════════════════════════════════ */
 
-	/**
-	 * Build all merge tag values from form data + product context.
-	 */
-	public static function build_tag_values( array $form_data, int $product_id ): array {
-		$price = $product_id ? get_post_meta( $product_id, 'price', true ) : '';
+    /**
+     * Build all merge tag values from form data + product context.
+     */
+    public static function build_tag_values(array $form_data, int $product_id): array
+    {
+        $price = $product_id ? get_post_meta($product_id, 'price', true) : '';
 
-		return array_merge( $form_data, [
-			// Product context
-			'product_title'   => $product_id ? html_entity_decode( get_the_title( $product_id ), ENT_QUOTES ) : '',
-			'product_url'     => $product_id ? get_permalink( $product_id ) : '',
-			'product_price'   => $price ? LGL_Shortcodes::format_price( $price ) : '',
-			'product_type'    => $product_id ? get_post_type( $product_id ) : '',
+        return array_merge($form_data, [
+            // Product context
+            'product_title'   => $product_id ? html_entity_decode(get_the_title($product_id), ENT_QUOTES) : '',
+            'product_url'     => $product_id ? get_permalink($product_id) : '',
+            'product_price'   => $price ? LGL_Shortcodes::format_price($price) : '',
+            'product_type'    => $product_id ? get_post_type($product_id) : '',
 
-			// System
-			'site_name'       => get_bloginfo( 'name' ),
-			'site_url'        => home_url(),
-			'admin_email'     => get_option( 'admin_email' ),
-			'date'            => wp_date( get_option( 'date_format' ) ),
-			'time'            => wp_date( get_option( 'time_format' ) ),
-		] );
-	}
+            // System
+            'site_name'       => get_bloginfo('name'),
+            'site_url'        => home_url(),
+            'admin_email'     => get_option('admin_email'),
+            'date'            => wp_date(get_option('date_format')),
+            'time'            => wp_date(get_option('time_format')),
+        ]);
+    }
 
-	/**
-	 * Replace {{tag}} placeholders in a string with their resolved values.
-	 */
-	public static function process_tags( string $template, array $values ): string {
-		foreach ( $values as $key => $value ) {
-			if ( is_array( $value ) ) continue;
-			$template = str_replace( '{{' . $key . '}}', esc_html( (string) $value ), $template );
-		}
-		// Strip any unreplaced tags
-		$template = preg_replace( '/\{\{[^}]+\}\}/', '', $template );
-		return $template;
-	}
+    /**
+     * Replace {{tag}} placeholders in a string with their resolved values.
+     */
+    public static function process_tags(string $template, array $values): string
+    {
+        foreach ($values as $key => $value) {
+            if (is_array($value)) continue;
+            $template = str_replace('{{' . $key . '}}', esc_html((string) $value), $template);
+        }
+        // Strip any unreplaced tags
+        $template = preg_replace('/\{\{[^}]+\}\}/', '', $template);
+        return $template;
+    }
 
-	/**
-	 * Send the admin notification + optional auto-reply for a form submission.
-	 *
-	 * @param string $form_type   'enquiry' | 'reserve'
-	 * @param array  $form_data   Sanitized form field values keyed by field ID
-	 * @param int    $product_id  Product post ID (0 if none)
-	 */
-	public static function send( string $form_type, array $form_data, int $product_id ): void {
-		$email_cfg = get_option( "lgl_{$form_type}_email", [] );
-		$tag_values = self::build_tag_values( $form_data, $product_id );
+    /**
+     * Send the admin notification + optional auto-reply for a form submission.
+     *
+     * @param string $form_type   'enquiry' | 'reserve'
+     * @param array  $form_data   Sanitized form field values keyed by field ID
+     * @param int    $product_id  Product post ID (0 if none)
+     */
+    public static function send(string $form_type, array $form_data, int $product_id): void
+    {
+        $email_cfg = get_option("lgl_{$form_type}_email", []);
+        $tag_values = self::build_tag_values($form_data, $product_id);
 
-		// ── Admin notification ──────────────────────────────────────
-		$subject  = self::process_tags( $email_cfg['subject'] ?? '', $tag_values );
-		$body     = self::process_tags( $email_cfg['body']    ?? '', $tag_values );
+        // ── Admin notification ──────────────────────────────────────
+        $subject  = self::process_tags($email_cfg['subject'] ?? '', $tag_values);
+        $body     = self::process_tags($email_cfg['body']    ?? '', $tag_values);
 
-		if ( empty( $subject ) ) {
-			$name = trim( ( $form_data['first_name'] ?? '' ) . ' ' . ( $form_data['last_name'] ?? '' ) );
-			$product = $tag_values['product_title'] ?: 'Unknown Product';
-			$subject = $form_type === 'enquiry'
-				? "New Enquiry: {$name} — {$product}"
-				: "New Reservation: {$name} — {$product}";
-		}
+        if (empty($subject)) {
+            $name = trim(($form_data['first_name'] ?? '') . ' ' . ($form_data['last_name'] ?? ''));
+            $product = $tag_values['product_title'] ?: 'Unknown Product';
+            $subject = $form_type === 'enquiry'
+                ? "New Enquiry: {$name} — {$product}"
+                : "New Reservation: {$name} — {$product}";
+        }
 
-		if ( empty( $body ) ) {
-			// Plain text fallback
-			$body  = "<p><strong>Product:</strong> {$tag_values['product_title']}</p><ul>";
-			foreach ( $form_data as $k => $v ) {
-				$body .= '<li><strong>' . esc_html( ucwords( str_replace( '_', ' ', $k ) ) ) . ':</strong> ' . esc_html( $v ) . '</li>';
-			}
-			$body .= '</ul>';
-		}
+        if (empty($body)) {
+            // Plain text fallback
+            $body  = "<p><strong>Product:</strong> {$tag_values['product_title']}</p><ul>";
+            foreach ($form_data as $k => $v) {
+                $body .= '<li><strong>' . esc_html(ucwords(str_replace('_', ' ', $k))) . ':</strong> ' . esc_html($v) . '</li>';
+            }
+            $body .= '</ul>';
+        }
 
-		$recipients = self::resolve_recipients( $email_cfg );
-		$headers    = [ 'Content-Type: text/html; charset=UTF-8' ];
+        $recipients = self::resolve_recipients($email_cfg);
+        $headers    = ['Content-Type: text/html; charset=UTF-8'];
 
-		if ( ! empty( $recipients ) ) {
-			wp_mail( $recipients, $subject, self::wrap_html( $subject, $body ), $headers );
-		}
+        if (! empty($recipients)) {
+            wp_mail($recipients, $subject, self::wrap_html($subject, $body), $headers);
+        }
 
-		// ── Auto-reply ──────────────────────────────────────────────
-		if ( ! empty( $email_cfg['auto_reply_enabled'] ) ) {
-			$submitter_email = $form_data['email'] ?? '';
-			if ( is_email( $submitter_email ) ) {
-				$ar_subject = self::process_tags( $email_cfg['auto_reply_subject'] ?? '', $tag_values );
-				$ar_body    = self::process_tags( $email_cfg['auto_reply_body']    ?? '', $tag_values );
+        // ── Auto-reply ──────────────────────────────────────────────
+        if (! empty($email_cfg['auto_reply_enabled'])) {
+            $submitter_email = $form_data['email'] ?? '';
+            if (is_email($submitter_email)) {
+                $ar_subject = self::process_tags($email_cfg['auto_reply_subject'] ?? '', $tag_values);
+                $ar_body    = self::process_tags($email_cfg['auto_reply_body']    ?? '', $tag_values);
 
-				if ( empty( $ar_subject ) ) {
-					$ar_subject = 'Thank you for your ' . $form_type . ', ' . ( $form_data['first_name'] ?? '' );
-				}
-				if ( empty( $ar_body ) ) {
-					$ar_body = '<p>Hi ' . esc_html( $form_data['first_name'] ?? 'there' ) . ',</p><p>Thank you for getting in touch. We will be in contact with you shortly.</p><p>— ' . esc_html( get_bloginfo( 'name' ) ) . '</p>';
-				}
+                if (empty($ar_subject)) {
+                    $ar_subject = 'Thank you for your ' . $form_type . ', ' . ($form_data['first_name'] ?? '');
+                }
+                if (empty($ar_body)) {
+                    $ar_body = '<p>Hi ' . esc_html($form_data['first_name'] ?? 'there') . ',</p><p>Thank you for getting in touch. We will be in contact with you shortly.</p><p>— ' . esc_html(get_bloginfo('name')) . '</p>';
+                }
 
-				wp_mail( $submitter_email, $ar_subject, self::wrap_html( $ar_subject, $ar_body ), $headers );
-			}
-		}
-	}
+                wp_mail($submitter_email, $ar_subject, self::wrap_html($ar_subject, $ar_body), $headers);
+            }
+        }
+    }
 
 	/* ═══════════════════════════════════════════════════════════════
 	   HELPERS
 	═══════════════════════════════════════════════════════════════ */
 
-	/**
-	 * Resolve the recipient list from email config.
-	 */
-	private static function resolve_recipients( array $cfg ): array {
-		$admin = get_option( 'admin_email' );
-		$custom = sanitize_email( $cfg['custom_email'] ?? '' );
-		switch ( $cfg['recipient_type'] ?? 'admin' ) {
-			case 'custom': return $custom ? [ $custom ] : [ $admin ];
-			case 'both':   return array_filter( [ $admin, $custom ] );
-			default:       return [ $admin ];
-		}
-	}
+    /**
+     * Resolve the recipient list from email config.
+     */
+    private static function resolve_recipients(array $cfg): array
+    {
+        $admin = get_option('admin_email');
+        $custom = sanitize_email($cfg['custom_email'] ?? '');
+        switch ($cfg['recipient_type'] ?? 'admin') {
+            case 'custom':
+                return $custom ? [$custom] : [$admin];
+            case 'both':
+                return array_filter([$admin, $custom]);
+            default:
+                return [$admin];
+        }
+    }
 
-	/**
-	 * Wrap a body fragment in a basic responsive HTML email shell.
-	 */
-	public static function wrap_html( string $subject, string $body ): string {
-		$site = esc_html( get_bloginfo( 'name' ) );
-		$year = date( 'Y' );
-		// If the body already looks like a full HTML document, return as-is
-		if ( stripos( $body, '<html' ) !== false || stripos( $body, '<!DOCTYPE' ) !== false ) {
-			return $body;
-		}
-		return <<<HTML
+    /**
+     * Wrap a body fragment in a basic responsive HTML email shell.
+     */
+    public static function wrap_html(string $subject, string $body): string
+    {
+        $site = esc_html(get_bloginfo('name'));
+        $year = date('Y');
+        // If the body already looks like a full HTML document, return as-is
+        if (stripos($body, '<html') !== false || stripos($body, '<!DOCTYPE') !== false) {
+            return $body;
+        }
+        return <<<HTML
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -769,106 +790,116 @@ class LGL_Email_Builder {
 </body>
 </html>
 HTML;
-	}
+    }
 
 	/* ═══════════════════════════════════════════════════════════════
 	   MERGE TAG DEFINITIONS
 	═══════════════════════════════════════════════════════════════ */
 
-	/**
-	 * Build the full tag map combining system tags + dynamic form field tags.
-	 */
-	private function get_merge_tags( array $form_fields ): array {
-		$tags = $this->system_tags();
-		foreach ( $form_fields as $field ) {
-			$id = $field['id'] ?? '';
-			if ( ! $id ) continue;
-			// Skip if it's already in system tags
-			if ( isset( $tags[ "{{$id}}" ] ) ) continue;
-			$tags[ '{{' . $id . '}}' ] = $field['label'] ?? ucwords( str_replace( '_', ' ', $id ) );
-		}
-		return $tags;
-	}
+    /**
+     * Build the full tag map combining system tags + dynamic form field tags.
+     */
+    private function get_merge_tags(array $form_fields): array
+    {
+        $tags = $this->system_tags();
+        foreach ($form_fields as $field) {
+            $id = $field['id'] ?? '';
+            if (! $id) continue;
+            // Skip if it's already in system tags
+            if (isset($tags["{{$id}}"])) continue;
+            $tags['{{' . $id . '}}'] = $field['label'] ?? ucwords(str_replace('_', ' ', $id));
+        }
+        return $tags;
+    }
 
-	private function system_tags(): array {
-		return [
-			// Submitter
-			'{{first_name}}'    => 'First name',
-			'{{last_name}}'     => 'Last name',
-			'{{email}}'         => 'Email address',
-			'{{phone}}'         => 'Phone number',
-			// Vehicle
-			'{{product_title}}' => 'Vehicle name',
-			'{{product_url}}'   => 'Vehicle page URL',
-			'{{product_price}}' => 'Vehicle price',
-			'{{product_type}}'  => 'Vehicle type (caravan, motorhome…)',
-			// Site
-			'{{site_name}}'     => 'Website name',
-			'{{site_url}}'      => 'Website URL',
-			'{{admin_email}}'   => 'Admin email address',
-			'{{date}}'          => 'Submission date',
-			'{{time}}'          => 'Submission time',
-		];
-	}
+    private function system_tags(): array
+    {
+        return [
+            // Submitter
+            '{{first_name}}'    => 'First name',
+            '{{last_name}}'     => 'Last name',
+            '{{email}}'         => 'Email address',
+            '{{phone}}'         => 'Phone number',
+            // Vehicle
+            '{{product_title}}' => 'Vehicle name',
+            '{{product_url}}'   => 'Vehicle page URL',
+            '{{product_price}}' => 'Vehicle price',
+            '{{product_type}}'  => 'Vehicle type (caravan, motorhome…)',
+            // Site
+            '{{site_name}}'     => 'Website name',
+            '{{site_url}}'      => 'Website URL',
+            '{{admin_email}}'   => 'Admin email address',
+            '{{date}}'          => 'Submission date',
+            '{{time}}'          => 'Submission time',
+        ];
+    }
 
-	private function subject_tags( array $all_tags ): array {
-		$common = [
-			'{{first_name}}', '{{last_name}}', '{{product_title}}',
-			'{{product_price}}', '{{site_name}}', '{{date}}',
-		];
-		return array_filter( $all_tags, fn( $k ) => in_array( $k, $common, true ), ARRAY_FILTER_USE_KEY );
-	}
+    private function subject_tags(array $all_tags): array
+    {
+        $common = [
+            '{{first_name}}',
+            '{{last_name}}',
+            '{{product_title}}',
+            '{{product_price}}',
+            '{{site_name}}',
+            '{{date}}',
+        ];
+        return array_filter($all_tags, fn($k) => in_array($k, $common, true), ARRAY_FILTER_USE_KEY);
+    }
 
-	/**
-	 * Group merge tags for the toolbar and reference panel.
-	 */
-	private function grouped_tags( array $all_tags ): array {
-		$system_keys = array_keys( $this->system_tags() );
-		$groups = [
-			'Submitter' => [],
-			'Vehicle'   => [],
-			'Site'      => [],
-			'Form Fields' => [],
-		];
-		foreach ( $all_tags as $tag => $label ) {
-			if ( in_array( $tag, ['{{first_name}}','{{last_name}}','{{email}}','{{phone}}'], true ) ) {
-				$groups['Submitter'][$tag] = $label;
-			} elseif ( str_starts_with( $tag, '{{product_' ) ) {
-				$groups['Vehicle'][$tag] = $label;
-			} elseif ( in_array( $tag, ['{{site_name}}','{{site_url}}','{{admin_email}}','{{date}}','{{time}}'], true ) ) {
-				$groups['Site'][$tag] = $label;
-			} elseif ( ! in_array( $tag, $system_keys, true ) ) {
-				$groups['Form Fields'][$tag] = $label;
-			}
-		}
-		return array_filter( $groups );
-	}
+    /**
+     * Group merge tags for the toolbar and reference panel.
+     */
+    private function grouped_tags(array $all_tags): array
+    {
+        $system_keys = array_keys($this->system_tags());
+        $groups = [
+            'Submitter' => [],
+            'Vehicle'   => [],
+            'Site'      => [],
+            'Form Fields' => [],
+        ];
+        foreach ($all_tags as $tag => $label) {
+            if (in_array($tag, ['{{first_name}}', '{{last_name}}', '{{email}}', '{{phone}}'], true)) {
+                $groups['Submitter'][$tag] = $label;
+            } elseif (str_starts_with($tag, '{{product_')) {
+                $groups['Vehicle'][$tag] = $label;
+            } elseif (in_array($tag, ['{{site_name}}', '{{site_url}}', '{{admin_email}}', '{{date}}', '{{time}}'], true)) {
+                $groups['Site'][$tag] = $label;
+            } elseif (! in_array($tag, $system_keys, true)) {
+                $groups['Form Fields'][$tag] = $label;
+            }
+        }
+        return array_filter($groups);
+    }
 
-	/* ═══════════════════════════════════════════════════════════════
+    /* ═══════════════════════════════════════════════════════════════
 	   DEFAULT EMAIL TEMPLATES
 	═══════════════════════════════════════════════════════════════ */
 
-	private function default_email( string $type ): array {
-		return [
-			'subject'            => $type === 'enquiry'
-				? 'New Enquiry: {{first_name}} {{last_name}} — {{product_title}}'
-				: 'New Reservation: {{first_name}} {{last_name}} — {{product_title}}',
-			'body'               => $type === 'enquiry'
-				? $this->default_admin_body( 'enquiry' )
-				: $this->default_admin_body( 'reserve' ),
-			'recipient_type'     => 'admin',
-			'custom_email'       => '',
-			'auto_reply_enabled' => false,
-			'auto_reply_subject' => $type === 'enquiry'
-				? 'Thank you for your enquiry, {{first_name}}'
-				: 'Your reservation request has been received, {{first_name}}',
-			'auto_reply_body'    => $this->default_autoreply_body( $type ),
-		];
-	}
+    private function default_email(string $type): array
+    {
+        return [
+            'subject'            => $type === 'enquiry'
+                ? 'New Enquiry: {{first_name}} {{last_name}} — {{product_title}}'
+                : 'New Reservation: {{first_name}} {{last_name}} — {{product_title}}',
+            'body'               => $type === 'enquiry'
+                ? $this->default_admin_body('enquiry')
+                : $this->default_admin_body('reserve'),
+            'recipient_type'     => 'admin',
+            'custom_email'       => '',
+            'auto_reply_enabled' => false,
+            'auto_reply_subject' => $type === 'enquiry'
+                ? 'Thank you for your enquiry, {{first_name}}'
+                : 'Your reservation request has been received, {{first_name}}',
+            'auto_reply_body'    => $this->default_autoreply_body($type),
+        ];
+    }
 
-	private function default_admin_body( string $type ): string {
-		$noun = $type === 'enquiry' ? 'Enquiry' : 'Reservation';
-		return <<<HTML
+    private function default_admin_body(string $type): string
+    {
+        $noun = $type === 'enquiry' ? 'Enquiry' : 'Reservation';
+        return <<<HTML
 <h2>New {$noun} Received</h2>
 
 <p>A new {$noun} has been submitted on <a href="{{site_url}}">{{site_name}}</a>.</p>
@@ -893,14 +924,15 @@ HTML;
 
 <p><a href="{{product_url}}" style="display:inline-block;padding:12px 24px;background:#003793;color:#fff;border-radius:5px;text-decoration:none;font-weight:600;">View Vehicle →</a></p>
 HTML;
-	}
+    }
 
-	private function default_autoreply_body( string $type ): string {
-		$noun    = $type === 'enquiry' ? 'enquiry' : 'reservation request';
-		$promise = $type === 'enquiry'
-			? 'A member of our team will be in touch with you shortly.'
-			: 'We will hold the vehicle for you and a member of our team will be in touch within 24 hours to confirm your visit.';
-		return <<<HTML
+    private function default_autoreply_body(string $type): string
+    {
+        $noun    = $type === 'enquiry' ? 'enquiry' : 'reservation request';
+        $promise = $type === 'enquiry'
+            ? 'A member of our team will be in touch with you shortly.'
+            : 'We will hold the vehicle for you and a member of our team will be in touch within 24 hours to confirm your visit.';
+        return <<<HTML
 <h2>Thank you, {{first_name}}!</h2>
 
 <p>We have received your {$noun} for the <strong>{{product_title}}</strong> and we appreciate your interest.</p>
@@ -921,5 +953,5 @@ HTML;
 
 <p>Kind regards,<br><strong>{{site_name}}</strong><br><a href="{{site_url}}">{{site_url}}</a></p>
 HTML;
-	}
+    }
 }
