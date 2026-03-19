@@ -29,7 +29,7 @@ $enquiry_settings  = LGL_Forms::get_enquiry_settings();
 $reserve_settings  = LGL_Forms::get_reserve_settings();
 $reserve_mode      = LGL_Forms::get_current_reserve_mode($post_id);
 $is_reserved       = LGL_Forms::is_reserved($post_id);
-$fin_mode  = $fin['mode'] ?? 'native';
+$fin_mode  = $finance_settings['mode'] ?? 'native';
 
 $finance_btn_text  = esc_html($finance_settings['button_text']  ?? __('FINANCE CALCULATOR', 'lgl'));
 $enquiry_btn_text  = esc_html($enquiry_settings['button_text']  ?? __('ENQUIRE NOW', 'lgl'));
