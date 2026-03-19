@@ -142,17 +142,3 @@ $durations = array_values( array_filter( array_map( 'trim', explode( "\n", $dur_
 	</div>
 </div>
 <?php endif; ?>
-
-<!-- ════════════════════════════════════════════════════════════
-     AUTO-RESERVE CONFIRM DIALOG
-════════════════════════════════════════════════════════════ -->
-<?php if ( $mode === 'auto_reserve' && ! $reserved ) : ?>
-<div class="lgl-confirm-dialog" id="lgl-auto-reserve-confirm" style="display:none" role="dialog" aria-modal="true">
-	<h3><?php _e( 'Reserve this Vehicle?', 'lgl-shortcodes' ); ?></h3>
-	<p><?php _e( 'This will reserve the vehicle for you. Our sales team will be in touch shortly to confirm.', 'lgl-shortcodes' ); ?></p>
-	<div class="lgl-confirm-actions">
-		<button class="lgl-btn lgl-btn-secondary lgl-confirm-yes"><?php _e( 'Yes, Reserve Now', 'lgl-shortcodes' ); ?></button>
-		<button class="lgl-btn lgl-btn-outline lgl-confirm-no"><?php _e( 'Cancel', 'lgl-shortcodes' ); ?></button>
-	</div>
-</div>
-<?php endif; ?>
