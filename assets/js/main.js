@@ -75,8 +75,6 @@
 
         // Dependent Dropdown Logic (Make -> Model)
         $('#lgl_make').on('change', function () {
-            if ($('#lgl_target_post_type').val()) return;
-
             let make_id = $(this).val();
             let $model_select = $('#lgl_model');
 
@@ -219,13 +217,12 @@
         });
 
         /**
-   * Faceted filter update — for each filter, the server computes available
-   * values by applying every OTHER active filter but excluding that filter
-   * itself.  This guarantees no combination can ever return 0 results.
-   */
+         * Fetches valid filter options for the current filter state and repopulates
+         * condition, berth, and price dropdowns so impossible combinations are impossible.
+         */
         function update_filter_options() {
             const postType = $('#lgl_target_post_type').val();
-            if (!postType) return;
+            if (!postType) return; // Global search form — no post_type locked in yet
 
             const formData = $('#lgl-search-form').serialize();
 
@@ -244,34 +241,23 @@
 
                     isUpdatingFilters = true;
 
-                    const resets = [
-                        _repopulate_select('#lgl_condition', d.conditions, 'Any Condition'),
-                        _repopulate_select('#lgl_berth', d.berths, 'Any Berth'),
-                        _repopulate_price_select('#lgl_price_min', d.prices, 'Min Price'),
-                        _repopulate_price_select('#lgl_price_max', d.prices, 'Max Price'),
-                        _repopulate_taxonomy_select('#lgl_make', d.makes, 'All Makes'),
-                        _repopulate_taxonomy_select('#lgl_model', d.models, 'All Models'),
-                    ];
+                    _repopulate_select('#lgl_condition', d.conditions, 'Any Condition');
+                    _repopulate_select('#lgl_berth', d.berths, 'Any Berth');
+                    _repopulate_price_select('#lgl_price_min', d.prices, 'Min Price');
+                    _repopulate_price_select('#lgl_price_max', d.prices, 'Max Price');
 
                     isUpdatingFilters = false;
-
-                    // One or more filters had an impossible value and were silently
-                    // cleared — fire a fresh search so the user sees valid results.
-                    if (resets.some(Boolean)) {
-                        execute_search();
-                    }
                 }
             });
         }
 
         /**
-         * Rebuild a plain-value select (condition, berth).
-         * Returns true if the previously-selected value was removed.
+         * Rebuilds a plain-value select (condition, berth) with only the provided values.
+         * Preserves the current selection if it is still valid; resets to "" otherwise.
          */
         function _repopulate_select(selector, values, placeholder) {
             const $el = $(selector);
             const current = $el.val();
-            let wasReset = false;
 
             $el.empty().append(new Option(placeholder, ''));
 
@@ -283,21 +269,18 @@
 
             if (current && !stillValid) {
                 $el.val('');
-                wasReset = true;
             }
 
-            $el.trigger('change.select2');
-            return wasReset;
+            $el.trigger('change'); // Refresh Select2 display
         }
 
         /**
-         * Rebuild a price select with {value, label} objects.
-         * Returns true if the previously-selected value was removed.
+         * Rebuilds a price select with {value, label} objects.
+         * Preserves the current selection if it is still in the new price list.
          */
         function _repopulate_price_select(selector, prices, placeholder) {
             const $el = $(selector);
             const current = parseFloat($el.val()) || 0;
-            let wasReset = false;
 
             $el.empty().append(new Option(placeholder, ''));
 
@@ -309,49 +292,9 @@
 
             if (current && !stillValid) {
                 $el.val('');
-                wasReset = true;
             }
 
-            $el.trigger('change.select2');
-            return wasReset;
-        }
-
-        /**
-         * Rebuild a taxonomy select (make, model) whose values are term IDs.
-         * Returns true if the previously-selected value was removed.
-         */
-        function _repopulate_taxonomy_select(selector, items, placeholder) {
-            const $el = $(selector);
-            const current = $el.val();
-            let wasReset = false;
-
-            $el.empty().append(new Option(placeholder, ''));
-
-            if (!items || items.length === 0) {
-                // No valid options — clear and disable if it is the model dropdown.
-                if (current) wasReset = true;
-                if (selector === '#lgl_model') {
-                    $el.val('').prop('disabled', true).trigger('change.select2');
-                } else {
-                    $el.val('').trigger('change.select2');
-                }
-                return wasReset;
-            }
-
-            let stillValid = false;
-            $.each(items, function (i, item) {
-                const isSelected = String(item.id) === String(current);
-                if (isSelected) stillValid = true;
-                $el.append(new Option(item.text, item.id, false, isSelected));
-            });
-
-            if (current && !stillValid) {
-                $el.val('');
-                wasReset = true;
-            }
-
-            $el.prop('disabled', false).trigger('change.select2');
-            return wasReset;
+            $el.trigger('change'); // Refresh Select2 display
         }
 
         /**
