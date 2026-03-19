@@ -266,103 +266,102 @@ class LGL_Email_Builder
     private function admin_js(): string
     {
         return '
-		(function($){
-			// ── Insert merge tag into the focused textarea ──
-			var $lastFocus = null;
-			$(document).on("focus", ".lgl-eb-textarea, .lgl-eb-subject-input", function(){
-				$lastFocus = $(this);
-			});
+    (function($){
+        // ── Insert merge tag into the focused textarea ──
+        var $lastFocus = null;
+        $(document).on("focus", ".lgl-eb-textarea, .lgl-eb-subject-input", function(){
+            $lastFocus = $(this);
+        });
 
-			$(document).on("click", ".lgl-eb-insert-tag, .lgl-eb-tag-ref code", function(e){
-				e.preventDefault();
-				var tag = $(this).data("tag") || $(this).text().trim();
-				if (!$lastFocus || !$lastFocus.length) {
-					// Default to first textarea if nothing focused yet
-					$lastFocus = $(".lgl-eb-textarea:first");
-				}
-				var el = $lastFocus[0];
-				var start = el.selectionStart, end = el.selectionEnd;
-				var val = el.value;
-				el.value = val.substring(0, start) + tag + val.substring(end);
-				el.selectionStart = el.selectionEnd = start + tag.length;
-				el.focus();
-			});
+        $(document).on("click", ".lgl-eb-insert-tag, .lgl-eb-tag-ref code", function(e){
+            e.preventDefault();
+            var tag = $(this).data("tag") || $(this).text().trim();
+            if (!$lastFocus || !$lastFocus.length) {
+                $lastFocus = $(".lgl-eb-textarea:first");
+            }
+            var el = $lastFocus[0];
+            var start = el.selectionStart, end = el.selectionEnd;
+            var val = el.value;
+            el.value = val.substring(0, start) + tag + val.substring(end);
+            el.selectionStart = el.selectionEnd = start + tag.length;
+            el.focus();
+        });
 
-			// ── Tab switching ──
-			$(document).on("click", ".lgl-eb-tab", function(){
-				var $tabs = $(this).closest(".lgl-eb-tabs").next(".lgl-eb-tab-panels");
-				var idx = $(this).index();
-				$(this).addClass("active").siblings().removeClass("active");
-				$tabs.find(".lgl-eb-tab-content").eq(idx).addClass("active").siblings().removeClass("active");
-			});
+        // ── Tab switching ──
+        $(document).on("click", ".lgl-eb-tab", function(){
+            var $tabs = $(this).closest(".lgl-eb-tabs").next(".lgl-eb-tab-panels");
+            var idx = $(this).index();
+            $(this).addClass("active").siblings().removeClass("active");
+            $tabs.find(".lgl-eb-tab-content").eq(idx).addClass("active").siblings().removeClass("active");
+        });
 
-			// ── Auto-reply toggle ──
-			$(document).on("change", "#lgl-eb-auto-reply-toggle", function(){
-				$(this).is(":checked") ? $("#lgl-eb-autoreply-section").addClass("is-open") : $("#lgl-eb-autoreply-section").removeClass("is-open");
-			});
+        // ── Auto-reply toggle ──
+        $(document).on("change", "#lgl-eb-auto-reply-toggle", function(){
+            $(this).is(":checked") ? $("#lgl-eb-autoreply-section").addClass("is-open") : $("#lgl-eb-autoreply-section").removeClass("is-open");
+        });
 
-			// ── Recipient type ──
-			$(document).on("change", "input[name="recipient_type"]", function(){
-				$(this).val() === "custom" || $(this).val() === "both"
-					? $("#lgl-custom-email-row").addClass("is-visible")
-					: $("#lgl-custom-email-row").removeClass("is-visible");
-			});
+        // ── Recipient type ──
+        $(document).on("change", "[name=\'recipient_type\']", function(){
+            var val = $(this).val();
+            (val === "custom" || val === "both")
+                ? $("#lgl-custom-email-row").addClass("is-visible")
+                : $("#lgl-custom-email-row").removeClass("is-visible");
+        });
 
-			// ── Live preview ──
-			$(document).on("click", "#lgl-eb-preview-btn", function(e){
-				e.preventDefault();
-				var html = $("#lgl-eb-body").val();
-				// Replace merge tags with placeholder text for preview
-				html = html.replace(/\{\{([^}]+)\}\}/g, function(m, tag){
-					var map = {
-						first_name: "John", last_name: "Doe", email: "john@example.com",
-						phone: "07700 900000", product_title: "Bailey Autograph 75-4i",
-						product_url: "#", product_price: "£29,995", site_name: document.title,
-						site_url: window.location.origin, date: new Date().toLocaleDateString("en-GB"),
-						"time": new Date().toLocaleTimeString("en-GB", {hour:"2-digit",minute:"2-digit"})
-					};
-					return map[tag.toLowerCase()] || ("<em style=\"color:#c00\">[" + tag + "]</em>");
-				});
-				var $frame = $("#lgl-eb-preview-frame");
-				if (!$frame.length) {
-					$frame = $("<iframe id=\"lgl-eb-preview-frame\"></iframe>");
-					$(this).after($frame);
-				}
-				$frame.show();
-				var doc = $frame[0].contentDocument || $frame[0].contentWindow.document;
-				doc.open(); doc.write(html); doc.close();
-			});
+        // ── Live preview ──
+        $(document).on("click", "#lgl-eb-preview-btn", function(e){
+            e.preventDefault();
+            var html = $("#lgl-eb-body").val();
+            html = html.replace(/\{\{([^}]+)\}\}/g, function(m, tag){
+                var map = {
+                    first_name: "John", last_name: "Doe", email: "john@example.com",
+                    phone: "07700 900000", product_title: "Bailey Autograph 75-4i",
+                    product_url: "#", product_price: "£29,995", site_name: document.title,
+                    site_url: window.location.origin, date: new Date().toLocaleDateString("en-GB"),
+                    "time": new Date().toLocaleTimeString("en-GB", {hour:"2-digit",minute:"2-digit"})
+                };
+                return map[tag.toLowerCase()] || ("<em style=\"color:#c00\">[" + tag + "]</em>");
+            });
+            var $frame = $("#lgl-eb-preview-frame");
+            if (!$frame.length) {
+                $frame = $("<iframe id=\"lgl-eb-preview-frame\"></iframe>");
+                $(this).after($frame);
+            }
+            $frame.show();
+            var doc = $frame[0].contentDocument || $frame[0].contentWindow.document;
+            doc.open(); doc.write(html); doc.close();
+        });
 
-			// ── Send test email ──
-			$(document).on("click", "#lgl-eb-send-test", function(e){
-				e.preventDefault();
-				var email = $("#lgl-eb-test-email").val().trim();
-				if (!email) { alert("Please enter a test email address."); return; }
-				var $msg = $("#lgl-eb-test-msg");
-				$msg.text("Sending...").removeClass("success error");
-				$.ajax({
-					url: ajaxurl, type: "POST",
-					data: {
-						action: "lgl_send_test_email",
-						nonce: $("#lgl_eb_nonce").val(),
-						email: email,
-						subject: $("#lgl-eb-subject").val(),
-						body: $("#lgl-eb-body").val()
-					},
-					success: function(r){
-						if (r.success) $msg.text("Test sent!").addClass("success");
-						else $msg.text("Failed: " + r.data).addClass("error");
-					}
-				});
-			});
+        // ── Send test email ──
+        $(document).on("click", "#lgl-eb-send-test", function(e){
+            e.preventDefault();
+            var email = $("#lgl-eb-test-email").val().trim();
+            if (!email) { alert("Please enter a test email address."); return; }
+            var $msg = $("#lgl-eb-test-msg");
+            $msg.text("Sending...").removeClass("success error");
+            $.ajax({
+                url: ajaxurl, type: "POST",
+                data: {
+                    action: "lgl_send_test_email",
+                    nonce: $("#lgl_eb_nonce").val(),
+                    email: email,
+                    subject: $("#lgl-eb-subject").val(),
+                    body: $("#lgl-eb-body").val()
+                },
+                success: function(r){
+                    if (r.success) $msg.text("Test sent!").addClass("success");
+                    else $msg.text("Failed: " + r.data).addClass("error");
+                }
+            });
+        });
 
-			// Trigger initial recipient state on page load
-			$("input[name=\"recipient_type\"]:checked").trigger("change");
-			if ($("#lgl-eb-auto-reply-toggle").is(":checked")) {
-				$("#lgl-eb-autoreply-section").addClass("is-open");
-			}
-		})(jQuery);
-		';
+        // Trigger initial states on page load
+        $("[name=\'recipient_type\']:checked").trigger("change");
+        if ($("#lgl-eb-auto-reply-toggle").is(":checked")) {
+            $("#lgl-eb-autoreply-section").addClass("is-open");
+        }
+    })(jQuery);
+    ';
     }
 
     /* ═══════════════════════════════════════════════════════════════
