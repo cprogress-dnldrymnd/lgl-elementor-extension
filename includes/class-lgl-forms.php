@@ -151,58 +151,70 @@ class LGL_Forms
 
 	/**
 	 * Outputs the admin CSS styling.
-	 * @return string The raw CSS payload.
+	 * Uses CSS Grid for strict column alignment within repeater rows.
 	 */
 	private function admin_css()
 	{
 		return '
         .lgl-form-builder-wrap .lgl-fbl-layout{display:grid;grid-template-columns:1fr 280px;gap:20px;margin-top:16px}
-        .lgl-fbl-section{background:#fff;border:1px solid #c3c4c7;border-radius:4px;padding:18px 20px;margin-bottom:14px}
+        .lgl-fbl-section{background:#fff;border:1px solid #c3c4c7;border-radius:4px;padding:18px 20px;margin-bottom:14px;box-shadow:0 1px 1px rgba(0,0,0,.04)}
         .lgl-fbl-section h3{margin:0 0 14px;font-size:14px;border-bottom:1px solid #f0f0f1;padding-bottom:10px}
-        .lgl-fields-list{border:1px solid #ddd;border-radius:3px;margin-bottom:10px;min-height:40px}
-        .lgl-field-row{display:flex;align-items:stretch;border-bottom:1px solid #eee;background:#fff;transition:box-shadow 0.2s}
-        .lgl-field-row:last-child{border-bottom:none}
-        .lgl-field-row.ui-sortable-helper{box-shadow:0 4px 12px rgba(0,0,0,.15);background:#f0f6fc}
-        .lgl-field-handle{width:34px;flex-shrink:0;display:flex;align-items:center;justify-content:center;cursor:grab;color:#aaa;border-right:1px solid #eee;background:#f9f9f9}
+        
+        /* Container for Repeater */
+        .lgl-fields-list{border:1px solid #dcdcde;border-radius:4px;margin-bottom:14px;min-height:40px;background:#f6f7f7;padding:10px}
+        
+        /* Repeater Row */
+        .lgl-field-row{display:flex;align-items:stretch;border:1px solid #dcdcde;background:#fff;margin-bottom:10px;border-radius:4px;transition:box-shadow 0.2s ease, border-color 0.2s ease}
+        .lgl-field-row:last-child{margin-bottom:0}
+        .lgl-field-row.ui-sortable-helper{box-shadow:0 4px 12px rgba(0,0,0,.15);border-color:#2271b1}
+        
+        /* Drag Handle */
+        .lgl-field-handle{width:38px;flex-shrink:0;display:flex;align-items:center;justify-content:center;cursor:grab;color:#8c8f94;border-right:1px solid #dcdcde;background:#fcfcfc;border-radius:4px 0 0 4px}
+        .lgl-field-handle:hover{color:#2271b1;background:#f6f7f7}
         .lgl-field-handle:active{cursor:grabbing}
-        .lgl-field-body{flex:1;padding:10px 12px}
-        .lgl-field-top{display:flex;flex-wrap:wrap;gap:8px;align-items:flex-end}
-        .lgl-field-bottom{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap}
+        
+        /* Row Body & Grids */
+        .lgl-field-body{flex:1;padding:12px 16px}
+        .lgl-field-top{display:grid;grid-template-columns:minmax(140px,2fr) minmax(120px,1.5fr) minmax(120px,1fr) minmax(90px,1fr) auto auto;gap:16px;align-items:end}
+        .lgl-field-bottom{display:none;grid-template-columns:1fr 1fr;gap:16px;margin-top:14px;padding-top:14px;border-top:1px dashed #dcdcde}
+        
+        /* Form Groups */
         .lgl-fg{display:flex;flex-direction:column}
-        .lgl-fg label{font-size:11px;color:#646970;margin-bottom:2px;font-weight:700;text-transform:uppercase;letter-spacing:.4px}
-        .lgl-fg input,.lgl-fg select{min-width:110px}
-        .lgl-fg--wide{flex:1;min-width:180px}
-        .lgl-fg--wide input{width:100%}
-        .lgl-fg--opts{flex:1;min-width:160px}
-        .lgl-fg--opts textarea{width:100%;resize:vertical}
-        .lgl-fg--cb{justify-content:flex-end;padding-bottom:2px}
-        .lgl-fg--cb label{text-transform:none;font-size:13px;font-weight:400;letter-spacing:0;flex-direction:row;align-items:center;gap:4px}
-        .lgl-field-actions{margin-left:auto;display:flex;align-items:flex-end;gap:4px;}
-        .lgl-rm-field{color:#d63638!important;}
-        .lgl-rm-field:hover{background:#fceaeb;}
-        .lgl-clone-field{color:#2271b1!important;}
-        .lgl-clone-field:hover{background:#f0f6fc;}
-        .lgl-toggle-field{color:#50575e!important;}
-        .lgl-toggle-field:hover{background:#f0f0f1;}
+        .lgl-fg label{font-size:12px;font-weight:600;color:#50575e;margin-bottom:6px;text-transform:none;letter-spacing:normal}
+        .lgl-fg input[type="text"],.lgl-fg select{width:100%;height:32px;line-height:1.3;font-size:13px;border-radius:3px;box-shadow:inset 0 1px 2px rgba(0,0,0,.03)}
+        .lgl-fg textarea{width:100%;font-size:13px;border-radius:3px;box-shadow:inset 0 1px 2px rgba(0,0,0,.03)}
+        
+        /* Inline Checkbox Group */
+        .lgl-fg-inline{display:flex;align-items:center;height:32px}
+        .lgl-fg-inline label{font-size:13px;font-weight:400;color:#3c434a;margin:0;display:flex;align-items:center;gap:6px;cursor:pointer}
+        .lgl-fg-inline input[type="checkbox"]{margin:0}
+        
+        /* Action Buttons */
+        .lgl-field-actions{display:flex;gap:6px;align-items:center;height:32px;justify-content:flex-end}
+        .lgl-field-actions button{padding:0;min-width:32px;width:32px;height:32px;display:flex;align-items:center;justify-content:center;border-radius:3px;cursor:pointer;background:transparent;border:1px solid transparent;color:#8c8f94;transition:all 0.15s ease}
+        .lgl-field-actions button:hover{background:#f0f0f1;border-color:#dcdcde;color:#1d2327}
+        .lgl-field-actions .lgl-rm-field:hover{background:#fceaeb;border-color:#d63638;color:#d63638}
+        .lgl-field-actions .lgl-clone-field:hover{background:#e6f0fa;border-color:#2271b1;color:#2271b1}
+        
+        /* Misc Utilities */
         .lgl-add-field .dashicons{vertical-align:middle;margin-top:-2px}
-        .lgl-fcount{font-size:12px;color:#646970;font-weight:400;margin-left:8px;background:#f0f0f1;padding:2px 8px;border-radius:10px}
+        .lgl-fcount{font-size:12px;color:#646970;font-weight:400;margin-left:8px;background:#f0f0f1;padding:3px 8px;border-radius:10px}
         .lgl-help-list{margin:0;padding-left:16px}
         .lgl-help-list li{font-size:13px;margin-bottom:5px;color:#3c434a}
-        .lgl-shortcode-tip{background:#f6f7f7;border:1px solid #e0e0e0;border-radius:3px;padding:10px;margin-top:8px;font-size:12px}
-        .lgl-shortcode-tip code{display:inline-block;background:#fff;border:1px solid #e0e0e0;padding:2px 5px;border-radius:2px;margin:1px 0}
-        .lgl-sub-badge{display:inline-block;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:700;text-transform:uppercase}
-        .lgl-sub-pending{background:#fcf0b2;color:#674c03}
-        .lgl-sub-confirmed{background:#b8e6bf;color:#1a4d25}
-        .lgl-sub-cancelled{background:#fceaeb;color:#8a1f1f}
-        .lgl-sub-auto{background:#d2e9f7;color:#0a4b78}
-        .lgl-sub-detail-table th{width:160px;font-weight:600}
-        @media(max-width:960px){.lgl-form-builder-wrap .lgl-fbl-layout{grid-template-columns:1fr}}
+        
+        /* Responsive Grid Collapse */
+        @media(max-width:1100px){
+            .lgl-form-builder-wrap .lgl-fbl-layout{grid-template-columns:1fr}
+            .lgl-field-top{grid-template-columns:1fr 1fr;gap:12px;align-items:start}
+            .lgl-field-bottom{grid-template-columns:1fr}
+            .lgl-field-actions{grid-column:1 / -1;justify-content:flex-start;margin-top:4px}
+            .lgl-fg-inline{height:auto;margin-top:10px}
+        }
         ';
 	}
 
 	/**
 	 * Outputs the admin JavaScript with expanded repeater functionality and custom UI toggles.
-	 * @return string The raw JavaScript payload.
 	 */
 	private function admin_js()
 	{
@@ -218,7 +230,10 @@ class LGL_Forms
                     var $r=$(this).closest(".lgl-field-row");
                     var $id=$r.find(".lgl-id-inp");
                     if($id.data("manual"))return;
-                    $id.val($(this).val().toLowerCase().replace(/[^a-z0-9\s_-]/g,"").replace(/[\s-]+/g,"_").replace(/^_+|_+$/g,""));
+                    
+                    // Allow simple alphanumeric characters and underscores, strip HTML
+                    var cleanLabel = $("<div>").html($(this).val()).text(); 
+                    $id.val(cleanLabel.toLowerCase().replace(/[^a-z0-9\s_-]/g,"").replace(/[\s-]+/g,"_").replace(/^_+|_+$/g,""));
                 });
                 
                 $(document).on("keyup",".lgl-id-inp",function(){$(this).data("manual",true)});
@@ -242,6 +257,10 @@ class LGL_Forms
                     fc++;
                     updateCount();
                     $r.find(".lgl-label-inp").focus();
+                    
+                    // Force the new row to show its bottom drawer to encourage filling placeholder/options out
+                    $r.find(".lgl-field-bottom").css("display", "grid");
+                    $r.find(".lgl-toggle-field .dashicons").removeClass("dashicons-arrow-down-alt2").addClass("dashicons-arrow-up-alt2");
                 });
 
                 // Duplicate field
@@ -253,11 +272,19 @@ class LGL_Forms
                     updateCount();
                 });
 
-                // Toggle/Collapse field
+                // Toggle/Collapse field (uses CSS Grid, so we manually fade/toggle to prevent flex/block breaking)
                 $(document).on("click",".lgl-toggle-field",function(){
                     var $row = $(this).closest(".lgl-field-row");
-                    $row.find(".lgl-field-bottom").slideToggle(200);
-                    $(this).find(".dashicons").toggleClass("dashicons-arrow-up-alt2 dashicons-arrow-down-alt2");
+                    var $bottom = $row.find(".lgl-field-bottom");
+                    
+                    if ($bottom.is(":visible")) {
+                        $bottom.slideUp(200);
+                        $(this).find(".dashicons").removeClass("dashicons-arrow-up-alt2").addClass("dashicons-arrow-down-alt2");
+                    } else {
+                        // Restore grid layout explicitly
+                        $bottom.css("display", "grid").hide().slideDown(200);
+                        $(this).find(".dashicons").removeClass("dashicons-arrow-down-alt2").addClass("dashicons-arrow-up-alt2");
+                    }
                 });
                 
                 // Remove field
@@ -626,77 +653,80 @@ class LGL_Forms
 	}
 
 	/**
-	 * Renders a single field item row inside the builder repeater.
-	 * Expanded field types array to include 'acceptance'.
-	 * * @param int|string $i Current index of the builder loop.
-	 * @param array $f Field data.
-	 */
-	private function render_field_row($i, $f)
-	{
-		$types = [
-			'text'       => 'Text',
-			'email'      => 'Email',
-			'tel'        => 'Phone',
-			'number'     => 'Number',
-			'date'       => 'Date',
-			'time'       => 'Time',
-			'textarea'   => 'Textarea',
-			'select'     => 'Select',
-			'acceptance' => 'Acceptance (Checkbox)'
-		];
-		$cur   = $f['type'] ?? 'text';
-		$opts_style = $cur === 'select' ? '' : 'display:none';
-	?>
-		<div class="lgl-field-row" data-i="<?php echo esc_attr($i); ?>">
-			<div class="lgl-field-handle" title="Drag to reorder"><span class="dashicons dashicons-menu"></span></div>
-			<div class="lgl-field-body">
-				<div class="lgl-field-top">
-					<div class="lgl-fg">
-						<label><?php _e('Label', 'lgl-shortcodes'); ?></label>
-						<input type="text" name="fields[<?php echo esc_attr($i); ?>][label]" value="<?php echo esc_attr($f['label'] ?? ''); ?>" placeholder="Field Label (HTML allowed)" class="lgl-label-inp" style="min-width:150px">
-					</div>
-					<div class="lgl-fg">
-						<label><?php _e('ID / Name', 'lgl-shortcodes'); ?></label>
-						<input type="text" name="fields[<?php echo esc_attr($i); ?>][id]" value="<?php echo esc_attr($f['id'] ?? ''); ?>" placeholder="auto" class="lgl-id-inp" style="min-width:120px;font-family:monospace;font-size:12px">
-					</div>
-					<div class="lgl-fg">
-						<label><?php _e('Type', 'lgl-shortcodes'); ?></label>
-						<select name="fields[<?php echo esc_attr($i); ?>][type]" class="lgl-type-sel">
-							<?php foreach ($types as $v => $l) : ?>
-								<option value="<?php echo esc_attr($v); ?>" <?php selected($cur, $v); ?>><?php echo esc_html($l); ?></option>
-							<?php endforeach; ?>
-						</select>
-					</div>
-					<div class="lgl-fg">
-						<label><?php _e('Width', 'lgl-shortcodes'); ?></label>
-						<select name="fields[<?php echo esc_attr($i); ?>][width]">
-							<option value="half" <?php selected($f['width'] ?? 'half', 'half'); ?>>Half</option>
-							<option value="full" <?php selected($f['width'] ?? '', 'full'); ?>>Full</option>
-						</select>
-					</div>
-					<div class="lgl-fg lgl-fg--cb">
-						<label><input type="checkbox" name="fields[<?php echo esc_attr($i); ?>][required]" value="1" <?php checked(! empty($f['required'])); ?>> <?php _e('Required', 'lgl-shortcodes'); ?></label>
-					</div>
-					<div class="lgl-field-actions">
-						<button type="button" class="lgl-toggle-field button-link button-small" title="Toggle"><span class="dashicons dashicons-arrow-up-alt2"></span></button>
-						<button type="button" class="lgl-clone-field button-link button-small" title="Duplicate"><span class="dashicons dashicons-admin-page"></span></button>
-						<button type="button" class="lgl-rm-field button-link button-small" title="Remove"><span class="dashicons dashicons-trash"></span></button>
-					</div>
-				</div>
-				<div class="lgl-field-bottom">
-					<div class="lgl-fg lgl-fg--wide">
-						<label><?php _e('Placeholder', 'lgl-shortcodes'); ?></label>
-						<input type="text" name="fields[<?php echo esc_attr($i); ?>][placeholder]" value="<?php echo esc_attr($f['placeholder'] ?? ''); ?>">
-					</div>
-					<div class="lgl-fg lgl-fg--opts" style="<?php echo $opts_style; ?>">
-						<label><?php _e('Options (one per line)', 'lgl-shortcodes'); ?></label>
-						<textarea name="fields[<?php echo esc_attr($i); ?>][options]" rows="3"><?php echo esc_textarea($f['options'] ?? ''); ?></textarea>
-					</div>
-				</div>
-			</div>
-		</div>
-	<?php
-	}
+     * Renders a single field item row inside the builder repeater.
+     * Uses CSS grid structure for rigorous column alignment.
+     * @param int|string $i Current index of the builder loop.
+     * @param array $f Field data.
+     */
+    private function render_field_row($i, $f)
+    {
+        $types = [
+            'text'       => 'Text', 
+            'email'      => 'Email', 
+            'tel'        => 'Phone', 
+            'number'     => 'Number', 
+            'date'       => 'Date', 
+            'time'       => 'Time', 
+            'textarea'   => 'Textarea', 
+            'select'     => 'Select',
+            'acceptance' => 'Acceptance (Checkbox)'
+        ];
+        $cur   = $f['type'] ?? 'text';
+        $opts_style = $cur === 'select' ? '' : 'display:none;';
+    ?>
+        <div class="lgl-field-row" data-i="<?php echo esc_attr($i); ?>">
+            <div class="lgl-field-handle" title="Drag to reorder"><span class="dashicons dashicons-menu"></span></div>
+            <div class="lgl-field-body">
+                
+                <div class="lgl-field-top">
+                    <div class="lgl-fg">
+                        <label><?php _e('Label', 'lgl-shortcodes'); ?></label>
+                        <input type="text" name="fields[<?php echo esc_attr($i); ?>][label]" value="<?php echo esc_attr($f['label'] ?? ''); ?>" placeholder="Label (HTML allowed)" class="lgl-label-inp">
+                    </div>
+                    <div class="lgl-fg">
+                        <label><?php _e('ID / Name', 'lgl-shortcodes'); ?></label>
+                        <input type="text" name="fields[<?php echo esc_attr($i); ?>][id]" value="<?php echo esc_attr($f['id'] ?? ''); ?>" placeholder="auto" class="lgl-id-inp" style="font-family:monospace;">
+                    </div>
+                    <div class="lgl-fg">
+                        <label><?php _e('Type', 'lgl-shortcodes'); ?></label>
+                        <select name="fields[<?php echo esc_attr($i); ?>][type]" class="lgl-type-sel">
+                            <?php foreach ($types as $v => $l) : ?>
+                                <option value="<?php echo esc_attr($v); ?>" <?php selected($cur, $v); ?>><?php echo esc_html($l); ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                    <div class="lgl-fg">
+                        <label><?php _e('Width', 'lgl-shortcodes'); ?></label>
+                        <select name="fields[<?php echo esc_attr($i); ?>][width]">
+                            <option value="half" <?php selected($f['width'] ?? 'half', 'half'); ?>>Half</option>
+                            <option value="full" <?php selected($f['width'] ?? '', 'full'); ?>>Full</option>
+                        </select>
+                    </div>
+                    <div class="lgl-fg-inline">
+                        <label><input type="checkbox" name="fields[<?php echo esc_attr($i); ?>][required]" value="1" <?php checked(! empty($f['required'])); ?>> <?php _e('Required', 'lgl-shortcodes'); ?></label>
+                    </div>
+                    <div class="lgl-field-actions">
+                        <button type="button" class="lgl-toggle-field" title="Edit Settings"><span class="dashicons dashicons-arrow-down-alt2"></span></button>
+                        <button type="button" class="lgl-clone-field" title="Duplicate Field"><span class="dashicons dashicons-admin-page"></span></button>
+                        <button type="button" class="lgl-rm-field" title="Remove Field"><span class="dashicons dashicons-trash"></span></button>
+                    </div>
+                </div>
+
+                <div class="lgl-field-bottom">
+                    <div class="lgl-fg">
+                        <label><?php _e('Placeholder', 'lgl-shortcodes'); ?></label>
+                        <input type="text" name="fields[<?php echo esc_attr($i); ?>][placeholder]" value="<?php echo esc_attr($f['placeholder'] ?? ''); ?>">
+                    </div>
+                    <div class="lgl-fg lgl-fg--opts" style="<?php echo $opts_style; ?>">
+                        <label><?php _e('Options (one per line)', 'lgl-shortcodes'); ?></label>
+                        <textarea name="fields[<?php echo esc_attr($i); ?>][options]" rows="2"><?php echo esc_textarea($f['options'] ?? ''); ?></textarea>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    <?php
+    }
 
     /* ═══════════════════════════════════════════════════════════════
        SAVE SETTINGS
@@ -1298,59 +1328,59 @@ class LGL_Forms
 	}
 
 	/**
-     * Bootstraps compiled string mapping logic parameters index log maps.
-     * Introduces the UI layout structure for 'acceptance' field types.
-     * * @param array $field Builder specific payload object structures.
-     * @param string $prefix Evaluated values configurations context mappings.
-     * @return string Evaluated mappings hooks values DOM mapping log schema strings.
-     */
-    public static function render_form_field($field, $prefix = 'lgl_f_')
-    {
-        $id    = 'lglf-' . esc_attr($field['id']);
-        $name  = $prefix . esc_attr($field['id']);
-        $req   = ! empty($field['required']);
-        $ph    = esc_attr($field['placeholder'] ?? '');
-        $type  = esc_attr($field['type'] ?? 'text');
-        $width = ($field['width'] ?? 'half') === 'full' ? 'lgl-form-col-full' : 'lgl-form-col-half';
-        $ra    = $req ? ' required' : '';
-        $rl    = $req ? ' <span class="lgl-form-req">(Required)</span>' : '';
+	 * Bootstraps compiled string mapping logic parameters index log maps.
+	 * Introduces the UI layout structure for 'acceptance' field types.
+	 * * @param array $field Builder specific payload object structures.
+	 * @param string $prefix Evaluated values configurations context mappings.
+	 * @return string Evaluated mappings hooks values DOM mapping log schema strings.
+	 */
+	public static function render_form_field($field, $prefix = 'lgl_f_')
+	{
+		$id    = 'lglf-' . esc_attr($field['id']);
+		$name  = $prefix . esc_attr($field['id']);
+		$req   = ! empty($field['required']);
+		$ph    = esc_attr($field['placeholder'] ?? '');
+		$type  = esc_attr($field['type'] ?? 'text');
+		$width = ($field['width'] ?? 'half') === 'full' ? 'lgl-form-col-full' : 'lgl-form-col-half';
+		$ra    = $req ? ' required' : '';
+		$rl    = $req ? ' <span class="lgl-form-req">(Required)</span>' : '';
 
-        $out  = '<div class="lgl-form-field ' . $width . '">';
+		$out  = '<div class="lgl-form-field ' . $width . '">';
 
-        // Specialized rendering for checkboxes
-        if ('acceptance' === $type) {
-            $out .= '<label class="lgl-checkbox-label" for="' . $id . '" style="display:flex; align-items:flex-start; gap:8px; font-weight:normal; cursor:pointer;">';
-            $out .= '<input type="checkbox" id="' . $id . '" name="' . $name . '" value="1"' . $ra . ' style="margin-top:4px;"> ';
-            $out .= '<span>' . wp_kses_post($field['label']) . $rl . '</span>';
-            $out .= '</label>';
-        } else {
-            // Standard rendering
-            $out .= '<label for="' . $id . '">' . wp_kses_post($field['label']) . $rl . '</label>';
+		// Specialized rendering for checkboxes
+		if ('acceptance' === $type) {
+			$out .= '<label class="lgl-checkbox-label" for="' . $id . '" style="display:flex; align-items:flex-start; gap:8px; font-weight:normal; cursor:pointer;">';
+			$out .= '<input type="checkbox" id="' . $id . '" name="' . $name . '" value="1"' . $ra . ' style="margin-top:4px;"> ';
+			$out .= '<span>' . wp_kses_post($field['label']) . $rl . '</span>';
+			$out .= '</label>';
+		} else {
+			// Standard rendering
+			$out .= '<label for="' . $id . '">' . wp_kses_post($field['label']) . $rl . '</label>';
 
-            if ('textarea' === $type) {
-                $out .= '<textarea id="' . $id . '" name="' . $name . '" placeholder="' . $ph . '"' . $ra . '></textarea>';
-            } elseif ('select' === $type) {
-                $opts = array_filter(array_map('trim', explode("\n", $field['options'] ?? '')));
-                $out .= '<select id="' . $id . '" name="' . $name . '"' . $ra . '>';
-                $out .= '<option value="">— Select —</option>';
-                foreach ($opts as $o) $out .= '<option value="' . esc_attr($o) . '">' . esc_html($o) . '</option>';
-                $out .= '</select>';
-            } elseif ('time' === $type) {
-                $out .= '<div class="lgl-time-picker">'
-                    . '<input type="number" name="' . $name . '_hh" placeholder="HH" min="1" max="12" class="lgl-time-hh"' . $ra . '>'
-                    . '<span class="lgl-time-sep">:</span>'
-                    . '<input type="number" name="' . $name . '_mm" placeholder="MM" min="0" max="59" class="lgl-time-mm">'
-                    . '<select name="' . $name . '_ampm" class="lgl-time-ampm"><option>AM</option><option>PM</option></select>'
-                    . '<input type="hidden" name="' . $name . '" class="lgl-time-val">'
-                    . '</div>';
-            } else {
-                $out .= '<input type="' . $type . '" id="' . $id . '" name="' . $name . '" placeholder="' . $ph . '"' . $ra . '>';
-            }
-        }
-        
-        $out .= '</div>';
-        return $out;
-    }
+			if ('textarea' === $type) {
+				$out .= '<textarea id="' . $id . '" name="' . $name . '" placeholder="' . $ph . '"' . $ra . '></textarea>';
+			} elseif ('select' === $type) {
+				$opts = array_filter(array_map('trim', explode("\n", $field['options'] ?? '')));
+				$out .= '<select id="' . $id . '" name="' . $name . '"' . $ra . '>';
+				$out .= '<option value="">— Select —</option>';
+				foreach ($opts as $o) $out .= '<option value="' . esc_attr($o) . '">' . esc_html($o) . '</option>';
+				$out .= '</select>';
+			} elseif ('time' === $type) {
+				$out .= '<div class="lgl-time-picker">'
+					. '<input type="number" name="' . $name . '_hh" placeholder="HH" min="1" max="12" class="lgl-time-hh"' . $ra . '>'
+					. '<span class="lgl-time-sep">:</span>'
+					. '<input type="number" name="' . $name . '_mm" placeholder="MM" min="0" max="59" class="lgl-time-mm">'
+					. '<select name="' . $name . '_ampm" class="lgl-time-ampm"><option>AM</option><option>PM</option></select>'
+					. '<input type="hidden" name="' . $name . '" class="lgl-time-val">'
+					. '</div>';
+			} else {
+				$out .= '<input type="' . $type . '" id="' . $id . '" name="' . $name . '" placeholder="' . $ph . '"' . $ra . '>';
+			}
+		}
+
+		$out .= '</div>';
+		return $out;
+	}
 
     /* ═══════════════════════════════════════════════════════════════
        DEFAULTS
