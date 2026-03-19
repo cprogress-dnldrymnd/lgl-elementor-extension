@@ -32,9 +32,9 @@ $min_dep   = (float) ($fin['min_deposit'] ?? 100);
     <div class="lgl-modal-inner">
         <div class="lgl-modal-header">
             <div>
-                <h2 id="lgl-fc-title"><?php echo esc_html($fin['title'] ?? __('Finance Calculator', 'lgl-shortcodes')); ?></h2>
+                <h2 id="lgl-fc-title"><?php echo esc_html(LGL_Forms::parse_modal_string($fin['title'] ?? __('Finance Calculator', 'lgl-shortcodes'), $post_id)); ?></h2>
                 <?php if (! empty($fin['subtitle'])) : ?>
-                    <p class="lgl-modal-subtitle"><?php echo esc_html($fin['subtitle']); ?></p>
+                    <p class="lgl-modal-subtitle"><?php echo esc_html(LGL_Forms::parse_modal_string($fin['subtitle'], $post_id)); ?></p>
                 <?php endif; ?>
             </div>
             <button class="lgl-modal-close-btn" aria-label="<?php esc_attr_e('Close', 'lgl-shortcodes'); ?>">&#x2715;</button>
@@ -83,7 +83,7 @@ $min_dep   = (float) ($fin['min_deposit'] ?? 100);
                     </div>
                 </div>
 
-                <p class="lgl-fc-disclaimer"><?php echo esc_html($fin['disclaimer_text'] ?? ''); ?></p>
+                <p class="lgl-fc-disclaimer"><?php echo esc_html(LGL_Forms::parse_modal_string($fin['disclaimer_text'] ?? '', $post_id)); ?></p>
             <?php endif; ?>
 
         </div>
@@ -94,7 +94,7 @@ $min_dep   = (float) ($fin['min_deposit'] ?? 100);
 <div class="lgl-modal" id="lgl-modal-enquiry" role="dialog" aria-modal="true" aria-labelledby="lgl-enq-title">
     <div class="lgl-modal-inner">
         <div class="lgl-modal-header">
-            <h2 id="lgl-enq-title"><?php echo esc_html($enq['title'] ?? __('Make an Enquiry', 'lgl-shortcodes')); ?></h2>
+            <h2 id="lgl-enq-title"><?php echo esc_html(LGL_Forms::parse_modal_string($enq['title'] ?? __('Make an Enquiry', 'lgl-shortcodes'), $post_id)); ?></h2>
             <button class="lgl-modal-close-btn" aria-label="<?php esc_attr_e('Close', 'lgl-shortcodes'); ?>">&#x2715;</button>
         </div>
         <div class="lgl-modal-body">
@@ -121,7 +121,7 @@ $min_dep   = (float) ($fin['min_deposit'] ?? 100);
     <div class="lgl-modal" id="lgl-modal-reserve" role="dialog" aria-modal="true" aria-labelledby="lgl-res-title">
         <div class="lgl-modal-inner">
             <div class="lgl-modal-header">
-                <h2 id="lgl-res-title"><?php echo esc_html($rs['title'] ?? __('Reserve this Leisure Vehicle for free', 'lgl-shortcodes')); ?></h2>
+                <h2 id="lgl-res-title"><?php echo esc_html(LGL_Forms::parse_modal_string($rs['title'] ?? __('Reserve this Leisure Vehicle for free', 'lgl-shortcodes'), $post_id)); ?></h2>
                 <button class="lgl-modal-close-btn" aria-label="<?php esc_attr_e('Close', 'lgl-shortcodes'); ?>">&#x2715;</button>
             </div>
             <div class="lgl-modal-body">
