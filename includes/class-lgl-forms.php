@@ -485,7 +485,7 @@ class LGL_Forms
                                         <th><label><?php _e('Default Reserve Mode', 'lgl-shortcodes'); ?></label></th>
                                         <td>
                                             <select name="default_reserve_mode">
-                                                <option value="auto_reserve" <?php selected($s['default_reserve_mode'] ?? '', 'auto_reserve'); ?>><?php _e('⚡ Auto Reserve (no form, one click)', 'lgl-shortcodes'); ?></option>
+                                                <option value="auto_reserve" <?php selected($s['default_reserve_mode'] ?? '', 'auto_reserve'); ?>><?php _e('⚡ Auto Reserve', 'lgl-shortcodes'); ?></option>
                                                 <option value="form_only" <?php selected($s['default_reserve_mode'] ?? 'form_only', 'form_only'); ?>><?php _e('📋 Form Only (show reservation form)', 'lgl-shortcodes'); ?></option>
                                                 <option value="no_reserve" <?php selected($s['default_reserve_mode'] ?? '', 'no_reserve'); ?>><?php _e('🚫 No Reserve Form (hide button)', 'lgl-shortcodes'); ?></option>
                                             </select>
