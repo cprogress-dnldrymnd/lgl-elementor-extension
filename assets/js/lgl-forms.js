@@ -21,7 +21,6 @@
         initFinanceCalculator();
         initEnquiryForm();
         initReserveForm();
-        initAutoReserve();
         initTimePickers();
         applyInitialReserveState();
     });
@@ -78,11 +77,11 @@
         $('.lgl-fc-calc-error').remove();
 
         var cashPrice = parseFloat(F.cashPrice) || 0;
-        var deposit   = parseFloat($('#lgl-fc-deposit').val()) || 0;
-        var durTxt    = $('#lgl-fc-duration').val() || '';
-        var apr       = parseFloat(F.apr)         || 10.90;
-        var fee       = parseFloat(F.purchaseFee)  || 10;
-        var months    = parseDuration(durTxt);
+        var deposit = parseFloat($('#lgl-fc-deposit').val()) || 0;
+        var durTxt = $('#lgl-fc-duration').val() || '';
+        var apr = parseFloat(F.apr) || 10.90;
+        var fee = parseFloat(F.purchaseFee) || 10;
+        var months = parseDuration(durTxt);
 
         if (cashPrice <= 0) {
             showCalcErr('Cash price is not set for this vehicle.');
@@ -98,12 +97,12 @@
         }
 
         /* HP amortisation formula */
-        var credit     = cashPrice - deposit;
-        var mRate      = (apr / 100) / 12;
-        var monthly    = credit * mRate / (1 - Math.pow(1 + mRate, -months));
+        var credit = cashPrice - deposit;
+        var mRate = (apr / 100) / 12;
+        var monthly = credit * mRate / (1 - Math.pow(1 + mRate, -months));
         var totalRepay = (monthly * months) + fee;
-        var totalInt   = totalRepay - credit - fee;
-        var flatRate   = totalInt / credit / (months / 12) * 100;
+        var totalInt = totalRepay - credit - fee;
+        var flatRate = totalInt / credit / (months / 12) * 100;
 
         $('#lgl-fc-cash-price').text(fmt(cashPrice));
         $('#lgl-fc-deposit-out').text(fmt(deposit));
@@ -158,57 +157,6 @@
     }
 
     /* ────────────────────────────────────────────────────────────
-       AUTO RESERVE
-    ──────────────────────────────────────────────────────────── */
-
-    function initAutoReserve() {
-        $(document).on('click', '[data-lgl-action="auto_reserve"]', function (e) {
-            e.preventDefault();
-            var $btn = $(this);
-            /* Show confirmation dialog */
-            $('#lgl-modal-overlay').addClass('lgl-overlay-active');
-            $('#lgl-auto-reserve-confirm').show();
-
-            /* Confirm */
-            $('#lgl-auto-reserve-confirm .lgl-confirm-yes').off('click').on('click', function () {
-                var $yes = $(this);
-                $yes.prop('disabled', true).html('<span class="lgl-submit-spin" style="display:inline-block"></span>');
-
-                $.ajax({
-                    url:    F.ajaxUrl,
-                    method: 'POST',
-                    data: {
-                        action:         'lgl_auto_reserve',
-                        lgl_forms_nonce: F.nonce,
-                        product_id:     F.productId,
-                    },
-                    success: function (res) {
-                        closeAllModals();
-                        if (res.success) {
-                            $btn.text(res.data.reserved_btn || F.reservedBtnText)
-                                .addClass('lgl-btn-reserved')
-                                .prop('disabled', true)
-                                .removeAttr('data-lgl-action');
-                            lglToast(res.data.message, 'success');
-                        } else {
-                            lglToast(res.data.message || 'Could not reserve. Please try again.', 'error');
-                        }
-                    },
-                    error: function () {
-                        closeAllModals();
-                        lglToast('Network error. Please try again.', 'error');
-                    }
-                });
-            });
-
-            /* Cancel */
-            $('#lgl-auto-reserve-confirm .lgl-confirm-no').off('click').on('click', function () {
-                closeAllModals();
-            });
-        });
-    }
-
-    /* ────────────────────────────────────────────────────────────
        APPLY INITIAL RESERVE STATE (already reserved on page load)
     ──────────────────────────────────────────────────────────── */
 
@@ -227,8 +175,8 @@
     ──────────────────────────────────────────────────────────── */
 
     function submitForm($form, type) {
-        var $btn  = $form.find('.lgl-form-submit-btn');
-        var $txt  = $btn.find('.lgl-submit-txt');
+        var $btn = $form.find('.lgl-form-submit-btn');
+        var $txt = $btn.find('.lgl-submit-txt');
         var $spin = $btn.find('.lgl-submit-spin');
 
         $btn.prop('disabled', true);
@@ -240,9 +188,9 @@
         data += '&lgl_forms_nonce=' + encodeURIComponent(F.nonce);
 
         $.ajax({
-            url:    F.ajaxUrl,
+            url: F.ajaxUrl,
             method: 'POST',
-            data:   data,
+            data: data,
             success: function (res) {
                 $btn.prop('disabled', false);
                 $txt.show();
@@ -316,10 +264,10 @@
 
     function initTimePickers() {
         $(document).on('input change', '.lgl-time-hh, .lgl-time-mm, .lgl-time-ampm', function () {
-            var $p    = $(this).closest('.lgl-time-picker');
-            var hh    = $p.find('.lgl-time-hh').val()   || '';
-            var mm    = $p.find('.lgl-time-mm').val()   || '';
-            var ampm  = $p.find('.lgl-time-ampm').val() || 'AM';
+            var $p = $(this).closest('.lgl-time-picker');
+            var hh = $p.find('.lgl-time-hh').val() || '';
+            var mm = $p.find('.lgl-time-mm').val() || '';
+            var ampm = $p.find('.lgl-time-ampm').val() || 'AM';
             if (hh && mm !== '') {
                 $p.find('.lgl-time-val').val(hh + ':' + String(mm).padStart(2, '0') + ' ' + ampm);
             }

@@ -113,9 +113,9 @@ $durations = array_values( array_filter( array_map( 'trim', explode( "\n", $dur_
 </div>
 
 <!-- ════════════════════════════════════════════════════════════
-     RESERVE MODAL (only if form_only mode)
+     RESERVE MODAL (only if form_only and auto_reserve mode)
 ════════════════════════════════════════════════════════════ -->
-<?php if ( $mode === 'form_only' ) : ?>
+* <?php if ( in_array( $mode, [ 'form_only', 'auto_reserve' ], true ) ) : ?>
 <div class="lgl-modal" id="lgl-modal-reserve" role="dialog" aria-modal="true" aria-labelledby="lgl-res-title">
 	<div class="lgl-modal-inner">
 		<div class="lgl-modal-header">

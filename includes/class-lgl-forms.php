@@ -38,8 +38,6 @@ class LGL_Forms {
 		add_action( 'wp_ajax_nopriv_lgl_submit_enquiry',  [ $this, 'ajax_submit_enquiry' ] );
 		add_action( 'wp_ajax_lgl_submit_reserve',         [ $this, 'ajax_submit_reserve' ] );
 		add_action( 'wp_ajax_nopriv_lgl_submit_reserve',  [ $this, 'ajax_submit_reserve' ] );
-		add_action( 'wp_ajax_lgl_auto_reserve',           [ $this, 'ajax_auto_reserve' ] );
-		add_action( 'wp_ajax_nopriv_lgl_auto_reserve',    [ $this, 'ajax_auto_reserve' ] );
 
 		// ── Frontend: inject modals into footer ──────────────────────
 		add_action( 'wp_footer', [ $this, 'render_modals' ] );
@@ -734,16 +732,25 @@ class LGL_Forms {
 		$post_id = wp_insert_post( [ 'post_type' => 'lgl_reserve_sub', 'post_title' => sprintf( 'Reservation: %s — %s', $name ?: 'Unknown', current_time( 'Y-m-d H:i' ) ), 'post_status' => 'publish' ] );
 		if ( is_wp_error( $post_id ) ) wp_send_json_error( [ 'message' => __( 'Could not save reservation.', 'lgl-shortcodes' ) ] );
 
-		update_post_meta( $post_id, '_lgl_form_data',       $data );
-		update_post_meta( $post_id, '_lgl_product_id',      $product_id );
-		update_post_meta( $post_id, '_lgl_submitted_at',    current_time( 'mysql' ) );
-		update_post_meta( $post_id, '_lgl_reserve_mode_sub', 'form_only' );
-		update_post_meta( $post_id, '_lgl_reserve_status',  'pending' );
+		// Determine actual reserve mode for this product
+        $actual_mode = LGL_Forms::get_current_reserve_mode( $product_id );
 
-		if ( $product_id ) {
-			update_post_meta( $product_id, '_lgl_is_reserved', '1' );
-			update_post_meta( $product_id, '_lgl_reserved_at', current_time( 'mysql' ) );
-		}
+        update_post_meta( $post_id, '_lgl_form_data',        $data );
+        update_post_meta( $post_id, '_lgl_product_id',       $product_id );
+        update_post_meta( $post_id, '_lgl_submitted_at',     current_time( 'mysql' ) );
+        update_post_meta( $post_id, '_lgl_reserve_mode_sub', $actual_mode );
+
+        if ( $actual_mode === 'auto_reserve' ) {
+            // Auto Reserve: mark vehicle as reserved immediately on form submit
+            update_post_meta( $post_id, '_lgl_reserve_status', 'auto' );
+            if ( $product_id ) {
+                update_post_meta( $product_id, '_lgl_is_reserved', '1' );
+                update_post_meta( $product_id, '_lgl_reserved_at', current_time( 'mysql' ) );
+            }
+        } else {
+            // Form Only: save submission but leave vehicle unreserved for staff to confirm
+            update_post_meta( $post_id, '_lgl_reserve_status', 'pending' );
+        }
 		$this->notify_admin( 'reserve', $data, $product_id );
 
 		$rs = get_option( 'lgl_reserve_form', [] );
@@ -753,34 +760,7 @@ class LGL_Forms {
 		] );
 	}
 
-	public function ajax_auto_reserve() {
-		if ( ! wp_verify_nonce( $_POST['lgl_forms_nonce'] ?? '', 'lgl_forms_nonce' ) ) {
-			wp_send_json_error( [ 'message' => __( 'Security check failed.', 'lgl-shortcodes' ) ] );
-		}
-		$product_id = absint( $_POST['product_id'] ?? 0 );
-		if ( ! $product_id ) wp_send_json_error( [ 'message' => __( 'Invalid product.', 'lgl-shortcodes' ) ] );
-		if ( get_post_meta( $product_id, '_lgl_is_reserved', true ) ) {
-			wp_send_json_error( [ 'message' => __( 'This vehicle has already been reserved.', 'lgl-shortcodes' ) ] );
-		}
 
-		$post_id = wp_insert_post( [ 'post_type' => 'lgl_reserve_sub', 'post_title' => 'Auto-Reservation — ' . current_time( 'Y-m-d H:i' ), 'post_status' => 'publish' ] );
-		if ( is_wp_error( $post_id ) ) wp_send_json_error( [ 'message' => __( 'Could not save reservation.', 'lgl-shortcodes' ) ] );
-
-		update_post_meta( $post_id, '_lgl_form_data',       [] );
-		update_post_meta( $post_id, '_lgl_product_id',      $product_id );
-		update_post_meta( $post_id, '_lgl_submitted_at',    current_time( 'mysql' ) );
-		update_post_meta( $post_id, '_lgl_reserve_mode_sub', 'auto_reserve' );
-		update_post_meta( $post_id, '_lgl_reserve_status',  'auto' );
-		update_post_meta( $product_id, '_lgl_is_reserved',  '1' );
-		update_post_meta( $product_id, '_lgl_reserved_at',  current_time( 'mysql' ) );
-
-		$rs = get_option( 'lgl_reserve_form', [] );
-		$this->notify_admin( 'reserve', [], $product_id );
-		wp_send_json_success( [
-			'message'      => $rs['success_message'] ?? __( 'Vehicle reserved successfully!', 'lgl-shortcodes' ),
-			'reserved_btn' => $rs['reserved_button_text'] ?? __( 'Reserved', 'lgl-shortcodes' ),
-		] );
-	}
 
 	private function collect_and_validate( $fields ) {
 		$data   = [];
