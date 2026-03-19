@@ -29,6 +29,7 @@ $enquiry_settings  = LGL_Forms::get_enquiry_settings();
 $reserve_settings  = LGL_Forms::get_reserve_settings();
 $reserve_mode      = LGL_Forms::get_current_reserve_mode($post_id);
 $is_reserved       = LGL_Forms::is_reserved($post_id);
+$fin_mode  = $fin['mode'] ?? 'native';
 
 $finance_btn_text  = esc_html($finance_settings['button_text']  ?? __('FINANCE CALCULATOR', 'lgl'));
 $enquiry_btn_text  = esc_html($enquiry_settings['button_text']  ?? __('ENQUIRE NOW', 'lgl'));
@@ -173,16 +174,17 @@ $sub_title = get_post_meta($post_id, 'sub_title', true);
 
                             <!-- ── Button Group (now triggers modals) ── -->
                             <div class="lgl-btn-group">
-
-                                <!-- Finance Calculator -->
-                                <button
-                                    type="button"
-                                    class="lgl-btn lgl-btn-secondary"
-                                    id="lgl-finance-button"
-                                    data-lgl-modal="finance"
-                                    data-price="<?php echo esc_attr($price); ?>">
-                                    <?php echo $finance_btn_text; ?>
-                                </button>
+                                <?php if ('off' !== $fin_mode) : ?>
+                                    <!-- Finance Calculator -->
+                                    <button
+                                        type="button"
+                                        class="lgl-btn lgl-btn-secondary"
+                                        id="lgl-finance-button"
+                                        data-lgl-modal="finance"
+                                        data-price="<?php echo esc_attr($price); ?>">
+                                        <?php echo $finance_btn_text; ?>
+                                    </button>
+                                <?php endif; ?>
 
                                 <!-- Enquire Now -->
                                 <button
