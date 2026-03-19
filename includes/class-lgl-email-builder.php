@@ -571,6 +571,7 @@ function renderGlobalPreview() {
             });
     }
 
+
     var headerHtml = resolveTags($("#lgl-global-header-ta").val() || "");
     var footerHtml = resolveTags($("#lgl-global-footer-ta").val() || "");
 
