@@ -51,7 +51,7 @@
         if (!$m.length) return;
         $('#lgl-modal-overlay').addClass('lgl-overlay-active');
         $m.addClass('lgl-modal-active');
-        
+
         // Auto-run calculator on open if native mode is active
         if (id === 'lgl-modal-finance' && F.financeMode !== 'off' && F.financeMode !== 'custom') {
             calcFinance();
@@ -75,10 +75,10 @@
     function initFinanceCalculator() {
         // Run explicitly on button click (fallback)
         $(document).on('click', '#lgl-fc-calc-btn', calcFinance);
-        
+
         // Auto-recalculate on input changes as per spec
         $(document).on('input change', '#lgl-fc-deposit, #lgl-fc-duration', calcFinance);
-        
+
         // Fallback for enter key
         $(document).on('keypress', '#lgl-modal-finance input, #lgl-modal-finance select', function (e) {
             if (e.which === 13) {
@@ -94,7 +94,7 @@
         var cashPrice = parseFloat(F.cashPrice) || 0;
         var deposit = parseFloat($('#lgl-fc-deposit').val()) || 0;
         var termMonths = parseInt($('#lgl-fc-duration').val()) || parseInt(F.defaultTerm) || 60;
-        
+
         var minDeposit = parseFloat(F.minDeposit) || 0;
         var aprRate = parseFloat(F.aprRate) || 10.90;
         var purchaseFee = parseFloat(F.purchaseFee) || 0;
@@ -150,12 +150,12 @@
         $('#lgl-fc-dur-out').text(termMonths + ' months');
         $('#lgl-fc-monthly').text(fmt(monthlyPayment));
         $('#lgl-fc-total').text(fmt(totalRepayable));
-        
+
         // Output compound fee string if admin fee is present, otherwise just purchase fee
         var feeString = fmt(purchaseFee);
         if (adminFee > 0) feeString += ' (+ ' + fmt(adminFee) + ' Admin)';
         $('#lgl-fc-fee').text(feeString);
-        
+
         $('#lgl-fc-rate').text(interestRateDisplay);
         $('#lgl-fc-apr').text(F.representativeApr); // Standardized string output
         $('#lgl-fc-payment').text(fmt(monthlyPayment));
@@ -167,7 +167,7 @@
 
     function showCalcErr(msg) {
         // Output zero defaults visually when there is an error to prevent hanging math visuals
-        $('.lgl-fc-out-val').not('#lgl-fc-cash-price').text('—'); 
+        $('.lgl-fc-out-val').not('#lgl-fc-cash-price').text('—');
         $('#lgl-fc-calc-btn').before('<div class="lgl-fc-calc-error" style="color:#d63638;font-size:13px;margin-bottom:12px;">' + msg + '</div>');
     }
 
@@ -268,28 +268,46 @@
        FORM VALIDATION
     ──────────────────────────────────────────────────────────── */
 
+    /**
+      * Executes required-field boundary checking, mapping regex parameters, 
+      * and specific boolean evaluations for boolean checkbox types.
+      * * @param {jQuery} $form Target form DOM object reference.
+      * @returns {boolean} Validation status hook logic value.
+      */
     function validateForm($form) {
         var ok = true;
         $form.find('[required]').each(function () {
             $(this).removeClass('lgl-input-err');
-            if ($(this).val().trim() === '') {
+            $(this).closest('label').removeClass('lgl-checkbox-err');
+
+            if ($(this).is(':checkbox')) {
+                // Strict state boolean checking for acceptance constraints
+                if (!$(this).is(':checked')) {
+                    $(this).addClass('lgl-input-err');
+                    $(this).closest('label').addClass('lgl-checkbox-err');
+                    ok = false;
+                }
+            } else if ($(this).val().trim() === '') {
                 $(this).addClass('lgl-input-err');
                 ok = false;
             }
         });
+
+        // Secondary execution phase: Regex email format constraints
         $form.find('input[type=email]').each(function () {
             if ($(this).val() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test($(this).val())) {
                 $(this).addClass('lgl-input-err');
                 ok = false;
             }
         });
+
         if (!ok) {
             showFormMsg($form, 'Please fill in all required fields correctly.', 'error');
             $form.find('.lgl-input-err:first').trigger('focus');
         }
+
         return ok;
     }
-
     function showFormMsg($form, msg, type) {
         var $m = $form.find('.lgl-form-msg');
         $m.text(msg)
