@@ -806,7 +806,7 @@ class LGL_Forms {
 		$dur_raw   = $fin['durations'] ?? "1 Year\n2 Years\n3 Years\n4 Years\n5 Years";
 		$durations = array_values( array_filter( array_map( 'trim', explode( "\n", $dur_raw ) ) ) );
 
-		wp_localize_script( 'lgl-main-js', 'lglForms', [
+		wp_localize_script( 'lgl-forms-js', 'lglForms', [
 			'ajaxUrl'         => admin_url( 'admin-ajax.php' ),
 			'nonce'           => wp_create_nonce( 'lgl_forms_nonce' ),
 			'productId'       => $post_id,
