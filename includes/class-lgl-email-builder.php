@@ -228,7 +228,8 @@ class LGL_Email_Builder
             border: none;
             padding: 0;
         }
-        #lgl-eb-preview-frame {
+        #lgl-eb-preview-frame,
+        #lgl-global-preview-frame {
             width: 100%;
             height: calc(100vh - 120px);
             min-height: 600px;
@@ -483,13 +484,175 @@ class LGL_Email_Builder
             });
         });
 
-        $(document).ready(function() {
-            $("[name=\'recipient_type\']:checked").trigger("change");
-            if ($("#lgl-eb-auto-reply-toggle").is(":checked")) {
-                $("#lgl-eb-autoreply-section").addClass("is-open");
-            }
-            renderPreview();
-        });
+       /**
+ * Global template tag insert (targets specific textarea by data-target).
+ * * @author Digitally Disruptive - Donald Raymundo <https://digitallydisruptive.co.uk/>
+ */
+$(document).on("click", ".lgl-global-tag", function(e) {
+    e.preventDefault();
+    var targetId = $(this).data("target");
+    var tag      = $(this).data("tag");
+    if (!targetId) return;
+    var el = document.getElementById(targetId);
+    if (!el) return;
+    var start = el.selectionStart, end = el.selectionEnd;
+    el.value = el.value.substring(0, start) + tag + el.value.substring(end);
+    el.selectionStart = el.selectionEnd = start + tag.length;
+    el.focus();
+    renderGlobalPreview();
+});
+
+/**
+ * Tag ref clicks on the global tab.
+ * Inserts the clicked tag into the last focused global textarea.
+ */
+$(document).on("click", ".lgl-eb-tag-ref code", function(e) {
+    e.preventDefault();
+    var tag = $(this).data("tag") || $(this).text().trim();
+    // On the global tab there are no inner tabs; insert into the last focused textarea
+    if ($lastFocus && $lastFocus.hasClass("lgl-global-textarea")) {
+        var el = $lastFocus[0];
+        var start = el.selectionStart, end = el.selectionEnd;
+        el.value = el.value.substring(0, start) + tag + el.value.substring(end);
+        el.selectionStart = el.selectionEnd = start + tag.length;
+        el.focus();
+        renderGlobalPreview();
+    }
+});
+
+/**
+ * Renders the global email template preview by injecting a compiled HTML string into the target iframe.
+ */
+function renderGlobalPreview() {
+    var $frame = $("#lgl-global-preview-frame");
+    if (!$frame.length) return;
+
+    var siteName   = $("#lgl-g-site-name").val()       || get_option_blogname || "Website";
+    var colorBg    = $("#lgl-gc-bg").val()             || "#f5f5f5";
+    var colorBodBg = $("#lgl-gc-body-bg").val()        || "#ffffff";
+    var colorText  = $("#lgl-gc-text").val()           || "#1d2327";
+    var colorHBg   = $("#lgl-gc-header-bg").val()      || "#001537";
+    var colorHTxt  = $("#lgl-gc-header-txt").val()     || "#ffffff";
+    var colorLink  = $("#lgl-gc-link").val()           || "#003793";
+    var currentYear = new Date().getFullYear();
+
+    /**
+     * Reads live textarea values and resolves merge tags into visible HTML strings.
+     * * @param {string} html - The raw HTML containing the shortcodes/tags.
+     * @returns {string} The processed HTML with tags replaced by placeholders.
+     */
+    function resolveTags(html) {
+        return html
+            .replace(/\{\{site_name\}\}/g, siteName)
+            .replace(/\{\{year\}\}/g, currentYear)
+            // contact tags — resolved to their visible placeholder text
+            .replace(/\{\{(\w+)\}\}/g, function(m, key) {
+                var map = {
+                    contact_phone:    "01234 567890",
+                    contact_whatsapp: "01234 567890",
+                    contact_email:    "sales@example.com",
+                    contact_address:  "123 Example Street, Town, County, AB1 2CD"
+                };
+                return map[key] ? "<em style=\"color:#888\">[" + map[key] + "]</em>" : m;
+            });
+    }
+
+    var headerHtml = resolveTags($("#lgl-global-header-ta").val() || "");
+    var footerHtml = resolveTags($("#lgl-global-footer-ta").val() || "");
+
+    // Sample body so the user can see the full wrapper in context
+    var sampleBody = "<h2>Sample Email Content</h2>"
+        + "<p>This is how your email body will appear inside the global template. "
+        + "Headers and footers defined here wrap every transactional email sent by the plugin.</p>"
+        + "<p><a class=\"eb-button\" href=\"#\">Example Button</a></p>"
+        + "<table><tr><th>Field</th><th>Value</th></tr>"
+        + "<tr><td>Vehicle</td><td>Bailey Autograph 75-4i</td></tr>"
+        + "<tr><td>Price</td><td>£29,995</td></tr></table>";
+
+    var fullHtml = "<!DOCTYPE html><html lang=\"en\"><head>"
+        + "<meta charset=\"UTF-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\">"
+        + "<style>"
+        + "body{margin:0;padding:0;background:" + colorBg + ";font-family:-apple-system,BlinkMacSystemFont,\"Segoe UI\",Roboto,sans-serif;color:" + colorText + "}"
+        + ".eb-wrapper{max-width:640px;margin:30px auto;background:" + colorBodBg + ";border-radius:6px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.08)}"
+        + ".eb-header{background:" + colorHBg + ";padding:24px 32px}"
+        + ".eb-header h1,.eb-header h2,.eb-header h3{margin:0;font-size:20px;color:" + colorHTxt + "}"
+        + ".eb-body{padding:32px;line-height:1.65}"
+        + ".eb-body h2{font-size:18px;color:" + colorHBg + ";margin:0 0 16px}"
+        + ".eb-body p{margin:0 0 14px;font-size:14px}"
+        + ".eb-body a{color:" + colorLink + "}"
+        + ".eb-button{display:inline-block;padding:12px 24px;background:" + colorLink + ";color:#fff;border-radius:5px;text-decoration:none;font-weight:600}"
+        + ".eb-body table{width:100%;border-collapse:collapse;margin-bottom:16px}"
+        + ".eb-body table td,.eb-body table th{padding:10px 12px;border:1px solid #e0e0e0;font-size:13px;text-align:left}"
+        + ".eb-body table th{background:" + colorBg + ";font-weight:600}"
+        + ".eb-footer{background:" + colorBg + ";padding:16px 32px;font-size:11px;color:#8c8f94;text-align:center}"
+        + "</style></head><body>"
+        + "<div class=\"eb-wrapper\">"
+        + headerHtml
+        + "<div class=\"eb-body\">" + sampleBody + "</div>"
+        + footerHtml
+        + "</div></body></html>";
+
+    var doc = $frame[0].contentDocument || $frame[0].contentWindow.document;
+    doc.open(); doc.write(fullHtml); doc.close();
+}
+
+/**
+ * Auto-refresh global preview on textarea input.
+ */
+var globalPreviewTimeout;
+$(document).on("input", ".lgl-global-textarea", function() {
+    clearTimeout(globalPreviewTimeout);
+    globalPreviewTimeout = setTimeout(renderGlobalPreview, 300);
+});
+
+/**
+ * Auto-refresh global preview on color changes.
+ */
+$(document).on("input change", ".lgl-global-color", function() {
+    // Sync the hidden mirror inputs so renderGlobalPreview reads the live value
+    var idMap = {
+        "lgl-gc-bg":         "lgl-g-color-bg",
+        "lgl-gc-body-bg":    "lgl-g-color-body-bg",
+        "lgl-gc-text":       "lgl-g-color-text",
+        "lgl-gc-header-bg":  "lgl-g-color-header-bg",
+        "lgl-gc-header-txt": "lgl-g-color-header-txt",
+        "lgl-gc-link":       "lgl-g-color-link"
+    };
+    var mirrorId = idMap[$(this).attr("id")];
+    if (mirrorId) $("#" + mirrorId).val($(this).val());
+    clearTimeout(globalPreviewTimeout);
+    globalPreviewTimeout = setTimeout(renderGlobalPreview, 100);
+});
+
+/**
+ * Handle manual preview refresh trigger.
+ */
+$(document).on("click", "#lgl-global-preview-btn", function(e) {
+    e.preventDefault();
+    renderGlobalPreview();
+});
+
+/**
+ * Initialize components and bootstrap global preview on DOM ready.
+ */
+$(document).ready(function() {
+    $("[name=\'recipient_type\']:checked").trigger("change");
+    if ($("#lgl-eb-auto-reply-toggle").is(":checked")) {
+        $("#lgl-eb-autoreply-section").addClass("is-open");
+    }
+    
+    // Fallback invocation assuming renderPreview exists elsewhere in scope
+    if (typeof renderPreview === "function") {
+        renderPreview();
+    }
+    
+    // Bootstrap global preview if on the global tab
+    if ($("#lgl-global-preview-frame").length) {
+        renderGlobalPreview();
+    }
+});
+       
+
 
     })(jQuery);
     ';
@@ -545,66 +708,118 @@ class LGL_Email_Builder
         echo '</div>'; // End wrap
     }
 
-    /**
-     * Sub-renderer: Global email structure and color theming.
-     *
-     * @return void
-     */
     private function render_global_email_page()
     {
-        $global_settings = self::get_global_email_settings();
+        $global_settings  = self::get_global_email_settings();
+        $contact_defs     = self::get_contact_tag_definitions();
+
+        // Build the tag map available on the global template
+        $global_tags = ['{{site_name}}' => 'Website name', '{{year}}' => 'Current year'];
+        foreach ($contact_defs as $key => $label) {
+            $global_tags['{{' . $key . '}}'] = $label;
+        }
 ?>
         <div class="lgl-eb-wrap">
-            <p class="description"><?php _e('Define the wrapper HTML and core branding colors that encapsulate all transactional emails.', 'lgl-shortcodes'); ?></p>
-            <div class="lgl-eb-master-layout" style="grid-template-columns: 1fr; max-width: 800px;">
-                <form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>">
-                    <?php wp_nonce_field("lgl_save_global_email", 'lgl_eb_form_nonce'); ?>
-                    <input type="hidden" name="action" value="lgl_save_global_email">
+            <div class="lgl-eb-master-layout">
 
-                    <div class="lgl-eb-section">
-                        <h3><?php _e('Theme Colors', 'lgl-shortcodes'); ?></h3>
-                        <div class="lgl-eb-color-grid">
-                            <div class="lgl-eb-color-row">
-                                <label><?php _e('Outer Background', 'lgl-shortcodes'); ?></label>
-                                <input type="color" name="color_bg" value="<?php echo esc_attr($global_settings['color_bg']); ?>">
-                            </div>
-                            <div class="lgl-eb-color-row">
-                                <label><?php _e('Inner Background', 'lgl-shortcodes'); ?></label>
-                                <input type="color" name="color_body_bg" value="<?php echo esc_attr($global_settings['color_body_bg']); ?>">
-                            </div>
-                            <div class="lgl-eb-color-row">
-                                <label><?php _e('Text Color', 'lgl-shortcodes'); ?></label>
-                                <input type="color" name="color_text" value="<?php echo esc_attr($global_settings['color_text']); ?>">
-                            </div>
-                            <div class="lgl-eb-color-row">
-                                <label><?php _e('Header Background', 'lgl-shortcodes'); ?></label>
-                                <input type="color" name="color_header_bg" value="<?php echo esc_attr($global_settings['color_header_bg']); ?>">
-                            </div>
-                            <div class="lgl-eb-color-row">
-                                <label><?php _e('Header Text', 'lgl-shortcodes'); ?></label>
-                                <input type="color" name="color_header_text" value="<?php echo esc_attr($global_settings['color_header_text']); ?>">
-                            </div>
-                            <div class="lgl-eb-color-row">
-                                <label><?php _e('Link & Accent', 'lgl-shortcodes'); ?></label>
-                                <input type="color" name="color_link" value="<?php echo esc_attr($global_settings['color_link']); ?>">
+                <!-- ── LEFT: Builder column ── -->
+                <div class="lgl-eb-builder-column">
+                    <form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>" id="lgl-global-form">
+                        <?php wp_nonce_field('lgl_save_global_email', 'lgl_eb_form_nonce'); ?>
+                        <input type="hidden" name="action" value="lgl_save_global_email">
+
+                        <!-- Hidden inputs so the shared JS preview can read live color values -->
+                        <input type="hidden" id="lgl-g-site-name" value="<?php echo esc_attr(get_option('blogname')); ?>">
+                        <input type="hidden" id="lgl-g-color-bg" value="<?php echo esc_attr($global_settings['color_bg']); ?>">
+                        <input type="hidden" id="lgl-g-color-body-bg" value="<?php echo esc_attr($global_settings['color_body_bg']); ?>">
+                        <input type="hidden" id="lgl-g-color-text" value="<?php echo esc_attr($global_settings['color_text']); ?>">
+                        <input type="hidden" id="lgl-g-color-header-bg" value="<?php echo esc_attr($global_settings['color_header_bg']); ?>">
+                        <input type="hidden" id="lgl-g-color-header-txt" value="<?php echo esc_attr($global_settings['color_header_text']); ?>">
+                        <input type="hidden" id="lgl-g-color-link" value="<?php echo esc_attr($global_settings['color_link']); ?>">
+
+                        <!-- Colors -->
+                        <div class="lgl-eb-section">
+                            <h3><?php _e('Theme Colors', 'lgl-shortcodes'); ?></h3>
+                            <div class="lgl-eb-color-grid">
+                                <div class="lgl-eb-color-row">
+                                    <label><?php _e('Outer Background', 'lgl-shortcodes'); ?></label>
+                                    <input type="color" name="color_bg" id="lgl-gc-bg" value="<?php echo esc_attr($global_settings['color_bg']); ?>" class="lgl-global-color">
+                                </div>
+                                <div class="lgl-eb-color-row">
+                                    <label><?php _e('Inner Background', 'lgl-shortcodes'); ?></label>
+                                    <input type="color" name="color_body_bg" id="lgl-gc-body-bg" value="<?php echo esc_attr($global_settings['color_body_bg']); ?>" class="lgl-global-color">
+                                </div>
+                                <div class="lgl-eb-color-row">
+                                    <label><?php _e('Text Color', 'lgl-shortcodes'); ?></label>
+                                    <input type="color" name="color_text" id="lgl-gc-text" value="<?php echo esc_attr($global_settings['color_text']); ?>" class="lgl-global-color">
+                                </div>
+                                <div class="lgl-eb-color-row">
+                                    <label><?php _e('Header Background', 'lgl-shortcodes'); ?></label>
+                                    <input type="color" name="color_header_bg" id="lgl-gc-header-bg" value="<?php echo esc_attr($global_settings['color_header_bg']); ?>" class="lgl-global-color">
+                                </div>
+                                <div class="lgl-eb-color-row">
+                                    <label><?php _e('Header Text', 'lgl-shortcodes'); ?></label>
+                                    <input type="color" name="color_header_text" id="lgl-gc-header-txt" value="<?php echo esc_attr($global_settings['color_header_text']); ?>" class="lgl-global-color">
+                                </div>
+                                <div class="lgl-eb-color-row">
+                                    <label><?php _e('Link & Accent', 'lgl-shortcodes'); ?></label>
+                                    <input type="color" name="color_link" id="lgl-gc-link" value="<?php echo esc_attr($global_settings['color_link']); ?>" class="lgl-global-color">
+                                </div>
                             </div>
                         </div>
-                    </div>
 
-                    <div class="lgl-eb-section">
-                        <h3><?php _e('Global Header (HTML)', 'lgl-shortcodes'); ?></h3>
-                        <p class="description" style="margin-bottom:10px;"><?php _e('Available tags: <code>{{site_name}}</code>', 'lgl-shortcodes'); ?></p>
-                        <textarea name="header" class="lgl-eb-textarea lgl-eb-textarea-small"><?php echo esc_textarea($global_settings['header']); ?></textarea>
-                    </div>
+                        <!-- Global Header -->
+                        <div class="lgl-eb-section">
+                            <h3><?php _e('Global Header (HTML)', 'lgl-shortcodes'); ?></h3>
+                            <div class="lgl-eb-tag-toolbar" data-for="lgl-global-header-ta">
+                                <span class="lgl-tag-group-label"><?php _e('Available Tags', 'lgl-shortcodes'); ?></span>
+                                <?php foreach ($global_tags as $tag => $desc) : ?>
+                                    <button type="button" class="lgl-eb-insert-tag lgl-global-tag" data-tag="<?php echo esc_attr($tag); ?>" data-target="lgl-global-header-ta" title="<?php echo esc_attr($desc); ?>"><?php echo esc_html($tag); ?></button>
+                                <?php endforeach; ?>
+                            </div>
+                            <textarea name="header" id="lgl-global-header-ta" class="lgl-eb-textarea lgl-eb-textarea-small lgl-global-textarea"><?php echo esc_textarea($global_settings['header']); ?></textarea>
+                        </div>
 
-                    <div class="lgl-eb-section">
-                        <h3><?php _e('Global Footer (HTML)', 'lgl-shortcodes'); ?></h3>
-                        <p class="description" style="margin-bottom:10px;"><?php _e('Available tags: <code>{{site_name}}</code>, <code>{{year}}</code>', 'lgl-shortcodes'); ?></p>
-                        <textarea name="footer" class="lgl-eb-textarea lgl-eb-textarea-small"><?php echo esc_textarea($global_settings['footer']); ?></textarea>
-                    </div>
+                        <!-- Global Footer -->
+                        <div class="lgl-eb-section">
+                            <h3><?php _e('Global Footer (HTML)', 'lgl-shortcodes'); ?></h3>
+                            <div class="lgl-eb-tag-toolbar" data-for="lgl-global-footer-ta">
+                                <span class="lgl-tag-group-label"><?php _e('Available Tags', 'lgl-shortcodes'); ?></span>
+                                <?php foreach ($global_tags as $tag => $desc) : ?>
+                                    <button type="button" class="lgl-eb-insert-tag lgl-global-tag" data-tag="<?php echo esc_attr($tag); ?>" data-target="lgl-global-footer-ta" title="<?php echo esc_attr($desc); ?>"><?php echo esc_html($tag); ?></button>
+                                <?php endforeach; ?>
+                            </div>
+                            <textarea name="footer" id="lgl-global-footer-ta" class="lgl-eb-textarea lgl-eb-textarea-small lgl-global-textarea"><?php echo esc_textarea($global_settings['footer']); ?></textarea>
+                        </div>
 
-                    <?php submit_button(__('Save Global Template', 'lgl-shortcodes')); ?>
-                </form>
+                        <!-- Tag Reference Sidebar (inline on global tab) -->
+                        <div class="lgl-eb-section">
+                            <h3><?php _e('Available Merge Tags', 'lgl-shortcodes'); ?></h3>
+                            <ul class="lgl-eb-tag-ref">
+                                <?php foreach ($global_tags as $tag => $desc) : ?>
+                                    <li>
+                                        <code data-tag="<?php echo esc_attr($tag); ?>"><?php echo esc_html($tag); ?></code>
+                                        <span class="lgl-tag-desc"><?php echo esc_html($desc); ?></span>
+                                    </li>
+                                <?php endforeach; ?>
+                            </ul>
+                        </div>
+
+                        <?php submit_button(__('Save Global Template', 'lgl-shortcodes')); ?>
+                    </form>
+                </div>
+
+                <!-- ── RIGHT: Live Preview column ── -->
+                <div class="lgl-eb-preview-column">
+                    <div class="lgl-eb-section lgl-eb-preview-sticky">
+                        <div class="lgl-eb-preview-header">
+                            <h3><?php _e('Live Preview', 'lgl-shortcodes'); ?></h3>
+                            <button type="button" id="lgl-global-preview-btn" class="button button-secondary button-small"><?php _e('⟳ Refresh', 'lgl-shortcodes'); ?></button>
+                        </div>
+                        <iframe id="lgl-global-preview-frame" title="Global Template Preview"></iframe>
+                    </div>
+                </div>
+
             </div>
         </div>
     <?php
