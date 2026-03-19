@@ -66,6 +66,21 @@ class LGL_Email_Builder
         if ($hook !== 'lgl-settings_page_lgl-email-builder') return;
 
         wp_add_inline_style('wp-admin', $this->admin_css());
+
+        // Build contact tag preview values from the single source of truth.
+        // Uses saved lgl_settings values when available, falls back to the field label.
+        $contact_placeholders = [];
+        if (class_exists('LGL_Shortcodes')) {
+            $lgl_options = get_option('lgl_settings', []);
+            foreach (LGL_Shortcodes::get_contact_fields_definition() as $key => $field) {
+                $contact_placeholders[$key] = ! empty($lgl_options[$key])
+                    ? $lgl_options[$key]
+                    : '[' . $field['label'] . ']';
+            }
+        }
+
+        // Inject before the main script so resolveTags can reference it.
+        wp_add_inline_script('jquery', 'var lglContactTagPlaceholders = ' . wp_json_encode($contact_placeholders) . ';');
         wp_add_inline_script('jquery', $this->admin_js());
     }
 
@@ -545,15 +560,14 @@ function renderGlobalPreview() {
         return html
             .replace(/\{\{site_name\}\}/g, siteName)
             .replace(/\{\{year\}\}/g, currentYear)
-            // contact tags — resolved to their visible placeholder text
             .replace(/\{\{(\w+)\}\}/g, function(m, key) {
-                var map = {
-                    contact_phone:    "01234 567890",
-                    contact_whatsapp: "01234 567890",
-                    contact_email:    "sales@example.com",
-                    contact_address:  "123 Example Street, Town, County, AB1 2CD"
-                };
-                return map[key] ? "<em style=\"color:#888\">[" + map[key] + "]</em>" : m;
+                if (
+                    typeof lglContactTagPlaceholders !== "undefined" &&
+                    lglContactTagPlaceholders.hasOwnProperty(key)
+                ) {
+                    return "<em style=\"color:#888\">[" + lglContactTagPlaceholders[key] + "]</em>";
+                }
+                return m;
             });
     }
 
