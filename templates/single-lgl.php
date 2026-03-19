@@ -189,32 +189,16 @@ $sub_title = get_post_meta($post_id, 'sub_title', true);
                                     data-lgl-modal="enquiry">
                                     <?php echo $enquiry_btn_text; ?>
                                 </button>
-
-                                <!-- Reserve Now (depends on mode) -->
-                                <?php if ($reserve_mode === 'auto_reserve') : ?>
+                                <?php if (in_array($reserve_mode, ['auto_reserve', 'form_only'], true)) : ?>
                                     <button
                                         type="button"
-                                        class="lgl-btn lgl-btn-outline lgl-reserve-btn<?php echo $is_reserved ? ' lgl-btn-reserved' : ''; ?>"
                                         id="lgl-reserve-button"
-                                        data-lgl-action="auto_reserve"
-                                        data-product-id="<?php echo esc_attr($post_id); ?>"
-                                        <?php echo $is_reserved ? 'disabled' : ''; ?>>
+                                        class="lgl-btn lgl-btn-outline lgl-reserve-btn<?php echo $is_reserved ? ' lgl-btn-reserved lgl-is-reserved' : ''; ?>"
+                                        <?php if (! $is_reserved) : ?>data-lgl-modal="reserve" <?php endif; ?>
+                                        <?php echo $is_reserved ? 'disabled="disabled"' : ''; ?>>
                                         <?php echo $reserve_btn_text; ?>
                                     </button>
-
-                                <?php elseif ($reserve_mode === 'form_only') : ?>
-                                    <button
-                                        type="button"
-                                        class="lgl-btn lgl-btn-outline lgl-reserve-btn"
-                                        id="lgl-reserve-button"
-                                        data-lgl-modal="reserve">
-                                        RESERVE NOW
-                                    </button>
-
-                                <?php
-                                // 'no_reserve' → button is completely omitted
-                                endif;
-                                ?>
+                                <?php endif; ?>
 
                             </div>
 
