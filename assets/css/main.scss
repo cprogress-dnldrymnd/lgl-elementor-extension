@@ -1929,8 +1929,8 @@ $border-radius: 16px;
         flex-direction: column !important;
         border-radius: 0 !important;
         @media(max-width: 575px) {
-            width: 100%;
-            max-width: 100%;
+            width: 100% !important;
+            max-width: 100% !important;
         }
     }
 

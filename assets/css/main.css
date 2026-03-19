@@ -1498,8 +1498,8 @@
     border-radius: 0 !important; } }
   @media (max-width: 1024px) and (max-width: 575px) {
     .lgl-search-offcanvas {
-      width: 100%;
-      max-width: 100%; } }
+      width: 100% !important;
+      max-width: 100% !important; } }
 
 @media (max-width: 1024px) {
   .lgl-search-offcanvas.is-open {
