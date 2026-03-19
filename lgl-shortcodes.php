@@ -20,6 +20,7 @@ define('LGL_SHORTCODES_URL', plugin_dir_url(__FILE__));
 define('LGL_SHORTCODES_VERSION', '3.5.3'); // Update this version number with each release for cache busting.
 // ── Load the Forms integration ──
 require_once LGL_SHORTCODES_PATH . 'includes/class-lgl-forms.php';
+require_once LGL_SHORTCODES_PATH . 'includes/class-lgl-email-builder.php';
 
 if (! class_exists('LGL_Shortcodes')) {
 
@@ -75,6 +76,9 @@ if (! class_exists('LGL_Shortcodes')) {
             add_action('wp_ajax_lgl_get_compare_table', array($this, 'ajax_get_compare_table'));
             add_action('wp_ajax_nopriv_lgl_get_compare_table', array($this, 'ajax_get_compare_table'));
 
+            add_action('wp_ajax_lgl_send_test_email', [$this, 'ajax_send_test_email']);
+
+
             // Aggressive override: Force plugin template for specific CPTs, bypassing theme hierarchy
             add_filter('single_template', array($this, 'force_plugin_single_template'), 99999);
 
@@ -114,6 +118,7 @@ if (! class_exists('LGL_Shortcodes')) {
             add_action('save_post', array($this, 'save_featured_meta_box'));
 
             new LGL_Forms();
+            new LGL_Email_Builder();
         }
 
         /**
@@ -2457,6 +2462,35 @@ if (! class_exists('LGL_Shortcodes')) {
             wp_send_json_success(array(
                 'message' => __('Your account details have been updated successfully.', 'lgl-shortcodes'),
             ));
+        }
+
+        public function ajax_send_test_email()
+        {
+            check_ajax_referer(sanitize_key($_POST['nonce'] ?? ''), false);
+            if (! current_user_can('manage_options')) wp_send_json_error('Unauthorized');
+            $to      = sanitize_email($_POST['email']   ?? '');
+            $subject = sanitize_text_field($_POST['subject'] ?? 'LGL Test Email');
+            $body    = wp_kses_post($_POST['body'] ?? '<p>Test email body.</p>');
+            // Replace merge tags with placeholder values
+            $placeholders = [
+                'first_name' => 'John',
+                'last_name' => 'Doe',
+                'email' => $to,
+                'phone' => '07700 900000',
+                'product_title' => 'Bailey Autograph 75-4i',
+                'product_url'   => home_url(),
+                'product_price' => '£29,995',
+                'product_type'  => 'caravan',
+                'site_name'     => get_bloginfo('name'),
+                'site_url'      => home_url(),
+                'admin_email'   => get_option('admin_email'),
+                'date'          => wp_date(get_option('date_format')),
+                'time'          => wp_date(get_option('time_format')),
+            ];
+            $body = LGL_Email_Builder::process_tags($body, $placeholders);
+            $html = LGL_Email_Builder::wrap_html($subject, $body);
+            $sent = wp_mail($to, '[TEST] ' . $subject, $html, ['Content-Type: text/html; charset=UTF-8']);
+            $sent ? wp_send_json_success() : wp_send_json_error('wp_mail() returned false. Check your mail settings.');
         }
     }
 
