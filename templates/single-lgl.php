@@ -66,6 +66,9 @@ $sub_title = get_post_meta($post_id, 'sub_title', true);
                 <div class="lgl-post--main">
                     <?php if (!empty($gallery)) { ?>
                         <div class="lgl-post--gallery js-gallery-slider">
+                            <?php if ($is_reserved) { ?>
+                                <div class="reserved-tag"><?= $reserve_settings['reserved_button_text']  ?></div>
+                            <?php } ?>
                             <div class="lgl-gallery-slider lgl-slider-for js-gallery-slider-for">
                                 <?php if (has_post_thumbnail()) { ?>
                                     <div class="lgl-slider-item-wrap">
