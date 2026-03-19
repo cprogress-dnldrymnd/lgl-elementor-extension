@@ -161,7 +161,7 @@
     ──────────────────────────────────────────────────────────── */
 
     function applyInitialReserveState() {
-        if (!F.isReserved) return console.log('xxx');
+        if (!F.isReserved) return;
         $('.lgl-reserve-btn')
             .text(F.reservedBtnText)
             .addClass('lgl-btn-reserved')
