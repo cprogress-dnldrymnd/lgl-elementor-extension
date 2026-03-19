@@ -16,14 +16,10 @@ class LGL_Email_Builder
        BOOT
     ═══════════════════════════════════════════════════════════════ */
 
-    /**
-     * Initialize WordPress hooks for menu generation, assets, and form processing.
-     *
-     * @return void
-     */
     public function __construct()
     {
-        add_action('admin_menu',            [$this, 'add_submenu_pages']);
+        // Lower priority (10) to ensure it renders above Submissions
+        add_action('admin_menu',            [$this, 'add_submenu_pages'], 10);
         add_action('admin_enqueue_scripts', [$this, 'admin_assets']);
         add_action('admin_post_lgl_save_enquiry_email', [$this, 'save_email_settings']);
         add_action('admin_post_lgl_save_reserve_email', [$this, 'save_email_settings']);
@@ -31,39 +27,19 @@ class LGL_Email_Builder
     }
 
     /* ═══════════════════════════════════════════════════════════════
-       MENU
+       MENU ROUTING
     ═══════════════════════════════════════════════════════════════ */
 
-    /**
-     * Register submenu pages under the main 'lgl-settings' menu.
-     *
-     * @return void
-     */
     public function add_submenu_pages()
     {
+        // Consolidated single submenu page
         add_submenu_page(
             'lgl-settings',
-            __('Global Email Template', 'lgl-shortcodes'),
-            __('Global Template', 'lgl-shortcodes'),
+            __('Email Builder', 'lgl-shortcodes'),
+            __('Email Builder', 'lgl-shortcodes'),
             'manage_options',
-            'lgl-global-email',
-            [$this, 'render_global_email_page']
-        );
-        add_submenu_page(
-            'lgl-settings',
-            __('Enquiry Email Builder', 'lgl-shortcodes'),
-            __('Enquiry Emails', 'lgl-shortcodes'),
-            'manage_options',
-            'lgl-enquiry-email',
-            [$this, 'render_enquiry_email_page']
-        );
-        add_submenu_page(
-            'lgl-settings',
-            __('Reserve Email Builder', 'lgl-shortcodes'),
-            __('Reserve Emails', 'lgl-shortcodes'),
-            'manage_options',
-            'lgl-reserve-email',
-            [$this, 'render_reserve_email_page']
+            'lgl-email-builder',
+            [$this, 'render_master_email_builder_page']
         );
     }
 
@@ -71,37 +47,22 @@ class LGL_Email_Builder
        ASSETS
     ═══════════════════════════════════════════════════════════════ */
 
-    /**
-     * Enqueue inline CSS and JS strictly on the email builder screens.
-     *
-     * @param string $hook The current admin page hook.
-     * @return void
-     */
     public function admin_assets($hook)
     {
-        $pages = [
-            'lgl-settings_page_lgl-global-email',
-            'lgl-settings_page_lgl-enquiry-email',
-            'lgl-settings_page_lgl-reserve-email',
-        ];
-        if (! in_array($hook, $pages, true)) return;
+        // Only load on the consolidated email builder page
+        if ($hook !== 'lgl-settings_page_lgl-email-builder') return;
 
         wp_add_inline_style('wp-admin', $this->admin_css());
         wp_add_inline_script('jquery', $this->admin_js());
     }
-    /**
-     * Define the inline CSS required for the builder layout.
-     *
-     * @return string Minified CSS payload.
-     */
+
     private function admin_css(): string
     {
         return '
         /* ── Master Layout ── */
-        .lgl-eb-wrap { max-width: 1600px; }
+        .lgl-eb-wrap { max-width: 1600px; margin-top: 20px; }
         .lgl-eb-master-layout {
             display: grid;
-            /* Increased right column from 500px to 700px */
             grid-template-columns: minmax(0, 1fr) 700px; 
             gap: 30px;
             margin-top: 20px;
@@ -323,7 +284,6 @@ class LGL_Email_Builder
         .lgl-eb-test-msg.success { color: #00a32a; }
         .lgl-eb-test-msg.error { color: #d63638; }
 
-        /* Increased breakpoint to 1400px so it collapses before getting squeezed */
         @media (max-width: 1400px) { 
             .lgl-eb-master-layout { grid-template-columns: 1fr; }
             #lgl-eb-preview-frame { height: 600px; }
@@ -333,24 +293,18 @@ class LGL_Email_Builder
         ';
     }
 
-    /**
-     * Define inline JavaScript for frontend DOM interactions and live preview.
-     *
-     * @return string JavaScript payload.
-     */
     private function admin_js(): string
     {
         return '
     (function($){
 
-        // ── Tab switching ─────────────────────────────────────────────
+        // ── Inner UI Tab switching ────────────────────────────────────
         $(document).on("click", ".lgl-eb-tab", function(){
             var idx = $(this).index();
             $(this).addClass("active").siblings().removeClass("active");
             var $panels = $(this).closest(".lgl-eb-builder-column").find(".lgl-eb-tab-panels");
             $panels.find(".lgl-eb-tab-content").removeClass("active").eq(idx).addClass("active");
             
-            // Re-render preview for newly active tab
             setTimeout(function(){ $("#lgl-eb-preview-btn").trigger("click"); }, 50);
         });
 
@@ -367,7 +321,7 @@ class LGL_Email_Builder
             if (!$lastFocus || !$lastFocus.length) {
                 $lastFocus = $(".lgl-eb-tab-content.active .lgl-eb-textarea:first");
             }
-            if (!$lastFocus.length) return; // Fallback if no textarea exists
+            if (!$lastFocus.length) return;
             var el = $lastFocus[0];
             var start = el.selectionStart, end = el.selectionEnd;
             var val = el.value;
@@ -375,7 +329,6 @@ class LGL_Email_Builder
             el.selectionStart = el.selectionEnd = start + tag.length;
             el.focus();
             
-            // Trigger preview update
             $("#lgl-eb-preview-btn").trigger("click");
         });
 
@@ -402,7 +355,6 @@ class LGL_Email_Builder
             var html = $activeEditor.val();
             var currentYear = new Date().getFullYear();
             
-            // Read state mappings
             var siteName = $("#lgl-site-name").val() || "Website";
             var colorBg = $("#lgl-color-bg").val() || "#f5f5f5";
             var colorBodyBg = $("#lgl-color-body-bg").val() || "#ffffff";
@@ -411,7 +363,6 @@ class LGL_Email_Builder
             var colorHeaderText = $("#lgl-color-header-text").val() || "#ffffff";
             var colorLink = $("#lgl-color-link").val() || "#003793";
 
-            // Inject body merge tags
             html = html.replace(/\{\{([^}]+)\}\}/g, function(m, tag){
                 var map = {
                     first_name: "John", last_name: "Doe", email: "john@example.com",
@@ -426,7 +377,6 @@ class LGL_Email_Builder
             var $frame = $("#lgl-eb-preview-frame");
             if (!$frame.length) return;
 
-            // Retrieve global headers and footers injected via hidden fields, fallback to defaults
             var rawHeader = $("#lgl-global-header-template").val() || \'<div class="eb-header"><h1>{{site_name}}</h1></div>\';
             var rawFooter = $("#lgl-global-footer-template").val() || \'<div class="eb-footer">&copy; {{year}} {{site_name}}. This is an automated notification.</div>\';
             
@@ -475,7 +425,6 @@ class LGL_Email_Builder
             renderPreview();
         });
 
-        // Debounced Live Preview on Keyup
         var previewTimeout;
         $(document).on("input", ".lgl-eb-textarea", function(){
             clearTimeout(previewTimeout);
@@ -511,7 +460,6 @@ class LGL_Email_Builder
             });
         });
 
-        // ── Trigger initial states on page load ───────────────────────
         $(document).ready(function() {
             $("[name=\'recipient_type\']:checked").trigger("change");
             if ($("#lgl-eb-auto-reply-toggle").is(":checked")) {
@@ -525,28 +473,58 @@ class LGL_Email_Builder
     }
 
     /* ═══════════════════════════════════════════════════════════════
-       PAGE RENDERERS
+       PAGE RENDERERS & ROUTING
     ═══════════════════════════════════════════════════════════════ */
 
     /**
-     * Renders the UI for managing the global email template (Header, Footer, Colors).
-     *
-     * @return void
+     * Master render controller for the Email Builder Tabs.
      */
-    public function render_global_email_page()
+    public function render_master_email_builder_page()
     {
         if (! current_user_can('manage_options')) return;
 
+        $active_tab = isset($_GET['tab']) ? sanitize_key($_GET['tab']) : 'global';
+
+        echo '<div class="wrap">';
+        echo '<h1>' . __('Email Builder', 'lgl-shortcodes') . '</h1>';
+
         if (isset($_GET['saved'])) {
-            echo '<div class="notice notice-success is-dismissible"><p>' . __('Global template settings saved.', 'lgl-shortcodes') . '</p></div>';
+            echo '<div class="notice notice-success is-dismissible"><p>' . __('Settings saved.', 'lgl-shortcodes') . '</p></div>';
         }
 
+        // Native WordPress Nav Tabs
+        echo '<h2 class="nav-tab-wrapper">';
+        $tabs = [
+            'global'  => __('Global Template', 'lgl-shortcodes'),
+            'enquiry' => __('Enquiry Emails', 'lgl-shortcodes'),
+            'reserve' => __('Reserve Emails', 'lgl-shortcodes'),
+        ];
+
+        foreach ($tabs as $key => $name) {
+            $active = ($active_tab === $key) ? 'nav-tab-active' : '';
+            $url = admin_url('admin.php?page=lgl-email-builder&tab=' . $key);
+            echo '<a href="' . esc_url($url) . '" class="nav-tab ' . esc_attr($active) . '">' . esc_html($name) . '</a>';
+        }
+        echo '</h2>';
+
+        // Route to sub-renderers
+        if ($active_tab === 'global') {
+            $this->render_global_email_page();
+        } elseif ($active_tab === 'enquiry') {
+            $this->render_enquiry_email_page();
+        } elseif ($active_tab === 'reserve') {
+            $this->render_reserve_email_page();
+        }
+
+        echo '</div>'; // End wrap
+    }
+
+    private function render_global_email_page()
+    {
         $global_settings = self::get_global_email_settings();
 ?>
-        <div class="wrap lgl-eb-wrap">
-            <h1><?php _e('Global Email Template', 'lgl-shortcodes'); ?></h1>
+        <div class="lgl-eb-wrap">
             <p class="description"><?php _e('Define the wrapper HTML and core branding colors that encapsulate all transactional emails.', 'lgl-shortcodes'); ?></p>
-
             <div class="lgl-eb-master-layout" style="grid-template-columns: 1fr; max-width: 800px;">
                 <form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>">
                     <?php wp_nonce_field("lgl_save_global_email", 'lgl_eb_form_nonce'); ?>
@@ -598,49 +576,25 @@ class LGL_Email_Builder
                 </form>
             </div>
         </div>
-    <?php
+<?php
     }
 
-    /**
-     * Renders the Enquiry form email builder logic.
-     *
-     * @return void
-     */
-    public function render_enquiry_email_page()
+    private function render_enquiry_email_page()
     {
         $form_settings  = get_option('lgl_enquiry_form', []);
         $email_settings = get_option('lgl_enquiry_email', $this->default_email('enquiry'));
         $this->render_page('enquiry', $form_settings, $email_settings);
     }
 
-    /**
-     * Renders the Reserve form email builder logic.
-     *
-     * @return void
-     */
-    public function render_reserve_email_page()
+    private function render_reserve_email_page()
     {
         $form_settings  = get_option('lgl_reserve_form', []);
         $email_settings = get_option('lgl_reserve_email', $this->default_email('reserve'));
         $this->render_page('reserve', $form_settings, $email_settings);
     }
 
-    /**
-     * Core renderer utilizing layout structure for individual email templates.
-     *
-     * @param string $type The context identifier ('enquiry' or 'reserve').
-     * @param array $form_settings Associated form configuration.
-     * @param array $email_settings Existing configuration options to bind to UI.
-     * @return void
-     */
     private function render_page(string $type, array $form_settings, array $email_settings)
     {
-        if (! current_user_can('manage_options')) return;
-
-        if (isset($_GET['saved'])) {
-            echo '<div class="notice notice-success is-dismissible"><p>' . __('Email settings saved.', 'lgl-shortcodes') . '</p></div>';
-        }
-
         $action          = "lgl_save_{$type}_email";
         $all_tags        = $this->get_merge_tags($form_settings['fields'] ?? []);
         $subject         = $email_settings['subject']          ?? '';
@@ -651,17 +605,11 @@ class LGL_Email_Builder
         $ar_subject      = $email_settings['auto_reply_subject'] ?? '';
         $ar_body         = $email_settings['auto_reply_body']    ?? '';
         $global_settings = self::get_global_email_settings();
-        $title           = $type === 'enquiry'
-            ? __('Enquiry Email Builder', 'lgl-shortcodes')
-            : __('Reserve Email Builder', 'lgl-shortcodes');
-
-        $test_nonce = wp_create_nonce('lgl_email_builder');
-    ?>
-        <div class="wrap lgl-eb-wrap">
-            <h1><?php echo esc_html($title); ?></h1>
-
+        $test_nonce      = wp_create_nonce('lgl_email_builder');
+?>
+        <div class="lgl-eb-wrap">
             <div class="lgl-eb-master-layout">
-
+                
                 <div class="lgl-eb-builder-column">
                     <div class="lgl-eb-tabs">
                         <div class="lgl-eb-tab active"><?php _e('📬 Admin Notification', 'lgl-shortcodes'); ?></div>
@@ -673,11 +621,11 @@ class LGL_Email_Builder
                         <input type="hidden" name="action" value="<?php echo esc_attr($action); ?>">
                         <input type="hidden" name="form_type" value="<?php echo esc_attr($type); ?>">
                         <input type="hidden" id="lgl-eb-nonce-value" value="<?php echo esc_attr($test_nonce); ?>">
-
+                        
                         <input type="hidden" id="lgl-global-header-template" value="<?php echo esc_attr($global_settings['header']); ?>">
                         <input type="hidden" id="lgl-global-footer-template" value="<?php echo esc_attr($global_settings['footer']); ?>">
                         <input type="hidden" id="lgl-site-name" value="<?php echo esc_attr(get_option('blogname')); ?>">
-
+                        
                         <input type="hidden" id="lgl-color-bg" value="<?php echo esc_attr($global_settings['color_bg']); ?>">
                         <input type="hidden" id="lgl-color-body-bg" value="<?php echo esc_attr($global_settings['color_body_bg']); ?>">
                         <input type="hidden" id="lgl-color-text" value="<?php echo esc_attr($global_settings['color_text']); ?>">
@@ -805,8 +753,7 @@ class LGL_Email_Builder
                     </div>
                 </div>
 
-            </div>
-        </div>
+            </div></div>
 <?php
     }
 
@@ -814,13 +761,6 @@ class LGL_Email_Builder
        TAG TOOLBAR
     ═══════════════════════════════════════════════════════════════ */
 
-    /**
-     * Builds out the quick-insert toolbar grouping UI.
-     *
-     * @param array $all_tags Map of system merge tags.
-     * @param string $textarea_id Document target ID for inject mapping.
-     * @return void
-     */
     private function render_tag_toolbar(array $all_tags, string $textarea_id)
     {
         $groups = $this->grouped_tags($all_tags);
@@ -843,12 +783,6 @@ class LGL_Email_Builder
        TAG REFERENCE SIDEBAR
     ═══════════════════════════════════════════════════════════════ */
 
-    /**
-     * Helper list generator detailing description for tags.
-     *
-     * @param array $all_tags Available definitions.
-     * @return void
-     */
     private function render_tag_reference(array $all_tags)
     {
         $groups = $this->grouped_tags($all_tags);
@@ -876,11 +810,6 @@ class LGL_Email_Builder
        SAVE
     ═══════════════════════════════════════════════════════════════ */
 
-    /**
-     * Intercept POST save requests from the individual template builders.
-     *
-     * @return void
-     */
     public function save_email_settings()
     {
         $form_type = sanitize_key($_POST['form_type'] ?? '');
@@ -900,15 +829,11 @@ class LGL_Email_Builder
             'auto_reply_body'    => wp_kses_post($_POST['auto_reply_body']           ?? ''),
         ]);
 
-        wp_redirect(admin_url("admin.php?page=lgl-{$form_type}-email&saved=1"));
+        // Redirect back to the correct tab in the unified builder
+        wp_redirect(admin_url("admin.php?page=lgl-email-builder&tab={$form_type}&saved=1"));
         exit;
     }
 
-    /**
-     * Intercept POST save requests from the Global Template builder.
-     *
-     * @return void
-     */
     public function save_global_email_settings()
     {
         check_admin_referer("lgl_save_global_email", 'lgl_eb_form_nonce');
@@ -925,7 +850,7 @@ class LGL_Email_Builder
             'color_link'        => sanitize_hex_color($_POST['color_link'] ?? '#003793'),
         ]);
 
-        wp_redirect(admin_url('admin.php?page=lgl-global-email&saved=1'));
+        wp_redirect(admin_url('admin.php?page=lgl-email-builder&tab=global&saved=1'));
         exit;
     }
 
@@ -933,13 +858,6 @@ class LGL_Email_Builder
        STATIC: PROCESS & SEND EMAILS
     ═══════════════════════════════════════════════════════════════ */
 
-    /**
-     * Constructs the localized merge tag mappings.
-     *
-     * @param array $form_data Current context request data.
-     * @param int $product_id Bound relation ID for merge logic.
-     * @return array Hydrated data tags.
-     */
     public static function build_tag_values(array $form_data, int $product_id): array
     {
         $price = $product_id ? get_post_meta($product_id, 'price', true) : '';
@@ -957,13 +875,6 @@ class LGL_Email_Builder
         ]);
     }
 
-    /**
-     * Engine processor for converting merge maps into standard text templates.
-     *
-     * @param string $template Layout structure holding `{{var}}` notation.
-     * @param array $values Dictionary of hydrated keys.
-     * @return string Processed html blob.
-     */
     public static function process_tags(string $template, array $values): string
     {
         foreach ($values as $key => $value) {
@@ -974,20 +885,11 @@ class LGL_Email_Builder
         return $template;
     }
 
-    /**
-     * Fires the system routine generating payloads to dispatch to WordPress Mail components.
-     *
-     * @param string $form_type System trigger configuration scope.
-     * @param array $form_data Supplied data layer.
-     * @param int $product_id Active linked entity.
-     * @return void
-     */
     public static function send(string $form_type, array $form_data, int $product_id): void
     {
         $email_cfg  = get_option("lgl_{$form_type}_email", []);
         $tag_values = self::build_tag_values($form_data, $product_id);
 
-        // ── Admin notification ──────────────────────────────────────
         $subject = self::process_tags($email_cfg['subject'] ?? '', $tag_values);
         $body    = self::process_tags($email_cfg['body']    ?? '', $tag_values);
 
@@ -1014,7 +916,6 @@ class LGL_Email_Builder
             wp_mail($recipients, $subject, self::wrap_html($subject, $body), $headers);
         }
 
-        // ── Auto-reply ──────────────────────────────────────────────
         if (! empty($email_cfg['auto_reply_enabled'])) {
             $submitter_email = $form_data['email'] ?? '';
             if (is_email($submitter_email)) {
@@ -1037,12 +938,6 @@ class LGL_Email_Builder
        HELPERS
     ═══════════════════════════════════════════════════════════════ */
 
-    /**
-     * Determines correct email addresses.
-     *
-     * @param array $cfg Admin configuration target options.
-     * @return array Output parsed structure.
-     */
     private static function resolve_recipients(array $cfg): array
     {
         $admin  = get_option('admin_email');
@@ -1057,11 +952,6 @@ class LGL_Email_Builder
         }
     }
 
-    /**
-     * Retrieves the Global Template settings structure with required fallback defaults.
-     *
-     * @return array Data object map dictating header, footer, and branding color properties.
-     */
     private static function get_global_email_settings(): array
     {
         $defaults = [
@@ -1077,13 +967,6 @@ class LGL_Email_Builder
         return wp_parse_args(get_option('lgl_global_email_settings', []), $defaults);
     }
 
-    /**
-     * Centralized system method for appending the outer HTML structure elements dynamically retrieved from settings configurations.
-     *
-     * @param string $subject Used for injecting within raw DOCTYPE scope.
-     * @param string $body Central element layout framework.
-     * @return string Validated HTML system configuration layout.
-     */
     public static function wrap_html(string $subject, string $body): string
     {
         $site = esc_html(get_option('blogname'));
@@ -1094,12 +977,10 @@ class LGL_Email_Builder
         }
 
         $global_settings = self::get_global_email_settings();
-
-        // Replace base tags in global header and footer
+        
         $header = str_replace(['{{site_name}}', '{{year}}'], [$site, $year], $global_settings['header']);
         $footer = str_replace(['{{site_name}}', '{{year}}'], [$site, $year], $global_settings['footer']);
 
-        // Load colors
         $bg         = esc_attr($global_settings['color_bg']);
         $body_bg    = esc_attr($global_settings['color_body_bg']);
         $text       = esc_attr($global_settings['color_text']);
@@ -1143,16 +1024,6 @@ class LGL_Email_Builder
 HTML;
     }
 
-    /* ═══════════════════════════════════════════════════════════════
-       MERGE TAG DEFINITIONS
-    ═══════════════════════════════════════════════════════════════ */
-
-    /**
-     * Combines system default tags with requested form mapping overrides.
-     *
-     * @param array $form_fields Source elements array logic.
-     * @return array Final system mapped configuration.
-     */
     private function get_merge_tags(array $form_fields): array
     {
         $tags = $this->system_tags();
@@ -1164,11 +1035,6 @@ HTML;
         return $tags;
     }
 
-    /**
-     * Map basic definition references representing entity boundaries.
-     *
-     * @return array Mapped variables.
-     */
     private function system_tags(): array
     {
         return [
@@ -1188,24 +1054,12 @@ HTML;
         ];
     }
 
-    /**
-     * Filter structure exclusively returning attributes available for subjects mapping.
-     *
-     * @param array $all_tags Total available attributes map.
-     * @return array
-     */
     private function subject_tags(array $all_tags): array
     {
         $common = ['{{first_name}}', '{{last_name}}', '{{product_title}}', '{{product_price}}', '{{site_name}}', '{{date}}'];
         return array_filter($all_tags, fn($k) => in_array($k, $common, true), ARRAY_FILTER_USE_KEY);
     }
 
-    /**
-     * Filter map definitions into respective UI organizational clusters.
-     *
-     * @param array $all_tags Total valid items.
-     * @return array Clustered mapping object array.
-     */
     private function grouped_tags(array $all_tags): array
     {
         $system_keys = array_keys($this->system_tags());
@@ -1226,16 +1080,6 @@ HTML;
         return array_filter($groups);
     }
 
-    /* ═══════════════════════════════════════════════════════════════
-       DEFAULT EMAIL TEMPLATES
-    ═══════════════════════════════════════════════════════════════ */
-
-    /**
-     * Framework defining initialization configuration defaults prior to user overrides existing.
-     *
-     * @param string $type The context identifier.
-     * @return array Baseline property initialization structures.
-     */
     private function default_email(string $type): array
     {
         return [
@@ -1253,12 +1097,6 @@ HTML;
         ];
     }
 
-    /**
-     * Fallback configuration mapping UI text initialization.
-     *
-     * @param string $type The context identifier.
-     * @return string Validated UI structure HTML blob.
-     */
     private function default_admin_body(string $type): string
     {
         $noun = $type === 'enquiry' ? 'Enquiry' : 'Reservation';
@@ -1288,12 +1126,6 @@ HTML;
 HTML;
     }
 
-    /**
-     * Logic defining baseline auto responder payload defaults.
-     *
-     * @param string $type Target execution context definition string.
-     * @return string Defined HTML fallback payload string execution component.
-     */
     private function default_autoreply_body(string $type): string
     {
         $noun    = $type === 'enquiry' ? 'enquiry' : 'reservation request';
