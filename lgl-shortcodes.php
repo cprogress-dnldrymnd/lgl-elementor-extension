@@ -256,8 +256,6 @@ if (! class_exists('LGL_Shortcodes')) {
                 'contact_email'    => array('label' => 'Email Address',   'type' => 'text',     'default' => ''),
                 'contact_address'  => array('label' => 'Address',         'type' => 'textarea', 'default' => ''),
                 'contact_test'  => array('label' => 'Test',         'type' => 'textarea', 'default' => ''),
-                // Add new contact fields here e.g.:
-                // 'contact_facebook' => array( 'label' => 'Facebook URL', 'type' => 'text', 'default' => '' ),
             );
         }
 
