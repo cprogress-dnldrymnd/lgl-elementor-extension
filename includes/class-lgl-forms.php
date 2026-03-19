@@ -535,7 +535,7 @@ class LGL_Forms
                             <div class="lgl-fbl-section" style="background:#fff8e1;border-color:#ffe082">
                                 <h3><?php _e('Reserve Modes', 'lgl-shortcodes'); ?></h3>
                                 <ul class="lgl-help-list">
-                                    <li><strong>Auto Reserve</strong> — One click reserves immediately. No form. Button becomes "Reserved".</li>
+                                    <li><strong>Auto Reserve</strong> — Opens the reservation form popup. Submission saved to database and disable the reserve popup.</li>
                                     <li><strong>Form Only</strong> — Shows this form popup. Submission saved to database.</li>
                                     <li><strong>No Reserve Form</strong> — Button completely hidden.</li>
                                 </ul>
