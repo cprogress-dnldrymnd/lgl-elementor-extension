@@ -485,6 +485,9 @@ function resolveAllTags(html, siteName, currentYear) {
             var colorHeaderText = $("#lgl-color-header-text").val() || "#ffffff";
             var colorLink = $("#lgl-color-link").val() || "#003793";
 
+                var rawHeader = $("#lgl-global-header-template").val() || \'<div class="eb-header"><h1>{{site_name}}</h1></div>\';
+            var rawFooter = $("#lgl-global-footer-template").val() || \'<div class="eb-footer">&copy; {{year}} {{site_name}}. This is an automated notification.</div>\';
+
         html       = resolveAllTags(html,      siteName, currentYear);
 var headerHtml = resolveAllTags(rawHeader, siteName, currentYear);
 var footerHtml = resolveAllTags(rawFooter, siteName, currentYear);
@@ -493,8 +496,7 @@ var footerHtml = resolveAllTags(rawFooter, siteName, currentYear);
             var $frame = $("#lgl-eb-preview-frame");
             if (!$frame.length) return;
 
-            var rawHeader = $("#lgl-global-header-template").val() || \'<div class="eb-header"><h1>{{site_name}}</h1></div>\';
-            var rawFooter = $("#lgl-global-footer-template").val() || \'<div class="eb-footer">&copy; {{year}} {{site_name}}. This is an automated notification.</div>\';
+        
             
        
             
