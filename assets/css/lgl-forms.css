@@ -275,6 +275,9 @@
 .lgl-form-field input.lgl-input-err {
     border-color: var(--lgl-color-error);
 }
+.lgl-checkbox-err.lgl-checkbox-err.lgl-checkbox-err {
+    color: var(--lgl-color-error);
+}
 
 /* ── Time Picker ── */
 .lgl-time-picker {
