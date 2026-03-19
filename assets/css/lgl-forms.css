@@ -112,7 +112,7 @@
     color: var(--lgl-color-secondary);
 }
 .lgl-form-req {
-    color: #e87722;
+    color: var(--lgl-color-error);
     font-size: 12px;
     font-weight: normal;
 }
