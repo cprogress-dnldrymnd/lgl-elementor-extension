@@ -93,8 +93,9 @@
     padding: 24px;
     overflow-y: auto;
     flex: 1;
-    min-height: 0; /* ← THIS is the fix */
     -webkit-overflow-scrolling: touch;
+    max-height: 70vh;
+    overflow: auto;
 }
 /* ── Finance Calculator ── */
 .lgl-fc-inputs {
