@@ -907,54 +907,33 @@ $(document).ready(function() {
                             </div>
                         </div>
 
-                        <!-- ══════════════════════════════════════════════════════
-                             Sender Identity — From Name & From Email
-                        ══════════════════════════════════════════════════════ -->
+                        <!-- Sender Identity -->
                         <div class="lgl-eb-section">
                             <h3>✉️ <?php _e('Sender Identity', 'lgl-shortcodes'); ?></h3>
-                            <p class="description" style="margin-bottom:16px;">
-                                <?php _e(
-                                    'Sets the <strong>From Name</strong> and <strong>From Email</strong> on every email sent by WordPress. Leave blank to keep the WordPress default.',
-                                    'lgl-shortcodes'
-                                ); ?>
-                            </p>
-                            <table class="form-table" style="margin:0;">
-                                <tr>
-                                    <th style="width:160px;">
-                                        <label for="lgl_from_name"><?php _e('From Name', 'lgl-shortcodes'); ?></label>
-                                    </th>
-                                    <td>
-                                        <input
-                                            type="text"
-                                            id="lgl_from_name"
-                                            name="from_name"
-                                            value="<?php echo esc_attr( $global_settings['from_name'] ?? '' ); ?>"
-                                            placeholder="<?php echo esc_attr( get_option('blogname') ); ?>"
-                                            class="regular-text">
-                                        <p class="description"><?php _e( 'e.g. Clwyd Caravans', 'lgl-shortcodes' ); ?></p>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <th>
-                                        <label for="lgl_from_email"><?php _e('From Email', 'lgl-shortcodes'); ?></label>
-                                    </th>
-                                    <td>
-                                        <input
-                                            type="email"
-                                            id="lgl_from_email"
-                                            name="from_email"
-                                            value="<?php echo esc_attr( $global_settings['from_email'] ?? '' ); ?>"
-                                            placeholder="<?php echo esc_attr( get_option('admin_email') ); ?>"
-                                            class="regular-text">
-                                        <p class="description">
-                                            <?php _e( 'Use an address at your own domain to avoid spam filters — e.g. <code>noreply@clwydcaravans.com</code>.', 'lgl-shortcodes' ); ?>
-                                        </p>
-                                    </td>
-                                </tr>
-                            </table>
-                        </div>
+                            <p class="description" style="margin-bottom:14px;"><?php _e( 'Overrides the <strong>From Name</strong> and <strong>From Email</strong> on every email sent by WordPress. Leave blank to keep the WordPress default.', 'lgl-shortcodes' ); ?></p>
 
+                            <div class="lgl-eb-row">
+                                <label for="lgl_from_name"><?php _e('From Name', 'lgl-shortcodes'); ?></label>
+                                <input type="text" id="lgl_from_name" name="from_name"
+                                    value="<?php echo esc_attr($global_settings['from_name'] ?? ''); ?>"
+                                    placeholder="<?php echo esc_attr(get_option('blogname')); ?>"
+                                    style="width:100%;max-width:420px;">
+                                <span class="description"><?php _e('e.g. Clwyd Caravans &amp; Leisure Ltd', 'lgl-shortcodes'); ?></span>
+                            </div>
 
+                            <div class="lgl-eb-row">
+                                <label for="lgl_from_email"><?php _e('From Email', 'lgl-shortcodes'); ?></label>
+                                <input type="email" id="lgl_from_email" name="from_email"
+                                    value="<?php echo esc_attr($global_settings['from_email'] ?? ''); ?>"
+                                    placeholder="<?php echo esc_attr(get_option('admin_email')); ?>"
+                                    style="width:100%;max-width:420px;">
+                                <span class="description"><?php _e('Use an address at your own domain — e.g. <code>noreply@clwydcaravans.com</code>.', 'lgl-shortcodes'); ?></span>
+                            </div><!-- /.lgl-eb-row from_email -->
+                        </div><!-- /.lgl-eb-section sender identity -->
+
+                        <!-- Theme Colors -->
+                        <div class="lgl-eb-section">
+                            <h3><?php _e('Theme Colors', 'lgl-shortcodes'); ?></h3>
                             <div class="lgl-eb-color-grid">
                                 <div class="lgl-eb-color-row">
                                     <label><?php _e('Outer Background', 'lgl-shortcodes'); ?></label>
@@ -977,11 +956,11 @@ $(document).ready(function() {
                                     <input type="color" name="color_header_text" id="lgl-gc-header-txt" value="<?php echo esc_attr($global_settings['color_header_text']); ?>" class="lgl-global-color">
                                 </div>
                                 <div class="lgl-eb-color-row">
-                                    <label><?php _e('Link & Accent', 'lgl-shortcodes'); ?></label>
+                                    <label><?php _e('Link &amp; Accent', 'lgl-shortcodes'); ?></label>
                                     <input type="color" name="color_link" id="lgl-gc-link" value="<?php echo esc_attr($global_settings['color_link']); ?>" class="lgl-global-color">
                                 </div>
                             </div>
-                        </div>
+                        </div><!-- /.lgl-eb-section colors -->
 
                         <!-- Global Header -->
                         <div class="lgl-eb-section">
