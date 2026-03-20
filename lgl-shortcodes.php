@@ -876,6 +876,7 @@ if (! class_exists('LGL_Shortcodes')) {
             add_shortcode('lgl_wishlist', array($this, 'render_shortcode'));
             add_shortcode('lgl_my_account', array($this, 'render_shortcode'));
             add_shortcode('lgl_mini_account', array($this, 'render_shortcode'));
+            add_shortcode('lgl_breadcrumbs', array($this, 'render_shortcode'));
         }
 
         /**
