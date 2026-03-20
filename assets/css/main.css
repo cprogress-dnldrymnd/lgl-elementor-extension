@@ -2047,6 +2047,9 @@
 .lgl-breadcrumbs-light .lgl-current-page {
   color: #ffffff; }
 
+.lgl-breadcrumbs-light.lgl-breadcrumbs-light.lgl-breadcrumbs-light a:hover {
+  color: var(--lgl-color-accent); }
+
 .lgl-breadcrumbs-wrapper {
   font-size: 18px;
   display: flex;

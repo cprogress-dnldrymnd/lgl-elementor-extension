@@ -2634,7 +2634,11 @@ $wt-cols: 110px 1fr 120px 110px 80px 80px 50px;
 .lgl-breadcrumbs-light .lgl-current-page {
     color: #ffffff;
 }
-
+.lgl-breadcrumbs-light.lgl-breadcrumbs-light.lgl-breadcrumbs-light a {
+    &:hover {
+        color: var(--lgl-color-accent);
+    }
+}
 .lgl-breadcrumbs-wrapper {
     font-size: 18px;
     display: flex;
