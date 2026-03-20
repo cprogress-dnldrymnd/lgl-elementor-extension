@@ -35,7 +35,7 @@ $post_type_label = $post_type_obj ? $post_type_obj->labels->name : 'Vehicles';
 echo '<div class="lgl-breadcrumbs-wrapper" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 15px;">';
 
     echo '<div class="lgl-breadcrumbs">';
-        echo '<a href="' . esc_url($home_url) . '">Home</a> <span class="lgl-separator">&raquo;</span> ';
+        echo '<a href="' . esc_url($home_url) . '">Home</a> <span class="lgl-separator">|</span> ';
 
         if (is_singular() && in_array($post_type, array('caravan', 'motorhome', 'campervan'))) {
             // Single Vehicle Page
