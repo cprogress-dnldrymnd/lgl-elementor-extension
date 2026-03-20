@@ -123,7 +123,7 @@ $sub_title = get_post_meta($post_id, 'sub_title', true);
                             </div>
                         </div>
                     <?php } ?>
-                    <?php echo '<h3>' . esc_html(get_the_title()) . '</h3>'; ?>
+                    <?php echo '<h1>' . esc_html(get_the_title()) . '</h1>'; ?>
                 </div>
 
                 <div class="lgl-post--sidebar">

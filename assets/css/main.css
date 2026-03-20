@@ -587,6 +587,11 @@
   .single-lgl.single-lgl.single-lgl > .lgl-holder > .lgl-post.lgl-post.lgl-post {
     border: none;
     background-color: transparent; }
+  .single-lgl.single-lgl.single-lgl .lgl-breadcrumbs-wrapper {
+    margin-bottom: 40px; }
+  @media (max-width: 575px) {
+    .single-lgl.single-lgl.single-lgl .lgl-current-page {
+      display: none; } }
 
 .lgl-post--wrap {
   position: relative;
@@ -2089,11 +2094,5 @@
   text-decoration: underline;
   font-size: 16px;
   font-weight: bold; }
-
-.single .lgl-breadcrumbs-wrapper {
-  margin-bottom: 40px; }
-@media (max-width: 575px) {
-  .single .lgl-current-page {
-    display: none; } }
 
 /*# sourceMappingURL=main.css.map */

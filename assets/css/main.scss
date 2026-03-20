@@ -777,6 +777,14 @@
             background-color: transparent;
         }
     }
+    .lgl-breadcrumbs-wrapper {
+        margin-bottom: 40px;
+    }
+    .lgl-current-page {
+        @media (max-width: 575px) {
+            display: none;
+        }
+    }
 }
 
 .lgl-post--wrap {
@@ -2683,15 +2691,4 @@ $wt-cols: 110px 1fr 120px 110px 80px 80px 50px;
     text-decoration: underline;
     font-size: 16px;
     font-weight: bold;
-}
-
-.single {
-    .lgl-breadcrumbs-wrapper {
-        margin-bottom: 40px;
-    }
-    .lgl-current-page {
-        @media (max-width: 575px) {
-            display: none;
-        }
-    }
 }
