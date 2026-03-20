@@ -29,12 +29,16 @@ if (is_singular(array('caravan', 'motorhome', 'campervan'))) {
 
     // Helper function to strictly cast page IDs and ensure valid URLs
     $get_archive_url = function ($setting_key, $cpt_slug) use ($options, $home_url) {
-        $page_id = isset($options[$setting_key]) ? intval($options[$setting_key]) : 0;
-        if ($page_id > 0) {
-            return get_permalink($page_id);
+        // Check if setting exists and is not empty
+        if (!empty($options[$setting_key])) {
+            $permalink = get_permalink((int)$options[$setting_key]);
+            if ($permalink) {
+                return $permalink;
+            }
         }
+        // Fallback to native post type archive if settings fail
         $link = get_post_type_archive_link($cpt_slug);
-        return $link ? $link : $home_url . '/' . $cpt_slug . '/'; // Absolute fallback
+        return $link ? $link : rtrim($home_url, '/') . '/' . $cpt_slug . '/';
     };
 
     // Resolve the proper archive base URL and Label

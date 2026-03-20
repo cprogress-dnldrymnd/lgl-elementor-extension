@@ -19,7 +19,7 @@
       * Retrieves the last search URL from session storage and updates 
       * the "Back to Results" and Breadcrumb archive links.
       * Strictly verifies the user's origin path to prevent stale session injection.
-      * Reveals the Back button ONLY if the origin matches the archive page.
+      * Reveals the Back button ONLY if the origin matches the archive page (and is not the homepage).
       */
     function initBreadcrumbs() {
         const lastUrl = sessionStorage.getItem('lgl_last_search_url');
@@ -32,14 +32,14 @@
                     const refObj = new URL(document.referrer);
                     const lastObj = new URL(lastUrl);
 
-                    // Check if the page the user just came from matches the path of the saved search URL.
-                    if (refObj.pathname === lastObj.pathname) {
+                    // Check if paths match AND ensure the path is not the root homepage
+                    if (refObj.pathname === lastObj.pathname && refObj.pathname !== '/' && refObj.pathname !== '') {
                         $backBtn.attr('href', lastUrl);
                         $('.lgl-br-archive').attr('href', lastUrl);
 
                         // Origin validated: Reveal the Back to Results button
                         $backWrapper.show();
-                        return; // Stop here, successful execution
+                        return; // Stop execution here
                     }
                 } catch (e) {
                     // Fail silently on invalid URLs
