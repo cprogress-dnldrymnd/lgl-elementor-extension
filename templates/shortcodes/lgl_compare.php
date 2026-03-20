@@ -121,7 +121,7 @@ if (!empty($_GET['compare'])) {
 
         <div style="display: flex; align-items: center; flex-grow: 1; max-width: 400px;">
             <select id="lgl-compare-search-input" style="width: 100%;">
-                <option value=""><?php esc_html_e('Search & Add Vehicle...', 'lgl-shortcodes'); ?></option>
+                <option value=""><?php _e('Search & Add Vehicle...', 'lgl-shortcodes'); ?></option>
             </select>
         </div>
     </div>
