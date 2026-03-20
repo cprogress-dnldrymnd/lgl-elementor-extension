@@ -309,6 +309,7 @@ if ($active_make) {
             var panel = document.getElementById('lgl-search-offcanvas');
             var backdrop = document.getElementById('lgl-search-backdrop');
             var closeBtn = panel ? panel.querySelector('.lgl-offcanvas-close') : null;
+            var searchForm = document.getElementById('lgl-search-form');
 
             if (!toggleBtn || !panel || !backdrop) return;
 
@@ -332,6 +333,15 @@ if ($active_make) {
             toggleBtn.addEventListener('click', openPanel);
             if (closeBtn) closeBtn.addEventListener('click', closePanel);
             backdrop.addEventListener('click', closePanel);
+
+            // Intercept form submission to automatically collapse the mobile offcanvas
+            if (searchForm) {
+                searchForm.addEventListener('submit', function() {
+                    if (panel.classList.contains('is-open')) {
+                        closePanel();
+                    }
+                });
+            }
 
             // Close on Escape key
             document.addEventListener('keydown', function(e) {
