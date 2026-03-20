@@ -94,38 +94,25 @@ if ($post_type && $active_make) {
 // -------------------------------------------------------------------
 // Read active URL parameters to pre-populate the filter fields
 // -------------------------------------------------------------------
-$active_make  = get_query_var('listing_make') ? sanitize_text_field(get_query_var('listing_make')) : (isset($_GET['listing_make']) ? sanitize_text_field($_GET['listing_make']) : '');
-$active_model = get_query_var('listing_model') ? sanitize_text_field(get_query_var('listing_model')) : (isset($_GET['listing_model']) ? sanitize_text_field($_GET['listing_model']) : '');
-
-// BULLETPROOF FALLBACK: Extract Make and Model directly from the URL path if WordPress misses them
-if (empty($active_make) || empty($active_model)) {
-    $current_path = trim(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH), '/');
-    $path_segments = explode('/', $current_path);
-
-    $pt_index = false;
-    if ($post_type) {
-        $pt_index = array_search($post_type . 's', $path_segments); // Looks for 'caravans'
-        if ($pt_index === false) {
-            $pt_index = array_search($post_type, $path_segments); // Looks for 'caravan'
-        }
-    }
-
-    if ($pt_index !== false) {
-        if (empty($active_make) && isset($path_segments[$pt_index + 1])) {
-            $active_make = sanitize_text_field($path_segments[$pt_index + 1]);
-        }
-        // Safely ignore WP injected query strings or parameters when assigning the model
-        if (empty($active_model) && isset($path_segments[$pt_index + 2])) {
-            $active_model = sanitize_text_field(str_replace('/', '', $path_segments[$pt_index + 2]));
-        }
-    }
-}
-
-// Proceed with the rest of the parameters...
+// Prioritize native query vars from our rewrite rules, fallback to standard $_GET
+$active_make      = get_query_var('listing_make') ? sanitize_text_field(get_query_var('listing_make')) : (isset($_GET['listing_make']) ? sanitize_text_field($_GET['listing_make']) : '');
+$active_model     = get_query_var('listing_model') ? sanitize_text_field(get_query_var('listing_model')) : (isset($_GET['listing_model']) ? sanitize_text_field($_GET['listing_model']) : '');
 $active_condition = isset($_GET['condition'])     ? sanitize_text_field($_GET['condition'])     : '';
 $active_berth     = isset($_GET['berth'])         ? sanitize_text_field($_GET['berth'])         : '';
 $active_price_min = isset($_GET['price_min'])     ? sanitize_text_field($_GET['price_min'])     : '';
 $active_price_max = isset($_GET['price_max'])     ? sanitize_text_field($_GET['price_max'])     : '';
+
+// Calculate the clean Base URL for JavaScript path construction
+$base_archive_url = '';
+if ($post_type) {
+    $options = get_option('lgl_settings', array());
+    $page_key = $post_type . '_page';
+    if (!empty($options[$page_key])) {
+        $base_archive_url = get_permalink($options[$page_key]);
+    } else {
+        $base_archive_url = get_post_type_archive_link($post_type);
+    }
+}
 ?>
 
 <?php if ($post_type) : ?>
