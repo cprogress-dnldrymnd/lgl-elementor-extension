@@ -32,7 +32,7 @@ if ($is_single) {
     if ($current_id == ($options['caravan_page'] ?? 0)) $post_type = 'caravan';
     elseif ($current_id == ($options['motorhome_page'] ?? 0)) $post_type = 'motorhome';
     elseif ($current_id == ($options['campervan_page'] ?? 0)) $post_type = 'campervan';
-    
+
     // Fallback for native post type archives
     elseif (is_post_type_archive(array('caravan', 'motorhome', 'campervan'))) {
         $post_type = get_query_var('post_type');
@@ -41,7 +41,7 @@ if ($is_single) {
 
 // 2. Render LGL Specific Breadcrumbs
 if (!empty($post_type)) {
-    
+
     // Helper function to strictly cast page IDs and ensure valid base URLs
     $get_archive_url = function ($setting_key, $cpt_slug) use ($options, $home_url) {
         if (!empty($options[$setting_key])) {
@@ -56,7 +56,10 @@ if (!empty($post_type)) {
     $archive_label = ucfirst($post_type) . 's';
 
     // Extract Make and Model Slugs/Names
-    $make_slug = ''; $model_slug = ''; $make_name = ''; $model_name = '';
+    $make_slug = '';
+    $model_slug = '';
+    $make_name = '';
+    $model_name = '';
 
     if ($is_single) {
         // Retrieve terms directly from the post
@@ -64,9 +67,11 @@ if (!empty($post_type)) {
         if (!is_wp_error($terms) && !empty($terms)) {
             foreach ($terms as $term) {
                 if ($term->parent == 0) {
-                    $make_slug = $term->slug; $make_name = $term->name;
+                    $make_slug = $term->slug;
+                    $make_name = $term->name;
                 } else {
-                    $model_slug = $term->slug; $model_name = $term->name;
+                    $model_slug = $term->slug;
+                    $model_name = $term->name;
                 }
             }
             // Self-heal: If model is found but make is missing, trace the parent
@@ -75,7 +80,8 @@ if (!empty($post_type)) {
                     if ($term->slug === $model_slug && $term->parent > 0) {
                         $parent_term = get_term($term->parent, 'listing-make-model');
                         if (!is_wp_error($parent_term)) {
-                            $make_slug = $parent_term->slug; $make_name = $parent_term->name;
+                            $make_slug = $parent_term->slug;
+                            $make_name = $parent_term->name;
                         }
                     }
                 }
@@ -85,7 +91,7 @@ if (!empty($post_type)) {
         // Read directly from the URL query vars on search/archive pages
         $make_slug  = get_query_var('listing_make') ? sanitize_text_field(get_query_var('listing_make')) : '';
         $model_slug = get_query_var('listing_model') ? sanitize_text_field(get_query_var('listing_model')) : '';
-        
+
         if ($make_slug) {
             $make_term = get_term_by('slug', $make_slug, 'listing-make-model');
             if ($make_term) $make_name = $make_term->name;
@@ -100,7 +106,9 @@ if (!empty($post_type)) {
 
     // A. Vehicle Type Node (e.g., Motorhomes)
     if ($make_slug || $is_single) {
-        echo '<a href="' . esc_url($archive_url) . '" class="lgl-br-archive">' . esc_html($archive_label) . '</a> <span class="lgl-separator">|</span> ';
+        $ajax_class = (!$is_single) ? ' lgl-ajax-breadcrumb' : '';
+        $data_attr  = (!$is_single) ? ' data-action="clear-all"' : '';
+        echo '<a href="' . esc_url($archive_url) . '" class="lgl-br-archive' . $ajax_class . '"' . $data_attr . '>' . esc_html($archive_label) . '</a> <span class="lgl-separator">|</span> ';
     } else {
         echo '<span class="lgl-current-page">' . esc_html($archive_label) . '</span>';
     }
@@ -108,12 +116,13 @@ if (!empty($post_type)) {
     // B. Make Node
     if ($make_slug && $make_name) {
         if ($model_slug || $is_single) {
-            echo '<a href="' . esc_url($archive_url . $make_slug . '/') . '">' . esc_html($make_name) . '</a> <span class="lgl-separator">|</span> ';
+            $ajax_class = (!$is_single) ? 'class="lgl-ajax-breadcrumb"' : '';
+            $data_attr  = (!$is_single) ? 'data-action="clear-model"' : '';
+            echo '<a href="' . esc_url($archive_url . $make_slug . '/') . '" ' . $ajax_class . ' ' . $data_attr . '>' . esc_html($make_name) . '</a> <span class="lgl-separator">|</span> ';
         } else {
             echo '<span class="lgl-current-page">' . esc_html($make_name) . '</span>';
         }
     }
-
     // C. Model Node
     if ($model_slug && $model_name) {
         if ($is_single) {
@@ -136,7 +145,6 @@ if (!empty($post_type)) {
         echo '<a href="' . esc_url($archive_url) . '" class="lgl-back-to-results" style="text-decoration: none;">&laquo; Back to Results</a>';
         echo '</div>';
     }
-
 } else {
     // 3. Standard Custom Pages View (Non-LGL)
     $page_title = get_the_title($current_id);

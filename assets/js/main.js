@@ -218,6 +218,33 @@
             }, 400);
         });
 
+        // Intercept Breadcrumb Clicks on Archive Pages for Seamless AJAX Routing
+        $(document).on('click', '.lgl-ajax-breadcrumb', function (e) {
+            // Abort and allow standard navigation if the search form isn't present (e.g., Single Pages)
+            if ($('#lgl-search-form.lgl-filter-form-ajax').length === 0) return;
+
+            e.preventDefault();
+
+            let $clicked = $(this);
+            let action = $clicked.data('action');
+            let text = $clicked.text();
+
+            // 1. Manipulate the Select2 nodes based on the breadcrumb depth
+            if (action === 'clear-all') {
+                $('#lgl_make').val('').trigger('change.select2');
+                $('#lgl_model').val('').trigger('change.select2');
+            } else if (action === 'clear-model') {
+                $('#lgl_model').val('').trigger('change.select2');
+            }
+
+            // 2. Trigger the AJAX execution
+            $('#lgl-search-form').trigger('submit');
+
+            // 3. Mutate the DOM to reflect the new state instantly
+            $clicked.nextAll().remove(); // Strip deeper levels and separators
+            $clicked.replaceWith('<span class="lgl-current-page">' + text + '</span>'); // Convert link to active plain text node
+        });
+
         /**
          * Fetches valid filter options for the current filter state and repopulates
          * the dropdowns so impossible combinations are completely hidden.
