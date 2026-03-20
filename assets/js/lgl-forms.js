@@ -238,6 +238,9 @@
                 $spin.hide();
 
                 if (res.success) {
+                    // ── NEW LOGIC: Hide form fields and button on success ──
+                    $form.find('.lgl-form-grid, .lgl-form-submit-btn').hide();
+
                     showFormMsg($form, res.data.message, 'success');
                     $form.find('input:not([type=hidden]), select, textarea').val('');
 
@@ -249,10 +252,10 @@
                             .removeAttr('data-lgl-modal');
                     }
 
-                    /* Auto-close after a short delay */
-                    setTimeout(closeAllModals, 3200);
+                    /* Auto-close after a delay to let them read the message */
+                    setTimeout(closeAllModals, 4000);
                 } else {
-                    showFormMsg($form, res.data.message || 'Something went wrong. Please try again.', 'error');
+                    showFormMsg($form, res.data.message || 'Something went wrong.', 'error');
                 }
             },
             error: function () {
