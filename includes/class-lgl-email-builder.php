@@ -918,7 +918,7 @@ $(document).ready(function() {
                                     value="<?php echo esc_attr($global_settings['from_name'] ?? ''); ?>"
                                     placeholder="<?php echo esc_attr(get_option('blogname')); ?>"
                                     style="width:100%;max-width:420px;">
-                                <span class="description"><?php _e('e.g. Clwyd Caravans &amp; Leisure Ltd', 'lgl-shortcodes'); ?></span>
+                                <span class="description"><?php _e('e.g. Website Name Ltd', 'lgl-shortcodes'); ?></span>
                             </div>
 
                             <div class="lgl-eb-row">
@@ -927,7 +927,7 @@ $(document).ready(function() {
                                     value="<?php echo esc_attr($global_settings['from_email'] ?? ''); ?>"
                                     placeholder="<?php echo esc_attr(get_option('admin_email')); ?>"
                                     style="width:100%;max-width:420px;">
-                                <span class="description"><?php _e('Use an address at your own domain — e.g. <code>noreply@clwydcaravans.com</code>.', 'lgl-shortcodes'); ?></span>
+                                <span class="description"><?php _e('Use an address at your own domain — e.g. <code>noreply@website.com</code>.', 'lgl-shortcodes'); ?></span>
                             </div><!-- /.lgl-eb-row from_email -->
                         </div><!-- /.lgl-eb-section sender identity -->
 
