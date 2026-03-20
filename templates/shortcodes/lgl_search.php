@@ -321,7 +321,7 @@ if ($post_type) {
 
                 <?php } ?>
 
-                <div class="lgl-filter-group lgl-submit-group" style="display: flex; flex-direction: column; gap: 8px;">
+                <div class="lgl-filter-group lgl-submit-group">
                     <button type="submit" class="lgl-search-submit">
                         <?php if ($post_type != false) { ?>
                             SEARCH NOW
@@ -331,15 +331,14 @@ if ($post_type) {
                             </svg>
                         <?php } ?>
                     </button>
-
-                    <?php if ($post_type != false) { ?>
-                        <button type="button" class="lgl-reset-filters-btn" aria-label="Reset all search filters" style="background: transparent; border: none; text-decoration: underline; color: inherit; cursor: pointer; padding: 4px; font-size: 0.9em; align-self: center;">
-                            Reset Filters
-                        </button>
-                    <?php } ?>
                 </div>
-
             </form>
+
+            <?php if ($post_type != false) { ?>
+                <button type="button" class="lgl-reset-filters-btn" aria-label="Reset all search filters" style="background: transparent; border: none; text-decoration: underline; color: inherit; cursor: pointer; padding: 4px; font-size: 0.9em; align-self: center;">
+                    Reset Filters
+                </button>
+            <?php } ?>
         </div>
 
         <?php if ($post_type) : ?>
