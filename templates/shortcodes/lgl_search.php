@@ -165,172 +165,174 @@ if ($post_type) {
 
         <div class="lgl-search-container lgl-holder <?= $post_type == false ? 'lgl-search-container-bg-secondary' : '' ?>">
             <form id="lgl-search-form" class="lgl-filter-form <?= $post_type == false ? 'lgl-filter-form-no-ajax' : 'lgl-filter-form-ajax' ?>">
-                <input type="hidden" name="post_type" id="lgl_target_post_type" value="<?php echo esc_attr($post_type); ?>">
-                <input type="hidden" id="lgl_base_archive_url" value="<?php echo esc_url($base_archive_url); ?>">
+                <div class="lgl-search-form-inner">
+                    <input type="hidden" name="post_type" id="lgl_target_post_type" value="<?php echo esc_attr($post_type); ?>">
+                    <input type="hidden" id="lgl_base_archive_url" value="<?php echo esc_url($base_archive_url); ?>">
 
-                <?php if ($post_type == false) { ?>
-                    <?php
-                    $options = get_option('lgl_settings', array());
+                    <?php if ($post_type == false) { ?>
+                        <?php
+                        $options = get_option('lgl_settings', array());
 
-                    $caravan_page   = $options['caravan_page']   ?? false;
-                    $motorhome_page = $options['motorhome_page'] ?? false;
-                    $campervan_page = $options['campervan_page'] ?? false;
+                        $caravan_page   = $options['caravan_page']   ?? false;
+                        $motorhome_page = $options['motorhome_page'] ?? false;
+                        $campervan_page = $options['campervan_page'] ?? false;
 
-                    $vehicle_types = array();
-                    if ($caravan_page)   $vehicle_types[] = array('url' => get_the_permalink($caravan_page),   'label' => 'Caravan',   'slug' => 'caravan');
-                    if ($motorhome_page) $vehicle_types[] = array('url' => get_the_permalink($motorhome_page), 'label' => 'Motorhome', 'slug' => 'motorhome');
-                    if ($campervan_page) $vehicle_types[] = array('url' => get_the_permalink($campervan_page), 'label' => 'Campervan', 'slug' => 'campervan');
-                    ?>
+                        $vehicle_types = array();
+                        if ($caravan_page)   $vehicle_types[] = array('url' => get_the_permalink($caravan_page),   'label' => 'Caravan',   'slug' => 'caravan');
+                        if ($motorhome_page) $vehicle_types[] = array('url' => get_the_permalink($motorhome_page), 'label' => 'Motorhome', 'slug' => 'motorhome');
+                        if ($campervan_page) $vehicle_types[] = array('url' => get_the_permalink($campervan_page), 'label' => 'Campervan', 'slug' => 'campervan');
+                        ?>
 
-                    <?php if (!empty($vehicle_types)) : ?>
+                        <?php if (!empty($vehicle_types)) : ?>
+                            <div class="lgl-filter-group">
+                                <label for="lgl_vehicle_type">Leisure Vehicle Type</label>
+                                <select name="post_type" id="lgl_post_type" class="lgl-select2" data-placeholder="Leisure Vehicle Type" required>
+                                    <option value="">Leisure Vehicle Type</option>
+                                    <?php foreach ($vehicle_types as $type) : ?>
+                                        <option value="<?php echo esc_attr($type['url']); ?>"
+                                            data-post-type="<?php echo esc_attr($type['slug']); ?>"
+                                            <?php selected($active_post_type, $type['url']); ?>>
+                                            <?php echo esc_html($type['label']); ?>
+                                        </option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </div>
+                        <?php endif; ?>
+                    <?php } ?>
+
+                    <!-- Make -->
+                    <div class="lgl-filter-group">
+                        <label for="lgl_make">Make</label>
+                        <select name="listing_make" id="lgl_make" class="lgl-select2" data-placeholder="Select Make" <?php echo ($post_type == false) ? 'disabled' : ''; ?>>
+                            <option value=""><?php echo ($post_type == false) ? 'Select Vehicle Type First' : 'All Makes'; ?></option>
+                            <?php if ($post_type != false) : ?>
+                                <?php foreach ($makes as $make) : ?>
+                                    <option value="<?php echo esc_attr($make->slug); ?>" <?php selected($active_make, $make->slug); ?>>
+                                        <?php echo esc_html($make->name); ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            <?php endif; ?>
+                        </select>
+                    </div>
+
+                    <!-- Model -->
+                    <div class="lgl-filter-group">
+                        <label for="lgl_model">Model</label>
+                        <?php
+                        // Ensure the field is NEVER disabled if an active model exists in the URL
+                        $is_disabled = (empty($active_make_models) && empty($active_model)) ? 'disabled' : '';
+
+                        // Check if the active model was accidentally filtered out of the array
+                        $model_found = false;
+                        if (!empty($active_make_models) && $active_model) {
+                            foreach ($active_make_models as $model) {
+                                if ($model->slug === $active_model) {
+                                    $model_found = true;
+                                    break;
+                                }
+                            }
+                        }
+                        ?>
+                        <select name="listing_model" id="lgl_model" class="lgl-select2" data-placeholder="Select Model" <?php echo $is_disabled; ?>>
+                            <?php if (empty($active_make_models) && empty($active_model)) : ?>
+                                <option value="">Select Make First</option>
+                            <?php else : ?>
+                                <option value="">All Models</option>
+
+                                <?php
+                                // Fallback: Force the active model into the dropdown so JS serialization catches it
+                                if ($active_model && !$model_found) :
+                                    $fallback_term = get_term_by('slug', $active_model, 'listing-make-model');
+                                    if ($fallback_term) :
+                                ?>
+                                        <option value="<?php echo esc_attr($fallback_term->slug); ?>" selected="selected">
+                                            <?php echo esc_html($fallback_term->name); ?>
+                                        </option>
+                                <?php
+                                    endif;
+                                endif;
+                                ?>
+
+                                <?php if (!empty($active_make_models)) : ?>
+                                    <?php foreach ($active_make_models as $model) : ?>
+                                        <option value="<?php echo esc_attr($model->slug); ?>" <?php selected($active_model, $model->slug); ?>>
+                                            <?php echo esc_html($model->name); ?>
+                                        </option>
+                                    <?php endforeach; ?>
+                                <?php endif; ?>
+                            <?php endif; ?>
+                        </select>
+                    </div>
+
+                    <?php if ($post_type != false) { ?>
+
+                        <!-- Condition -->
                         <div class="lgl-filter-group">
-                            <label for="lgl_vehicle_type">Leisure Vehicle Type</label>
-                            <select name="post_type" id="lgl_post_type" class="lgl-select2" data-placeholder="Leisure Vehicle Type" required>
-                                <option value="">Leisure Vehicle Type</option>
-                                <?php foreach ($vehicle_types as $type) : ?>
-                                    <option value="<?php echo esc_attr($type['url']); ?>"
-                                        data-post-type="<?php echo esc_attr($type['slug']); ?>"
-                                        <?php selected($active_post_type, $type['url']); ?>>
-                                        <?php echo esc_html($type['label']); ?>
+                            <label for="lgl_condition">Condition</label>
+                            <select name="condition" id="lgl_condition" class="lgl-select2" data-placeholder="Any Condition">
+                                <option value="">Any Condition</option>
+                                <?php foreach ($conditions as $cond) : ?>
+                                    <option value="<?php echo esc_attr($cond); ?>"
+                                        <?php selected($active_condition, $cond); ?>>
+                                        <?php echo esc_html($cond); ?>
                                     </option>
                                 <?php endforeach; ?>
                             </select>
                         </div>
-                    <?php endif; ?>
-                <?php } ?>
 
-                <!-- Make -->
-                <div class="lgl-filter-group">
-                    <label for="lgl_make">Make</label>
-                    <select name="listing_make" id="lgl_make" class="lgl-select2" data-placeholder="Select Make" <?php echo ($post_type == false) ? 'disabled' : ''; ?>>
-                        <option value=""><?php echo ($post_type == false) ? 'Select Vehicle Type First' : 'All Makes'; ?></option>
-                        <?php if ($post_type != false) : ?>
-                            <?php foreach ($makes as $make) : ?>
-                                <option value="<?php echo esc_attr($make->slug); ?>" <?php selected($active_make, $make->slug); ?>>
-                                    <?php echo esc_html($make->name); ?>
-                                </option>
-                            <?php endforeach; ?>
-                        <?php endif; ?>
-                    </select>
-                </div>
-
-                <!-- Model -->
-                <div class="lgl-filter-group">
-                    <label for="lgl_model">Model</label>
-                    <?php
-                    // Ensure the field is NEVER disabled if an active model exists in the URL
-                    $is_disabled = (empty($active_make_models) && empty($active_model)) ? 'disabled' : '';
-
-                    // Check if the active model was accidentally filtered out of the array
-                    $model_found = false;
-                    if (!empty($active_make_models) && $active_model) {
-                        foreach ($active_make_models as $model) {
-                            if ($model->slug === $active_model) {
-                                $model_found = true;
-                                break;
-                            }
-                        }
-                    }
-                    ?>
-                    <select name="listing_model" id="lgl_model" class="lgl-select2" data-placeholder="Select Model" <?php echo $is_disabled; ?>>
-                        <?php if (empty($active_make_models) && empty($active_model)) : ?>
-                            <option value="">Select Make First</option>
-                        <?php else : ?>
-                            <option value="">All Models</option>
-
-                            <?php
-                            // Fallback: Force the active model into the dropdown so JS serialization catches it
-                            if ($active_model && !$model_found) :
-                                $fallback_term = get_term_by('slug', $active_model, 'listing-make-model');
-                                if ($fallback_term) :
-                            ?>
-                                    <option value="<?php echo esc_attr($fallback_term->slug); ?>" selected="selected">
-                                        <?php echo esc_html($fallback_term->name); ?>
-                                    </option>
-                            <?php
-                                endif;
-                            endif;
-                            ?>
-
-                            <?php if (!empty($active_make_models)) : ?>
-                                <?php foreach ($active_make_models as $model) : ?>
-                                    <option value="<?php echo esc_attr($model->slug); ?>" <?php selected($active_model, $model->slug); ?>>
-                                        <?php echo esc_html($model->name); ?>
+                        <!-- Berth -->
+                        <div class="lgl-filter-group">
+                            <label for="lgl_berth">Berth</label>
+                            <select name="berth" id="lgl_berth" class="lgl-select2" data-placeholder="Any Berth">
+                                <option value="">Any Berth</option>
+                                <?php foreach ($berths as $berth) : ?>
+                                    <option value="<?php echo esc_attr($berth); ?>"
+                                        <?php selected($active_berth, $berth); ?>>
+                                        <?php echo esc_html($berth); ?>
                                     </option>
                                 <?php endforeach; ?>
-                            <?php endif; ?>
-                        <?php endif; ?>
-                    </select>
-                </div>
+                            </select>
+                        </div>
 
-                <?php if ($post_type != false) { ?>
+                        <!-- Min Price -->
+                        <div class="lgl-filter-group">
+                            <select name="price_min" id="lgl_price_min" class="lgl-select2" data-placeholder="Min Price">
+                                <option value="">Min Price</option>
+                                <?php foreach ($prices as $price) : ?>
+                                    <option value="<?php echo esc_attr($price); ?>"
+                                        <?php selected((float) $active_price_min, $price); ?>>
+                                        <?php echo esc_html(LGL_Shortcodes::format_price($price)); ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
 
-                    <!-- Condition -->
-                    <div class="lgl-filter-group">
-                        <label for="lgl_condition">Condition</label>
-                        <select name="condition" id="lgl_condition" class="lgl-select2" data-placeholder="Any Condition">
-                            <option value="">Any Condition</option>
-                            <?php foreach ($conditions as $cond) : ?>
-                                <option value="<?php echo esc_attr($cond); ?>"
-                                    <?php selected($active_condition, $cond); ?>>
-                                    <?php echo esc_html($cond); ?>
-                                </option>
-                            <?php endforeach; ?>
-                        </select>
+                        <!-- Max Price -->
+                        <div class="lgl-filter-group">
+                            <select name="price_max" id="lgl_price_max" class="lgl-select2" data-placeholder="Max Price">
+                                <option value="">Max Price</option>
+                                <?php foreach ($prices as $price) : ?>
+                                    <option value="<?php echo esc_attr($price); ?>"
+                                        <?php selected((float) $active_price_max, $price); ?>>
+                                        <?php echo esc_html(LGL_Shortcodes::format_price($price)); ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+
+                    <?php } ?>
+
+                    <div class="lgl-filter-group lgl-submit-group">
+                        <button type="submit" class="lgl-search-submit">
+                            <?php if ($post_type != false) { ?>
+                                SEARCH NOW
+                            <?php } else { ?>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
+                                    <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0" />
+                                </svg>
+                            <?php } ?>
+                        </button>
                     </div>
-
-                    <!-- Berth -->
-                    <div class="lgl-filter-group">
-                        <label for="lgl_berth">Berth</label>
-                        <select name="berth" id="lgl_berth" class="lgl-select2" data-placeholder="Any Berth">
-                            <option value="">Any Berth</option>
-                            <?php foreach ($berths as $berth) : ?>
-                                <option value="<?php echo esc_attr($berth); ?>"
-                                    <?php selected($active_berth, $berth); ?>>
-                                    <?php echo esc_html($berth); ?>
-                                </option>
-                            <?php endforeach; ?>
-                        </select>
-                    </div>
-
-                    <!-- Min Price -->
-                    <div class="lgl-filter-group">
-                        <select name="price_min" id="lgl_price_min" class="lgl-select2" data-placeholder="Min Price">
-                            <option value="">Min Price</option>
-                            <?php foreach ($prices as $price) : ?>
-                                <option value="<?php echo esc_attr($price); ?>"
-                                    <?php selected((float) $active_price_min, $price); ?>>
-                                    <?php echo esc_html(LGL_Shortcodes::format_price($price)); ?>
-                                </option>
-                            <?php endforeach; ?>
-                        </select>
-                    </div>
-
-                    <!-- Max Price -->
-                    <div class="lgl-filter-group">
-                        <select name="price_max" id="lgl_price_max" class="lgl-select2" data-placeholder="Max Price">
-                            <option value="">Max Price</option>
-                            <?php foreach ($prices as $price) : ?>
-                                <option value="<?php echo esc_attr($price); ?>"
-                                    <?php selected((float) $active_price_max, $price); ?>>
-                                    <?php echo esc_html(LGL_Shortcodes::format_price($price)); ?>
-                                </option>
-                            <?php endforeach; ?>
-                        </select>
-                    </div>
-
-                <?php } ?>
-
-                <div class="lgl-filter-group lgl-submit-group">
-                    <button type="submit" class="lgl-search-submit">
-                        <?php if ($post_type != false) { ?>
-                            SEARCH NOW
-                        <?php } else { ?>
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
-                                <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0" />
-                            </svg>
-                        <?php } ?>
-                    </button>
                 </div>
                 <?php if ($post_type != false) { ?>
                     <button type="button" class="lgl-reset-filters-btn" aria-label="Reset all search filters" style="background: transparent; border: none; text-decoration: underline; color: inherit; cursor: pointer; padding: 4px; font-size: 0.9em; align-self: center;">
