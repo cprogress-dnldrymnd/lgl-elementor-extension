@@ -31,11 +31,8 @@ class LGL_Email_Builder
         add_action('admin_post_lgl_save_global_email',  [$this, 'save_global_email_settings']);
 
         // ── Global template: apply to ALL outgoing wp_mail calls when enabled ──
+        // This now handles Gravity Forms too — see maybe_apply_global_template().
         add_filter('wp_mail',           [$this, 'maybe_apply_global_template'], 10, 1);
-
-        // ── Gravity Forms: hook in before GF adds its own HTML wrapper ──
-        // Priority 9 so we run before GF's own processing at priority 10.
-        add_filter('gform_pre_send_email', [$this, 'apply_template_to_gf_email'], 9, 4);
 
         // ── From Name / From Email — applied globally whenever a value is saved ──
         add_filter('wp_mail_from',      [$this, 'filter_mail_from'],      10, 1);
@@ -71,13 +68,23 @@ class LGL_Email_Builder
         $subject = $args['subject'] ?? '';
         $body    = $args['message'] ?? '';
 
-        // Skip emails that are already a complete HTML document (LGL's own emails,
-        // WooCommerce, etc. that wrap themselves).
-        if ( stripos( $body, '<!DOCTYPE' ) !== false || stripos( $body, '<html' ) !== false ) {
+        // Skip only COMPLETE HTML documents (those with <!DOCTYPE or <head>).
+        // These are already fully wrapped — LGL's own emails, WooCommerce, etc.
+        // Gravity Forms uses a bare <html><body> wrapper (no DOCTYPE, no <head>),
+        // so GF emails intentionally fall through here and get handled below.
+        if ( stripos( $body, '<!DOCTYPE' ) !== false || stripos( $body, '<head' ) !== false ) {
             return $args;
         }
 
-        // Wrap the body in the global template
+        // Strip any bare <html>/<body> wrapper (e.g. Gravity Forms) so we don't
+        // nest html/body elements inside our styled template shell.
+        $body = preg_replace( '/<html[^>]*>/i',  '', $body );
+        $body = preg_replace( '/<\/html>/i',      '', $body );
+        $body = preg_replace( '/<body[^>]*>/i',  '', $body );
+        $body = preg_replace( '/<\/body>/i',      '', $body );
+        $body = trim( $body );
+
+        // Wrap the cleaned body in the global LGL template
         $args['message'] = self::wrap_html( $subject, $body );
 
         // Ensure the email is sent as HTML
@@ -101,59 +108,6 @@ class LGL_Email_Builder
         $args['headers'] = $headers;
 
         return $args;
-    }
-
-    /* ═══════════════════════════════════════════════════════════════
-       GRAVITY FORMS FILTER — Apply global template to GF notifications
-    ═══════════════════════════════════════════════════════════════ */
-
-    /**
-     * Applies the LGL global email template to Gravity Forms notifications.
-     *
-     * Why a separate hook?
-     * GF calls wp_mail() with a body that already contains <html> tags (it builds
-     * its own basic HTML wrapper internally). Our wp_mail filter sees <html> and
-     * deliberately skips those emails to avoid double-wrapping. This hook fires on
-     * gform_pre_send_email BEFORE GF adds its own wrapper, so we get the raw
-     * notification body and can wrap it cleanly ourselves. The wp_mail filter then
-     * sees <!DOCTYPE in the resulting message and skips it — no double wrapping.
-     *
-     * Only fires when:
-     *  - "Apply to All Site Emails" is enabled in LGL → Email Builder → Global Template.
-     *  - The notification message format is 'html' (plain text notifications are skipped).
-     *  - The body is not already a full HTML document.
-     *
-     * @param  array  $email           GF email args: to, from, reply_to, subject, message, headers, attachments.
-     * @param  string $message_format  'html' or 'text'.
-     * @param  array  $notification    The GF notification configuration array.
-     * @param  array  $entry           The submitted form entry.
-     * @return array                   Modified email args with wrapped message.
-     */
-    public function apply_template_to_gf_email( array $email, string $message_format, array $notification, array $entry ): array
-    {
-        $global = self::get_global_email_settings();
-
-        // Feature disabled — pass through untouched
-        if ( empty( $global['apply_to_all_emails'] ) ) {
-            return $email;
-        }
-
-        // Only wrap HTML-format notifications — leave plain text as-is
-        if ( $message_format !== 'html' ) {
-            return $email;
-        }
-
-        $subject = $email['subject'] ?? '';
-        $body    = $email['message'] ?? '';
-
-        // Guard: skip if already a full HTML document
-        if ( stripos( $body, '<!DOCTYPE' ) !== false || stripos( $body, '<html' ) !== false ) {
-            return $email;
-        }
-
-        $email['message'] = self::wrap_html( $subject, $body );
-
-        return $email;
     }
 
     /* ═══════════════════════════════════════════════════════════════
@@ -950,13 +904,13 @@ $(document).ready(function() {
                                     </label>
                                     <p>
                                         <?php _e(
-                                            'When enabled, every email sent via <code>wp_mail()</code> — including WordPress core, WooCommerce, contact forms, and any other plugin — will be wrapped in the header, footer, and colour settings defined below. Emails that are already full HTML documents are skipped automatically.',
+                                            'When enabled, every email sent via <code>wp_mail()</code> — including WordPress core, WooCommerce, Gravity Forms, and any other plugin — will be wrapped in the header, footer, and colour settings defined below.',
                                             'lgl-shortcodes'
                                         ); ?>
                                     </p>
                                     <p>
                                         <?php _e(
-                                            '<strong>Gravity Forms</strong> notifications are handled via a dedicated hook that intercepts the message before GF adds its own HTML wrapper. HTML-format notifications are wrapped; plain text notifications are left as-is.',
+                                            '<strong>Gravity Forms</strong> notifications are supported. GF adds a minimal <code>&lt;html&gt;&lt;body&gt;</code> wrapper to its notifications; that wrapper is automatically stripped and replaced with this template. Emails already containing a full HTML document (with <code>&lt;!DOCTYPE&gt;</code> or <code>&lt;head&gt;</code>) are skipped to prevent double-wrapping.',
                                             'lgl-shortcodes'
                                         ); ?>
                                     </p>
