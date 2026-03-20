@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Breadcrumbs and Back to Results Template
  * Shortcode: [lgl_breadcrumbs]
@@ -10,50 +9,54 @@ if (!defined('ABSPATH')) {
 }
 
 $post_type = get_post_type();
-$post_type_obj = get_post_type_object($post_type);
 $home_url = home_url();
-
 $options = get_option('lgl_settings', array());
-$archive_url = '';
+$current_id = get_queried_object_id();
 
-// Resolve the proper archive base URL from settings
-if ($post_type === 'caravan' && !empty($options['caravan_page'])) {
-    $archive_url = get_permalink($options['caravan_page']);
-} elseif ($post_type === 'motorhome' && !empty($options['motorhome_page'])) {
-    $archive_url = get_permalink($options['motorhome_page']);
-} elseif ($post_type === 'campervan' && !empty($options['campervan_page'])) {
-    $archive_url = get_permalink($options['campervan_page']);
-} else {
-    // Fallback to native post type archive
-    $archive_url = get_post_type_archive_link($post_type);
-}
-
-$post_type_label = $post_type_obj ? $post_type_obj->labels->name : 'Vehicles';
-
-// The JS file will automatically replace the href of .lgl-br-archive and .lgl-back-to-results
-// with the fully filtered URL stored in sessionStorage.
-// Determine the CSS class based on the shortcode attribute
+// Determine the CSS class based on the shortcode attribute. Defaults to 'dark'.
 $style_class = (isset($style) && $style === 'light') ? 'lgl-breadcrumbs-light' : 'lgl-breadcrumbs-dark';
 
-echo '<div class="lgl-breadcrumbs-wrapper ' . esc_attr($style_class) . '">';
+echo '<div class="lgl-breadcrumbs-wrapper ' . esc_attr($style_class) . '" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 15px;">';
 
-echo '<div class="lgl-breadcrumbs">';
-echo '<a href="' . esc_url($home_url) . '">Home</a> <span class="lgl-separator">|</span> ';
+    echo '<div class="lgl-breadcrumbs">';
+    echo '<a href="' . esc_url($home_url) . '">Home</a> <span class="lgl-separator">|</span> ';
 
-if (is_singular() && in_array($post_type, array('caravan', 'motorhome', 'campervan'))) {
-    // Single Vehicle Page
-    echo '<a href="' . esc_url($archive_url) . '" class="lgl-br-archive">' . esc_html($post_type_label) . '</a> <span class="lgl-separator">|</span> ';
-    echo '<span class="lgl-current-page">' . esc_html(get_the_title()) . '</span>';
-    echo '</div>'; // End breadcrumbs left side
+    // 1. Single Vehicle Page View
+    if (is_singular(array('caravan', 'motorhome', 'campervan'))) {
+        $archive_url = '';
+        $archive_label = '';
+        
+        // Resolve the proper archive base URL and Label from settings
+        if ($post_type === 'caravan') {
+            $archive_url = !empty($options['caravan_page']) ? get_permalink($options['caravan_page']) : get_post_type_archive_link('caravan');
+            $archive_label = 'Caravans';
+        } elseif ($post_type === 'motorhome') {
+            $archive_url = !empty($options['motorhome_page']) ? get_permalink($options['motorhome_page']) : get_post_type_archive_link('motorhome');
+            $archive_label = 'Motorhomes';
+        } elseif ($post_type === 'campervan') {
+            $archive_url = !empty($options['campervan_page']) ? get_permalink($options['campervan_page']) : get_post_type_archive_link('campervan');
+            $archive_label = 'Campervans';
+        }
 
-    // Back to Results Button (Right side)
-    echo '<div class="lgl-br-back">';
-    echo '<a href="' . esc_url($archive_url) . '" class="lgl-back-to-results lgl-btn lgl-btn-secondary">&laquo; Back to Results</a>';
-    echo '</div>';
-} else {
-    // General Archive Page
-    echo '<span class="lgl-current-page">' . esc_html($post_type_label) . '</span>';
-    echo '</div>'; // End breadcrumbs left side
-}
+        // Output middle breadcrumb (Archive Link)
+        echo '<a href="' . esc_url($archive_url) . '" class="lgl-br-archive">' . esc_html($archive_label) . '</a> <span class="lgl-separator">|</span> ';
+        // Output current vehicle title
+        echo '<span class="lgl-current-page">' . esc_html(get_the_title()) . '</span>';
+        echo '</div>'; // End breadcrumbs left side
+        
+        // Output Back to Results Button (Right side)
+        // The href here will be dynamically overwritten by our JS to include previous filter parameters
+        echo '<div class="lgl-br-back">';
+        echo '<a href="' . esc_url($archive_url) . '" class="lgl-back-to-results lgl-btn lgl-btn-secondary" style="text-decoration: none;">&laquo; Back to Results</a>';
+        echo '</div>';
+    } 
+    // 2. Custom Archive Pages or Standard Pages View
+    else {
+        // Fetch the actual title of the current page (e.g., "Motorhomes") instead of the post type label
+        $page_title = get_the_title($current_id);
+        
+        echo '<span class="lgl-current-page">' . esc_html($page_title) . '</span>';
+        echo '</div>'; // End breadcrumbs left side
+    }
 
 echo '</div>';
