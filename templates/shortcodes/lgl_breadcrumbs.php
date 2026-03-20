@@ -16,7 +16,7 @@ $current_id = get_queried_object_id();
 // Determine the CSS class based on the shortcode attribute. Defaults to 'dark'.
 $style_class = (isset($style) && $style === 'light') ? 'lgl-breadcrumbs-light' : 'lgl-breadcrumbs-dark';
 
-echo '<div class="lgl-breadcrumbs-wrapper ' . esc_attr($style_class) . '" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 15px;">';
+echo '<div class="lgl-breadcrumbs-wrapper ' . esc_attr($style_class) . '">';
 
     echo '<div class="lgl-breadcrumbs">';
     echo '<a href="' . esc_url($home_url) . '">Home</a> <span class="lgl-separator">|</span> ';
@@ -47,7 +47,7 @@ echo '<div class="lgl-breadcrumbs-wrapper ' . esc_attr($style_class) . '" style=
         // Output Back to Results Button (Right side)
         // The href here will be dynamically overwritten by our JS to include previous filter parameters
         echo '<div class="lgl-br-back">';
-        echo '<a href="' . esc_url($archive_url) . '" class="lgl-back-to-results lgl-btn lgl-btn-secondary" style="text-decoration: none;">&laquo; Back to Results</a>';
+        echo '<a href="' . esc_url($archive_url) . '" class="lgl-back-to-results lgl-btn lgl-btn-secondary">&laquo; Back to Results</a>';
         echo '</div>';
     } 
     // 2. Custom Archive Pages or Standard Pages View

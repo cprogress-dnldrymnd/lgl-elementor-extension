@@ -2058,8 +2058,12 @@
   margin-bottom: 20px;
   flex-wrap: wrap;
   gap: 15px; }
-  .lgl-breadcrumbs-wrapper a {
-    text-decoration: none; }
+  .lgl-breadcrumbs-wrapper .lgl-breadcrumbs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: clamp(5px, 1.5vw, 20px); }
+    .lgl-breadcrumbs-wrapper .lgl-breadcrumbs a {
+      text-decoration: none; }
 
 /* Maintain button styling overrides */
 .lgl-breadcrumbs-wrapper .lgl-back-to-results {
