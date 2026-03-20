@@ -211,7 +211,7 @@ jQuery(document).ready(function($) {
     // -------------------------------------------------------------------------
     if (searchSelector.length) {
         searchSelector.select2({
-            placeholder: '<?php echo esc_js(__('Search & Add Vehicle...', 'lgl-shortcodes')); ?>',
+            placeholder: '<?php echo _e(__('Search & Add Vehicle...', 'lgl-shortcodes')); ?>',
             allowClear:  true,
             ajax: {
                 url:      lgl_ajax_obj.ajax_url,
