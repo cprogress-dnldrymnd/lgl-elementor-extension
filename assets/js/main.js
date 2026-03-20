@@ -192,11 +192,9 @@
             if (isUpdatingFilters) return;
 
             currentPage = 1;
-
-            // Capture the serialized data immediately before the fields are disabled
             const currentFormData = $('#lgl-search-form').serialize();
 
-            execute_search(currentFormData);
+            execute_search(currentFormData, false); // Pass false here
             update_filter_options(currentFormData);
         });
 
@@ -355,7 +353,7 @@
          * Compiles form parameters and dispatches the AJAX search payload.
          * * @param {string} providedFormData Pre-captured string to bypass disabled state limits
          */
-        function execute_search(providedFormData) {
+        function execute_search(providedFormData, isInitialLoad = false) {
             if (activeSearchXhr) {
                 activeSearchXhr.abort();
                 activeSearchXhr = null;
@@ -374,7 +372,7 @@
             $('.lgl-pagination-wrap').css('opacity', '0.5');
 
             // --- ADD THIS BLOCK: Live URL Update & State Persistence ---
-            if (window.history.replaceState) {
+            if (window.history.replaceState && !isInitialLoad) {
                 const urlParams = new URLSearchParams(formDataStr);
 
                 // 1. Extract make and model for the path
@@ -459,7 +457,7 @@
         // Trigger initial search to populate grid on load
         if ($('#lgl-search-form').length) {
             const initialData = $('#lgl-search-form').serialize();
-            execute_search(initialData);
+            execute_search(initialData, true); // Pass true here
             update_filter_options(initialData);
         }
     }

@@ -217,16 +217,48 @@ if ($post_type) {
                 <!-- Model -->
                 <div class="lgl-filter-group">
                     <label for="lgl_model">Model</label>
-                    <select name="listing_model" id="lgl_model" class="lgl-select2" data-placeholder="Select Model" <?php echo empty($active_make_models) ? 'disabled' : ''; ?>>
-                        <?php if (empty($active_make_models)) : ?>
+                    <?php
+                    // Ensure the field is NEVER disabled if an active model exists in the URL
+                    $is_disabled = (empty($active_make_models) && empty($active_model)) ? 'disabled' : '';
+
+                    // Check if the active model was accidentally filtered out of the array
+                    $model_found = false;
+                    if (!empty($active_make_models) && $active_model) {
+                        foreach ($active_make_models as $model) {
+                            if ($model->slug === $active_model) {
+                                $model_found = true;
+                                break;
+                            }
+                        }
+                    }
+                    ?>
+                    <select name="listing_model" id="lgl_model" class="lgl-select2" data-placeholder="Select Model" <?php echo $is_disabled; ?>>
+                        <?php if (empty($active_make_models) && empty($active_model)) : ?>
                             <option value="">Select Make First</option>
                         <?php else : ?>
                             <option value="">All Models</option>
-                            <?php foreach ($active_make_models as $model) : ?>
-                                <option value="<?php echo esc_attr($model->slug); ?>" <?php selected($active_model, $model->slug); ?>>
-                                    <?php echo esc_html($model->name); ?>
-                                </option>
-                            <?php endforeach; ?>
+
+                            <?php
+                            // Fallback: Force the active model into the dropdown so JS serialization catches it
+                            if ($active_model && !$model_found) :
+                                $fallback_term = get_term_by('slug', $active_model, 'listing-make-model');
+                                if ($fallback_term) :
+                            ?>
+                                    <option value="<?php echo esc_attr($fallback_term->slug); ?>" selected="selected">
+                                        <?php echo esc_html($fallback_term->name); ?>
+                                    </option>
+                            <?php
+                                endif;
+                            endif;
+                            ?>
+
+                            <?php if (!empty($active_make_models)) : ?>
+                                <?php foreach ($active_make_models as $model) : ?>
+                                    <option value="<?php echo esc_attr($model->slug); ?>" <?php selected($active_model, $model->slug); ?>>
+                                        <?php echo esc_html($model->name); ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            <?php endif; ?>
                         <?php endif; ?>
                     </select>
                 </div>
