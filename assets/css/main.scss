@@ -834,7 +834,7 @@
 }
 
 .lgl-post--gallery {
-    .lgl-gallery-slider {
+    .lgl-slider-nav.lgl-gallery-slider {
         display: grid;
         grid-template-columns: repeat(4, 1fr);
         gap: 20px;
