@@ -832,7 +832,19 @@
         }
     }
 }
+
 .lgl-post--gallery {
+    .lgl-gallery-slider {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 20px;
+        @media (max-width: 767px) {
+            gap: 10px;
+        }
+        @media (max-width: 599px) {
+            grid-template-columns: repeat(3, 1fr);
+        }
+    }
     .lgl-cover-image {
         position: relative;
         overflow: hidden;
