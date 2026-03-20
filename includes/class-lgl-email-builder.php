@@ -31,7 +31,11 @@ class LGL_Email_Builder
         add_action('admin_post_lgl_save_global_email',  [$this, 'save_global_email_settings']);
 
         // ── Global template: apply to ALL outgoing wp_mail calls when enabled ──
-        add_filter('wp_mail', [$this, 'maybe_apply_global_template'], 10, 1);
+        add_filter('wp_mail',           [$this, 'maybe_apply_global_template'], 10, 1);
+
+        // ── From Name / From Email — applied globally whenever a value is saved ──
+        add_filter('wp_mail_from',      [$this, 'filter_mail_from'],      10, 1);
+        add_filter('wp_mail_from_name', [$this, 'filter_mail_from_name'], 10, 1);
     }
 
     /* ═══════════════════════════════════════════════════════════════
@@ -51,12 +55,12 @@ class LGL_Email_Builder
      * @param array $args  wp_mail argument array: to, subject, message, headers, attachments.
      * @return array       Potentially modified argument array.
      */
-    public function maybe_apply_global_template(array $args): array
+    public function maybe_apply_global_template( array $args ): array
     {
         $global = self::get_global_email_settings();
 
         // Feature disabled — pass through untouched
-        if (empty($global['apply_to_all_emails'])) {
+        if ( empty( $global['apply_to_all_emails'] ) ) {
             return $args;
         }
 
@@ -65,28 +69,28 @@ class LGL_Email_Builder
 
         // Skip emails that are already a complete HTML document (LGL's own emails,
         // WooCommerce, etc. that wrap themselves).
-        if (stripos($body, '<!DOCTYPE') !== false || stripos($body, '<html') !== false) {
+        if ( stripos( $body, '<!DOCTYPE' ) !== false || stripos( $body, '<html' ) !== false ) {
             return $args;
         }
 
         // Wrap the body in the global template
-        $args['message'] = self::wrap_html($subject, $body);
+        $args['message'] = self::wrap_html( $subject, $body );
 
         // Ensure the email is sent as HTML
         $headers = $args['headers'] ?? [];
-        if (is_string($headers)) {
-            $headers = array_filter(array_map('trim', explode("\n", $headers)));
+        if ( is_string( $headers ) ) {
+            $headers = array_filter( array_map( 'trim', explode( "\n", $headers ) ) );
         }
 
         $has_content_type = false;
-        foreach ((array) $headers as $header) {
-            if (stripos($header, 'content-type') !== false) {
+        foreach ( (array) $headers as $header ) {
+            if ( stripos( $header, 'content-type' ) !== false ) {
                 $has_content_type = true;
                 break;
             }
         }
 
-        if (! $has_content_type) {
+        if ( ! $has_content_type ) {
             $headers[] = 'Content-Type: text/html; charset=UTF-8';
         }
 
@@ -96,8 +100,36 @@ class LGL_Email_Builder
     }
 
     /* ═══════════════════════════════════════════════════════════════
-       MENU ROUTING
+       SENDER FILTERS — From Name & From Email
     ═══════════════════════════════════════════════════════════════ */
+
+    /**
+     * Overrides the "From" email address for all outgoing wp_mail() calls
+     * when a custom from email is saved in LGL → Email Builder → Global Template.
+     *
+     * @param  string $from  Default from address supplied by WordPress.
+     * @return string        LGL from address, or the original if not configured.
+     */
+    public function filter_mail_from( string $from ): string {
+        $settings   = self::get_global_email_settings();
+        $custom     = sanitize_email( $settings['from_email'] ?? '' );
+        return ( $custom && is_email( $custom ) ) ? $custom : $from;
+    }
+
+    /**
+     * Overrides the "From" display name for all outgoing wp_mail() calls
+     * when a custom from name is saved in LGL → Email Builder → Global Template.
+     *
+     * @param  string $name  Default from name supplied by WordPress.
+     * @return string        LGL from name, or the original if not configured.
+     */
+    public function filter_mail_from_name( string $name ): string {
+        $settings   = self::get_global_email_settings();
+        $custom     = sanitize_text_field( $settings['from_name'] ?? '' );
+        return ( $custom !== '' ) ? $custom : $name;
+    }
+
+
     /**
      * Register the consolidated master submenu page for the Email Builder.
      *
@@ -854,10 +886,10 @@ $(document).ready(function() {
                                     id="lgl_apply_to_all_emails"
                                     name="apply_to_all_emails"
                                     value="1"
-                                    <?php checked(! empty($global_settings['apply_to_all_emails'])); ?>>
+                                    <?php checked( ! empty( $global_settings['apply_to_all_emails'] ) ); ?>>
                                 <div>
                                     <label for="lgl_apply_to_all_emails">
-                                        <?php _e('Wrap all outgoing WordPress emails in this global template', 'lgl-shortcodes'); ?>
+                                        <?php _e( 'Wrap all outgoing WordPress emails in this global template', 'lgl-shortcodes' ); ?>
                                     </label>
                                     <p>
                                         <?php _e(
@@ -875,9 +907,54 @@ $(document).ready(function() {
                             </div>
                         </div>
 
-                        <!-- Colors -->
+                        <!-- ══════════════════════════════════════════════════════
+                             Sender Identity — From Name & From Email
+                        ══════════════════════════════════════════════════════ -->
                         <div class="lgl-eb-section">
-                            <h3><?php _e('Theme Colors', 'lgl-shortcodes'); ?></h3>
+                            <h3>✉️ <?php _e('Sender Identity', 'lgl-shortcodes'); ?></h3>
+                            <p class="description" style="margin-bottom:16px;">
+                                <?php _e(
+                                    'Sets the <strong>From Name</strong> and <strong>From Email</strong> on every email sent by WordPress. Leave blank to keep the WordPress default.',
+                                    'lgl-shortcodes'
+                                ); ?>
+                            </p>
+                            <table class="form-table" style="margin:0;">
+                                <tr>
+                                    <th style="width:160px;">
+                                        <label for="lgl_from_name"><?php _e('From Name', 'lgl-shortcodes'); ?></label>
+                                    </th>
+                                    <td>
+                                        <input
+                                            type="text"
+                                            id="lgl_from_name"
+                                            name="from_name"
+                                            value="<?php echo esc_attr( $global_settings['from_name'] ?? '' ); ?>"
+                                            placeholder="<?php echo esc_attr( get_option('blogname') ); ?>"
+                                            class="regular-text">
+                                        <p class="description"><?php _e( 'e.g. Clwyd Caravans', 'lgl-shortcodes' ); ?></p>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>
+                                        <label for="lgl_from_email"><?php _e('From Email', 'lgl-shortcodes'); ?></label>
+                                    </th>
+                                    <td>
+                                        <input
+                                            type="email"
+                                            id="lgl_from_email"
+                                            name="from_email"
+                                            value="<?php echo esc_attr( $global_settings['from_email'] ?? '' ); ?>"
+                                            placeholder="<?php echo esc_attr( get_option('admin_email') ); ?>"
+                                            class="regular-text">
+                                        <p class="description">
+                                            <?php _e( 'Use an address at your own domain to avoid spam filters — e.g. <code>noreply@clwydcaravans.com</code>.', 'lgl-shortcodes' ); ?>
+                                        </p>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+
+
                             <div class="lgl-eb-color-grid">
                                 <div class="lgl-eb-color-row">
                                     <label><?php _e('Outer Background', 'lgl-shortcodes'); ?></label>
@@ -1238,6 +1315,9 @@ $(document).ready(function() {
             'color_link'          => sanitize_hex_color($_POST['color_link']        ?? '#003793'),
             // NEW: persist the "apply to all" checkbox
             'apply_to_all_emails' => ! empty($_POST['apply_to_all_emails']),
+            // NEW: sender identity
+            'from_name'           => sanitize_text_field($_POST['from_name']  ?? ''),
+            'from_email'          => sanitize_email($_POST['from_email']      ?? ''),
         ]);
 
         wp_redirect(admin_url('admin.php?page=lgl-email-builder&tab=global&saved=1'));
@@ -1366,6 +1446,8 @@ $(document).ready(function() {
             'color_header_text'   => '#ffffff',
             'color_link'          => '#003793',
             'apply_to_all_emails' => false,
+            'from_name'           => '',
+            'from_email'          => '',
         ];
         return wp_parse_args(get_option('lgl_global_email_settings', []), $defaults);
     }

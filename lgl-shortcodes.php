@@ -255,7 +255,6 @@ if (! class_exists('LGL_Shortcodes')) {
                 'contact_whatsapp' => array('label' => 'WhatsApp Number', 'type' => 'text',     'default' => ''),
                 'contact_email'    => array('label' => 'Email Address',   'type' => 'text',     'default' => ''),
                 'contact_address'  => array('label' => 'Address',         'type' => 'textarea', 'default' => ''),
-                'contact_test'  => array('label' => 'Test',         'type' => 'textarea', 'default' => ''),
             );
         }
 
