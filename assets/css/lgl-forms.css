@@ -240,16 +240,16 @@
     gap: 14px;
     margin-bottom: 16px;
 }
-.lgl-form-field label {
+.lgl-form-field.lgl-form-field.lgl-form-field.lgl-form-field.lgl-form-field label {
     display: block;
     font-size: 13px;
     font-weight: 600;
     margin-bottom: 5px;
     color: var(--lgl-color-secondary);
 }
-.lgl-form-field input,
-.lgl-form-field select,
-.lgl-form-field textarea {
+.lgl-form-field.lgl-form-field.lgl-form-field.lgl-form-field.lgl-form-field input,
+.lgl-form-field.lgl-form-field.lgl-form-field.lgl-form-field.lgl-form-field select,
+.lgl-form-field.lgl-form-field.lgl-form-field.lgl-form-field.lgl-form-field textarea {
     width: 100%;
     padding: 10px 12px;
     border: 1.5px solid var(--lgl-color-medium-gray);
@@ -261,24 +261,24 @@
     font-family: var(--lgl-font-primary);
     transition: border-color 0.2s;
 }
-.lgl-form-field input:focus,
-.lgl-form-field select:focus,
-.lgl-form-field textarea:focus {
+.lgl-form-field.lgl-form-field.lgl-form-field.lgl-form-field.lgl-form-field input:focus,
+.lgl-form-field.lgl-form-field.lgl-form-field.lgl-form-field.lgl-form-field select:focus,
+.lgl-form-field.lgl-form-field.lgl-form-field.lgl-form-field.lgl-form-field textarea:focus {
     outline: none;
     border-color: var(--lgl-color-primary);
     box-shadow: 0 0 0 3px rgba(0, 55, 147, 0.1);
 }
-.lgl-form-field textarea {
+.lgl-form-field.lgl-form-field.lgl-form-field.lgl-form-field.lgl-form-field textarea {
     min-height: 100px;
     resize: vertical;
 }
-.lgl-form-field.lgl-form-col-full {
+.lgl-form-field.lgl-form-field.lgl-form-field.lgl-form-field.lgl-form-field.lgl-form-col-full {
     grid-column: 1 / -1;
 }
-.lgl-form-field.lgl-form-col-half {
+.lgl-form-field.lgl-form-field.lgl-form-field.lgl-form-field.lgl-form-field.lgl-form-col-half {
     grid-column: span 1;
 }
-.lgl-form-field input.lgl-input-err {
+.lgl-form-field.lgl-form-field.lgl-form-field.lgl-form-field.lgl-form-field input.lgl-input-err {
     border-color: var(--lgl-color-error);
 }
 .lgl-checkbox-err.lgl-checkbox-err.lgl-checkbox-err {
@@ -449,7 +449,7 @@
     .lgl-form-grid {
         grid-template-columns: 1fr;
     }
-    .lgl-form-field.lgl-form-col-half {
+    .lgl-form-field.lgl-form-field.lgl-form-field.lgl-form-field.lgl-form-field.lgl-form-col-half {
         grid-column: 1 / -1;
     }
     .lgl-confirm-dialog {
