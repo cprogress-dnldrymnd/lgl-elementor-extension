@@ -834,7 +834,7 @@
 }
 
 .lgl-post--gallery {
-    .lgl-slider-nav.lgl-gallery-slider {
+    .lgl-slider-nav.lgl-gallery-slider:not(.slick-initialized) {
         display: grid;
         grid-template-columns: repeat(4, 1fr);
         gap: 20px;

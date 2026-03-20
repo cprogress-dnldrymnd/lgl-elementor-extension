@@ -631,15 +631,15 @@
     .lgl-post--wrap .lgl-post--sidebar {
       width: 100%; } }
 
-.lgl-post--gallery .lgl-slider-nav.lgl-gallery-slider {
+.lgl-post--gallery .lgl-slider-nav.lgl-gallery-slider:not(.slick-initialized) {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 20px; }
   @media (max-width: 767px) {
-    .lgl-post--gallery .lgl-slider-nav.lgl-gallery-slider {
+    .lgl-post--gallery .lgl-slider-nav.lgl-gallery-slider:not(.slick-initialized) {
       gap: 10px; } }
   @media (max-width: 599px) {
-    .lgl-post--gallery .lgl-slider-nav.lgl-gallery-slider {
+    .lgl-post--gallery .lgl-slider-nav.lgl-gallery-slider:not(.slick-initialized) {
       grid-template-columns: repeat(3, 1fr); } }
 .lgl-post--gallery .lgl-cover-image {
   position: relative;
