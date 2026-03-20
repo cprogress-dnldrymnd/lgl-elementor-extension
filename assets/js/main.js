@@ -486,52 +486,51 @@
                     }
                 }
             }
+
+            activeSearchXhr = $.ajax({
+                url: lgl_ajax_obj.ajax_url,
+                type: 'POST',
+                data: {
+                    action: 'lgl_fetch_results',
+                    nonce: lgl_ajax_obj.nonce,
+                    post_type: postType,
+                    form_data: formData,
+                    paged: currentPage,
+                    limit: limit,
+                },
+                success: function (response) {
+                    if (response.success) {
+                        $('#lgl-results-grid').html(response.data.html);
+                        $('.lgl-pagination-wrap').html(response.data.pagination);
+
+                        let visibleCount = $('#lgl-results-grid .lgl-post').length;
+                        $('#lgl-results-count').html('Showing ' + visibleCount + ' of ' + response.data.count + ' results');
+                    } else {
+                        alert('Error fetching results.');
+                    }
+                },
+                error: function (xhr) {
+                    if (xhr.statusText !== 'abort') {
+                        alert('A server error occurred. Please try again.');
+                    }
+                },
+                complete: function () {
+                    activeSearchXhr = null;
+                    $('#lgl-loader').hide();
+                    $('#lgl-results-grid').css('opacity', '1');
+                    $('.lgl-pagination-wrap').css('opacity', '1');
+                    _set_filters_disabled(false);
+                }
+            });
         }
 
-        activeSearchXhr = $.ajax({
-            url: lgl_ajax_obj.ajax_url,
-            type: 'POST',
-            data: {
-                action: 'lgl_fetch_results',
-                nonce: lgl_ajax_obj.nonce,
-                post_type: postType,
-                form_data: formData,
-                paged: currentPage,
-                limit: limit,
-            },
-            success: function (response) {
-                if (response.success) {
-                    $('#lgl-results-grid').html(response.data.html);
-                    $('.lgl-pagination-wrap').html(response.data.pagination);
-
-                    let visibleCount = $('#lgl-results-grid .lgl-post').length;
-                    $('#lgl-results-count').html('Showing ' + visibleCount + ' of ' + response.data.count + ' results');
-                } else {
-                    alert('Error fetching results.');
-                }
-            },
-            error: function (xhr) {
-                if (xhr.statusText !== 'abort') {
-                    alert('A server error occurred. Please try again.');
-                }
-            },
-            complete: function () {
-                activeSearchXhr = null;
-                $('#lgl-loader').hide();
-                $('#lgl-results-grid').css('opacity', '1');
-                $('.lgl-pagination-wrap').css('opacity', '1');
-                _set_filters_disabled(false);
-            }
-        });
+        // Trigger initial search to populate grid on load
+        if ($('#lgl-search-form').length) {
+            const initialData = $('#lgl-search-form').serialize();
+            execute_search(initialData, true); // Pass true here
+            update_filter_options(initialData);
+        }
     }
-
-    // Trigger initial search to populate grid on load
-    if ($('#lgl-search-form').length) {
-        const initialData = $('#lgl-search-form').serialize();
-        execute_search(initialData, true); // Pass true here
-        update_filter_options(initialData);
-    }
-}
 
 
 
@@ -540,284 +539,284 @@
      * @return {void}
      */
     function initLGLMiniWishlist() {
-    const $wrapper = jQuery('.lgl-mini-wishlist-wrapper');
-    const $toggle = jQuery('.lgl-mini-wishlist-toggle-trigger');
-    const $dropdown = jQuery('.lgl-mini-wishlist-dropdown');
-    const $content = jQuery('.lgl-mini-wishlist-content');
-    const $badge = jQuery('.lgl-wishlist-count');
+        const $wrapper = jQuery('.lgl-mini-wishlist-wrapper');
+        const $toggle = jQuery('.lgl-mini-wishlist-toggle-trigger');
+        const $dropdown = jQuery('.lgl-mini-wishlist-dropdown');
+        const $content = jQuery('.lgl-mini-wishlist-content');
+        const $badge = jQuery('.lgl-wishlist-count');
 
-    if (!$wrapper.length) return;
-
-    /**
-     * Toggles the active state of the mini wishlist dropdown.
-     */
-    $toggle.on('click', function (e) {
-        e.preventDefault();
-        $dropdown.toggleClass('is-active');
-    });
-
-    /**
-     * Closes the dropdown when a click event occurs outside of the wrapper component.
-     */
-    jQuery(document).on('click', function (e) {
-        if (!$wrapper.is(e.target) && $wrapper.has(e.target).length === 0) {
-            $dropdown.removeClass('is-active');
-        }
-    });
-
-    /**
-     * Executes the AJAX request to remove a vehicle from the wishlist 
-     * and delegates DOM updates on success.
-     */
-    $content.on('click', '.lgl-remove-btn', function (e) {
-        e.preventDefault();
-        const $btn = jQuery(this);
-        const postId = $btn.data('id');
-
-        // Apply visual degradation to indicate processing
-        $btn.css('opacity', '0.5').css('pointer-events', 'none');
-
-        jQuery.ajax({
-            url: lgl_ajax_obj.ajax_url,
-            type: 'POST',
-            data: {
-                action: 'lgl_add_to_wishlist',
-                post_id: postId,
-                nonce: lgl_ajax_obj.nonce
-            },
-            success: function (response) {
-                if (response.success) {
-                    $badge.text(response.data.count);
-                    refreshMiniWishlistHtml();
-                } else {
-                    $btn.css('opacity', '1').css('pointer-events', 'auto');
-                }
-            },
-            error: function () {
-                $btn.css('opacity', '1').css('pointer-events', 'auto');
-            }
-        });
-    });
-
-    /**
-     * Triggers a subsequent AJAX call to refresh the HTML payload of the dropdown 
-     * list to maintain synchronization with the backend state.
-     * @return {void}
-     */
-    function refreshMiniWishlistHtml() {
-        jQuery.ajax({
-            url: lgl_ajax_obj.ajax_url,
-            type: 'POST',
-            data: {
-                action: 'lgl_refresh_mini_wishlist',
-                nonce: lgl_ajax_obj.nonce
-            },
-            success: function (response) {
-                if (response.success) {
-                    $content.html(response.data.html);
-                }
-            }
-        });
-    }
-}
-
-function sharevehicle() {
-    $('.lgl-vehicle-share-btn').on('click', function (e) {
-        e.preventDefault();
-
-        const $btn = $(this);
-        const urlToCopy = $btn.data('url');
-        const vehicleTitle = $btn.data('title') || 'Vehicle';
-        const successMessage = `Link for ${vehicleTitle} copied to clipboard!`;
-
-        if (!urlToCopy) {
-            console.error('Share Button Error: Missing data-url attribute.');
-            return;
-        }
+        if (!$wrapper.length) return;
 
         /**
-         * Executes the clipboard copy operation using the most appropriate API available.
-         * @param {string} text - The string (URL) to be copied to the clipboard.
-         * @param {string} successMsg - The notification message to display upon a successful copy.
+         * Toggles the active state of the mini wishlist dropdown.
          */
-        const executeCopy = (text, successMsg) => {
-            // Modern Async Clipboard API (Requires secure context / HTTPS)
-            if (navigator.clipboard && window.isSecureContext) {
-                navigator.clipboard.writeText(text)
-                    .then(() => {
-                        window.showNotification(successMsg, 'success');
-                    })
-                    .catch((err) => {
-                        console.error('Clipboard API Write Error: ', err);
-                        window.showNotification('Failed to copy link. Please try again.', 'error');
-                    });
-            } else {
-                // Fallback implementation for older browsers or local/non-secure environments
-                const $tempInput = $('<input>');
-                $('body').append($tempInput);
-                $tempInput.val(text).select();
+        $toggle.on('click', function (e) {
+            e.preventDefault();
+            $dropdown.toggleClass('is-active');
+        });
 
-                try {
-                    const successful = document.execCommand('copy');
-                    if (successful) {
-                        window.showNotification(successMsg, 'success');
+        /**
+         * Closes the dropdown when a click event occurs outside of the wrapper component.
+         */
+        jQuery(document).on('click', function (e) {
+            if (!$wrapper.is(e.target) && $wrapper.has(e.target).length === 0) {
+                $dropdown.removeClass('is-active');
+            }
+        });
+
+        /**
+         * Executes the AJAX request to remove a vehicle from the wishlist 
+         * and delegates DOM updates on success.
+         */
+        $content.on('click', '.lgl-remove-btn', function (e) {
+            e.preventDefault();
+            const $btn = jQuery(this);
+            const postId = $btn.data('id');
+
+            // Apply visual degradation to indicate processing
+            $btn.css('opacity', '0.5').css('pointer-events', 'none');
+
+            jQuery.ajax({
+                url: lgl_ajax_obj.ajax_url,
+                type: 'POST',
+                data: {
+                    action: 'lgl_add_to_wishlist',
+                    post_id: postId,
+                    nonce: lgl_ajax_obj.nonce
+                },
+                success: function (response) {
+                    if (response.success) {
+                        $badge.text(response.data.count);
+                        refreshMiniWishlistHtml();
                     } else {
-                        throw new Error('execCommand returned false');
+                        $btn.css('opacity', '1').css('pointer-events', 'auto');
                     }
-                } catch (err) {
-                    console.error('Fallback Clipboard Copy Error: ', err);
-                    window.showNotification('Failed to copy link. Please try again.', 'error');
-                } finally {
-                    // Always clean up the temporary DOM element
-                    $tempInput.remove();
+                },
+                error: function () {
+                    $btn.css('opacity', '1').css('pointer-events', 'auto');
                 }
-            }
-        };
+            });
+        });
 
-        // Trigger the copy logic
-        executeCopy(urlToCopy, successMessage);
-    });
-}
-
-/**
- * Display a toast notification globally.
- * Attached to the window object to prevent ReferenceErrors across different IIFE scopes.
- * @param {string} message - The message to display.
- * @param {string} type - 'success' or 'error' for styling.
- * @return {void}
- */
-window.showNotification = function (message, type = 'success') {
-    const $container = $('#lgl-notification-container');
-    const $notification = $('<div class="lgl-toast lgl-toast-' + type + '">' + message + '</div>');
-
-    $container.append($notification);
-
-    // Trigger reflow for transition
-    $notification[0].offsetHeight;
-
-    // Show
-    $notification.addClass('show');
-
-    // Remove after 3 seconds
-    setTimeout(function () {
-        $notification.removeClass('show');
-        setTimeout(function () {
-            $notification.remove();
-        }, 300); // Matches CSS transition duration
-    }, 3000);
-};
-
-/**
- * Binds click events for the wishlist functionality.
- * Handles AJAX requests to add or remove items from the user's wishlist and triggers toast notifications.
- * @return {void}
- */
-function add_to_wishlist() {
-    // Add Notification Container to Body
-    $('body').append('<div id="lgl-notification-container"></div>');
-
-    // Handle Wishlist Click
-    $(document).on('click', '.lgl-wishlist-btn', function (e) {
-        e.preventDefault();
-
-        let $btn = $(this);
-        let postId = $btn.data('id');
-        // Retrieve title from the data attribute as requested
-        let postTitle = $btn.data('title');
-
-        if ($btn.hasClass('processing')) return;
-
-        $btn.addClass('processing');
-
-        $.ajax({
-            url: lgl_ajax_obj.ajax_url,
-            type: 'POST',
-            data: {
-                action: 'lgl_add_to_wishlist',
-                nonce: lgl_ajax_obj.nonce,
-                post_id: postId
-            },
-            success: function (response) {
-                if (response.success) {
-                    if (response.data.status === 'added') {
-                        $btn.addClass('added');
-                        window.showNotification(postTitle + ' added to wishlist!');
-                    } else if (response.data.status === 'removed') {
-                        $btn.removeClass('added');
-                        window.showNotification(postTitle + ' removed from wishlist.', 'error'); // Using error type for styling removal
+        /**
+         * Triggers a subsequent AJAX call to refresh the HTML payload of the dropdown 
+         * list to maintain synchronization with the backend state.
+         * @return {void}
+         */
+        function refreshMiniWishlistHtml() {
+            jQuery.ajax({
+                url: lgl_ajax_obj.ajax_url,
+                type: 'POST',
+                data: {
+                    action: 'lgl_refresh_mini_wishlist',
+                    nonce: lgl_ajax_obj.nonce
+                },
+                success: function (response) {
+                    if (response.success) {
+                        $content.html(response.data.html);
                     }
+                }
+            });
+        }
+    }
+
+    function sharevehicle() {
+        $('.lgl-vehicle-share-btn').on('click', function (e) {
+            e.preventDefault();
+
+            const $btn = $(this);
+            const urlToCopy = $btn.data('url');
+            const vehicleTitle = $btn.data('title') || 'Vehicle';
+            const successMessage = `Link for ${vehicleTitle} copied to clipboard!`;
+
+            if (!urlToCopy) {
+                console.error('Share Button Error: Missing data-url attribute.');
+                return;
+            }
+
+            /**
+             * Executes the clipboard copy operation using the most appropriate API available.
+             * @param {string} text - The string (URL) to be copied to the clipboard.
+             * @param {string} successMsg - The notification message to display upon a successful copy.
+             */
+            const executeCopy = (text, successMsg) => {
+                // Modern Async Clipboard API (Requires secure context / HTTPS)
+                if (navigator.clipboard && window.isSecureContext) {
+                    navigator.clipboard.writeText(text)
+                        .then(() => {
+                            window.showNotification(successMsg, 'success');
+                        })
+                        .catch((err) => {
+                            console.error('Clipboard API Write Error: ', err);
+                            window.showNotification('Failed to copy link. Please try again.', 'error');
+                        });
                 } else {
-                    window.showNotification('Error: ' + (response.data || 'Unknown error.'), 'error');
-                }
-            },
-            error: function () {
-                window.showNotification('A server error occurred.', 'error');
-            },
-            complete: function () {
-                $btn.removeClass('processing');
-            }
-        });
-    });
-}
+                    // Fallback implementation for older browsers or local/non-secure environments
+                    const $tempInput = $('<input>');
+                    $('body').append($tempInput);
+                    $tempInput.val(text).select();
 
-function vehicle_slider() {
-    //vehicle slider
-    $('.vehicle-slider-js').slick({
-        mobileFirst: true, // Reverses default max-width breakpoint calculation to min-width
-        slidesToShow: 1,
-        slidesToScroll: 1,
-        fade: false, // Disabled to allow standard inline block layout for multiple slides
-        arrows: true,
-        responsive: [
-            {
-                // Triggers at min-width: 768px
-                breakpoint: 767,
-                settings: {
-                    slidesToShow: 2,
-                    slidesToScroll: 2,
-                }
-            },
-            {
-                // Triggers at min-width: 1300px
-                breakpoint: 1300,
-                settings: {
-                    slidesToShow: 3,
-                    slidesToScroll: 3,
-                }
-            }
-        ],
-        prevArrow: '<button type="button" class="slick-prev"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-left" viewBox="0 0 16 16"> <path fill-rule="evenodd" d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8"/> </svg></button>',
-        nextArrow: '<button type="button" class="slick-next"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-right" viewBox="0 0 16 16"> <path fill-rule="evenodd" d="M1 8a.5.5 0 0 1 .5-.5h11.793l-3.147-3.146a.5.5 0 0 1 .708-.708l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708L13.293 8.5H1.5A.5.5 0 0 1 1 8"/> </svg></button>'
-    });
-    /* Gallery Slider */
-    if ($('.js-gallery-slider').length > 0) {
-        $('.js-gallery-slider-for').slick({
-            slidesToShow: 1,
-            slidesToScroll: 1,
-            fade: true,
-            arrows: false,
-            asNavFor: '.js-gallery-slider-nav',
-            prevArrow: '<button type=\"button\" class=\"slick-prev\">Prev</button>',
-            nextArrow: '<button type=\"button\" class=\"slick-next\">Next</button>'
-        });
-        $('.js-gallery-slider-nav').slick({
-            slidesToShow: 4,
-            slidesToScroll: 1,
-            arrows: false,
-            focusOnSelect: true,
-            asNavFor: '.js-gallery-slider-for',
-            responsive: [
-                {
-                    breakpoint: 600,
-                    settings: {
-                        slidesToShow: 3
+                    try {
+                        const successful = document.execCommand('copy');
+                        if (successful) {
+                            window.showNotification(successMsg, 'success');
+                        } else {
+                            throw new Error('execCommand returned false');
+                        }
+                    } catch (err) {
+                        console.error('Fallback Clipboard Copy Error: ', err);
+                        window.showNotification('Failed to copy link. Please try again.', 'error');
+                    } finally {
+                        // Always clean up the temporary DOM element
+                        $tempInput.remove();
                     }
                 }
-            ]
+            };
+
+            // Trigger the copy logic
+            executeCopy(urlToCopy, successMessage);
         });
     }
-}
-}) (jQuery);
+
+    /**
+     * Display a toast notification globally.
+     * Attached to the window object to prevent ReferenceErrors across different IIFE scopes.
+     * @param {string} message - The message to display.
+     * @param {string} type - 'success' or 'error' for styling.
+     * @return {void}
+     */
+    window.showNotification = function (message, type = 'success') {
+        const $container = $('#lgl-notification-container');
+        const $notification = $('<div class="lgl-toast lgl-toast-' + type + '">' + message + '</div>');
+
+        $container.append($notification);
+
+        // Trigger reflow for transition
+        $notification[0].offsetHeight;
+
+        // Show
+        $notification.addClass('show');
+
+        // Remove after 3 seconds
+        setTimeout(function () {
+            $notification.removeClass('show');
+            setTimeout(function () {
+                $notification.remove();
+            }, 300); // Matches CSS transition duration
+        }, 3000);
+    };
+
+    /**
+     * Binds click events for the wishlist functionality.
+     * Handles AJAX requests to add or remove items from the user's wishlist and triggers toast notifications.
+     * @return {void}
+     */
+    function add_to_wishlist() {
+        // Add Notification Container to Body
+        $('body').append('<div id="lgl-notification-container"></div>');
+
+        // Handle Wishlist Click
+        $(document).on('click', '.lgl-wishlist-btn', function (e) {
+            e.preventDefault();
+
+            let $btn = $(this);
+            let postId = $btn.data('id');
+            // Retrieve title from the data attribute as requested
+            let postTitle = $btn.data('title');
+
+            if ($btn.hasClass('processing')) return;
+
+            $btn.addClass('processing');
+
+            $.ajax({
+                url: lgl_ajax_obj.ajax_url,
+                type: 'POST',
+                data: {
+                    action: 'lgl_add_to_wishlist',
+                    nonce: lgl_ajax_obj.nonce,
+                    post_id: postId
+                },
+                success: function (response) {
+                    if (response.success) {
+                        if (response.data.status === 'added') {
+                            $btn.addClass('added');
+                            window.showNotification(postTitle + ' added to wishlist!');
+                        } else if (response.data.status === 'removed') {
+                            $btn.removeClass('added');
+                            window.showNotification(postTitle + ' removed from wishlist.', 'error'); // Using error type for styling removal
+                        }
+                    } else {
+                        window.showNotification('Error: ' + (response.data || 'Unknown error.'), 'error');
+                    }
+                },
+                error: function () {
+                    window.showNotification('A server error occurred.', 'error');
+                },
+                complete: function () {
+                    $btn.removeClass('processing');
+                }
+            });
+        });
+    }
+
+    function vehicle_slider() {
+        //vehicle slider
+        $('.vehicle-slider-js').slick({
+            mobileFirst: true, // Reverses default max-width breakpoint calculation to min-width
+            slidesToShow: 1,
+            slidesToScroll: 1,
+            fade: false, // Disabled to allow standard inline block layout for multiple slides
+            arrows: true,
+            responsive: [
+                {
+                    // Triggers at min-width: 768px
+                    breakpoint: 767,
+                    settings: {
+                        slidesToShow: 2,
+                        slidesToScroll: 2,
+                    }
+                },
+                {
+                    // Triggers at min-width: 1300px
+                    breakpoint: 1300,
+                    settings: {
+                        slidesToShow: 3,
+                        slidesToScroll: 3,
+                    }
+                }
+            ],
+            prevArrow: '<button type="button" class="slick-prev"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-left" viewBox="0 0 16 16"> <path fill-rule="evenodd" d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8"/> </svg></button>',
+            nextArrow: '<button type="button" class="slick-next"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-right" viewBox="0 0 16 16"> <path fill-rule="evenodd" d="M1 8a.5.5 0 0 1 .5-.5h11.793l-3.147-3.146a.5.5 0 0 1 .708-.708l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708L13.293 8.5H1.5A.5.5 0 0 1 1 8"/> </svg></button>'
+        });
+        /* Gallery Slider */
+        if ($('.js-gallery-slider').length > 0) {
+            $('.js-gallery-slider-for').slick({
+                slidesToShow: 1,
+                slidesToScroll: 1,
+                fade: true,
+                arrows: false,
+                asNavFor: '.js-gallery-slider-nav',
+                prevArrow: '<button type=\"button\" class=\"slick-prev\">Prev</button>',
+                nextArrow: '<button type=\"button\" class=\"slick-next\">Next</button>'
+            });
+            $('.js-gallery-slider-nav').slick({
+                slidesToShow: 4,
+                slidesToScroll: 1,
+                arrows: false,
+                focusOnSelect: true,
+                asNavFor: '.js-gallery-slider-for',
+                responsive: [
+                    {
+                        breakpoint: 600,
+                        settings: {
+                            slidesToShow: 3
+                        }
+                    }
+                ]
+            });
+        }
+    }
+})(jQuery);
 
 
 /**
