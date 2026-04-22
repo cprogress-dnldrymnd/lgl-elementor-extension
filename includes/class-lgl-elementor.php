@@ -6,13 +6,16 @@ if (!defined('ABSPATH')) {
 /**
  * Initializes the Elementor Integration safely.
  */
-class LGL_Elementor_Integration {
-    public function __construct() {
+class LGL_Elementor_Integration
+{
+    public function __construct()
+    {
         add_action('elementor/elements/categories_registered', [$this, 'add_category']);
         add_action('elementor/widgets/register', [$this, 'register_widgets']);
     }
 
-    public function add_category($elements_manager) {
+    public function add_category($elements_manager)
+    {
         $elements_manager->add_category(
             'lgl-elements',
             [
@@ -22,7 +25,8 @@ class LGL_Elementor_Integration {
         );
     }
 
-    public function register_widgets($widgets_manager) {
+    public function register_widgets($widgets_manager)
+    {
         $widgets_manager->register(new LGL_Elementor_Widget());
     }
 }
@@ -40,25 +44,31 @@ add_action('plugins_loaded', function () {
  */
 if (did_action('elementor/loaded')) {
 
-    class LGL_Elementor_Widget extends \Elementor\Widget_Base {
+    class LGL_Elementor_Widget extends \Elementor\Widget_Base
+    {
 
-        public function get_name() {
+        public function get_name()
+        {
             return 'lgl_unified_shortcode';
         }
 
-        public function get_title() {
+        public function get_title()
+        {
             return __('LGL Shortcode', 'lgl-shortcodes');
         }
 
-        public function get_icon() {
+        public function get_icon()
+        {
             return 'eicon-shortcode';
         }
 
-        public function get_categories() {
+        public function get_categories()
+        {
             return ['lgl-elements'];
         }
 
-        protected function register_controls() {
+        protected function register_controls()
+        {
 
             $this->start_controls_section(
                 'content_section',
@@ -202,10 +212,11 @@ if (did_action('elementor/loaded')) {
             $this->end_controls_section();
         }
 
-        protected function render() {
+        protected function render()
+        {
             $settings = $this->get_settings_for_display();
             $shortcode_tag = $settings['shortcode_type'];
-            
+
             $atts_string = '';
 
             // Build shortcode string based on the active selection
@@ -215,26 +226,22 @@ if (did_action('elementor/loaded')) {
                 if (!empty($settings['attr_style']))       $atts_string .= ' style="' . esc_attr($settings['attr_style']) . '"';
                 if ($settings['attr_is_carousel'] === 'true') $atts_string .= ' is_carousel="true"';
                 if ($settings['attr_is_featured'] === 'true') $atts_string .= ' is_featured="true"';
-            } 
-            
-            elseif ($shortcode_tag === 'lgl_search') {
+            } elseif ($shortcode_tag === 'lgl_search') {
                 if (!empty($settings['attr_post_type']))   $atts_string .= ' post_type="' . esc_attr($settings['attr_post_type']) . '"';
                 if (!empty($settings['attr_search_type'])) $atts_string .= ' search_type="' . esc_attr($settings['attr_search_type']) . '"';
-                
+
                 // If live search is disabled, output 'false'
                 if (empty($settings['attr_live_search'])) {
                     $atts_string .= ' live_search="false"';
                 }
-            }
-
-            elseif ($shortcode_tag === 'lgl_compare_duo') {
+            } elseif ($shortcode_tag === 'lgl_compare_duo') {
                 if (!empty($settings['attr_post_id_1'])) $atts_string .= ' post_id_1="' . esc_attr($settings['attr_post_id_1']) . '"';
                 if (!empty($settings['attr_post_id_2'])) $atts_string .= ' post_id_2="' . esc_attr($settings['attr_post_id_2']) . '"';
             }
 
             // Execute shortcode
             $final_shortcode = '[' . $shortcode_tag . $atts_string . ']';
-            
+
             echo do_shortcode($final_shortcode);
         }
     }
