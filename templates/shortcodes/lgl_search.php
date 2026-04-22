@@ -213,11 +213,11 @@ if ($post_type) {
                     <?php } ?>
 
                     <!-- Make -->
-                    <div class="lgl-filter-group">
+                   <div class="lgl-filter-group">
                         <label for="lgl_make">Make</label>
-                        <select name="listing_make" id="lgl_make" class="lgl-select2" data-placeholder="Select Make" <?php echo ($post_type == false) ? 'disabled' : ''; ?>>
-                            <option value=""><?php echo ($post_type == false) ? 'Select Vehicle Type First' : 'All Makes'; ?></option>
-                            <?php if ($post_type != false) : ?>
+                        <select name="listing_make" id="lgl_make" class="lgl-select2" data-placeholder="Select Make" <?php echo ($data_post_type == false) ? 'disabled' : ''; ?>>
+                            <option value=""><?php echo ($data_post_type == false) ? 'Select Vehicle Type First' : 'All Makes'; ?></option>
+                            <?php if ($data_post_type != false) : ?>
                                 <?php foreach ($makes as $make) : ?>
                                     <option value="<?php echo esc_attr($make->slug); ?>" <?php selected($active_make, $make->slug); ?>>
                                         <?php echo esc_html($make->name); ?>
