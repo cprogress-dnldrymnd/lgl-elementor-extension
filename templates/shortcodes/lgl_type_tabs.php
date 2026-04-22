@@ -28,7 +28,7 @@ $active_type = get_query_var('post_type') ? get_query_var('post_type') : '';
 
 ?>
 <div class="lgl-type-tabs-wrapper">
-    <ul class="lgl-type-tabs" style="display: flex; gap: 10px; list-style: none; padding: 0;">
+    <ul class="lgl-type-tabs">
 
         <?php if ($enable_caravan && $caravan_page) :
             $url = get_the_permalink($caravan_page);
