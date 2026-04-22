@@ -18,7 +18,6 @@ class LGL_Elementor_Integration {
             return;
         }
 
-        // Elementor is active: hook into the registration processes
         add_action('elementor/elements/categories_registered', [$this, 'add_category']);
         add_action('elementor/widgets/register', [$this, 'register_widgets']);
     }
@@ -34,10 +33,19 @@ class LGL_Elementor_Integration {
     }
 
     public function register_widgets($widgets_manager) {
-        // ONLY require the widget class file when Elementor explicitly asks for widgets.
-        // This completely prevents the "Class not found" fatal error.
-        require_once __DIR__ . '/class-lgl-elementor-widget.php';
-        $widgets_manager->register(new \LGL_Elementor_Widget());
+        // Load the file containing all our individual widget classes
+        require_once __DIR__ . '/class-lgl-elementor-widgets.php';
+
+        // Register each widget individually
+        $widgets_manager->register(new \LGL_Widget_Search());
+        $widgets_manager->register(new \LGL_Widget_Type_Tabs());
+        $widgets_manager->register(new \LGL_Widget_Search_Results());
+        $widgets_manager->register(new \LGL_Widget_Listing());
+        $widgets_manager->register(new \LGL_Widget_Compare());
+        $widgets_manager->register(new \LGL_Widget_Compare_Duo());
+        $widgets_manager->register(new \LGL_Widget_Wishlist());
+        $widgets_manager->register(new \LGL_Widget_My_Account());
+        $widgets_manager->register(new \LGL_Widget_Breadcrumbs());
     }
 }
 
