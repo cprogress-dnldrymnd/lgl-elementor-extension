@@ -2782,10 +2782,10 @@ $wt-cols: 110px 1fr 120px 110px 80px 80px 50px;
             border-radius: 10px 10px 0 0;
             background-color: var(--lgl-color-white);
             color: var(--lgl-color-secondary);
-            padding-bottom: 0;
             min-width: 160px;
             &.is-active {
                 background-color: var(--lgl-color-secondary);
+                color: var(--lgl-color-white);
             }
         }
     }

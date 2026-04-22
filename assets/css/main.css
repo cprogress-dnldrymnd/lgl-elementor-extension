@@ -2173,9 +2173,9 @@
     border-radius: 10px 10px 0 0;
     background-color: var(--lgl-color-white);
     color: var(--lgl-color-secondary);
-    padding-bottom: 0;
     min-width: 160px; }
     .lgl-type-tabs-wrapper .lgl-type-tabs .lgl-tab-btn.is-active {
-      background-color: var(--lgl-color-secondary); }
+      background-color: var(--lgl-color-secondary);
+      color: var(--lgl-color-white); }
 
 /*# sourceMappingURL=main.css.map */
