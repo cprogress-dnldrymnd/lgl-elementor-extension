@@ -16,7 +16,6 @@ if (is_user_logged_in()) {
         : false;
 }
 
-ob_start();
 ?>
 <div class="lgl-mini-wishlist-wrapper">
     <div class="lgl-mini-wishlist-toggle lgl-mini-wishlist-toggle-trigger" role="button" tabindex="0">
@@ -35,7 +34,6 @@ ob_start();
         <div class="lgl-mini-wishlist-content">
             <?php echo $this->get_mini_wishlist_html(); ?>
         </div>
-
         <?php if ($wishlist_url) { ?>
             <div class="lgl-mini-wishlist-footer">
                 <a href="<?= $wishlist_url ?>" class="lgl-view-wishlist-link">View Your Wishlist</a>
