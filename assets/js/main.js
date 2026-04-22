@@ -16,6 +16,12 @@
         initTypeTabs();
     });
 
+    /**
+     * Initializes the newly added Vehicle Type Tabs shortcode.
+     * Listens for clicks on the tabs and syncs the selection with the main Search Form dropdown.
+     * If the search form isn't present (e.g., on a different page), it redirects the user.
+     */
+
     function initTypeTabs() {
         $(document).on('click', '.lgl-tab-btn', function (e) {
             e.preventDefault();

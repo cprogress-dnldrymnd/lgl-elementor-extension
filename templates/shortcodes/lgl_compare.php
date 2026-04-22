@@ -25,7 +25,15 @@ if (!empty($options['disable_compare'])) {
 $preload         = null;   // Will hold { ids: [], type: '' } if valid
 $preload_error   = null;   // Will hold a user-facing error string if invalid
 
-$allowed_types = array('caravan', 'motorhome', 'campervan');
+$enable_caravan   = isset($options['enable_caravan']) ? $options['enable_caravan'] : '1';
+$enable_motorhome = isset($options['enable_motorhome']) ? $options['enable_motorhome'] : '1';
+$enable_campervan = isset($options['enable_campervan']) ? $options['enable_campervan'] : '1';
+
+// Dynamically build the allowed types array based on active settings
+$allowed_types = array();
+if ($enable_caravan) $allowed_types[] = 'caravan';
+if ($enable_motorhome) $allowed_types[] = 'motorhome';
+if ($enable_campervan) $allowed_types[] = 'campervan';
 
 if (!empty($_GET['compare'])) {
     $raw_ids = sanitize_text_field(wp_unslash($_GET['compare']));
