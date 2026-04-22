@@ -13,7 +13,33 @@
         initLGLMiniWishlist();
         sharevehicle();
         initBreadcrumbs();
+        initTypeTabs();
     });
+
+    function initTypeTabs() {
+        $(document).on('click', '.lgl-tab-btn', function (e) {
+            e.preventDefault();
+            const $btn = $(this);
+            const url = $btn.data('url');
+
+            // UI Update: Make active
+            $('.lgl-tab-btn').removeClass('is-active');
+            $btn.addClass('is-active');
+
+            // Find the global search dropdown
+            const $select = $('#lgl_post_type');
+
+            if ($select.length > 0) {
+                // If on global search page: update hidden select to adjust the filters below it
+                $select.val(url).trigger('change.select2');
+            } else {
+                // If on an archive page: Redirect to the target vehicle type page
+                if (url) {
+                    window.location.href = url;
+                }
+            }
+        });
+    }
 
     /**
       * Retrieves the last search URL from session storage and updates 

@@ -177,10 +177,14 @@ if ($post_type) {
                         $motorhome_page = $options['motorhome_page'] ?? false;
                         $campervan_page = $options['campervan_page'] ?? false;
 
+                        $enable_caravan   = isset($options['enable_caravan']) ? $options['enable_caravan'] : '1';
+                        $enable_motorhome = isset($options['enable_motorhome']) ? $options['enable_motorhome'] : '1';
+                        $enable_campervan = isset($options['enable_campervan']) ? $options['enable_campervan'] : '1';
+
                         $vehicle_types = array();
-                        if ($caravan_page)   $vehicle_types[] = array('url' => get_the_permalink($caravan_page),   'label' => 'Caravan',   'slug' => 'caravan');
-                        if ($motorhome_page) $vehicle_types[] = array('url' => get_the_permalink($motorhome_page), 'label' => 'Motorhome', 'slug' => 'motorhome');
-                        if ($campervan_page) $vehicle_types[] = array('url' => get_the_permalink($campervan_page), 'label' => 'Campervan', 'slug' => 'campervan');
+                        if ($enable_caravan && $caravan_page)   $vehicle_types[] = array('url' => get_the_permalink($caravan_page),   'label' => 'Caravan',   'slug' => 'caravan');
+                        if ($enable_motorhome && $motorhome_page) $vehicle_types[] = array('url' => get_the_permalink($motorhome_page), 'label' => 'Motorhome', 'slug' => 'motorhome');
+                        if ($enable_campervan && $campervan_page) $vehicle_types[] = array('url' => get_the_permalink($campervan_page), 'label' => 'Campervan', 'slug' => 'campervan');
                         ?>
 
                         <?php if (!empty($vehicle_types)) : ?>

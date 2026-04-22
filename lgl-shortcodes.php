@@ -428,6 +428,9 @@ if (! class_exists('LGL_Shortcodes')) {
             add_settings_section('lgl_pages', 'LGL Pages', null, 'lgl-pages');
 
             $lgl_pages_fields = array(
+                'enable_caravan'             => array('label' => 'Enable Caravans', 'type' => 'checkbox', 'default' => '1'),
+                'enable_motorhome'           => array('label' => 'Enable Motorhomes', 'type' => 'checkbox', 'default' => '1'),
+                'enable_campervan'           => array('label' => 'Enable Campervans', 'type' => 'checkbox', 'default' => '1'),
                 'vehicle_comparison_page_id' => array('label' => 'Vehicle Comparison Page', 'type' => 'select_page', 'default' => ''),
                 'wishlist_page_id' => array('label' => 'Wishlist Page', 'type' => 'select_page', 'default' => ''),
                 'my_account_page_id'         => array('label' => 'My Account Page',          'type' => 'select_page', 'default' => ''),
@@ -928,6 +931,7 @@ if (! class_exists('LGL_Shortcodes')) {
             add_shortcode('lgl_my_account', array($this, 'render_shortcode'));
             add_shortcode('lgl_mini_account', array($this, 'render_shortcode'));
             add_shortcode('lgl_breadcrumbs', array($this, 'render_shortcode'));
+            add_shortcode('lgl_type_tabs', array($this, 'render_shortcode'));
         }
 
         /**
