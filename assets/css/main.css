@@ -2159,4 +2159,23 @@
   font-size: 1rem;
   font-weight: bold; }
 
+.lgl-type-tabs-wrapper .lgl-type-tabs {
+  display: flex;
+  list-style: none;
+  padding: 0;
+  margin-bottom: -1px;
+  gap: 5px;
+  padding-left: 50px; }
+  .lgl-type-tabs-wrapper .lgl-type-tabs li {
+    line-height: 1;
+    display: flex; }
+  .lgl-type-tabs-wrapper .lgl-type-tabs .lgl-tab-btn {
+    border-radius: 10px 10px 0 0;
+    background-color: var(--lgl-color-white);
+    color: var(--lgl-color-secondary);
+    padding-bottom: 0;
+    min-width: 160px; }
+    .lgl-type-tabs-wrapper .lgl-type-tabs .lgl-tab-btn.is-active {
+      background-color: var(--lgl-color-secondary); }
+
 /*# sourceMappingURL=main.css.map */
