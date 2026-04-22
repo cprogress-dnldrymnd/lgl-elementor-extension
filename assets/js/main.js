@@ -175,7 +175,7 @@
             window.location.href = redirectUrl;
         });
 
-       // Dependent Dropdown Logic (Make -> Model) for global search or initial load
+        // Dependent Dropdown Logic (Make -> Model) for global search or initial load
         $('#lgl_make').on('change', function () {
             if (isUpdatingFilters) return; // Prevent conflicts with update_filter_options
 
@@ -213,16 +213,23 @@
             }
         });
 
-        // Vehicle Type change → load Makes for the selected type (global search form only)
+        // Vehicle Type change → load Makes for the selected type
         $('#lgl_post_type').on('change', function () {
             const $selected = $(this).find('option:selected');
             const postTypeSlug = $selected.data('post-type');
             const $makeSelect = $('#lgl_make');
             const $modelSelect = $('#lgl_model');
 
-            // Ensure the hidden form input updates so update_filter_options works on the global form
+            // Update hidden target so backend knows what to query
             $('#lgl_target_post_type').val(postTypeSlug);
 
+            // NEW: If secondary fields are visible (Tabs mode), let update_filter_options handle ALL fetching holistically
+            if ($('#lgl_condition').length > 0 && typeof update_filter_options === 'function') {
+                update_filter_options($('#lgl-search-form').serialize());
+                return; // Abort the basic fetcher!
+            }
+
+            // --- Basic Global Search Fetcher (Only runs if Condition/Berth are completely hidden) ---
             $makeSelect.empty().append('<option value="">Select Vehicle Type First</option>').prop('disabled', true).trigger('change.select2');
             $modelSelect.empty().append('<option value="">Select Make First</option>').prop('disabled', true).trigger('change.select2');
 
@@ -248,16 +255,8 @@
                     } else {
                         $makeSelect.empty().append('<option value="">No makes available</option>').trigger('change.select2');
                     }
-                },
-                error: function () {
-                    $makeSelect.empty().append('<option value="">Error loading makes</option>').trigger('change.select2');
-                },
+                }
             });
-
-            // NEW: If secondary fields are visible (Tabs mode), fetch fresh Condition/Berth/Price options
-            if ($('#lgl_condition').length > 0 && typeof update_filter_options === 'function') {
-                update_filter_options($('#lgl-search-form').serialize());
-            }
         });
 
         // Single handler — captures form data BEFORE execute_search disables the inputs!
@@ -276,6 +275,20 @@
             // Inject visibility evaluation here
             evaluateResetButtonVisibility();
         });
+
+        // NEW handler: Ensure filter options update on NO-AJAX forms when using tabs
+        $('#lgl-search-form.lgl-filter-form-no-ajax').on('change', 'select', function (e) {
+            // Ignore post_type as its own handler manages base logic above
+            if ($(this).attr('id') === 'lgl_post_type') return;
+
+            if (isUpdatingFilters) return;
+
+            // Trigger the option constraint fetcher natively
+            const currentFormData = $('#lgl-search-form').serialize();
+            update_filter_options(currentFormData);
+            evaluateResetButtonVisibility();
+        });
+        
         // Intercept standard WordPress pagination clicks for AJAX handling
         $(document).on('click', '.lgl-pagination-wrap a.page-numbers', function (e) {
             e.preventDefault();
