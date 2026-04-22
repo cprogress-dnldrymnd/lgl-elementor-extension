@@ -43,6 +43,12 @@
     margin-bottom: 0;
     background-color: var(--lgl-color-primary);
     padding: 30px;
+    @media (max-width: 575px) {
+        padding: 20px;
+    }
+    @media (max-width: 440px) {
+        padding: 15px;
+    }
     &:not(.lgl-search-container-bg-secondary) {
         @media (max-width: 1024px) {
             padding: 0;
@@ -486,6 +492,9 @@
             @media (max-width: 480px) {
                 font-size: 1.25rem;
             }
+            @media (max-width: 1024px) {
+                font-size: 1.25rem;
+            }
         }
     }
     &.style-2 {
@@ -606,6 +615,10 @@
         svg {
             width: 20px;
             height: 20px;
+        }
+        @media (max-width: 480px) {
+            padding: 10px 15px;
+            font-size: 0.875rem;
         }
     }
 }
@@ -2801,6 +2814,7 @@ $wt-cols: 110px 1fr 120px 110px 80px 80px 50px;
             }
             @media (max-width: 575px) {
                 font-size: 0.75rem;
+                border-radius: 5px 5px 0 0;
             }
             @media (max-width: 440px) {
                 padding: 10px 10px;
