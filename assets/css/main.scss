@@ -330,6 +330,12 @@
             .select2-container--default .select2-selection--single {
                 background-color: #f1f1f1;
                 border-color: #f1f1f1;
+                @media (max-width: 767px) {
+                    font-size: 1rem;
+                }
+                @media (max-width: 575px) {
+                    font-size: 14px;
+                }
             }
         }
         @media (max-width: 480px) {
@@ -344,6 +350,16 @@
                 display: -webkit-inline-box;
             }
         }
+    }
+}
+
+.select2-container,
+.elementor-editor-active .select2-container {
+    @media (max-width: 767px) {
+        font-size: 1rem;
+    }
+    @media (max-width: 575px) {
+        font-size: 14px;
     }
 }
 
