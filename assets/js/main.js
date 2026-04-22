@@ -175,9 +175,13 @@
             window.location.href = redirectUrl;
         });
 
-        // Dependent Dropdown Logic (Make -> Model) for global search or initial load
+       // Dependent Dropdown Logic (Make -> Model) for global search or initial load
         $('#lgl_make').on('change', function () {
             if (isUpdatingFilters) return; // Prevent conflicts with update_filter_options
+
+            // NEW: Abort this basic fetcher if full filter layout is present.
+            // Let update_filter_options() handle the tightly constrained fetch!
+            if ($('#lgl_condition').length > 0) return;
 
             let make_id = $(this).val();
             let $model_select = $('#lgl_model');
