@@ -378,3 +378,146 @@ class LGL_Widget_Breadcrumbs extends \Elementor\Widget_Base
         echo do_shortcode('[lgl_breadcrumbs]');
     }
 }
+
+/* ==========================================================================
+   5. Related Vehicles Widget
+   ========================================================================== */
+class LGL_Widget_Related_Vehicles extends \Elementor\Widget_Base
+{
+    public function get_name()
+    {
+        return 'lgl_related_vehicles_widget';
+    }
+    public function get_title()
+    {
+        return __('Related Vehicles', 'lgl-shortcodes');
+    }
+    public function get_icon()
+    {
+        return 'eicon-post-list';
+    }
+    public function get_categories()
+    {
+        return ['lgl-elements'];
+    }
+    public function get_keywords()
+    {
+        return ['lgl', 'related', 'vehicles', 'similar'];
+    }
+
+    protected function register_controls()
+    {
+        $this->start_controls_section('content_section', ['label' => __('Related Settings', 'lgl-shortcodes'), 'tab' => \Elementor\Controls_Manager::TAB_CONTENT]);
+
+        $this->add_control('attr_post_type', [
+            'label' => __('Vehicle Type', 'lgl-shortcodes'),
+            'type' => \Elementor\Controls_Manager::SELECT,
+            'default' => '',
+            'options' => ['' => 'Current Post Type', 'caravan' => 'Caravan', 'motorhome' => 'Motorhome', 'campervan' => 'Campervan'],
+        ]);
+
+        $this->add_control('attr_count', [
+            'label' => __('Number of Vehicles', 'lgl-shortcodes'),
+            'type' => \Elementor\Controls_Manager::NUMBER,
+            'default' => 3,
+        ]);
+
+        $this->end_controls_section();
+    }
+
+    protected function render()
+    {
+        $settings = $this->get_settings_for_display();
+        $atts = '';
+        if (!empty($settings['attr_post_type'])) $atts .= ' post_type="' . esc_attr($settings['attr_post_type']) . '"';
+        if (!empty($settings['attr_count'])) $atts .= ' count="' . esc_attr($settings['attr_count']) . '"';
+        echo do_shortcode('[lgl_related_vehicles' . $atts . ']');
+    }
+}
+
+/* ==========================================================================
+   6. Mini Components (No Attributes)
+   ========================================================================== */
+class LGL_Widget_Mini_Account extends \Elementor\Widget_Base
+{
+    public function get_name()
+    {
+        return 'lgl_mini_account_widget';
+    }
+    public function get_title()
+    {
+        return __('Mini Account Bar', 'lgl-shortcodes');
+    }
+    public function get_icon()
+    {
+        return 'eicon-person';
+    }
+    public function get_categories()
+    {
+        return ['lgl-elements'];
+    }
+    public function get_keywords()
+    {
+        return ['lgl', 'mini', 'account', 'login', 'bar'];
+    }
+    protected function render()
+    {
+        echo do_shortcode('[lgl_mini_account]');
+    }
+}
+
+class LGL_Widget_Mini_Compare extends \Elementor\Widget_Base
+{
+    public function get_name()
+    {
+        return 'lgl_mini_compare_widget';
+    }
+    public function get_title()
+    {
+        return __('Mini Compare Button', 'lgl-shortcodes');
+    }
+    public function get_icon()
+    {
+        return 'eicon-exchange';
+    }
+    public function get_categories()
+    {
+        return ['lgl-elements'];
+    }
+    public function get_keywords()
+    {
+        return ['lgl', 'mini', 'compare', 'button'];
+    }
+    protected function render()
+    {
+        echo do_shortcode('[lgl_mini_compare]');
+    }
+}
+
+class LGL_Widget_Mini_Wishlist extends \Elementor\Widget_Base
+{
+    public function get_name()
+    {
+        return 'lgl_mini_wishlist_widget';
+    }
+    public function get_title()
+    {
+        return __('Mini Wishlist Dropdown', 'lgl-shortcodes');
+    }
+    public function get_icon()
+    {
+        return 'eicon-heart-o';
+    }
+    public function get_categories()
+    {
+        return ['lgl-elements'];
+    }
+    public function get_keywords()
+    {
+        return ['lgl', 'mini', 'wishlist', 'dropdown', 'favorites'];
+    }
+    protected function render()
+    {
+        echo do_shortcode('[lgl_mini_wishlist]');
+    }
+}

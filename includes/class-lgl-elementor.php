@@ -65,6 +65,10 @@ class LGL_Elementor_Integration
         $widgets_manager->register(new \LGL_Widget_Wishlist());
         $widgets_manager->register(new \LGL_Widget_My_Account());
         $widgets_manager->register(new \LGL_Widget_Breadcrumbs());
+        $widgets_manager->register(new \LGL_Widget_Mini_Account());
+        $widgets_manager->register(new \LGL_Widget_Mini_Compare());
+        $widgets_manager->register(new \LGL_Widget_Mini_Wishlist());
+        $widgets_manager->register(new \LGL_Widget_Related_Vehicles());
     }
 }
 
