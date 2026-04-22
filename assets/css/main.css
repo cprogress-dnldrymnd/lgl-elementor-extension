@@ -2218,18 +2218,18 @@
         min-width: 160px; } }
     @media (max-width: 767px) {
       .lgl-type-tabs-wrapper .lgl-type-tabs .lgl-tab-btn {
-        padding: 10px 15px; } }
+        padding: 15px 15px; } }
     @media (max-width: 575px) {
       .lgl-type-tabs-wrapper .lgl-type-tabs .lgl-tab-btn {
         font-size: 0.75rem;
         border-radius: 5px 5px 0 0; } }
     @media (max-width: 440px) {
       .lgl-type-tabs-wrapper .lgl-type-tabs .lgl-tab-btn {
-        padding: 10px 10px;
+        padding: 15px 10px;
         font-size: 10px; } }
     @media (max-width: 320px) {
       .lgl-type-tabs-wrapper .lgl-type-tabs .lgl-tab-btn {
-        padding: 10px 5px;
+        padding: 15px 5px;
         font-size: 8px; } }
   @media (max-width: 575px) {
     .lgl-type-tabs-wrapper .lgl-type-tabs {
