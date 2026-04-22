@@ -951,8 +951,9 @@ if (! class_exists('LGL_Shortcodes')) {
 
             $attributes_arr = [];
 
-            if ($shortcode_tag == 'lgl_search') {
+            f ($shortcode_tag == 'lgl_search') {
                 $attributes_arr['post_type'] = false;
+                $attributes_arr['search_type'] = 'default';
             }
 
             if ($shortcode_tag == 'lgl_listing') {

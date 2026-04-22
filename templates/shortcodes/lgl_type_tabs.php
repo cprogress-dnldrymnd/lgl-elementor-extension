@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Renders interactive buttons for Caravans, Motorhomes, and Campervans.
  * Respects the global enable/disable settings.
@@ -22,28 +23,28 @@ $campervan_page = $options['campervan_page'] ?? false;
 
 // Determine current active post type to highlight the correct tab on load
 global $wp_query;
-$current_url = get_permalink(); 
+$current_url = get_permalink();
 $active_type = get_query_var('post_type') ? get_query_var('post_type') : '';
 
 ?>
 <div class="lgl-type-tabs-wrapper">
     <ul class="lgl-type-tabs" style="display: flex; gap: 10px; list-style: none; padding: 0;">
-        
-        <?php if ($enable_caravan && $caravan_page) : 
+
+        <?php if ($enable_caravan && $caravan_page) :
             $url = get_the_permalink($caravan_page);
-            $is_active = ($active_type === 'caravan' || $current_url === $url) ? 'is-active' : '';
+            $is_active = ($active_type === 'caravan' || $current_url === $url || empty($active_type)) ? 'is-active' : '';
         ?>
             <li><button type="button" class="lgl-tab-btn lgl-btn <?php echo esc_attr($is_active); ?>" data-post-type="caravan" data-url="<?php echo esc_url($url); ?>">Caravans</button></li>
         <?php endif; ?>
 
-        <?php if ($enable_motorhome && $motorhome_page) : 
+        <?php if ($enable_motorhome && $motorhome_page) :
             $url = get_the_permalink($motorhome_page);
             $is_active = ($active_type === 'motorhome' || $current_url === $url) ? 'is-active' : '';
         ?>
             <li><button type="button" class="lgl-tab-btn lgl-btn <?php echo esc_attr($is_active); ?>" data-post-type="motorhome" data-url="<?php echo esc_url($url); ?>">Motorhomes</button></li>
         <?php endif; ?>
 
-        <?php if ($enable_campervan && $campervan_page) : 
+        <?php if ($enable_campervan && $campervan_page) :
             $url = get_the_permalink($campervan_page);
             $is_active = ($active_type === 'campervan' || $current_url === $url) ? 'is-active' : '';
         ?>

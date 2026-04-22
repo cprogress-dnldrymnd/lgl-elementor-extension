@@ -8,11 +8,18 @@ if (!defined('ABSPATH')) {
  * @var string $post_type Extracted from shortcode attributes.
  */
 
-$conditions = LGL_Shortcodes::get_unique_meta_values($post_type, 'condition');
-$berths     = LGL_Shortcodes::get_unique_meta_values($post_type, 'berth');
-$raw_prices = LGL_Shortcodes::get_unique_meta_values($post_type, 'price');
+$search_type = isset($search_type) ? $search_type : 'default';
 
-// Sanitize and sort prices numerically to ensure correct sequential display
+// If search_type is tabs, default the initial data pulls to 'caravan' so dropdowns populate
+$data_post_type = $post_type;
+if ($post_type == false && $search_type === 'tabs') {
+    $data_post_type = 'caravan';
+}
+
+$conditions = LGL_Shortcodes::get_unique_meta_values($data_post_type, 'condition');
+$berths     = LGL_Shortcodes::get_unique_meta_values($data_post_type, 'berth');
+$raw_prices = LGL_Shortcodes::get_unique_meta_values($data_post_type, 'price');
+
 $prices = array();
 if (!empty($raw_prices)) {
     foreach ($raw_prices as $price) {
@@ -24,12 +31,9 @@ if (!empty($raw_prices)) {
 $prices = array_unique($prices);
 sort($prices, SORT_NUMERIC);
 
-// Fetch makes filtered to only those with published posts of the current post_type.
-// When post_type is false (global search form), all top-level makes are returned as
-// the vehicle type hasn't been chosen yet — JS will reload them on type selection.
-if ($post_type) {
+if ($data_post_type) {
     $type_post_ids = get_posts(array(
-        'post_type'      => $post_type,
+        'post_type'      => $data_post_type,
         'post_status'    => 'publish',
         'posts_per_page' => -1,
         'fields'         => 'ids',
@@ -43,7 +47,6 @@ if ($post_type) {
         if (!is_wp_error($assigned_terms) && !empty($assigned_terms)) {
             $make_ids = array();
             foreach ($assigned_terms as $term) {
-                // Models point to their parent make; top-level terms are already makes
                 $make_ids[] = ($term->parent > 0) ? (int) $term->parent : (int) $term->term_id;
             }
             $make_ids = array_unique($make_ids);
@@ -62,7 +65,6 @@ if ($post_type) {
         }
     }
 } else {
-    // Global search form — no post_type yet, return all top-level makes
     $makes = get_terms(array(
         'taxonomy'   => 'listing-make-model',
         'parent'     => 0,
@@ -188,14 +190,20 @@ if ($post_type) {
                         ?>
 
                         <?php if (!empty($vehicle_types)) : ?>
-                            <div class="lgl-filter-group">
+                            <div class="lgl-filter-group" <?php echo ($search_type === 'tabs') ? 'style="display: none;"' : ''; ?>>
                                 <label for="lgl_vehicle_type">Leisure Vehicle Type</label>
                                 <select name="post_type" id="lgl_post_type" class="lgl-select2" data-placeholder="Leisure Vehicle Type" required>
                                     <option value="">Leisure Vehicle Type</option>
-                                    <?php foreach ($vehicle_types as $type) : ?>
+                                    <?php foreach ($vehicle_types as $type) :
+                                        $is_selected = selected($active_post_type, $type['url'], false);
+                                        // Default to caravan internally if tabs mode is active
+                                        if ($search_type === 'tabs' && empty($active_post_type) && $type['slug'] === 'caravan') {
+                                            $is_selected = 'selected="selected"';
+                                        }
+                                    ?>
                                         <option value="<?php echo esc_attr($type['url']); ?>"
                                             data-post-type="<?php echo esc_attr($type['slug']); ?>"
-                                            <?php selected($active_post_type, $type['url']); ?>>
+                                            <?php echo $is_selected; ?>>
                                             <?php echo esc_html($type['label']); ?>
                                         </option>
                                     <?php endforeach; ?>
@@ -268,7 +276,7 @@ if ($post_type) {
                         </select>
                     </div>
 
-                    <?php if ($post_type != false) { ?>
+                    <?php if ($post_type != false || $search_type === 'tabs') { ?>
 
                         <!-- Condition -->
                         <div class="lgl-filter-group">

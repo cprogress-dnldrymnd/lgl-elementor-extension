@@ -28,7 +28,7 @@
             const $btn = $(this);
             const url = $btn.data('url');
 
-            // UI Update: Make active
+            // UI Update: Swap active classes
             $('.lgl-tab-btn').removeClass('is-active');
             $btn.addClass('is-active');
 
@@ -36,13 +36,11 @@
             const $select = $('#lgl_post_type');
 
             if ($select.length > 0) {
-                // If on global search page: update hidden select to adjust the filters below it
+                // Update select2 AND explicitly trigger native change so options update
                 $select.val(url).trigger('change.select2');
+                $select.trigger('change');
             } else {
-                // If on an archive page: Redirect to the target vehicle type page
-                if (url) {
-                    window.location.href = url;
-                }
+                if (url) window.location.href = url;
             }
         });
     }
@@ -127,12 +125,9 @@
         $('#lgl-search-form.lgl-filter-form-no-ajax').on('submit', function (e) {
             e.preventDefault();
 
-            // The option VALUE is the full archive page URL set in LGL Settings → LGL Pages
-            // ... inside the global search submit handler ...
-            const destUrl = $('#lgl_post_type').val(); // This is the base URL
+            const destUrl = $('#lgl_post_type').val(); // Base URL
 
             if (!destUrl) {
-                // No vehicle type chosen — shake the dropdown
                 $('#lgl_post_type').closest('.lgl-filter-group').addClass('lgl-field-error');
                 setTimeout(function () {
                     $('#lgl_post_type').closest('.lgl-filter-group').removeClass('lgl-field-error');
@@ -154,6 +149,23 @@
                 if (modelVal) {
                     redirectUrl += encodeURIComponent(modelVal) + '/';
                 }
+            }
+
+            // Capture secondary filters to pass as query parameters during the redirect
+            const params = new URLSearchParams();
+            const condition = $('#lgl_condition').val();
+            const berth = $('#lgl_berth').val();
+            const priceMin = $('#lgl_price_min').val();
+            const priceMax = $('#lgl_price_max').val();
+
+            if (condition) params.append('condition', condition);
+            if (berth) params.append('berth', berth);
+            if (priceMin) params.append('price_min', priceMin);
+            if (priceMax) params.append('price_max', priceMax);
+
+            const queryString = params.toString();
+            if (queryString) {
+                redirectUrl += '?' + queryString;
             }
 
             window.location.href = redirectUrl;
@@ -200,6 +212,9 @@
             const $makeSelect = $('#lgl_make');
             const $modelSelect = $('#lgl_model');
 
+            // Ensure the hidden form input updates so update_filter_options works on the global form
+            $('#lgl_target_post_type').val(postTypeSlug);
+
             $makeSelect.empty().append('<option value="">Select Vehicle Type First</option>').prop('disabled', true).trigger('change.select2');
             $modelSelect.empty().append('<option value="">Select Make First</option>').prop('disabled', true).trigger('change.select2');
 
@@ -230,6 +245,11 @@
                     $makeSelect.empty().append('<option value="">Error loading makes</option>').trigger('change.select2');
                 },
             });
+
+            // NEW: If secondary fields are visible (Tabs mode), fetch fresh Condition/Berth/Price options
+            if ($('#lgl_condition').length > 0 && typeof update_filter_options === 'function') {
+                update_filter_options($('#lgl-search-form').serialize());
+            }
         });
 
         // Single handler — captures form data BEFORE execute_search disables the inputs!
