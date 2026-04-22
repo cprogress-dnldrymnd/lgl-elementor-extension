@@ -68,10 +68,13 @@ if (!current_user_can('manage_options')) {
             'examples'    => array(
                 '[lgl_search]',
                 '[lgl_search post_type="caravan"]',
-                '[lgl_search post_type="motorhome"]',
+                '[lgl_search search_type="tabs"]',
+                '[lgl_search search_type="tabs" live_search="false"]',
             ),
             'attributes'  => array(
-                array('name' => 'post_type', 'default' => '(none)', 'description' => 'Optional. Locks the form to a specific vehicle type: <code>caravan</code>, <code>motorhome</code>, or <code>campervan</code>. When omitted a vehicle-type dropdown is shown and the form redirects to the appropriate listing page set under <strong>LGL Pages</strong>.'),
+                array('name' => 'post_type',   'default' => '(none)',  'description' => 'Optional. Locks the form to a specific vehicle type: <code>caravan</code>, <code>motorhome</code>, or <code>campervan</code>. When omitted a vehicle-type dropdown is shown and the form redirects to the appropriate listing page set under <strong>LGL Pages</strong>.'),
+                array('name' => 'search_type', 'default' => 'default', 'description' => 'Optional. Set to <code>tabs</code> when using the <code>[lgl_type_tabs]</code> shortcode. This hides the default vehicle type dropdown and immediately renders all secondary filters.'),
+                array('name' => 'live_search', 'default' => 'true',    'description' => 'Optional. Set to <code>false</code> to disable the inline AJAX refresh and force the form to redirect the user to the correct archive page on submission.'),
             ),
         ),
 
@@ -84,6 +87,18 @@ if (!current_user_can('manage_options')) {
             ),
             'attributes'  => array(
                 array('name' => '—', 'default' => '—', 'description' => 'No attributes. Reads filter state from the AJAX payload sent by <code>[lgl_search]</code>.'),
+            ),
+        ),
+
+        array(
+            'tag'         => 'lgl_type_tabs',
+            'label'       => 'Vehicle Type Tabs',
+            'description' => 'Renders interactive buttons for Caravans, Motorhomes, and Campervans. Designed to be placed directly above <code>[lgl_search search_type="tabs"]</code>. Clicking a tab syncs the search form automatically.',
+            'examples'    => array(
+                '[lgl_type_tabs]',
+            ),
+            'attributes'  => array(
+                array('name' => '—', 'default' => '—', 'description' => 'No attributes. Tab visibility automatically respects the global enable/disable toggles set under <strong>LGL Settings → LGL Pages</strong>.'),
             ),
         ),
 
@@ -369,9 +384,12 @@ if (!current_user_can('manage_options')) {
 
         array(
             'slug'        => 'lgl-pages',
-            'label'       => 'LGL Pages',
-            'description' => 'Maps key plugin features to specific WordPress pages. The plugin reads these IDs to generate internal links and redirect targets across all shortcodes.',
+            'label'       => 'LGL Pages & Active Vehicles',
+            'description' => 'Maps key plugin features to specific WordPress pages and controls which vehicle types are active site-wide.',
             'fields'      => array(
+                array('name' => 'Enable Caravans',         'type' => 'Checkbox',      'default' => 'On',     'description' => 'Global toggle. Disabling this removes Caravans from the Type Tabs, Search Dropdowns, and Comparison features.'),
+                array('name' => 'Enable Motorhomes',       'type' => 'Checkbox',      'default' => 'On',     'description' => 'Global toggle for Motorhomes.'),
+                array('name' => 'Enable Campervans',       'type' => 'Checkbox',      'default' => 'On',     'description' => 'Global toggle for Campervans.'),
                 array('name' => 'Vehicle Comparison Page', 'type' => 'Page selector', 'default' => '(none)', 'description' => 'The page containing the <code>[lgl_compare]</code> shortcode. Used as the destination for all "Compare" links across the site, including the mini compare button and the compare duo card CTA.'),
                 array('name' => 'Wishlist Page',           'type' => 'Page selector', 'default' => '(none)', 'description' => 'The page containing the <code>[lgl_wishlist]</code> shortcode. Used as the "View Your Wishlist" link in the mini wishlist dropdown footer.'),
                 array('name' => 'My Account Page',         'type' => 'Page selector', 'default' => '(none)', 'description' => 'The page containing the <code>[lgl_my_account]</code> shortcode. Used as the destination for the mini account bar links and as the post-logout redirect target.'),
