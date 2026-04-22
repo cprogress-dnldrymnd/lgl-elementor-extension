@@ -125,7 +125,11 @@
         $('#lgl-search-form.lgl-filter-form-no-ajax').on('submit', function (e) {
             e.preventDefault();
 
-            const destUrl = $('#lgl_post_type').val(); // Base URL
+            // Try to get base URL from dropdown (if global search), fallback to hidden input (if specific post_type search)
+            let destUrl = $('#lgl_post_type').val();
+            if (!destUrl) {
+                destUrl = $('#lgl_base_archive_url').val();
+            }
 
             if (!destUrl) {
                 $('#lgl_post_type').closest('.lgl-filter-group').addClass('lgl-field-error');

@@ -166,7 +166,13 @@ if ($post_type) {
         <?php endif; ?>
 
         <div class="lgl-search-container lgl-holder <?= $post_type == false ? 'lgl-search-container-bg-secondary' : '' ?>">
-            <form id="lgl-search-form" class="lgl-filter-form <?= $post_type == false ? 'lgl-filter-form-no-ajax' : 'lgl-filter-form-ajax' ?>">
+            <?php
+            // Evaluate string 'true' or 'false' into an actual boolean
+            $is_live_search = filter_var($live_search, FILTER_VALIDATE_BOOLEAN);
+            // Apply ajax class if live_search is true, otherwise apply no-ajax class to trigger a redirect
+            $form_class = $is_live_search ? 'lgl-filter-form-ajax' : 'lgl-filter-form-no-ajax';
+            ?>
+            <form id="lgl-search-form" class="lgl-filter-form <?php echo esc_attr($form_class); ?>">
                 <div class="lgl-search-form-inner">
                     <input type="hidden" name="post_type" id="lgl_target_post_type" value="<?php echo esc_attr($data_post_type); ?>">
                     <input type="hidden" id="lgl_base_archive_url" value="<?php echo esc_url($base_archive_url); ?>">
