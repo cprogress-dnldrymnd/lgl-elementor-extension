@@ -25,6 +25,12 @@ class LGL_Widget_Search extends \Elementor\Widget_Base
         return ['lgl-elements'];
     }
 
+    // ADDED: Search Keywords
+    public function get_keywords()
+    {
+        return ['lgl', 'search', 'filter', 'vehicle', 'caravan', 'motorhome'];
+    }
+
     protected function register_controls()
     {
         $this->start_controls_section('content_section', ['label' => __('Search Settings', 'lgl-shortcodes'), 'tab' => \Elementor\Controls_Manager::TAB_CONTENT]);
@@ -84,6 +90,12 @@ class LGL_Widget_Listing extends \Elementor\Widget_Base
     public function get_categories()
     {
         return ['lgl-elements'];
+    }
+
+    // ADDED: Search Keywords
+    public function get_keywords()
+    {
+        return ['lgl', 'listing', 'grid', 'carousel', 'vehicles', 'caravan', 'motorhome'];
     }
 
     protected function register_controls()
@@ -160,6 +172,12 @@ class LGL_Widget_Compare_Duo extends \Elementor\Widget_Base
         return ['lgl-elements'];
     }
 
+    // ADDED: Search Keywords
+    public function get_keywords()
+    {
+        return ['lgl', 'compare', 'duo', 'vs', 'versus', 'vehicles'];
+    }
+
     protected function register_controls()
     {
         $this->start_controls_section('content_section', ['label' => __('Compare Vehicles', 'lgl-shortcodes'), 'tab' => \Elementor\Controls_Manager::TAB_CONTENT]);
@@ -211,6 +229,10 @@ class LGL_Widget_Type_Tabs extends \Elementor\Widget_Base
     {
         return ['lgl-elements'];
     }
+    public function get_keywords()
+    {
+        return ['lgl', 'tabs', 'type', 'caravan', 'motorhome', 'campervan'];
+    }
     protected function render()
     {
         echo do_shortcode('[lgl_type_tabs]');
@@ -234,6 +256,10 @@ class LGL_Widget_Search_Results extends \Elementor\Widget_Base
     public function get_categories()
     {
         return ['lgl-elements'];
+    }
+    public function get_keywords()
+    {
+        return ['lgl', 'search', 'results', 'grid'];
     }
     protected function render()
     {
@@ -259,6 +285,10 @@ class LGL_Widget_Compare extends \Elementor\Widget_Base
     {
         return ['lgl-elements'];
     }
+    public function get_keywords()
+    {
+        return ['lgl', 'compare', 'table', 'vehicles'];
+    }
     protected function render()
     {
         echo do_shortcode('[lgl_compare]');
@@ -282,6 +312,10 @@ class LGL_Widget_Wishlist extends \Elementor\Widget_Base
     public function get_categories()
     {
         return ['lgl-elements'];
+    }
+    public function get_keywords()
+    {
+        return ['lgl', 'wishlist', 'saved', 'favorites'];
     }
     protected function render()
     {
@@ -307,6 +341,10 @@ class LGL_Widget_My_Account extends \Elementor\Widget_Base
     {
         return ['lgl-elements'];
     }
+    public function get_keywords()
+    {
+        return ['lgl', 'account', 'dashboard', 'login', 'register'];
+    }
     protected function render()
     {
         echo do_shortcode('[lgl_my_account]');
@@ -330,6 +368,10 @@ class LGL_Widget_Breadcrumbs extends \Elementor\Widget_Base
     public function get_categories()
     {
         return ['lgl-elements'];
+    }
+    public function get_keywords()
+    {
+        return ['lgl', 'breadcrumbs', 'navigation', 'back'];
     }
     protected function render()
     {
