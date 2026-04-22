@@ -2589,11 +2589,17 @@ if (! class_exists('LGL_Shortcodes')) {
         public function render_lgl_pages_description()
         {
             echo '<p>' . esc_html__('Map key plugin features to specific WordPress pages.', 'lgl-shortcodes') . '</p>';
-            echo '<form method="post" action="' . esc_url(admin_url('admin-post.php')) . '">';
-            echo '<input type="hidden" name="action" value="lgl_generate_pages">';
-            wp_nonce_field('lgl_generate_pages_action', 'lgl_generate_pages_nonce');
-            echo '<button type="submit" class="button button-primary" style="margin-bottom: 15px;">' . esc_html__('Auto-Generate Missing Pages', 'lgl-shortcodes') . '</button>';
-            echo '</form>';
+
+            // Generate a secure GET URL with a nonce instead of using a nested form
+            $generate_url = wp_nonce_url(
+                admin_url('admin-post.php?action=lgl_generate_pages'),
+                'lgl_generate_pages_action',
+                'lgl_generate_pages_nonce'
+            );
+
+            // Output as an anchor tag styled exactly like a primary button
+            echo '<a href="' . esc_url($generate_url) . '" class="button button-primary" style="margin-bottom: 15px;">' . esc_html__('Auto-Generate Missing Pages', 'lgl-shortcodes') . '</a>';
+
             echo '<p class="description">' . esc_html__('Clicking this button will automatically create any pages that are currently unassigned, insert the correct shortcodes, and assign them below.', 'lgl-shortcodes') . '</p>';
         }
 
