@@ -124,6 +124,8 @@ if (! class_exists('LGL_Shortcodes')) {
             add_action('admin_post_lgl_generate_pages', array($this, 'generate_default_pages'));
             add_action('admin_notices', array($this, 'lgl_generation_notice'));
 
+            add_filter('display_post_states', array($this, 'add_lgl_page_states'), 10, 2);
+
             new LGL_Forms();
             new LGL_Email_Builder();
         }
@@ -2667,6 +2669,43 @@ if (! class_exists('LGL_Shortcodes')) {
             if (isset($_GET['lgl_generated']) && $_GET['lgl_generated'] == '1') {
                 echo '<div class="notice notice-success is-dismissible"><p><strong>' . esc_html__('Success!', 'lgl-shortcodes') . '</strong> ' . esc_html__('Missing LGL pages have been generated and assigned automatically. Please visit Settings -> Permalinks and click "Save Changes" to finalize your URLs.', 'lgl-shortcodes') . '</p></div>';
             }
+        }
+
+        /**
+         * Adds custom post states to the Pages list in the WordPress admin
+         * to indicate which pages are currently assigned as LGL feature pages.
+         *
+         * @param array $post_states An array of post display states.
+         * @param WP_Post $post The current post object.
+         * @return array
+         */
+        public function add_lgl_page_states($post_states, $post)
+        {
+            // Only run this on the 'page' post type
+            if ('page' !== get_post_type($post)) {
+                return $post_states;
+            }
+
+            $options = get_option('lgl_settings', array());
+
+            // Map your option keys to the labels you want to display
+            $lgl_pages_map = array(
+                'vehicle_comparison_page_id' => __('LGL Compare Vehicles Page', 'lgl-shortcodes'),
+                'wishlist_page_id'           => __('LGL Wishlist Page', 'lgl-shortcodes'),
+                'my_account_page_id'         => __('LGL My Account Page', 'lgl-shortcodes'),
+                'caravan_page'               => __('LGL Caravans Page', 'lgl-shortcodes'),
+                'motorhome_page'             => __('LGL Motorhomes Page', 'lgl-shortcodes'),
+                'campervan_page'             => __('LGL Campervans Page', 'lgl-shortcodes'),
+            );
+
+            // Check if the current page ID matches any of the assigned LGL pages
+            foreach ($lgl_pages_map as $key => $label) {
+                if (!empty($options[$key]) && $post->ID == $options[$key]) {
+                    $post_states['lgl_' . $key] = $label;
+                }
+            }
+
+            return $post_states;
         }
     }
 
