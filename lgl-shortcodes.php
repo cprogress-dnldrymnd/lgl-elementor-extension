@@ -21,7 +21,7 @@ define('LGL_SHORTCODES_VERSION', '4.2.6');
 // ── Load the Forms integration ──
 require_once LGL_SHORTCODES_PATH . 'includes/class-lgl-forms.php';
 require_once LGL_SHORTCODES_PATH . 'includes/class-lgl-email-builder.php';
-require_once LGL_SHORTCODES_PATH . 'includes/class-lgl-elementor.php';
+#require_once LGL_SHORTCODES_PATH . 'includes/class-lgl-elementor.php';
 
 if (! class_exists('LGL_Shortcodes')) {
 
