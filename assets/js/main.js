@@ -104,37 +104,24 @@
         let activeSearchXhr = null;
 
         // Initialize Select2 on target classes
+        
         $('.lgl-select2').each(function () {
             const $select = $(this);
             const noSearchIds = ['lgl_post_type', 'lgl_condition', 'lgl_berth', 'lgl_price_min', 'lgl_price_max', 'lgl_make', 'lgl-sort-order'];
 
-            // 1. Find the direct wrapper around the select field
-            const $parent = $select.closest('.lgl-filter-group');
-
-            // 2. Force the wrapper to be relative so the dropdown anchors to it perfectly
-            if ($parent.length) {
-                $parent.css('position', 'relative');
-            }
-
-            // 3. Define the dropdown parent (fallback to body if no wrapper exists)
-            const dropdownContainer = $parent.length ? $parent : $(document.body);
-
             if (noSearchIds.includes($select.attr('id'))) {
-                // Disable search box for specific IDs and anchor it to the parent
+                // Disable search box for specific IDs
                 $select.select2({
                     width: '100%',
-                    minimumResultsForSearch: Infinity,
-                    dropdownParent: dropdownContainer
+                    minimumResultsForSearch: Infinity
                 });
             } else {
-                // Keep default behavior (with search) for Model, etc., and anchor it
+                // Keep default behavior (with search) for Make, Model, etc.
                 $select.select2({
-                    width: '100%',
-                    dropdownParent: dropdownContainer
+                    width: '100%'
                 });
             }
         });
-
 
         $('#lgl-search-form.lgl-filter-form-no-ajax').on('submit', function (e) {
             e.preventDefault();
