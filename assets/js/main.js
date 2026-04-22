@@ -108,19 +108,33 @@
             const $select = $(this);
             const noSearchIds = ['lgl_post_type', 'lgl_condition', 'lgl_berth', 'lgl_price_min', 'lgl_price_max', 'lgl_make', 'lgl-sort-order'];
 
+            // 1. Find the direct wrapper around the select field
+            const $parent = $select.closest('.lgl-filter-group');
+
+            // 2. Force the wrapper to be relative so the dropdown anchors to it perfectly
+            if ($parent.length) {
+                $parent.css('position', 'relative');
+            }
+
+            // 3. Define the dropdown parent (fallback to body if no wrapper exists)
+            const dropdownContainer = $parent.length ? $parent : $(document.body);
+
             if (noSearchIds.includes($select.attr('id'))) {
-                // Disable search box for specific IDs
+                // Disable search box for specific IDs and anchor it to the parent
                 $select.select2({
                     width: '100%',
-                    minimumResultsForSearch: Infinity
+                    minimumResultsForSearch: Infinity,
+                    dropdownParent: dropdownContainer
                 });
             } else {
-                // Keep default behavior (with search) for Make, Model, etc.
+                // Keep default behavior (with search) for Model, etc., and anchor it
                 $select.select2({
-                    width: '100%'
+                    width: '100%',
+                    dropdownParent: dropdownContainer
                 });
             }
         });
+
 
         $('#lgl-search-form.lgl-filter-form-no-ajax').on('submit', function (e) {
             e.preventDefault();
@@ -288,7 +302,7 @@
             update_filter_options(currentFormData);
             evaluateResetButtonVisibility();
         });
-        
+
         // Intercept standard WordPress pagination clicks for AJAX handling
         $(document).on('click', '.lgl-pagination-wrap a.page-numbers', function (e) {
             e.preventDefault();
