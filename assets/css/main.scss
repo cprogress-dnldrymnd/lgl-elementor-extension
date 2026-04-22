@@ -2771,9 +2771,10 @@ $wt-cols: 110px 1fr 120px 110px 80px 80px 50px;
         display: flex;
         list-style: none;
         padding: 0;
-        margin-bottom: -1px;
+        margin-bottom: 0;
         gap: 5px;
         padding-left: 50px;
+        padding-left: clamp(20px, 3vw, 50px);
         li {
             line-height: 1;
             display: flex;
@@ -2783,6 +2784,7 @@ $wt-cols: 110px 1fr 120px 110px 80px 80px 50px;
             background-color: var(--lgl-color-white);
             color: var(--lgl-color-secondary);
             min-width: 160px;
+            border: none;
             &.is-active {
                 background-color: var(--lgl-color-secondary);
                 color: var(--lgl-color-white);
