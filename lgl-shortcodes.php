@@ -121,6 +121,9 @@ if (! class_exists('LGL_Shortcodes')) {
             add_filter('query_vars', array($this, 'register_query_vars'));
             add_action('init', array($this, 'register_rewrite_rules'));
 
+            add_action('admin_post_lgl_generate_pages', array($this, 'generate_default_pages'));
+            add_action('admin_notices', array($this, 'lgl_generation_notice'));
+
             new LGL_Forms();
             new LGL_Email_Builder();
         }
@@ -426,7 +429,7 @@ if (! class_exists('LGL_Shortcodes')) {
             );
 
             // --- TAB 6: Comparison Table Settings ---
-            add_settings_section('lgl_pages', 'LGL Pages', null, 'lgl-pages');
+            add_settings_section('lgl_pages', 'LGL Pages & Active Vehicles', array($this, 'render_lgl_pages_description'), 'lgl-pages');
 
             $lgl_pages_fields = array(
                 'enable_caravan'             => array('label' => 'Enable Caravans', 'type' => 'checkbox', 'default' => '1'),
@@ -2580,9 +2583,86 @@ if (! class_exists('LGL_Shortcodes')) {
             $sent = wp_mail($to, '[TEST] ' . $subject, $html, ['Content-Type: text/html; charset=UTF-8']);
             $sent ? wp_send_json_success() : wp_send_json_error('wp_mail() returned false. Check your mail settings.');
         }
+        /**
+         * Renders the description and the Auto-Generate button above the LGL Pages settings fields.
+         */
+        public function render_lgl_pages_description()
+        {
+            echo '<p>' . esc_html__('Map key plugin features to specific WordPress pages.', 'lgl-shortcodes') . '</p>';
+            echo '<form method="post" action="' . esc_url(admin_url('admin-post.php')) . '">';
+            echo '<input type="hidden" name="action" value="lgl_generate_pages">';
+            wp_nonce_field('lgl_generate_pages_action', 'lgl_generate_pages_nonce');
+            echo '<button type="submit" class="button button-primary" style="margin-bottom: 15px;">' . esc_html__('Auto-Generate Missing Pages', 'lgl-shortcodes') . '</button>';
+            echo '</form>';
+            echo '<p class="description">' . esc_html__('Clicking this button will automatically create any pages that are currently unassigned, insert the correct shortcodes, and assign them below.', 'lgl-shortcodes') . '</p>';
+        }
+
+        /**
+         * Creates the missing pages, inserts the proper shortcodes, and updates the settings array.
+         */
+        public function generate_default_pages()
+        {
+            // Security checks
+            if (!current_user_can('manage_options')) {
+                wp_die('Unauthorized');
+            }
+            check_admin_referer('lgl_generate_pages_action', 'lgl_generate_pages_nonce');
+
+            $options = get_option('lgl_settings', array());
+
+            // Define the pages and the exact shortcodes they require
+            $pages_to_create = array(
+                'vehicle_comparison_page_id' => array('title' => 'Compare Vehicles', 'content' => '[lgl_compare]'),
+                'wishlist_page_id'           => array('title' => 'My Wishlist', 'content' => '[lgl_wishlist]'),
+                'my_account_page_id'         => array('title' => 'My Account', 'content' => '[lgl_my_account]'),
+                'caravan_page'               => array('title' => 'Caravans', 'content' => "[lgl_type_tabs]\n[lgl_search search_type=\"tabs\" post_type=\"caravan\"]\n[lgl_search_results]"),
+                'motorhome_page'             => array('title' => 'Motorhomes', 'content' => "[lgl_type_tabs]\n[lgl_search search_type=\"tabs\" post_type=\"motorhome\"]\n[lgl_search_results]"),
+                'campervan_page'             => array('title' => 'Campervans', 'content' => "[lgl_type_tabs]\n[lgl_search search_type=\"tabs\" post_type=\"campervan\"]\n[lgl_search_results]"),
+            );
+
+            $updated = false;
+
+            foreach ($pages_to_create as $key => $data) {
+                // Check if the setting is already populated AND the page actually exists
+                if (!empty($options[$key]) && get_post($options[$key])) {
+                    continue; // Skip existing pages so we don't duplicate them
+                }
+
+                // Create the new page
+                $page_id = wp_insert_post(array(
+                    'post_title'   => $data['title'],
+                    'post_content' => $data['content'],
+                    'post_status'  => 'publish',
+                    'post_type'    => 'page',
+                ));
+
+                // Assign the new page ID back into the LGL settings
+                if (!is_wp_error($page_id)) {
+                    $options[$key] = $page_id;
+                    $updated = true;
+                }
+            }
+
+            // Save settings if new pages were added
+            if ($updated) {
+                update_option('lgl_settings', $options);
+            }
+
+            // Redirect back to the LGL Pages tab with a success flag
+            wp_redirect(add_query_arg(array('page' => 'lgl-settings', 'tab' => 'lgl-pages', 'lgl_generated' => '1'), admin_url('admin.php')));
+            exit;
+        }
+
+        /**
+         * Displays a success banner when the user is redirected back after generating pages.
+         */
+        public function lgl_generation_notice()
+        {
+            if (isset($_GET['lgl_generated']) && $_GET['lgl_generated'] == '1') {
+                echo '<div class="notice notice-success is-dismissible"><p><strong>' . esc_html__('Success!', 'lgl-shortcodes') . '</strong> ' . esc_html__('Missing LGL pages have been generated and assigned automatically. Please visit Settings -> Permalinks and click "Save Changes" to finalize your URLs.', 'lgl-shortcodes') . '</p></div>';
+            }
+        }
     }
-
-
 
     // Instantiate the plugin architecture
     new LGL_Shortcodes();
