@@ -2165,7 +2165,6 @@
   padding: 0;
   margin-bottom: 0;
   gap: 5px;
-  padding-left: 50px;
   padding-left: clamp(20px, 3vw, 50px); }
   .lgl-type-tabs-wrapper .lgl-type-tabs li {
     line-height: 1;
@@ -2174,7 +2173,6 @@
     border-radius: 10px 10px 0 0;
     background-color: var(--lgl-color-white);
     color: var(--lgl-color-secondary);
-    min-width: 160px;
     border: none; }
     .lgl-type-tabs-wrapper .lgl-type-tabs .lgl-tab-btn:hover, .lgl-type-tabs-wrapper .lgl-type-tabs .lgl-tab-btn:focus, .lgl-type-tabs-wrapper .lgl-type-tabs .lgl-tab-btn:active {
       background-color: var(--lgl-color-secondary);
@@ -2182,5 +2180,25 @@
     .lgl-type-tabs-wrapper .lgl-type-tabs .lgl-tab-btn.is-active {
       background-color: var(--lgl-color-secondary);
       color: var(--lgl-color-white); }
+    @media (min-width: 768px) {
+      .lgl-type-tabs-wrapper .lgl-type-tabs .lgl-tab-btn {
+        min-width: 160px; } }
+    @media (max-width: 767px) {
+      .lgl-type-tabs-wrapper .lgl-type-tabs .lgl-tab-btn {
+        padding: 10px 15px; } }
+    @media (max-width: 575px) {
+      .lgl-type-tabs-wrapper .lgl-type-tabs .lgl-tab-btn {
+        font-size: 0.75rem; } }
+    @media (max-width: 440px) {
+      .lgl-type-tabs-wrapper .lgl-type-tabs .lgl-tab-btn {
+        padding: 10px 10px;
+        font-size: 10px; } }
+    @media (max-width: 320px) {
+      .lgl-type-tabs-wrapper .lgl-type-tabs .lgl-tab-btn {
+        padding: 10px 5px;
+        font-size: 8px; } }
+  @media (max-width: 575px) {
+    .lgl-type-tabs-wrapper .lgl-type-tabs {
+      padding-left: 10px; } }
 
 /*# sourceMappingURL=main.css.map */

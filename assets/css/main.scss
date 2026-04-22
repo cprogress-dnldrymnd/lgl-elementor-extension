@@ -2773,7 +2773,6 @@ $wt-cols: 110px 1fr 120px 110px 80px 80px 50px;
         padding: 0;
         margin-bottom: 0;
         gap: 5px;
-        padding-left: 50px;
         padding-left: clamp(20px, 3vw, 50px);
         li {
             line-height: 1;
@@ -2783,7 +2782,6 @@ $wt-cols: 110px 1fr 120px 110px 80px 80px 50px;
             border-radius: 10px 10px 0 0;
             background-color: var(--lgl-color-white);
             color: var(--lgl-color-secondary);
-            min-width: 160px;
             border: none;
             &:hover,
             &:focus,
@@ -2795,6 +2793,26 @@ $wt-cols: 110px 1fr 120px 110px 80px 80px 50px;
                 background-color: var(--lgl-color-secondary);
                 color: var(--lgl-color-white);
             }
+            @media (min-width: 768px) {
+                min-width: 160px;
+            }
+            @media (max-width: 767px) {
+                padding: 10px 15px;
+            }
+            @media (max-width: 575px) {
+                font-size: 0.75rem;
+            }
+            @media (max-width: 440px) {
+                padding: 10px 10px;
+                font-size: 10px;
+            }
+            @media (max-width: 320px) {
+                padding: 10px 5px;
+                font-size: 8px;
+            }
+        }
+        @media (max-width: 575px) {
+            padding-left: 10px;
         }
     }
 }
