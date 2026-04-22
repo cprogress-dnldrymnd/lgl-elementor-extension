@@ -2785,6 +2785,12 @@ $wt-cols: 110px 1fr 120px 110px 80px 80px 50px;
             color: var(--lgl-color-secondary);
             min-width: 160px;
             border: none;
+            &:hover,
+            &:focus,
+            &:active {
+                background-color: var(--lgl-color-secondary);
+                color: var(--lgl-color-white);
+            }
             &.is-active {
                 background-color: var(--lgl-color-secondary);
                 color: var(--lgl-color-white);

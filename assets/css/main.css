@@ -2176,6 +2176,9 @@
     color: var(--lgl-color-secondary);
     min-width: 160px;
     border: none; }
+    .lgl-type-tabs-wrapper .lgl-type-tabs .lgl-tab-btn:hover, .lgl-type-tabs-wrapper .lgl-type-tabs .lgl-tab-btn:focus, .lgl-type-tabs-wrapper .lgl-type-tabs .lgl-tab-btn:active {
+      background-color: var(--lgl-color-secondary);
+      color: var(--lgl-color-white); }
     .lgl-type-tabs-wrapper .lgl-type-tabs .lgl-tab-btn.is-active {
       background-color: var(--lgl-color-secondary);
       color: var(--lgl-color-white); }
