@@ -73,7 +73,7 @@ if ($data_post_type) {
 }
 
 // Filter active make models to only those belonging to the current post_type as well
-if ($post_type && $active_make) {
+if ($data_post_type && $active_make) {
 
     // Convert the slug string into the term object to retrieve the integer ID
     $active_make_term = get_term_by('slug', $active_make, 'listing-make-model');
@@ -168,7 +168,7 @@ if ($post_type) {
         <div class="lgl-search-container lgl-holder <?= $post_type == false ? 'lgl-search-container-bg-secondary' : '' ?>">
             <form id="lgl-search-form" class="lgl-filter-form <?= $post_type == false ? 'lgl-filter-form-no-ajax' : 'lgl-filter-form-ajax' ?>">
                 <div class="lgl-search-form-inner">
-                    <input type="hidden" name="post_type" id="lgl_target_post_type" value="<?php echo esc_attr($post_type); ?>">
+                    <input type="hidden" name="post_type" id="lgl_target_post_type" value="<?php echo esc_attr($data_post_type); ?>">
                     <input type="hidden" id="lgl_base_archive_url" value="<?php echo esc_url($base_archive_url); ?>">
 
                     <?php if ($post_type == false) { ?>
@@ -213,7 +213,7 @@ if ($post_type) {
                     <?php } ?>
 
                     <!-- Make -->
-                   <div class="lgl-filter-group">
+                    <div class="lgl-filter-group">
                         <label for="lgl_make">Make</label>
                         <select name="listing_make" id="lgl_make" class="lgl-select2" data-placeholder="Select Make" <?php echo ($data_post_type == false) ? 'disabled' : ''; ?>>
                             <option value=""><?php echo ($data_post_type == false) ? 'Select Vehicle Type First' : 'All Makes'; ?></option>
