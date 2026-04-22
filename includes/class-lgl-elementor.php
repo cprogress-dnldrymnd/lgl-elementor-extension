@@ -6,13 +6,16 @@ if (!defined('ABSPATH')) {
 /**
  * Initializes the Elementor Integration safely.
  */
-class LGL_Elementor_Integration {
-    public function __construct() {
+class LGL_Elementor_Integration
+{
+    public function __construct()
+    {
         // Wait until all plugins are loaded before checking for Elementor
         add_action('plugins_loaded', [$this, 'init']);
     }
 
-    public function init() {
+    public function init()
+    {
         // Abort entirely if Elementor is not active
         if (!did_action('elementor/loaded')) {
             return;
@@ -22,17 +25,33 @@ class LGL_Elementor_Integration {
         add_action('elementor/widgets/register', [$this, 'register_widgets']);
     }
 
-    public function add_category($elements_manager) {
+    public function add_category($elements_manager)
+    {
+        // 1. Add the category normally
         $elements_manager->add_category(
             'lgl-elements',
             [
                 'title' => __('LGL Leisure Vehicles', 'lgl-shortcodes'),
                 'icon'  => 'eicon-car',
+                'active' => true, // Keeps the panel expanded by default so it's immediately visible
             ]
         );
-    }
 
-    public function register_widgets($widgets_manager) {
+        // 2. Use a PHP closure to reorder Elementor's internal categories array
+        $reorder_categories = function () {
+            // Extract our custom category
+            $lgl_cat = $this->categories['lgl-elements'];
+            unset($this->categories['lgl-elements']);
+
+            // Merge it back at the absolute top of the array
+            $this->categories = array_merge(['lgl-elements' => $lgl_cat], $this->categories);
+        };
+
+        // 3. Execute the closure bound to the elements manager to bypass private property restrictions
+        $reorder_categories->call($elements_manager);
+    }
+    public function register_widgets($widgets_manager)
+    {
         // Load the file containing all our individual widget classes
         require_once __DIR__ . '/class-lgl-elementor-widgets.php';
 
