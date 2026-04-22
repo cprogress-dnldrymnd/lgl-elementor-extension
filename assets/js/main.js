@@ -74,8 +74,22 @@
         let activeSearchXhr = null;
 
         // Initialize Select2 on target classes
-        $('.lgl-select2').select2({
-            width: '100%'
+        $('.lgl-select2').each(function () {
+            const $select = $(this);
+            const noSearchIds = ['lgl_post_type', 'lgl_condition', 'lgl_berth', 'lgl_price_min', 'lgl_price_max'];
+
+            if (noSearchIds.includes($select.attr('id'))) {
+                // Disable search box for specific IDs
+                $select.select2({
+                    width: '100%',
+                    minimumResultsForSearch: Infinity
+                });
+            } else {
+                // Keep default behavior (with search) for Make, Model, etc.
+                $select.select2({
+                    width: '100%'
+                });
+            }
         });
 
         $('#lgl-search-form.lgl-filter-form-no-ajax').on('submit', function (e) {
