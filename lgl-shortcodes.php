@@ -631,14 +631,17 @@ if (! class_exists('LGL_Shortcodes')) {
                     }
                     echo '</select>';
                     break;
-
                 case 'checkbox':
-                    $is_checked = !empty($value) ? checked(1, $value, false) : '';
+                    // Add a hidden input to force a '0' submission when the checkbox is unticked.
+                    // This prevents the system from falling back to the default '1' state.
+                    $is_checked = (!empty($value) && $value != '0') ? checked(1, 1, false) : '';
                     echo sprintf(
-                        '<input type="checkbox" id="lgl_settings[%1$s]" name="lgl_settings[%1$s]" value="1" %2$s />',
+                        '<input type="hidden" name="lgl_settings[%1$s]" value="0" />
+                         <input type="checkbox" id="lgl_settings[%1$s]" name="lgl_settings[%1$s]" value="1" %2$s />',
                         esc_attr($id),
                         $is_checked
                     );
+                    break;
                     break;
                 case 'color':
                     echo sprintf(
