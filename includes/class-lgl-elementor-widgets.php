@@ -6,15 +6,33 @@ if (!defined('ABSPATH')) {
 /* ==========================================================================
    1. Vehicle Search Form Widget
    ========================================================================== */
-class LGL_Widget_Search extends \Elementor\Widget_Base {
-    public function get_name() { return 'lgl_search_widget'; }
-    public function get_title() { return __('Vehicle Search Form', 'lgl-shortcodes'); }
-    public function get_icon() { return 'eicon-search'; }
-    public function get_categories() { return ['lgl-elements']; }
-    public function get_keywords() { return ['lgl', 'search', 'filter', 'vehicle', 'caravan', 'motorhome']; }
+class LGL_Widget_Search extends \Elementor\Widget_Base
+{
+    public function get_name()
+    {
+        return 'lgl_search_widget';
+    }
+    public function get_title()
+    {
+        return __('Vehicle Search Form', 'lgl-shortcodes');
+    }
+    public function get_icon()
+    {
+        return 'eicon-search';
+    }
+    public function get_categories()
+    {
+        return ['lgl-elements'];
+    }
 
-    protected function register_controls() {
-        // --- CONTENT TAB ---
+    // ADDED: Search Keywords
+    public function get_keywords()
+    {
+        return ['lgl', 'search', 'filter', 'vehicle', 'caravan', 'motorhome'];
+    }
+
+    protected function register_controls()
+    {
         $this->start_controls_section('content_section', ['label' => __('Search Settings', 'lgl-shortcodes'), 'tab' => \Elementor\Controls_Manager::TAB_CONTENT]);
 
         $this->add_control('attr_post_type', [
@@ -39,65 +57,10 @@ class LGL_Widget_Search extends \Elementor\Widget_Base {
         ]);
 
         $this->end_controls_section();
-
-        // --- STYLE TAB ---
-        $this->start_controls_section(
-            'style_section',
-            [
-                'label' => __('Search Form Styles', 'lgl-shortcodes'),
-                'tab'   => \Elementor\Controls_Manager::TAB_STYLE,
-            ]
-        );
-
-        $this->add_control(
-            'search_bg_color',
-            [
-                'label'     => __('Background Color', 'lgl-shortcodes'),
-                'type'      => \Elementor\Controls_Manager::COLOR,
-                'selectors' => [
-                    // Target the specific container injected by the shortcode
-                    '{{WRAPPER}} .lgl-search-container' => 'background-color: {{VALUE}} !important; padding: 20px; border-radius: 8px;',
-                ],
-            ]
-        );
-
-        $this->add_control(
-            'search_label_color',
-            [
-                'label'     => __('Label Text Color', 'lgl-shortcodes'),
-                'type'      => \Elementor\Controls_Manager::COLOR,
-                'selectors' => [
-                    '{{WRAPPER}} .lgl-filter-group label, {{WRAPPER}} .lgl-search-container' => 'color: {{VALUE}} !important;',
-                ],
-            ]
-        );
-
-        $this->add_control(
-            'search_button_bg',
-            [
-                'label'     => __('Button Background Color', 'lgl-shortcodes'),
-                'type'      => \Elementor\Controls_Manager::COLOR,
-                'selectors' => [
-                    '{{WRAPPER}} .lgl-search-container button, {{WRAPPER}} .lgl-search-container input[type="submit"]' => 'background-color: {{VALUE}} !important; border-color: {{VALUE}} !important;',
-                ],
-            ]
-        );
-
-        $this->add_control(
-            'search_button_text_color',
-            [
-                'label'     => __('Button Text Color', 'lgl-shortcodes'),
-                'type'      => \Elementor\Controls_Manager::COLOR,
-                'selectors' => [
-                    '{{WRAPPER}} .lgl-search-container button, {{WRAPPER}} .lgl-search-container input[type="submit"]' => 'color: {{VALUE}} !important;',
-                ],
-            ]
-        );
-
-        $this->end_controls_section();
     }
 
-    protected function render() {
+    protected function render()
+    {
         $settings = $this->get_settings_for_display();
         $atts = '';
         if (!empty($settings['attr_post_type'])) $atts .= ' post_type="' . esc_attr($settings['attr_post_type']) . '"';
