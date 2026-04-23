@@ -40,8 +40,6 @@
 .lgl-search-container.lgl-search-container.lgl-search-container {
     border-radius: 8px;
     margin-bottom: 0;
-    background-color: var(--lgl-color-primary);
-    padding: 30px;
     @media (max-width: 575px) {
         padding: 20px;
     }
@@ -54,7 +52,6 @@
             background-color: transparent;
             border-radius: 0;
             border: 1px solid var(--lgl-color-light-gray);
-
             .lgl-filter-form .lgl-filter-group {
                 width: 100%;
             }

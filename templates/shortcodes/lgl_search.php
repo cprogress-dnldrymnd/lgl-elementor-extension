@@ -165,7 +165,7 @@ if ($post_type) {
         <div class="lgl-offcanvas-body">
         <?php endif; ?>
 
-        <div class="lgl-search-container lgl-holder <?= $post_type == false ? 'lgl-search-container-bg-secondary' : '' ?>">
+        <div class="lgl-search-container lgl-holder">
             <?php
             // Evaluate string 'true' or 'false' into an actual boolean
             $is_live_search = filter_var($live_search, FILTER_VALIDATE_BOOLEAN);

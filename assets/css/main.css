@@ -27,11 +27,8 @@
   font-family: var(--lgl-font-primary); }
 
 .lgl-search-container.lgl-search-container.lgl-search-container {
-  padding: 32px;
   border-radius: 8px;
-  margin-bottom: 0;
-  background-color: var(--lgl-color-primary);
-  padding: 30px; }
+  margin-bottom: 0; }
   @media (max-width: 575px) {
     .lgl-search-container.lgl-search-container.lgl-search-container {
       padding: 20px; } }
