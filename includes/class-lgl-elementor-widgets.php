@@ -3,36 +3,96 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
+/**
+ * Trait: LGL Elementor Style Controls
+ * Allows us to easily inject the exact same Style Tab into all 13 widgets
+ * without repeating code. Uses Elementor's native {{WRAPPER}} CSS generator.
+ */
+trait LGL_Elementor_Style_Controls {
+    protected function register_common_style_controls() {
+        $this->start_controls_section(
+            'section_lgl_style',
+            [
+                'label' => __('LGL General Styles', 'lgl-shortcodes'),
+                'tab'   => \Elementor\Controls_Manager::TAB_STYLE,
+            ]
+        );
+
+        $this->add_control(
+            'lgl_bg_color',
+            [
+                'label'     => __('Background Color', 'lgl-shortcodes'),
+                'type'      => \Elementor\Controls_Manager::COLOR,
+                'selectors' => [
+                    // Targets the direct container of the widget
+                    '{{WRAPPER}} > .elementor-widget-container' => 'background-color: {{VALUE}}; padding: 20px; border-radius: 8px;',
+                ],
+            ]
+        );
+
+        $this->add_control(
+            'lgl_text_color',
+            [
+                'label'     => __('Text Color', 'lgl-shortcodes'),
+                'type'      => \Elementor\Controls_Manager::COLOR,
+                'selectors' => [
+                    // Uses !important to guarantee it overrides theme/plugin default CSS
+                    '{{WRAPPER}}, {{WRAPPER}} p, {{WRAPPER}} span:not(.dashicons), {{WRAPPER}} label, {{WRAPPER}} div, {{WRAPPER}} a' => 'color: {{VALUE}} !important;',
+                ],
+            ]
+        );
+
+        $this->add_control(
+            'lgl_heading_color',
+            [
+                'label'     => __('Heading Color', 'lgl-shortcodes'),
+                'type'      => \Elementor\Controls_Manager::COLOR,
+                'selectors' => [
+                    '{{WRAPPER}} h1, {{WRAPPER}} h2, {{WRAPPER}} h3, {{WRAPPER}} h4, {{WRAPPER}} h5, {{WRAPPER}} h6, {{WRAPPER}} h3 a' => 'color: {{VALUE}} !important;',
+                ],
+            ]
+        );
+
+        $this->add_control(
+            'lgl_button_bg',
+            [
+                'label'     => __('Button Background', 'lgl-shortcodes'),
+                'type'      => \Elementor\Controls_Manager::COLOR,
+                'selectors' => [
+                    '{{WRAPPER}} button, {{WRAPPER}} .lgl-btn, {{WRAPPER}} input[type="submit"]' => 'background-color: {{VALUE}} !important; border-color: {{VALUE}} !important;',
+                ],
+            ]
+        );
+
+        $this->add_control(
+            'lgl_button_text',
+            [
+                'label'     => __('Button Text Color', 'lgl-shortcodes'),
+                'type'      => \Elementor\Controls_Manager::COLOR,
+                'selectors' => [
+                    '{{WRAPPER}} button, {{WRAPPER}} .lgl-btn, {{WRAPPER}} input[type="submit"], {{WRAPPER}} button *' => 'color: {{VALUE}} !important;',
+                ],
+            ]
+        );
+
+        $this->end_controls_section();
+    }
+}
+
+
 /* ==========================================================================
    1. Vehicle Search Form Widget
    ========================================================================== */
-class LGL_Widget_Search extends \Elementor\Widget_Base
-{
-    public function get_name()
-    {
-        return 'lgl_search_widget';
-    }
-    public function get_title()
-    {
-        return __('Vehicle Search Form', 'lgl-shortcodes');
-    }
-    public function get_icon()
-    {
-        return 'eicon-search';
-    }
-    public function get_categories()
-    {
-        return ['lgl-elements'];
-    }
+class LGL_Widget_Search extends \Elementor\Widget_Base {
+    use LGL_Elementor_Style_Controls;
 
-    // ADDED: Search Keywords
-    public function get_keywords()
-    {
-        return ['lgl', 'search', 'filter', 'vehicle', 'caravan', 'motorhome'];
-    }
+    public function get_name() { return 'lgl_search_widget'; }
+    public function get_title() { return __('Vehicle Search Form', 'lgl-shortcodes'); }
+    public function get_icon() { return 'eicon-search'; }
+    public function get_categories() { return ['lgl-elements']; }
+    public function get_keywords() { return ['lgl', 'search', 'filter', 'vehicle', 'caravan', 'motorhome']; }
 
-    protected function register_controls()
-    {
+    protected function register_controls() {
         $this->start_controls_section('content_section', ['label' => __('Search Settings', 'lgl-shortcodes'), 'tab' => \Elementor\Controls_Manager::TAB_CONTENT]);
 
         $this->add_control('attr_post_type', [
@@ -57,10 +117,12 @@ class LGL_Widget_Search extends \Elementor\Widget_Base
         ]);
 
         $this->end_controls_section();
+
+        // INJECT STYLE TAB
+        $this->register_common_style_controls();
     }
 
-    protected function render()
-    {
+    protected function render() {
         $settings = $this->get_settings_for_display();
         $atts = '';
         if (!empty($settings['attr_post_type'])) $atts .= ' post_type="' . esc_attr($settings['attr_post_type']) . '"';
@@ -70,36 +132,20 @@ class LGL_Widget_Search extends \Elementor\Widget_Base
     }
 }
 
+
 /* ==========================================================================
    2. Vehicle Listing Grid Widget
    ========================================================================== */
-class LGL_Widget_Listing extends \Elementor\Widget_Base
-{
-    public function get_name()
-    {
-        return 'lgl_listing_widget';
-    }
-    public function get_title()
-    {
-        return __('Vehicle Listing Grid', 'lgl-shortcodes');
-    }
-    public function get_icon()
-    {
-        return 'eicon-gallery-grid';
-    }
-    public function get_categories()
-    {
-        return ['lgl-elements'];
-    }
+class LGL_Widget_Listing extends \Elementor\Widget_Base {
+    use LGL_Elementor_Style_Controls;
 
-    // ADDED: Search Keywords
-    public function get_keywords()
-    {
-        return ['lgl', 'listing', 'grid', 'carousel', 'vehicles', 'caravan', 'motorhome'];
-    }
+    public function get_name() { return 'lgl_listing_widget'; }
+    public function get_title() { return __('Vehicle Listing Grid', 'lgl-shortcodes'); }
+    public function get_icon() { return 'eicon-gallery-grid'; }
+    public function get_categories() { return ['lgl-elements']; }
+    public function get_keywords() { return ['lgl', 'listing', 'grid', 'carousel', 'vehicles', 'caravan', 'motorhome']; }
 
-    protected function register_controls()
-    {
+    protected function register_controls() {
         $this->start_controls_section('content_section', ['label' => __('Listing Settings', 'lgl-shortcodes'), 'tab' => \Elementor\Controls_Manager::TAB_CONTENT]);
 
         $this->add_control('attr_post_type', [
@@ -135,10 +181,12 @@ class LGL_Widget_Listing extends \Elementor\Widget_Base
         ]);
 
         $this->end_controls_section();
+
+        // INJECT STYLE TAB
+        $this->register_common_style_controls();
     }
 
-    protected function render()
-    {
+    protected function render() {
         $settings = $this->get_settings_for_display();
         $atts = '';
         if (!empty($settings['attr_post_type'])) $atts .= ' post_type="' . esc_attr($settings['attr_post_type']) . '"';
@@ -150,36 +198,20 @@ class LGL_Widget_Listing extends \Elementor\Widget_Base
     }
 }
 
+
 /* ==========================================================================
    3. Compare Duo Card Widget
    ========================================================================== */
-class LGL_Widget_Compare_Duo extends \Elementor\Widget_Base
-{
-    public function get_name()
-    {
-        return 'lgl_compare_duo_widget';
-    }
-    public function get_title()
-    {
-        return __('Compare Duo Card', 'lgl-shortcodes');
-    }
-    public function get_icon()
-    {
-        return 'eicon-columns';
-    }
-    public function get_categories()
-    {
-        return ['lgl-elements'];
-    }
+class LGL_Widget_Compare_Duo extends \Elementor\Widget_Base {
+    use LGL_Elementor_Style_Controls;
 
-    // ADDED: Search Keywords
-    public function get_keywords()
-    {
-        return ['lgl', 'compare', 'duo', 'vs', 'versus', 'vehicles'];
-    }
+    public function get_name() { return 'lgl_compare_duo_widget'; }
+    public function get_title() { return __('Compare Duo Card', 'lgl-shortcodes'); }
+    public function get_icon() { return 'eicon-columns'; }
+    public function get_categories() { return ['lgl-elements']; }
+    public function get_keywords() { return ['lgl', 'compare', 'duo', 'vs', 'versus', 'vehicles']; }
 
-    protected function register_controls()
-    {
+    protected function register_controls() {
         $this->start_controls_section('content_section', ['label' => __('Compare Vehicles', 'lgl-shortcodes'), 'tab' => \Elementor\Controls_Manager::TAB_CONTENT]);
 
         $this->add_control('attr_post_id_1', [
@@ -195,10 +227,12 @@ class LGL_Widget_Compare_Duo extends \Elementor\Widget_Base
         ]);
 
         $this->end_controls_section();
+
+        // INJECT STYLE TAB
+        $this->register_common_style_controls();
     }
 
-    protected function render()
-    {
+    protected function render() {
         $settings = $this->get_settings_for_display();
         $atts = '';
         if (!empty($settings['attr_post_id_1'])) $atts .= ' post_id_1="' . esc_attr($settings['attr_post_id_1']) . '"';
@@ -207,206 +241,91 @@ class LGL_Widget_Compare_Duo extends \Elementor\Widget_Base
     }
 }
 
+
 /* ==========================================================================
-   4. Simple Widgets (No Attributes needed)
+   4. Simple Widgets (No Attributes, Just Styles)
    ========================================================================== */
 
-class LGL_Widget_Type_Tabs extends \Elementor\Widget_Base
-{
-    public function get_name()
-    {
-        return 'lgl_type_tabs_widget';
-    }
-    public function get_title()
-    {
-        return __('Vehicle Type Tabs', 'lgl-shortcodes');
-    }
-    public function get_icon()
-    {
-        return 'eicon-button';
-    }
-    public function get_categories()
-    {
-        return ['lgl-elements'];
-    }
-    public function get_keywords()
-    {
-        return ['lgl', 'tabs', 'type', 'caravan', 'motorhome', 'campervan'];
-    }
-    protected function render()
-    {
-        echo do_shortcode('[lgl_type_tabs]');
-    }
+class LGL_Widget_Type_Tabs extends \Elementor\Widget_Base {
+    use LGL_Elementor_Style_Controls;
+    public function get_name() { return 'lgl_type_tabs_widget'; }
+    public function get_title() { return __('Vehicle Type Tabs', 'lgl-shortcodes'); }
+    public function get_icon() { return 'eicon-button'; }
+    public function get_categories() { return ['lgl-elements']; }
+    public function get_keywords() { return ['lgl', 'tabs', 'type', 'caravan', 'motorhome', 'campervan']; }
+    protected function register_controls() { $this->register_common_style_controls(); }
+    protected function render() { echo do_shortcode('[lgl_type_tabs]'); }
 }
 
-class LGL_Widget_Search_Results extends \Elementor\Widget_Base
-{
-    public function get_name()
-    {
-        return 'lgl_search_results_widget';
-    }
-    public function get_title()
-    {
-        return __('Search Results Grid', 'lgl-shortcodes');
-    }
-    public function get_icon()
-    {
-        return 'eicon-archive';
-    }
-    public function get_categories()
-    {
-        return ['lgl-elements'];
-    }
-    public function get_keywords()
-    {
-        return ['lgl', 'search', 'results', 'grid'];
-    }
-    protected function render()
-    {
-        echo do_shortcode('[lgl_search_results]');
-    }
+class LGL_Widget_Search_Results extends \Elementor\Widget_Base {
+    use LGL_Elementor_Style_Controls;
+    public function get_name() { return 'lgl_search_results_widget'; }
+    public function get_title() { return __('Search Results Grid', 'lgl-shortcodes'); }
+    public function get_icon() { return 'eicon-archive'; }
+    public function get_categories() { return ['lgl-elements']; }
+    public function get_keywords() { return ['lgl', 'search', 'results', 'grid']; }
+    protected function register_controls() { $this->register_common_style_controls(); }
+    protected function render() { echo do_shortcode('[lgl_search_results]'); }
 }
 
-class LGL_Widget_Compare extends \Elementor\Widget_Base
-{
-    public function get_name()
-    {
-        return 'lgl_compare_widget';
-    }
-    public function get_title()
-    {
-        return __('Compare Table', 'lgl-shortcodes');
-    }
-    public function get_icon()
-    {
-        return 'eicon-table';
-    }
-    public function get_categories()
-    {
-        return ['lgl-elements'];
-    }
-    public function get_keywords()
-    {
-        return ['lgl', 'compare', 'table', 'vehicles'];
-    }
-    protected function render()
-    {
-        echo do_shortcode('[lgl_compare]');
-    }
+class LGL_Widget_Compare extends \Elementor\Widget_Base {
+    use LGL_Elementor_Style_Controls;
+    public function get_name() { return 'lgl_compare_widget'; }
+    public function get_title() { return __('Compare Table', 'lgl-shortcodes'); }
+    public function get_icon() { return 'eicon-table'; }
+    public function get_categories() { return ['lgl-elements']; }
+    public function get_keywords() { return ['lgl', 'compare', 'table', 'vehicles']; }
+    protected function register_controls() { $this->register_common_style_controls(); }
+    protected function render() { echo do_shortcode('[lgl_compare]'); }
 }
 
-class LGL_Widget_Wishlist extends \Elementor\Widget_Base
-{
-    public function get_name()
-    {
-        return 'lgl_wishlist_widget';
-    }
-    public function get_title()
-    {
-        return __('Full Wishlist Page', 'lgl-shortcodes');
-    }
-    public function get_icon()
-    {
-        return 'eicon-heart';
-    }
-    public function get_categories()
-    {
-        return ['lgl-elements'];
-    }
-    public function get_keywords()
-    {
-        return ['lgl', 'wishlist', 'saved', 'favorites'];
-    }
-    protected function render()
-    {
-        echo do_shortcode('[lgl_wishlist]');
-    }
+class LGL_Widget_Wishlist extends \Elementor\Widget_Base {
+    use LGL_Elementor_Style_Controls;
+    public function get_name() { return 'lgl_wishlist_widget'; }
+    public function get_title() { return __('Full Wishlist Page', 'lgl-shortcodes'); }
+    public function get_icon() { return 'eicon-heart'; }
+    public function get_categories() { return ['lgl-elements']; }
+    public function get_keywords() { return ['lgl', 'wishlist', 'saved', 'favorites']; }
+    protected function register_controls() { $this->register_common_style_controls(); }
+    protected function render() { echo do_shortcode('[lgl_wishlist]'); }
 }
 
-class LGL_Widget_My_Account extends \Elementor\Widget_Base
-{
-    public function get_name()
-    {
-        return 'lgl_my_account_widget';
-    }
-    public function get_title()
-    {
-        return __('My Account Dashboard', 'lgl-shortcodes');
-    }
-    public function get_icon()
-    {
-        return 'eicon-lock-user';
-    }
-    public function get_categories()
-    {
-        return ['lgl-elements'];
-    }
-    public function get_keywords()
-    {
-        return ['lgl', 'account', 'dashboard', 'login', 'register'];
-    }
-    protected function render()
-    {
-        echo do_shortcode('[lgl_my_account]');
-    }
+class LGL_Widget_My_Account extends \Elementor\Widget_Base {
+    use LGL_Elementor_Style_Controls;
+    public function get_name() { return 'lgl_my_account_widget'; }
+    public function get_title() { return __('My Account Dashboard', 'lgl-shortcodes'); }
+    public function get_icon() { return 'eicon-lock-user'; }
+    public function get_categories() { return ['lgl-elements']; }
+    public function get_keywords() { return ['lgl', 'account', 'dashboard', 'login', 'register']; }
+    protected function register_controls() { $this->register_common_style_controls(); }
+    protected function render() { echo do_shortcode('[lgl_my_account]'); }
 }
 
-class LGL_Widget_Breadcrumbs extends \Elementor\Widget_Base
-{
-    public function get_name()
-    {
-        return 'lgl_breadcrumbs_widget';
-    }
-    public function get_title()
-    {
-        return __('Breadcrumbs', 'lgl-shortcodes');
-    }
-    public function get_icon()
-    {
-        return 'eicon-navigation-horizontal';
-    }
-    public function get_categories()
-    {
-        return ['lgl-elements'];
-    }
-    public function get_keywords()
-    {
-        return ['lgl', 'breadcrumbs', 'navigation', 'back'];
-    }
-    protected function render()
-    {
-        echo do_shortcode('[lgl_breadcrumbs]');
-    }
+class LGL_Widget_Breadcrumbs extends \Elementor\Widget_Base {
+    use LGL_Elementor_Style_Controls;
+    public function get_name() { return 'lgl_breadcrumbs_widget'; }
+    public function get_title() { return __('Breadcrumbs', 'lgl-shortcodes'); }
+    public function get_icon() { return 'eicon-navigation-horizontal'; }
+    public function get_categories() { return ['lgl-elements']; }
+    public function get_keywords() { return ['lgl', 'breadcrumbs', 'navigation', 'back']; }
+    protected function register_controls() { $this->register_common_style_controls(); }
+    protected function render() { echo do_shortcode('[lgl_breadcrumbs]'); }
 }
+
 
 /* ==========================================================================
    5. Related Vehicles Widget
    ========================================================================== */
-class LGL_Widget_Related_Vehicles extends \Elementor\Widget_Base
-{
-    public function get_name()
-    {
-        return 'lgl_related_vehicles_widget';
-    }
-    public function get_title()
-    {
-        return __('Related Vehicles', 'lgl-shortcodes');
-    }
-    public function get_icon()
-    {
-        return 'eicon-post-list';
-    }
-    public function get_categories()
-    {
-        return ['lgl-elements'];
-    }
-    public function get_keywords()
-    {
-        return ['lgl', 'related', 'vehicles', 'similar'];
-    }
+class LGL_Widget_Related_Vehicles extends \Elementor\Widget_Base {
+    use LGL_Elementor_Style_Controls;
 
-    protected function register_controls()
-    {
+    public function get_name() { return 'lgl_related_vehicles_widget'; }
+    public function get_title() { return __('Related Vehicles', 'lgl-shortcodes'); }
+    public function get_icon() { return 'eicon-post-list'; }
+    public function get_categories() { return ['lgl-elements']; }
+    public function get_keywords() { return ['lgl', 'related', 'vehicles', 'similar']; }
+
+    protected function register_controls() {
         $this->start_controls_section('content_section', ['label' => __('Related Settings', 'lgl-shortcodes'), 'tab' => \Elementor\Controls_Manager::TAB_CONTENT]);
 
         $this->add_control('attr_post_type', [
@@ -423,10 +342,12 @@ class LGL_Widget_Related_Vehicles extends \Elementor\Widget_Base
         ]);
 
         $this->end_controls_section();
+
+        // INJECT STYLE TAB
+        $this->register_common_style_controls();
     }
 
-    protected function render()
-    {
+    protected function render() {
         $settings = $this->get_settings_for_display();
         $atts = '';
         if (!empty($settings['attr_post_type'])) $atts .= ' post_type="' . esc_attr($settings['attr_post_type']) . '"';
@@ -435,89 +356,39 @@ class LGL_Widget_Related_Vehicles extends \Elementor\Widget_Base
     }
 }
 
+
 /* ==========================================================================
-   6. Mini Components (No Attributes)
+   6. Mini Components (No Attributes, Just Styles)
    ========================================================================== */
-class LGL_Widget_Mini_Account extends \Elementor\Widget_Base
-{
-    public function get_name()
-    {
-        return 'lgl_mini_account_widget';
-    }
-    public function get_title()
-    {
-        return __('Mini Account Bar', 'lgl-shortcodes');
-    }
-    public function get_icon()
-    {
-        return 'eicon-person';
-    }
-    public function get_categories()
-    {
-        return ['lgl-elements'];
-    }
-    public function get_keywords()
-    {
-        return ['lgl', 'mini', 'account', 'login', 'bar'];
-    }
-    protected function render()
-    {
-        echo do_shortcode('[lgl_mini_account]');
-    }
+class LGL_Widget_Mini_Account extends \Elementor\Widget_Base {
+    use LGL_Elementor_Style_Controls;
+    public function get_name() { return 'lgl_mini_account_widget'; }
+    public function get_title() { return __('Mini Account Bar', 'lgl-shortcodes'); }
+    public function get_icon() { return 'eicon-person'; }
+    public function get_categories() { return ['lgl-elements']; }
+    public function get_keywords() { return ['lgl', 'mini', 'account', 'login', 'bar']; }
+    protected function register_controls() { $this->register_common_style_controls(); }
+    protected function render() { echo do_shortcode('[lgl_mini_account]'); }
 }
 
-class LGL_Widget_Mini_Compare extends \Elementor\Widget_Base
-{
-    public function get_name()
-    {
-        return 'lgl_mini_compare_widget';
-    }
-    public function get_title()
-    {
-        return __('Mini Compare Button', 'lgl-shortcodes');
-    }
-    public function get_icon()
-    {
-        return 'eicon-exchange';
-    }
-    public function get_categories()
-    {
-        return ['lgl-elements'];
-    }
-    public function get_keywords()
-    {
-        return ['lgl', 'mini', 'compare', 'button'];
-    }
-    protected function render()
-    {
-        echo do_shortcode('[lgl_mini_compare]');
-    }
+class LGL_Widget_Mini_Compare extends \Elementor\Widget_Base {
+    use LGL_Elementor_Style_Controls;
+    public function get_name() { return 'lgl_mini_compare_widget'; }
+    public function get_title() { return __('Mini Compare Button', 'lgl-shortcodes'); }
+    public function get_icon() { return 'eicon-exchange'; }
+    public function get_categories() { return ['lgl-elements']; }
+    public function get_keywords() { return ['lgl', 'mini', 'compare', 'button']; }
+    protected function register_controls() { $this->register_common_style_controls(); }
+    protected function render() { echo do_shortcode('[lgl_mini_compare]'); }
 }
 
-class LGL_Widget_Mini_Wishlist extends \Elementor\Widget_Base
-{
-    public function get_name()
-    {
-        return 'lgl_mini_wishlist_widget';
-    }
-    public function get_title()
-    {
-        return __('Mini Wishlist Dropdown', 'lgl-shortcodes');
-    }
-    public function get_icon()
-    {
-        return 'eicon-heart-o';
-    }
-    public function get_categories()
-    {
-        return ['lgl-elements'];
-    }
-    public function get_keywords()
-    {
-        return ['lgl', 'mini', 'wishlist', 'dropdown', 'favorites'];
-    }
-    protected function render()
-    {
-        echo do_shortcode('[lgl_mini_wishlist]');
-    }
+class LGL_Widget_Mini_Wishlist extends \Elementor\Widget_Base {
+    use LGL_Elementor_Style_Controls;
+    public function get_name() { return 'lgl_mini_wishlist_widget'; }
+    public function get_title() { return __('Mini Wishlist Dropdown', 'lgl-shortcodes'); }
+    public function get_icon() { return 'eicon-heart-o'; }
+    public function get_categories() { return ['lgl-elements']; }
+    public function get_keywords() { return ['lgl', 'mini', 'wishlist', 'dropdown', 'favorites']; }
+    protected function register_controls() { $this->register_common_style_controls(); }
+    protected function render() { echo do_shortcode('[lgl_mini_wishlist]'); }
 }
