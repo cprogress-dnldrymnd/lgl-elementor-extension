@@ -50,7 +50,6 @@ if (! class_exists('LGL_Shortcodes')) {
             add_action('init', array($this, 'register_shortcodes'));
             add_action('wp_enqueue_scripts', array($this, 'enqueue_assets'));
             add_action('wp_head', array($this, 'inject_dynamic_css'));
-            add_filter('post_thumbnail_html', array($this, 'fallback_placeholder_image'), 20, 5)
             add_filter('has_post_thumbnail', array($this, 'fallback_has_post_thumbnail'), 10, 3);
             add_filter('post_thumbnail_html', array($this, 'fallback_placeholder_image'), 20, 5);
             add_filter('post_thumbnail_url', array($this, 'fallback_post_thumbnail_url'), 10, 3);;
