@@ -2752,6 +2752,39 @@ if (! class_exists('LGL_Shortcodes')) {
 
             return $post_states;
         }
+
+        /**
+         * Automatically injects the global placeholder image if a vehicle does not have a featured image.
+         * Affects grids, search results, single vehicle pages, compare tables, and wishlists.
+         */
+        public function fallback_placeholder_image($html, $post_id, $post_thumbnail_id, $size, $attr)
+        {
+            // Only intervene if the native HTML string is empty
+            if (empty($html)) {
+                $post_type = get_post_type($post_id);
+                
+                // Ensure we only apply this to your plugin's target vehicles
+                if (in_array($post_type, array('caravan', 'motorhome', 'campervan'))) {
+                    
+                    $options = get_option('lgl_settings', array());
+                    $placeholder = isset($options['placeholder_image']) ? $options['placeholder_image'] : '';
+                    
+                    if (!empty($placeholder)) {
+                        // Safely extract or build CSS classes for the image
+                        $class = isset($attr['class']) ? esc_attr($attr['class']) : 'attachment-' . esc_attr(is_string($size) ? $size : 'default') . ' size-' . esc_attr(is_string($size) ? $size : 'default') . ' wp-post-image lgl-placeholder-image';
+                        
+                        // Construct the fallback image DOM element
+                        $html = sprintf(
+                            '<img src="%s" class="%s" alt="%s" style="object-fit: cover;" />', 
+                            esc_url($placeholder), 
+                            $class, 
+                            esc_attr(get_the_title($post_id))
+                        );
+                    }
+                }
+            }
+            return $html;
+        }
     }
 
     // Instantiate the plugin architecture
