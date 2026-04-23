@@ -50,6 +50,7 @@ if (! class_exists('LGL_Shortcodes')) {
             add_action('init', array($this, 'register_shortcodes'));
             add_action('wp_enqueue_scripts', array($this, 'enqueue_assets'));
             add_action('wp_head', array($this, 'inject_dynamic_css'));
+            add_filter('post_thumbnail_html', array($this, 'fallback_placeholder_image'), 20, 5);
 
             // AJAX endpoints for dependent dropdowns and search results
             add_action('wp_ajax_lgl_get_models', array($this, 'ajax_get_models'));
@@ -255,23 +256,50 @@ if (! class_exists('LGL_Shortcodes')) {
             // Enqueue native WP drag-and-drop sortable library
             wp_enqueue_script('jquery-ui-sortable');
 
+            wp_enqueue_media();
+
             // Enqueue Select2 dependencies for the admin UI
             wp_enqueue_style('select2', LGL_SHORTCODES_URL . 'assets/libs/select2/select2.min.css');
             wp_enqueue_script('select2', LGL_SHORTCODES_URL . 'assets/libs/select2/select2.min.js', array('jquery'), '4.1.0', true);
 
             // Inline script to initialize the color picker and Select2 instances
-            wp_add_inline_script('wp-color-picker', '
+            wp_add_inline_script('wp-color-picker', "
                 jQuery(document).ready(function($){
-                    $(".lgl-color-picker").wpColorPicker();
+                    $('.lgl-color-picker').wpColorPicker();
                     
                     if ($.fn.select2) {
-                        $(".lgl-select2-cpt").select2({
-                            placeholder: "Search and select vehicles...",
+                        $('.lgl-select2-cpt').select2({
+                            placeholder: 'Search and select vehicles...',
                             allowClear: true
                         });
                     }
+
+                    // NEW: Image Uploader Logic
+                    $('body').on('click', '.lgl-upload-image-btn', function(e) {
+                        e.preventDefault();
+                        var button = $(this);
+                        var inputField = button.siblings('.lgl-image-url');
+                        var previewImg = button.siblings('.lgl-image-preview');
+                        
+                        var customUploader = wp.media({
+                            title: 'Select Placeholder Image',
+                            button: { text: 'Use this image' },
+                            multiple: false
+                        }).on('select', function() {
+                            var attachment = customUploader.state().get('selection').first().toJSON();
+                            inputField.val(attachment.url);
+                            previewImg.attr('src', attachment.url).show();
+                        }).open();
+                    });
+                    
+                    $('body').on('click', '.lgl-remove-image-btn', function(e) {
+                        e.preventDefault();
+                        var button = $(this);
+                        button.siblings('.lgl-image-url').val('');
+                        button.siblings('.lgl-image-preview').hide().attr('src', '');
+                    });
                 });
-            ');
+            ");
         }
 
         public function register_admin_menu()
@@ -330,6 +358,7 @@ if (! class_exists('LGL_Shortcodes')) {
             add_settings_section('lgl_general_section', 'General Configuration', null, 'lgl-settings-general');
 
             $general_fields = array(
+                'placeholder_image' => array('label' => 'Global Placeholder Image', 'type' => 'image', 'default' => ''),
                 'disable_wishlist'  => array('label' => 'Disable Wishlist',  'type' => 'checkbox', 'default' => '0'),
                 'disable_compare'   => array('label' => 'Disable Compare',   'type' => 'checkbox', 'default' => '0'),
                 'currency_symbol'   => array('label' => 'Currency Symbol',   'type' => 'text',     'default' => '$'),
@@ -695,6 +724,22 @@ if (! class_exists('LGL_Shortcodes')) {
                     }
                     echo '</select>';
                     echo '<p class="description">Search and select the vehicles you wish to feature.</p>';
+                    break;
+                case 'image':
+                    $display = empty($value) ? 'none' : 'block';
+                    echo sprintf(
+                        '<div class="lgl-image-uploader-wrapper">
+                            <img src="%2$s" class="lgl-image-preview" style="max-width: 150px; height: auto; border-radius: 4px; display: %3$s; margin-bottom: 10px;" />
+                            <div style="display: flex; gap: 8px;">
+                                <input type="text" id="lgl_settings[%1$s]" name="lgl_settings[%1$s]" value="%2$s" class="regular-text lgl-image-url" placeholder="https://" />
+                                <button class="button lgl-upload-image-btn">Select Image</button>
+                                <button class="button lgl-remove-image-btn">Remove</button>
+                            </div>
+                        </div>',
+                        esc_attr($id),
+                        esc_url($value),
+                        esc_attr($display)
+                    );
                     break;
                 case 'text':
                 default:
