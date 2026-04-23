@@ -50,7 +50,10 @@ if (! class_exists('LGL_Shortcodes')) {
             add_action('init', array($this, 'register_shortcodes'));
             add_action('wp_enqueue_scripts', array($this, 'enqueue_assets'));
             add_action('wp_head', array($this, 'inject_dynamic_css'));
+            add_filter('post_thumbnail_html', array($this, 'fallback_placeholder_image'), 20, 5)
+            add_filter('has_post_thumbnail', array($this, 'fallback_has_post_thumbnail'), 10, 3);
             add_filter('post_thumbnail_html', array($this, 'fallback_placeholder_image'), 20, 5);
+            add_filter('post_thumbnail_url', array($this, 'fallback_post_thumbnail_url'), 10, 3);;
 
             // AJAX endpoints for dependent dropdowns and search results
             add_action('wp_ajax_lgl_get_models', array($this, 'ajax_get_models'));
@@ -126,6 +129,7 @@ if (! class_exists('LGL_Shortcodes')) {
             add_action('admin_notices', array($this, 'lgl_generation_notice'));
 
             add_filter('display_post_states', array($this, 'add_lgl_page_states'), 10, 2);
+            
 
             new LGL_Forms();
             new LGL_Email_Builder();
@@ -2762,22 +2766,22 @@ if (! class_exists('LGL_Shortcodes')) {
             // Only intervene if the native HTML string is empty
             if (empty($html)) {
                 $post_type = get_post_type($post_id);
-                
+
                 // Ensure we only apply this to your plugin's target vehicles
                 if (in_array($post_type, array('caravan', 'motorhome', 'campervan'))) {
-                    
+
                     $options = get_option('lgl_settings', array());
                     $placeholder = isset($options['placeholder_image']) ? $options['placeholder_image'] : '';
-                    
+
                     if (!empty($placeholder)) {
                         // Safely extract or build CSS classes for the image
                         $class = isset($attr['class']) ? esc_attr($attr['class']) : 'attachment-' . esc_attr(is_string($size) ? $size : 'default') . ' size-' . esc_attr(is_string($size) ? $size : 'default') . ' wp-post-image lgl-placeholder-image';
-                        
+
                         // Construct the fallback image DOM element
                         $html = sprintf(
-                            '<img src="%s" class="%s" alt="%s" style="object-fit: cover;" />', 
-                            esc_url($placeholder), 
-                            $class, 
+                            '<img src="%s" class="%s" alt="%s" style="object-fit: cover;" />',
+                            esc_url($placeholder),
+                            $class,
                             esc_attr(get_the_title($post_id))
                         );
                     }
