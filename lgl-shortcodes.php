@@ -128,7 +128,7 @@ if (! class_exists('LGL_Shortcodes')) {
             add_action('admin_notices', array($this, 'lgl_generation_notice'));
 
             add_filter('display_post_states', array($this, 'add_lgl_page_states'), 10, 2);
-            
+
 
             new LGL_Forms();
             new LGL_Email_Builder();
@@ -2756,7 +2756,7 @@ if (! class_exists('LGL_Shortcodes')) {
             return $post_states;
         }
 
-       /**
+        /**
          * 1. Forces WordPress to return TRUE when a template explicitly checks if (has_post_thumbnail())
          */
         public function fallback_has_post_thumbnail($has_thumbnail, $post, $thumbnail_id)
@@ -2780,23 +2780,23 @@ if (! class_exists('LGL_Shortcodes')) {
         {
             if (empty($html)) {
                 $post_type = get_post_type($post_id);
-                
+
                 if (in_array($post_type, array('caravan', 'motorhome', 'campervan'))) {
                     $options = get_option('lgl_settings', array());
                     $placeholder = isset($options['placeholder_image']) ? $options['placeholder_image'] : '';
-                    
+
                     if (!empty($placeholder)) {
                         $class = 'attachment-' . esc_attr(is_string($size) ? $size : 'default') . ' size-' . esc_attr(is_string($size) ? $size : 'default') . ' wp-post-image lgl-placeholder-image';
-                        
+
                         // Safely handle $attr if a theme passes custom classes as an array
                         if (is_array($attr) && isset($attr['class'])) {
                             $class .= ' ' . esc_attr($attr['class']);
                         }
-                        
+
                         $html = sprintf(
-                            '<img src="%s" class="%s" alt="%s" style="object-fit: cover;" />', 
-                            esc_url($placeholder), 
-                            $class, 
+                            '<img src="%s" class="%s" alt="%s" style="object-fit: cover;" />',
+                            esc_url($placeholder),
+                            $class,
                             esc_attr(get_the_title($post_id))
                         );
                     }
@@ -2815,7 +2815,7 @@ if (! class_exists('LGL_Shortcodes')) {
                 if (in_array($post_type, array('caravan', 'motorhome', 'campervan'))) {
                     $options = get_option('lgl_settings', array());
                     $placeholder = isset($options['placeholder_image']) ? $options['placeholder_image'] : '';
-                    
+
                     if (!empty($placeholder)) {
                         return esc_url($placeholder);
                     }
