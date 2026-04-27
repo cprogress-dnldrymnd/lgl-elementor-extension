@@ -63,6 +63,9 @@
       .lgl-search-container.lgl-search-container.lgl-search-container .lgl-filter-form.lgl-layout-vertical .lgl-search-form-inner .lgl-filter-group {
         --width: 100%;
         border-radius: 5px; }
+        .lgl-search-container.lgl-search-container.lgl-search-container .lgl-filter-form.lgl-layout-vertical .lgl-search-form-inner .lgl-filter-group select {
+          font-size: 0.875rem;
+          font-weight: 500; }
         .lgl-search-container.lgl-search-container.lgl-search-container .lgl-filter-form.lgl-layout-vertical .lgl-search-form-inner .lgl-filter-group.lgl-submit-group {
           padding: 0; }
         .lgl-search-container.lgl-search-container.lgl-search-container .lgl-filter-form.lgl-layout-vertical .lgl-search-form-inner .lgl-filter-group:not(.lgl-submit-group) {
@@ -2247,6 +2250,9 @@
 .lgl-select2 {
   opacity: 0; }
 
+.lgl-filter-group select {
+  font-size: 1rem;
+  font-weight: bold; }
 .lgl-filter-group .choices {
   width: 100%;
   height: 100%;
