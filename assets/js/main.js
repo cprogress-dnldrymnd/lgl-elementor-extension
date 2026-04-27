@@ -198,14 +198,21 @@
             let modelNode = $('#lgl_model')[0];
             let postType = $('#lgl_target_post_type').val() || $('#lgl_post_type').find('option:selected').data('post-type') || '';
 
-            // Soft reset model dropdown natively, using placeholder: true
+            /**
+             * Soft reset model dropdown natively.
+             * Call removeActiveItems() and setChoiceByValue('') to clear previously cached display text.
+             */
             if (modelNode && modelNode.choicesInstance) {
                 modelNode.choicesInstance.clearChoices();
+                modelNode.choicesInstance.removeActiveItems(); // Removes the stuck "Select Make First" text
+
                 if (!make_id) {
                     modelNode.choicesInstance.setChoices([{ value: '', label: 'Select Make First', selected: true, placeholder: true }], 'value', 'label', true);
                 } else {
                     modelNode.choicesInstance.setChoices([{ value: '', label: 'Loading models…', selected: true, placeholder: true }], 'value', 'label', true);
                 }
+
+                modelNode.choicesInstance.setChoiceByValue(''); // Forces the UI to sync the new placeholder
                 modelNode.choicesInstance.disable();
             }
 
@@ -221,8 +228,11 @@
                     },
                     success: function (response) {
                         if (modelNode && modelNode.choicesInstance) {
-                            // Safely check length whether response is an array or an object
                             const dataLength = response.data ? Object.keys(response.data).length : 0;
+
+                            // Flush again before repopulating
+                            modelNode.choicesInstance.clearChoices();
+                            modelNode.choicesInstance.removeActiveItems();
 
                             if (response.success && dataLength > 0) {
                                 let choicesArray = [{ value: '', label: 'All Models', selected: true, placeholder: true }];
@@ -230,21 +240,26 @@
                                     choicesArray.push({ value: item.id, label: item.text });
                                 });
                                 modelNode.choicesInstance.setChoices(choicesArray, 'value', 'label', true);
+                                modelNode.choicesInstance.setChoiceByValue(''); // Sync the "All Models" placeholder
                                 modelNode.choicesInstance.enable();
                             } else {
                                 modelNode.choicesInstance.setChoices([{ value: '', label: 'No models available', selected: true, placeholder: true }], 'value', 'label', true);
+                                modelNode.choicesInstance.setChoiceByValue(''); // Sync the "No models" placeholder
                             }
                         }
                     },
                     error: function () {
-                        // Prevent infinite loading state on failure
                         if (modelNode && modelNode.choicesInstance) {
+                            modelNode.choicesInstance.clearChoices();
+                            modelNode.choicesInstance.removeActiveItems();
                             modelNode.choicesInstance.setChoices([{ value: '', label: 'Error loading models', selected: true, placeholder: true }], 'value', 'label', true);
+                            modelNode.choicesInstance.setChoiceByValue('');
                         }
                     }
                 });
             }
         });
+
         // Vehicle Type change → load Makes for the selected type
         $('#lgl_post_type').on('change', function () {
             const $selected = $(this).find('option:selected');
@@ -262,15 +277,22 @@
                 return; // Abort the basic fetcher!
             }
 
-            // --- Basic Global Search Fetcher ---
+            /**
+             * Basic Global Search Fetcher
+             * Includes rigorous UI syncing via removeActiveItems and setChoiceByValue
+             */
             if (makeNode && makeNode.choicesInstance) {
                 makeNode.choicesInstance.clearChoices();
+                makeNode.choicesInstance.removeActiveItems();
                 makeNode.choicesInstance.setChoices([{ value: '', label: 'Select Vehicle Type First', selected: true, placeholder: true }], 'value', 'label', true);
+                makeNode.choicesInstance.setChoiceByValue('');
                 makeNode.choicesInstance.disable();
             }
             if (modelNode && modelNode.choicesInstance) {
                 modelNode.choicesInstance.clearChoices();
+                modelNode.choicesInstance.removeActiveItems();
                 modelNode.choicesInstance.setChoices([{ value: '', label: 'Select Make First', selected: true, placeholder: true }], 'value', 'label', true);
+                modelNode.choicesInstance.setChoiceByValue('');
                 modelNode.choicesInstance.disable();
             }
 
@@ -279,7 +301,9 @@
             // Trigger Loading State safely
             if (makeNode && makeNode.choicesInstance) {
                 makeNode.choicesInstance.clearChoices();
+                makeNode.choicesInstance.removeActiveItems();
                 makeNode.choicesInstance.setChoices([{ value: '', label: 'Loading makes…', selected: true, placeholder: true }], 'value', 'label', true);
+                makeNode.choicesInstance.setChoiceByValue('');
             }
 
             $.ajax({
@@ -293,9 +317,10 @@
                 success: function (response) {
                     if (makeNode && makeNode.choicesInstance) {
                         let choicesArray = [];
-
-                        // Safely evaluate data structure length
                         const dataLength = response.data ? Object.keys(response.data).length : 0;
+
+                        makeNode.choicesInstance.clearChoices();
+                        makeNode.choicesInstance.removeActiveItems();
 
                         if (response.success && dataLength > 0) {
                             choicesArray.push({ value: '', label: 'All Makes', selected: true, placeholder: true });
@@ -303,16 +328,20 @@
                                 choicesArray.push({ value: item.id, label: item.text });
                             });
                             makeNode.choicesInstance.setChoices(choicesArray, 'value', 'label', true);
+                            makeNode.choicesInstance.setChoiceByValue(''); // Force UI to display 'All Makes'
                             makeNode.choicesInstance.enable();
                         } else {
                             makeNode.choicesInstance.setChoices([{ value: '', label: 'No makes available', selected: true, placeholder: true }], 'value', 'label', true);
+                            makeNode.choicesInstance.setChoiceByValue(''); // Force UI to display 'No makes available'
                         }
                     }
                 },
                 error: function () {
-                    // Prevent infinite loading state on failure
                     if (makeNode && makeNode.choicesInstance) {
+                        makeNode.choicesInstance.clearChoices();
+                        makeNode.choicesInstance.removeActiveItems();
                         makeNode.choicesInstance.setChoices([{ value: '', label: 'Error loading makes', selected: true, placeholder: true }], 'value', 'label', true);
+                        makeNode.choicesInstance.setChoiceByValue('');
                     }
                 }
             });
