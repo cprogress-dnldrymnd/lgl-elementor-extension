@@ -60,7 +60,7 @@
     gap: 14px;
     flex-shrink: 0;
 }
-.lgl-modal-header h2 {
+.lgl-modal-header.lgl-modal-header h2 {
     margin: 0;
     font-size: 22px;
     font-weight: 700;
