@@ -84,9 +84,10 @@
                     border: 1px solid var(--lgl-color-tertiary) !important;
                     border-radius: 5px;
                     .choices {
+                        font-weight: 500;
+
                         .choices__inner {
                             font-size: 0.875rem;
-                            font-weight: 500;
                         }
                     }
                 }
@@ -2896,8 +2897,7 @@ $wt-cols: 110px 1fr 120px 110px 80px 80px 50px;
         .choices__list--dropdown,
         .choices__list[aria-expanded] {
             border: 1px solid var(--lgl-color-secondary);
-            .choices__list--dropdown .choices__item,
-            .choices__list[aria-expanded] .choices__item {
+            .choices__item {
                 padding: 10px 20px;
             }
         }
