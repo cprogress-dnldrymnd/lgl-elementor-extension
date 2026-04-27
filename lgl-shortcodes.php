@@ -1797,11 +1797,13 @@ if (! class_exists('LGL_Shortcodes')) {
                 ));
             }
 
-            $conditions = array();
-            $berths     = array();
-            $prices     = array();
-            $makes      = array();
-            $models     = array();
+            $prices              = array();
+            $makes               = array();
+            $models              = array();
+            $dynamic_meta_values = array();
+            $fuel_types          = array();
+            $chassis_list        = array();
+            $gearboxes           = array();
 
             if (!empty($matching_ids)) {
                 global $wpdb;
@@ -1831,6 +1833,23 @@ if (! class_exists('LGL_Shortcodes')) {
                             'value' => (float) $p,
                             'label' => self::format_price((float) $p),
                         );
+                    }
+                }
+
+                // Extract dependent taxonomies matching the current filter state
+                foreach (array('listing-fuel-type' => &$fuel_types, 'listing-chassis' => &$chassis_list, 'listing-gearbox' => &$gearboxes) as $tax => &$arr) {
+                    $terms = wp_get_object_terms($matching_ids, $tax);
+                    $seen = array();
+                    if (!is_wp_error($terms)) {
+                        foreach ($terms as $t) {
+                            if (!isset($seen[$t->term_id])) {
+                                $arr[] = array('id' => $t->slug, 'text' => $t->name);
+                                $seen[$t->term_id] = true;
+                            }
+                        }
+                        usort($arr, function ($a, $b) {
+                            return strcmp($a['text'], $b['text']);
+                        });
                     }
                 }
             }
@@ -1904,12 +1923,14 @@ if (! class_exists('LGL_Shortcodes')) {
                 }
             }
 
-            wp_send_json_success(array(
-                'conditions' => $conditions,
-                'berths'     => $berths,
-                'prices'     => $prices,
-                'makes'      => $makes,
-                'models'     => $models,
+          wp_send_json_success(array(
+                'prices'       => $prices,
+                'makes'        => $makes,
+                'models'       => $models,
+                'dynamic_meta' => $dynamic_meta_values,
+                'fuel_types'   => $fuel_types,
+                'chassis_list' => $chassis_list,
+                'gearboxes'    => $gearboxes,
             ));
         }
 
