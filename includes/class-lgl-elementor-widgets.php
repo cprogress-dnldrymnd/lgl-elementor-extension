@@ -55,7 +55,15 @@ class LGL_Widget_Search extends \Elementor\Widget_Base
             'default' => 'yes',
             'return_value' => 'true',
         ]);
-
+        $this->add_control('attr_layout', [
+            'label' => __('Form Layout', 'lgl-shortcodes'),
+            'type' => \Elementor\Controls_Manager::SELECT,
+            'default' => 'horizontal',
+            'options' => [
+                'horizontal' => 'Horizontal',
+                'vertical' => 'Vertical'
+            ],
+        ]);
         $this->end_controls_section();
     }
 
