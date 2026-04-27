@@ -103,25 +103,36 @@
         let isUpdatingFilters = false;
         let activeSearchXhr = null;
 
-        // Initialize Select2 on target classes
-        
+        /**
+   * Initializes Tom Select instances for elements with the .lgl-select2 class.
+   * Evaluates specific element IDs to toggle search functionality and dynamic option creation.
+   */
         $('.lgl-select2').each(function () {
-            const $select = $(this);
+            // Tom Select requires the native DOM element, not the jQuery wrapper
+            const nativeSelectElement = this;
+            const selectId = nativeSelectElement.id;
             const noSearchIds = ['lgl_post_type', 'lgl_condition', 'lgl_berth', 'lgl_price_min', 'lgl_price_max', 'lgl_make', 'lgl-sort-order'];
 
-            if (noSearchIds.includes($select.attr('id'))) {
+            if (noSearchIds.includes(selectId)) {
                 // Disable search box for specific IDs
-                $select.select2({
-                    width: '100%',
-                    minimumResultsForSearch: Infinity
+                new TomSelect(nativeSelectElement, {
+                    // Passing null to controlInput removes the search text box entirely
+                    controlInput: null
                 });
             } else {
                 // Keep default behavior (with search) for Make, Model, etc.
-                $select.select2({
-                    width: '100%'
+                // AND enable dynamic option creation
+                new TomSelect(nativeSelectElement, {
+                    // Allows users to type queries that don't exist in the list and create them as new options
+                    create: true,
+                    // UX enhancement: Instantiates the new option even if the user clicks outside the input before hitting Enter
+                    createOnBlur: true
                 });
             }
         });
+
+
+
 
         $('#lgl-search-form.lgl-filter-form-no-ajax').on('submit', function (e) {
             e.preventDefault();

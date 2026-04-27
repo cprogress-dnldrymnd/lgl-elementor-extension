@@ -4,7 +4,7 @@
  * Plugin Name: LGL Shortcodes
  * Plugin URI: https://digitallydisruptive.co.uk/
  * Description: A robust, OOP-based plugin to output customized data via shortcodes using a dynamic template routing system.
- * Version: 4.2.9
+ * Version: 4.3.0
  * Author: Digitally Disruptive - Donald Raymundo
  * Author URI: https://digitallydisruptive.co.uk/
  * Text Domain: lgl-shortcodes
@@ -17,7 +17,7 @@ if (! defined('ABSPATH')) {
 // Define a constant for the plugin directory path to ensure reliable file inclusion.
 define('LGL_SHORTCODES_PATH', plugin_dir_path(__FILE__));
 define('LGL_SHORTCODES_URL', plugin_dir_url(__FILE__));
-define('LGL_SHORTCODES_VERSION', '4.2.9');
+define('LGL_SHORTCODES_VERSION', '4.3.0');
 // ── Load the Forms integration ──
 require_once LGL_SHORTCODES_PATH . 'includes/class-lgl-forms.php';
 require_once LGL_SHORTCODES_PATH . 'includes/class-lgl-email-builder.php';
@@ -264,6 +264,10 @@ if (! class_exists('LGL_Shortcodes')) {
             // Enqueue Select2 dependencies for the admin UI
             wp_enqueue_style('select2', LGL_SHORTCODES_URL . 'assets/libs/select2/select2.min.css');
             wp_enqueue_script('select2', LGL_SHORTCODES_URL . 'assets/libs/select2/select2.min.js', array('jquery'), '4.1.0', true);
+
+            // Enqueue TomSelect dependencies for the admin UI
+            wp_enqueue_style('tomselect', LGL_SHORTCODES_URL . 'assets/libs/tomselect/tom-select.default.min.css');
+            wp_enqueue_script('tomselect', LGL_SHORTCODES_URL . 'assets/libs/tomselect/tom-select.base.js');
 
             // Inline script to initialize the color picker and Select2 instances
             wp_add_inline_script('wp-color-picker', "
