@@ -508,11 +508,25 @@ if (! class_exists('LGL_Shortcodes')) {
                 );
             }
 
-            // --- TAB 8: Search Filters ---
+         // --- TAB 8: Search Filters ---
             add_settings_section('lgl_search_filters_section', 'Search Filter Layout per Post Type (Drag to reorder, check to hide. Make and Model are fixed.)', null, 'lgl-settings-search-filters');
 
             $lgl_cpts = array('caravan', 'motorhome', 'campervan');
+            
+            // Fetch the lgl_pages option to check which vehicles are disabled
+            $lgl_pages_settings = get_option('lgl_pages', array()); 
+
             foreach ($lgl_cpts as $cpt) {
+                
+                // Check if this specific post type is disabled.
+                // Note: Depending on how your lgl_pages array is structured, the key might be 'disable_caravan' or 'caravan_disable'. 
+                // This checks both common patterns to be safe!
+                $is_disabled = !empty($lgl_pages_settings['disable_' . $cpt]) || !empty($lgl_pages_settings[$cpt . '_disable']);
+
+                if ($is_disabled) {
+                    continue; // Skip rendering the drag-and-drop builder for this post type
+                }
+
                 add_settings_field(
                     'search_manager_' . $cpt,
                     ucfirst($cpt) . ' Filters',
