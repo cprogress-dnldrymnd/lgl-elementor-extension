@@ -7,6 +7,9 @@ if ( ! defined( 'ABSPATH' ) ) {
     exit; // Exit if accessed directly
 }
 
+// --- ADDED FIX: Fetch the saved logos from the database ---
+$settings = get_option('lgl_manufacturer_settings', array());
+
 // 1. Check if we have any valid logos checked for display
 $has_logos = false;
 if ( ! empty( $settings ) ) {
