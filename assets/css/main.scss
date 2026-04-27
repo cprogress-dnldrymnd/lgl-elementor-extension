@@ -81,8 +81,10 @@
                 gap: 20px;
                 .lgl-filter-group {
                     --width: 100%;
-                    border: 1px solid var(--lgl-color-tertiary) !important;
                     border-radius: 5px;
+                    &:not(.lgl-submit-group) {
+                        border: 1px solid var(--lgl-color-tertiary) !important;
+                    }
                     .choices {
                         font-weight: 500;
 
