@@ -1,6 +1,6 @@
 /**
  * Frontend execution logic for LGL Shortcodes.
- * Handles Select2 initialization and AJAX operations.
+ * Handles Choices.js initialization and AJAX operations.
  */
 (function ($) {
     'use strict';
@@ -21,7 +21,6 @@
      * Listens for clicks on the tabs and syncs the selection with the main Search Form dropdown.
      * If the search form isn't present (e.g., on a different page), it redirects the user.
      */
-
     function initTypeTabs() {
         $(document).on('click', '.lgl-tab-btn', function (e) {
             e.preventDefault();
@@ -36,8 +35,12 @@
             const $select = $('#lgl_post_type');
 
             if ($select.length > 0) {
-                // Update select2 AND explicitly trigger native change so options update
-                $select.val(url).trigger('change.select2');
+                // Update Choices instance natively if it exists, fallback to standard jQuery val
+                if ($select[0] && $select[0].choicesInstance) {
+                    $select[0].choicesInstance.setChoiceByValue(url);
+                } else {
+                    $select.val(url);
+                }
                 $select.trigger('change');
             } else {
                 if (url) window.location.href = url;
@@ -94,7 +97,8 @@
 
     /**
       * Initializes the search form features.
-      * Binds Select2, handles dependent make/model dropdowns, and manages the AJAX submission and pagination UI.
+      * Binds Choices.js, handles dependent make/model dropdowns via API injection, 
+      * and manages the AJAX submission and pagination UI.
       *
       * @return void
       */
@@ -103,47 +107,24 @@
         let isUpdatingFilters = false;
         let activeSearchXhr = null;
 
-        // Initialize Select2 on target classes
-
-        /*
-
-        $('.lgl-select2').each(function () {
-            const $select = $(this);
-            const noSearchIds = ['lgl_post_type', 'lgl_condition', 'lgl_berth', 'lgl_price_min', 'lgl_price_max', 'lgl_make', 'lgl-sort-order'];
-
-            if (noSearchIds.includes($select.attr('id'))) {
-                // Disable search box for specific IDs
-                $select.select2({
-                    width: '100%',
-                    minimumResultsForSearch: Infinity
-                });
-            } else {
-                // Keep default behavior (with search) for Make, Model, etc.
-                $select.select2({
-                    width: '100%'
-                });
-            }
-        });*/
-
-
         /**
- * Initializes Choices.js instances for elements with the .lgl-select2 class.
- * Evaluates specific element IDs to toggle search functionality and dynamic option creation.
- */
+         * Initializes Choices.js instances and maps the internal API objects 
+         * directly onto the native DOM elements for cross-function accessibility.
+         */
         document.querySelectorAll('.lgl-select2').forEach(function (element) {
             const selectId = element.id;
             const noSearchIds = ['lgl_post_type', 'lgl_condition', 'lgl_berth', 'lgl_price_min', 'lgl_price_max', 'lgl_make', 'lgl-sort-order'];
 
             if (noSearchIds.includes(selectId)) {
                 // Disable search functionality completely for specific IDs
-                new Choices(element, {
+                element.choicesInstance = new Choices(element, {
                     searchEnabled: false,
                     itemSelectText: '', // Removes the default "Press to select" text on hover for a cleaner UI
                     shouldSort: false   // Keeps your original HTML <option> order
                 });
             } else {
                 // Keep default behavior (with search) AND enable dynamic option creation
-                new Choices(element, {
+                element.choicesInstance = new Choices(element, {
                     searchEnabled: true,
                     removeItemButton: true, // Adds an 'x' to remove selected items
                     addItems: true,         // Allows users to type and add custom values
@@ -152,8 +133,6 @@
                 });
             }
         });
-
-
 
         $('#lgl-search-form.lgl-filter-form-no-ajax').on('submit', function (e) {
             e.preventDefault();
@@ -217,11 +196,15 @@
             if ($('#lgl_condition').length > 0) return;
 
             let make_id = $(this).val();
-            let $model_select = $('#lgl_model');
+            let modelNode = $('#lgl_model')[0];
             let postType = $('#lgl_target_post_type').val() || $('#lgl_post_type').find('option:selected').data('post-type') || '';
 
-            // Soft reset model dropdown
-            $model_select.empty().append('<option value="">Select Model</option>').prop('disabled', true).trigger('change.select2');
+            // Soft reset model dropdown via Choices API natively
+            if (modelNode && modelNode.choicesInstance) {
+                modelNode.choicesInstance.clearChoices();
+                modelNode.choicesInstance.setChoices([{ value: '', label: 'Select Model', selected: true }], 'value', 'label', true);
+                modelNode.choicesInstance.disable();
+            }
 
             if (make_id) {
                 $.ajax({
@@ -234,12 +217,13 @@
                         post_type: postType
                     },
                     success: function (response) {
-                        if (response.success && response.data.length > 0) {
-                            $model_select.empty().append('<option value="">All Models</option>');
+                        if (response.success && response.data.length > 0 && modelNode && modelNode.choicesInstance) {
+                            let choicesArray = [{ value: '', label: 'All Models', selected: true }];
                             $.each(response.data, function (index, item) {
-                                $model_select.append(new Option(item.text, item.id, false, false));
+                                choicesArray.push({ value: item.id, label: item.text });
                             });
-                            $model_select.prop('disabled', false).trigger('change.select2');
+                            modelNode.choicesInstance.setChoices(choicesArray, 'value', 'label', true);
+                            modelNode.choicesInstance.enable();
                         }
                     }
                 });
@@ -250,8 +234,9 @@
         $('#lgl_post_type').on('change', function () {
             const $selected = $(this).find('option:selected');
             const postTypeSlug = $selected.data('post-type');
-            const $makeSelect = $('#lgl_make');
-            const $modelSelect = $('#lgl_model');
+            
+            let makeNode = $('#lgl_make')[0];
+            let modelNode = $('#lgl_model')[0];
 
             // Update hidden target so backend knows what to query
             $('#lgl_target_post_type').val(postTypeSlug);
@@ -263,12 +248,23 @@
             }
 
             // --- Basic Global Search Fetcher (Only runs if Condition/Berth are completely hidden) ---
-            $makeSelect.empty().append('<option value="">Select Vehicle Type First</option>').prop('disabled', true).trigger('change.select2');
-            $modelSelect.empty().append('<option value="">Select Make First</option>').prop('disabled', true).trigger('change.select2');
+            if (makeNode && makeNode.choicesInstance) {
+                makeNode.choicesInstance.clearChoices();
+                makeNode.choicesInstance.setChoices([{ value: '', label: 'Select Vehicle Type First', selected: true }], 'value', 'label', true);
+                makeNode.choicesInstance.disable();
+            }
+            if (modelNode && modelNode.choicesInstance) {
+                modelNode.choicesInstance.clearChoices();
+                modelNode.choicesInstance.setChoices([{ value: '', label: 'Select Make First', selected: true }], 'value', 'label', true);
+                modelNode.choicesInstance.disable();
+            }
 
             if (!postTypeSlug) return;
 
-            $makeSelect.empty().append('<option value="">Loading makes…</option>').trigger('change.select2');
+            if (makeNode && makeNode.choicesInstance) {
+                makeNode.choicesInstance.clearChoices();
+                makeNode.choicesInstance.setChoices([{ value: '', label: 'Loading makes…', selected: true }], 'value', 'label', true);
+            }
 
             $.ajax({
                 url: lgl_ajax_obj.ajax_url,
@@ -279,14 +275,18 @@
                     post_type: postTypeSlug,
                 },
                 success: function (response) {
-                    $makeSelect.empty().append('<option value="">All Makes</option>');
-                    if (response.success && response.data.length > 0) {
-                        $.each(response.data, function (i, item) {
-                            $makeSelect.append(new Option(item.text, item.id, false, false));
-                        });
-                        $makeSelect.prop('disabled', false).trigger('change.select2');
-                    } else {
-                        $makeSelect.empty().append('<option value="">No makes available</option>').trigger('change.select2');
+                    if (makeNode && makeNode.choicesInstance) {
+                        let choicesArray = [];
+                        if (response.success && response.data.length > 0) {
+                            choicesArray.push({ value: '', label: 'All Makes', selected: true });
+                            $.each(response.data, function (i, item) {
+                                choicesArray.push({ value: item.id, label: item.text });
+                            });
+                            makeNode.choicesInstance.setChoices(choicesArray, 'value', 'label', true);
+                            makeNode.choicesInstance.enable();
+                        } else {
+                            makeNode.choicesInstance.setChoices([{ value: '', label: 'No makes available', selected: true }], 'value', 'label', true);
+                        }
                     }
                 }
             });
@@ -353,12 +353,15 @@
             let action = $clicked.data('action');
             let text = $clicked.text();
 
-            // 1. Manipulate the Select2 nodes based on the breadcrumb depth
+            // 1. Manipulate the Choices.js nodes based on the breadcrumb depth natively
+            let makeNode = $('#lgl_make')[0];
+            let modelNode = $('#lgl_model')[0];
+
             if (action === 'clear-all') {
-                $('#lgl_make').val('').trigger('change.select2');
-                $('#lgl_model').val('').trigger('change.select2');
+                if (makeNode && makeNode.choicesInstance) makeNode.choicesInstance.setChoiceByValue('');
+                if (modelNode && modelNode.choicesInstance) modelNode.choicesInstance.setChoiceByValue('');
             } else if (action === 'clear-model') {
-                $('#lgl_model').val('').trigger('change.select2');
+                if (modelNode && modelNode.choicesInstance) modelNode.choicesInstance.setChoiceByValue('');
             }
 
             // 2. Trigger the AJAX execution
@@ -371,16 +374,21 @@
 
         /**
          * Intercepts the Reset Filters button click.
-         * Forcibly nullifies all Select2 instances within the target form to clear the UI,
-         * then delegates the actual reset operation to the primary AJAX submission pipeline.
+         * Forcibly nullifies all Choices.js instances within the target form to clear the UI.
          */
         $(document).on('click', '.lgl-reset-filters-btn', function (e) {
             e.preventDefault();
 
             const $form = $(this).closest('form');
 
-            // 1. Flush the visual and internal state of all Select2 nodes
-            $form.find('select.lgl-select2').val('').trigger('change.select2');
+            // 1. Flush the visual and internal state of all Choices.js nodes securely
+            $form.find('select.lgl-select2').each(function () {
+                if (this.choicesInstance) {
+                    this.choicesInstance.setChoiceByValue('');
+                } else {
+                    $(this).val('');
+                }
+            });
 
             // 2. Dispatch the submit event to trigger grid refresh and URL cleanup
             if ($form.hasClass('lgl-filter-form-ajax')) {
@@ -418,7 +426,7 @@
         /**
          * Fetches valid filter options for the current filter state and repopulates
          * the dropdowns so impossible combinations are completely hidden.
-         * * @param {string} providedFormData Pre-captured string to bypass disabled state limits
+         * @param {string} providedFormData Pre-captured string to bypass disabled state limits
          */
         function update_filter_options(providedFormData) {
             const postType = $('#lgl_target_post_type').val();
@@ -452,11 +460,17 @@
                     // Add Makes and Models to dynamic repopulation
                     _repopulate_object_select('#lgl_make', d.makes, 'All Makes');
 
+                    let modelNode = $('#lgl_model')[0];
+
                     if ($('#lgl_make').val()) {
                         _repopulate_object_select('#lgl_model', d.models, 'All Models');
-                        $('#lgl_model').prop('disabled', false).trigger('change.select2');
+                        if (modelNode && modelNode.choicesInstance) modelNode.choicesInstance.enable();
                     } else {
-                        $('#lgl_model').empty().append(new Option('Select Make First', '')).prop('disabled', true).trigger('change.select2');
+                        if (modelNode && modelNode.choicesInstance) {
+                            modelNode.choicesInstance.clearChoices();
+                            modelNode.choicesInstance.setChoices([{ value: '', label: 'Select Make First', selected: true }], 'value', 'label', true);
+                            modelNode.choicesInstance.disable();
+                        }
                     }
 
                     isUpdatingFilters = false;
@@ -465,81 +479,108 @@
         }
 
         /**
-         * Rebuilds a plain-value select (condition, berth) with only the provided values.
+         * Rebuilds a plain-value select (condition, berth) integrating Choices API cleanly.
+         * @param {string} selector The DOM element target
+         * @param {Array} values Array of flat values
+         * @param {string} placeholder Default input text
          */
         function _repopulate_select(selector, values, placeholder) {
-            const $el = $(selector);
-            const current = $el.val();
+            const el = $(selector)[0];
+            if (!el || !el.choicesInstance) return;
 
-            $el.empty().append(new Option(placeholder, ''));
+            const instance = el.choicesInstance;
+            const current = instance.getValue(true);
 
+            let choicesArray = [{ value: '', label: placeholder, selected: !current }];
             let stillValid = false;
+
             $.each(values, function (i, val) {
-                if (String(val) === String(current)) stillValid = true;
-                $el.append(new Option(val, val, false, String(val) === String(current)));
+                const isSelected = String(val) === String(current);
+                if (isSelected) stillValid = true;
+                choicesArray.push({ value: val, label: val, selected: isSelected });
             });
 
-            if (current && !stillValid) $el.val('');
-            $el.trigger('change.select2');
+            instance.clearChoices();
+            instance.setChoices(choicesArray, 'value', 'label', true);
+
+            if (current && !stillValid) instance.setChoiceByValue('');
         }
 
         /**
-         * Rebuilds a price select with {value, label} objects.
+         * Rebuilds a price select with {value, label} objects directly handling Virtual DOM.
          */
         function _repopulate_price_select(selector, prices, placeholder) {
-            const $el = $(selector);
-            const current = parseFloat($el.val()) || 0;
+            const el = $(selector)[0];
+            if (!el || !el.choicesInstance) return;
 
-            $el.empty().append(new Option(placeholder, ''));
+            const instance = el.choicesInstance;
+            const current = parseFloat(instance.getValue(true)) || 0;
 
+            let choicesArray = [{ value: '', label: placeholder, selected: !current }];
             let stillValid = false;
+
             $.each(prices, function (i, item) {
-                if (item.value === current) stillValid = true;
-                $el.append(new Option(item.label, item.value, false, item.value === current));
+                const isSelected = item.value === current;
+                if (isSelected) stillValid = true;
+                choicesArray.push({ value: item.value, label: item.label, selected: isSelected });
             });
 
-            if (current && !stillValid) $el.val('');
-            $el.trigger('change.select2');
+            instance.clearChoices();
+            instance.setChoices(choicesArray, 'value', 'label', true);
+
+            if (current && !stillValid) instance.setChoiceByValue('');
         }
 
         /**
-         * Rebuilds a select with {id, text} object arrays (specifically Make & Model taxonomies).
+         * Rebuilds a select with {id, text} object arrays safely parsing state objects.
          */
         function _repopulate_object_select(selector, items, placeholder) {
-            const $el = $(selector);
-            const current = String($el.val() || '');
+            const el = $(selector)[0];
+            if (!el || !el.choicesInstance) return;
 
-            $el.empty().append(new Option(placeholder, ''));
+            const instance = el.choicesInstance;
+            const current = String(instance.getValue(true) || '');
 
+            let choicesArray = [{ value: '', label: placeholder, selected: !current }];
             let stillValid = false;
+
             if (items && items.length > 0) {
                 $.each(items, function (i, item) {
-                    if (String(item.id) === current) stillValid = true;
-                    $el.append(new Option(item.text, item.id, false, String(item.id) === current));
+                    const isSelected = String(item.id) === current;
+                    if (isSelected) stillValid = true;
+                    choicesArray.push({ value: item.id, label: item.text, selected: isSelected });
                 });
             }
 
-            if (current && !stillValid) $el.val('');
-            $el.trigger('change.select2');
+            instance.clearChoices();
+            instance.setChoices(choicesArray, 'value', 'label', true);
+
+            if (current && !stillValid) instance.setChoiceByValue('');
         }
 
         /**
-         * Enables or disables all filter selects in the search form during a loading state.
+         * Enables or disables all filter selects utilizing mapped API limits.
+         * @param {boolean} disabled Disabling command flag
          */
         function _set_filters_disabled(disabled) {
             const $selects = $('#lgl-search-form select.lgl-select2');
 
             if (disabled) {
                 $selects.each(function () {
+                    // Cache the original state to the DOM dataset
                     if ($(this).prop('disabled')) {
                         $(this).data('lgl-was-disabled', true);
                     }
-                    $(this).prop('disabled', true).trigger('change.select2');
+                    // Fire native library disable hook
+                    if (this.choicesInstance) this.choicesInstance.disable();
+                    else $(this).prop('disabled', true);
                 });
             } else {
                 $selects.each(function () {
+                    // Check cache before re-enabling
                     if (!$(this).data('lgl-was-disabled')) {
-                        $(this).prop('disabled', false).trigger('change.select2');
+                        if (this.choicesInstance) this.choicesInstance.enable();
+                        else $(this).prop('disabled', false);
                     }
                     $(this).removeData('lgl-was-disabled');
                 });
@@ -548,7 +589,7 @@
 
         /**
          * Compiles form parameters and dispatches the AJAX search payload.
-         * * @param {string} providedFormData Pre-captured string to bypass disabled state limits
+         * @param {string} providedFormData Pre-captured string to bypass disabled state limits
          */
         function execute_search(providedFormData, isInitialLoad = false) {
             if (activeSearchXhr) {
@@ -627,7 +668,7 @@
                             let breadcrumbHtml = '<a href="' + homeUrl + '">Home</a> <span class="lgl-separator">|</span> ';
 
                             if (makeSlug) {
-                                // Extract the human-readable text from the dropdown
+                                // Extract the human-readable text from the dropdown natively via value query
                                 const makeText = $('#lgl_make option[value="' + makeSlug + '"]').text().trim() || makeSlug;
 
                                 // Archive node becomes a clickable reset link
