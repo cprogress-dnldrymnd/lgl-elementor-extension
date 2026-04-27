@@ -2006,7 +2006,7 @@ if (! class_exists('LGL_Shortcodes')) {
             }
 
             // ---------------------------------------------------------
-            // Dynamic Meta Queries (Replaces hardcoded condition/berth)
+            // Dynamic Meta Queries 
             // ---------------------------------------------------------
             $listing_fields = class_exists('LGL_Import_Post_Types') ? LGL_Import_Post_Types::get_listing_detail_fields() : array();
             $all_possible_meta = array_merge(
@@ -2015,9 +2015,13 @@ if (! class_exists('LGL_Shortcodes')) {
                 isset($listing_fields['motorhome_campervan']) ? $listing_fields['motorhome_campervan'] : array()
             );
 
+            // Keys that should NEVER be queried as standard postmeta
+            $skip_meta_keys = array('price', 'listing-fuel-type', 'listing-chassis', 'listing-gearbox');
+
             // Automatically check and apply standard meta query constraints dynamically
             foreach (array_keys($all_possible_meta) as $meta_key) {
-                if ($meta_key === 'price') continue; // Handled separately below
+                if (in_array($meta_key, $skip_meta_keys)) continue;
+
                 if (!empty($form_data[$meta_key])) {
                     $args['meta_query'][] = array(
                         'key'     => $meta_key,
