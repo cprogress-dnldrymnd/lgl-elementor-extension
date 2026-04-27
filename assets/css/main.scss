@@ -82,6 +82,9 @@
                 .lgl-filter-group {
                     --width: 100%;
                     border-radius: 5px;
+                    &.lgl-submit-group {
+                        padding: 0;
+                    }
                     &:not(.lgl-submit-group) {
                         border: 1px solid var(--lgl-color-tertiary) !important;
                     }
