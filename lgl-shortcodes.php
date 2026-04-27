@@ -1740,6 +1740,7 @@ if (! class_exists('LGL_Shortcodes')) {
             // IDs matching the full current filter (for condition/berth/price options)
             // ------------------------------------------------------------------
             $full_tax_query = array('relation' => 'AND');
+
             if ($model_id > 0) {
                 $full_tax_query[] = array(
                     'taxonomy' => 'listing-make-model',
@@ -2119,6 +2120,18 @@ if (! class_exists('LGL_Shortcodes')) {
                     'field'    => 'slug',
                     'terms'    => $make_slug,
                 );
+            }
+
+            // Apply constraints for the new taxonomies so other fields update dynamically
+            $tax_fields = array('listing-fuel-type', 'listing-chassis', 'listing-gearbox');
+            foreach ($tax_fields as $tax) {
+                if (!empty($form_data[$tax])) {
+                    $tax_query[] = array(
+                        'taxonomy' => $tax,
+                        'field'    => 'slug',
+                        'terms'    => sanitize_text_field($form_data[$tax]),
+                    );
+                }
             }
 
             // Execute Query
