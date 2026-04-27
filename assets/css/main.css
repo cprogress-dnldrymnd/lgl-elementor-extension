@@ -2251,7 +2251,8 @@
     display: flex;
     align-items: center;
     background-color: transparent;
-    border: none; }
+    border: none;
+    font-size: 1rem; }
   .lgl-filter-group .choices .choices__list--dropdown, .lgl-filter-group .choices .choices__list[aria-expanded] {
     border: none; }
 
