@@ -518,27 +518,10 @@ if (! class_exists('LGL_Shortcodes')) {
 
             foreach ($lgl_cpts as $cpt) {
 
-                // An aggressive check for common naming variations (singular & plural)
-                $cpt_plural = $cpt . 's'; // e.g., 'campervans'
-
-                $is_disabled = false;
-
-                // Check common "disable" keys
-                $disable_keys = array(
-                    'disable_' . $cpt,          // disable_campervan
-                    $cpt . '_disable',          // campervan_disable
-                    'disable_' . $cpt_plural,   // disable_campervans
-                    $cpt_plural . '_disable',   // campervans_disable
-                    'hide_' . $cpt,             // hide_campervan
-                    'hide_' . $cpt_plural       // hide_campervans
-                );
-
-                foreach ($disable_keys as $key) {
-                    if (!empty($lgl_pages_settings[$key]) && $lgl_pages_settings[$key] !== 'off' && $lgl_pages_settings[$key] !== 'no' && $lgl_pages_settings[$key] !== '0') {
-                        $is_disabled = true;
-                        break;
-                    }
-                }
+                // Check if this specific post type is disabled.
+                // Note: Depending on how your lgl_pages array is structured, the key might be 'disable_caravan' or 'caravan_disable'. 
+                // This checks both common patterns to be safe!
+                $is_disabled = !empty($lgl_pages_settings['disable_' . $cpt]) || !empty($lgl_pages_settings[$cpt . '_disable']);
 
                 if ($is_disabled) {
                     continue; // Skip rendering the drag-and-drop builder for this post type
