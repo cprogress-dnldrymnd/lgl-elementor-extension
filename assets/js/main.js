@@ -104,7 +104,9 @@
         let activeSearchXhr = null;
 
         // Initialize Select2 on target classes
-        
+
+        /*
+
         $('.lgl-select2').each(function () {
             const $select = $(this);
             const noSearchIds = ['lgl_post_type', 'lgl_condition', 'lgl_berth', 'lgl_price_min', 'lgl_price_max', 'lgl_make', 'lgl-sort-order'];
@@ -121,10 +123,37 @@
                     width: '100%'
                 });
             }
+        });*/
+
+
+        /**
+ * Initializes Choices.js instances for elements with the .lgl-select2 class.
+ * Evaluates specific element IDs to toggle search functionality and dynamic option creation.
+ */
+        document.querySelectorAll('.lgl-select2').forEach(function (element) {
+            const selectId = element.id;
+            const noSearchIds = ['lgl_post_type', 'lgl_condition', 'lgl_berth', 'lgl_price_min', 'lgl_price_max', 'lgl_make', 'lgl-sort-order'];
+
+            if (noSearchIds.includes(selectId)) {
+                // Disable search functionality completely for specific IDs
+                new Choices(element, {
+                    searchEnabled: false,
+                    itemSelectText: '', // Removes the default "Press to select" text on hover for a cleaner UI
+                    shouldSort: false   // Keeps your original HTML <option> order
+                });
+            } else {
+                // Keep default behavior (with search) AND enable dynamic option creation
+                new Choices(element, {
+                    searchEnabled: true,
+                    removeItemButton: true, // Adds an 'x' to remove selected items
+                    addItems: true,         // Allows users to type and add custom values
+                    duplicateItemsAllowed: false,
+                    paste: false            // Optional: prevents weird formatting if a user pastes a comma-separated list
+                });
+            }
         });
 
 
-        
 
         $('#lgl-search-form.lgl-filter-form-no-ajax').on('submit', function (e) {
             e.preventDefault();
