@@ -129,6 +129,8 @@ if (! class_exists('LGL_Shortcodes')) {
 
             add_filter('display_post_states', array($this, 'add_lgl_page_states'), 10, 2);
 
+            add_action('admin_menu', array($this, 'lgl_manufacturer_menu'));
+
 
             new LGL_Forms();
             new LGL_Email_Builder();
@@ -989,6 +991,8 @@ if (! class_exists('LGL_Shortcodes')) {
             add_shortcode('lgl_mini_account', array($this, 'render_shortcode'));
             add_shortcode('lgl_breadcrumbs', array($this, 'render_shortcode'));
             add_shortcode('lgl_type_tabs', array($this, 'render_shortcode'));
+            add_shortcode('lgl_manufacturer', array($this, 'render_shortcode'));
+
         }
 
         /**
@@ -1379,7 +1383,7 @@ if (! class_exists('LGL_Shortcodes')) {
                     </tbody>
                 </table>
             </div>
-<?php
+        <?php
             $html = ob_get_clean();
 
             wp_send_json_success(array('html' => $html));
@@ -2822,6 +2826,158 @@ if (! class_exists('LGL_Shortcodes')) {
                 }
             }
             return $url;
+        }
+
+        /**
+         * 1. Register the Settings Page Menu
+         */
+        public function lgl_manufacturer_menu()
+        {
+            $page_hook = add_submenu_page(
+                'options-general.php', // Places it under Settings
+                'LGL Manufacturers',
+                'Manufacturer Logos',
+                'manage_options',
+                'lgl-manufacturers',
+                array($this, 'lgl_manufacturers_page_html') // Note the array($this, ...) format
+            );
+
+            // Load WP Media library only on this specific page
+            add_action("admin_print_scripts-{$page_hook}", array($this, 'lgl_manufacturer_admin_scripts'));
+        }
+
+        /**
+         * Load Media Scripts
+         */
+        public function lgl_manufacturer_admin_scripts()
+        {
+            wp_enqueue_media();
+        }
+
+        /**
+         * 2. Render the Settings Page HTML & Handle Saving
+         */
+        public function lgl_manufacturers_page_html()
+        {
+            if (!current_user_can('manage_options')) return;
+
+            // Handle the form save
+            if (isset($_POST['lgl_manufacturer_nonce']) && wp_verify_nonce($_POST['lgl_manufacturer_nonce'], 'save_lgl_manufacturers')) {
+                $settings = isset($_POST['lgl_manufacturer']) ? $_POST['lgl_manufacturer'] : array();
+                update_option('lgl_manufacturer_settings', $settings);
+                echo '<div class="notice notice-success is-dismissible"><p>Manufacturer logos saved successfully.</p></div>';
+            }
+
+            $saved_settings = get_option('lgl_manufacturer_settings', array());
+
+            // Fetch only top-level Makes (parent = 0) from the taxonomy
+            $terms = get_terms(array(
+                'taxonomy'   => 'listing-make-model',
+                'parent'     => 0,
+                'hide_empty' => false,
+            ));
+
+        ?>
+            <div class="wrap">
+                <h1>Manufacturer Logos & Display Settings</h1>
+                <p>Manage logos for your top-level makes. These will display wherever you use the <code>[lgl_manufacturer]</code> shortcode.</p>
+
+                <form method="post">
+                    <?php wp_nonce_field('save_lgl_manufacturers', 'lgl_manufacturer_nonce'); ?>
+                    <table class="wp-list-table widefat fixed striped">
+                        <thead>
+                            <tr>
+                                <th style="width: 25%;">Manufacturer (Make)</th>
+                                <th style="width: 15%;">Frontend Display</th>
+                                <th>Logo Image</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php if (!empty($terms) && !is_wp_error($terms)) : ?>
+                                <?php foreach ($terms as $term) :
+                                    $is_checked = isset($saved_settings[$term->term_id]['display']) ? 'checked' : '';
+                                    $logo_url = isset($saved_settings[$term->term_id]['logo']) ? esc_url($saved_settings[$term->term_id]['logo']) : '';
+                                ?>
+                                    <tr>
+                                        <td><strong><?php echo esc_html($term->name); ?></strong></td>
+                                        <td>
+                                            <input type="checkbox" name="lgl_manufacturer[<?php echo $term->term_id; ?>][display]" value="1" <?php echo $is_checked; ?>>
+                                            <label>Show in Slider</label>
+                                        </td>
+                                        <td>
+                                            <input type="text" class="regular-text lgl-logo-url" name="lgl_manufacturer[<?php echo $term->term_id; ?>][logo]" value="<?php echo $logo_url; ?>">
+                                            <button type="button" class="button lgl-upload-logo-btn">Select/Upload Logo</button>
+                                            <div style="margin-top: 8px;">
+                                                <img src="<?php echo $logo_url; ?>" style="max-height: 50px; display: <?php echo $logo_url ? 'block' : 'none'; ?>;" class="lgl-logo-preview">
+                                            </div>
+                                        </td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            <?php else: ?>
+                                <tr>
+                                    <td colspan="3">No makes found. Please ensure you have added parent terms to 'listing-make-model'.</td>
+                                </tr>
+                            <?php endif; ?>
+                        </tbody>
+                    </table>
+                    <p class="submit">
+                        <input type="submit" name="submit" class="button button-primary" value="Save Logos & Settings">
+                    </p>
+                </form>
+            </div>
+
+            <script>
+                jQuery(document).ready(function($) {
+                    $('.lgl-upload-logo-btn').on('click', function(e) {
+                        e.preventDefault();
+                        var button = $(this);
+                        var inputField = button.siblings('.lgl-logo-url');
+                        var preview = button.siblings('div').find('.lgl-logo-preview');
+
+                        var frame = wp.media({
+                            title: 'Select Manufacturer Logo',
+                            button: {
+                                text: 'Use this image'
+                            },
+                            multiple: false
+                        });
+
+                        frame.on('select', function() {
+                            var attachment = frame.state().get('selection').first().toJSON();
+                            inputField.val(attachment.url);
+                            preview.attr('src', attachment.url).show();
+                        });
+
+                        frame.open();
+                    });
+                });
+            </script>
+<?php
+        }
+
+        /**
+         * 3. Render the [lgl_manufacturer] Shortcode
+         */
+        public function lgl_manufacturer_slider_shortcode($atts)
+        {
+            $settings = get_option('lgl_manufacturer_settings', array());
+            if (empty($settings)) return '';
+
+            ob_start();
+            echo '<div class="lgl-manufacturer-slider">';
+            foreach ($settings as $term_id => $data) {
+                // Only render if the box is checked AND a logo exists
+                if (isset($data['display']) && $data['display'] == '1' && !empty($data['logo'])) {
+                    $term = get_term($term_id, 'listing-make-model');
+                    $alt_text = (!is_wp_error($term) && $term) ? esc_attr($term->name) : 'Manufacturer Logo';
+
+                    echo '<div class="lgl-manufacturer-slide">';
+                    echo '<img src="' . esc_url($data['logo']) . '" alt="' . $alt_text . '">';
+                    echo '</div>';
+                }
+            }
+            echo '</div>';
+            return ob_get_clean();
         }
     }
 
