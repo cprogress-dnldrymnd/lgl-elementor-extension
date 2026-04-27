@@ -1202,7 +1202,7 @@
     flex-wrap: wrap;
     .lgl-nav-item {
         color: #fff;
-        font-family: "DM Sans";
+        font-family: var(--lgl-font-primary);
         font-size: 1.25rem;
         font-style: normal;
         font-weight: 700;

@@ -941,7 +941,7 @@
   flex-wrap: wrap; }
   .lgl-tabs--tbnav.lgl-tabs--tbnav .lgl-nav-item {
     color: #fff;
-    font-family: "DM Sans";
+    font-family: var(--lgl-font-primary);
     font-size: 1.25rem;
     font-style: normal;
     font-weight: 700;
