@@ -171,7 +171,7 @@ if ($post_type) {
             $is_live_search = filter_var($live_search, FILTER_VALIDATE_BOOLEAN);
             // Apply ajax class if live_search is true, otherwise apply no-ajax class to trigger a redirect
             $form_class = $is_live_search ? 'lgl-filter-form-ajax' : 'lgl-filter-form-no-ajax';
-
+            
             // Apply Layout Class
             $form_layout = isset($layout) ? $layout : 'horizontal';
             $form_class .= ' lgl-layout-' . $form_layout;
@@ -256,27 +256,32 @@ if ($post_type) {
                         }
                         ?>
                         <select name="listing_model" id="lgl_model" class="lgl-select2" data-placeholder="Select Model" <?php echo $is_disabled; ?>>
-                            <option value="">All Models</option>
-                            <?php
-                            // Fallback: Force the active model into the dropdown so JS serialization catches it
-                            if ($active_model && !$model_found) :
-                                $fallback_term = get_term_by('slug', $active_model, 'listing-make-model');
-                                if ($fallback_term) :
-                            ?>
-                                    <option value="<?php echo esc_attr($fallback_term->slug); ?>" selected="selected">
-                                        <?php echo esc_html($fallback_term->name); ?>
-                                    </option>
-                            <?php
-                                endif;
-                            endif;
-                            ?>
+                            <?php if (empty($active_make_models) && empty($active_model)) : ?>
+                                <option value="">Select Make First</option>
+                            <?php else : ?>
+                                <option value="">All Models</option>
 
-                            <?php if (!empty($active_make_models)) : ?>
-                                <?php foreach ($active_make_models as $model) : ?>
-                                    <option value="<?php echo esc_attr($model->slug); ?>" <?php selected($active_model, $model->slug); ?>>
-                                        <?php echo esc_html($model->name); ?>
-                                    </option>
-                                <?php endforeach; ?>
+                                <?php
+                                // Fallback: Force the active model into the dropdown so JS serialization catches it
+                                if ($active_model && !$model_found) :
+                                    $fallback_term = get_term_by('slug', $active_model, 'listing-make-model');
+                                    if ($fallback_term) :
+                                ?>
+                                        <option value="<?php echo esc_attr($fallback_term->slug); ?>" selected="selected">
+                                            <?php echo esc_html($fallback_term->name); ?>
+                                        </option>
+                                <?php
+                                    endif;
+                                endif;
+                                ?>
+
+                                <?php if (!empty($active_make_models)) : ?>
+                                    <?php foreach ($active_make_models as $model) : ?>
+                                        <option value="<?php echo esc_attr($model->slug); ?>" <?php selected($active_model, $model->slug); ?>>
+                                            <?php echo esc_html($model->name); ?>
+                                        </option>
+                                    <?php endforeach; ?>
+                                <?php endif; ?>
                             <?php endif; ?>
                         </select>
                     </div>
