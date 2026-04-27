@@ -507,6 +507,21 @@ if (! class_exists('LGL_Shortcodes')) {
                     array('id' => $id, 'type' => $field['type'], 'post_type' => $field['post_type'], 'default' => $field['default'])
                 );
             }
+
+            // --- TAB 8: Search Filters ---
+            add_settings_section('lgl_search_filters_section', 'Search Filter Layout per Post Type (Drag to reorder, check to hide. Make and Model are fixed.)', null, 'lgl-settings-search-filters');
+
+            $lgl_cpts = array('caravan', 'motorhome', 'campervan');
+            foreach ($lgl_cpts as $cpt) {
+                add_settings_field(
+                    'search_manager_' . $cpt,
+                    ucfirst($cpt) . ' Filters',
+                    array($this, 'render_search_filter_manager'),
+                    'lgl-settings-search-filters',
+                    'lgl_search_filters_section',
+                    array('post_type' => $cpt)
+                );
+            }
         }
 
         /**
@@ -780,6 +795,7 @@ if (! class_exists('LGL_Shortcodes')) {
                     <a href="#visibility" class="nav-tab <?php echo $active_tab == 'visibility' ? 'nav-tab-active' : ''; ?>" data-tab="visibility">Field Visibility</a>
                     <a href="#lgl-pages" class="nav-tab <?php echo $active_tab == 'lgl-pages' ? 'nav-tab-active' : ''; ?>" data-tab="lgl-pages">LGL Pages</a>
                     <a href="#featured" class="nav-tab <?php echo $active_tab == 'featured' ? 'nav-tab-active' : ''; ?>" data-tab="featured">Featured Vehicles</a>
+                    <a href="#search-filters" class="nav-tab <?php echo $active_tab == 'search-filters' ? 'nav-tab-active' : ''; ?>" data-tab="search-filters">Search Filters</a>
                 </h2>
 
                 <form method="post" action="options.php">
@@ -815,6 +831,10 @@ if (! class_exists('LGL_Shortcodes')) {
 
                     <div id="tab-finance" class="lgl-tab-content" <?php echo $active_tab == 'finance' ? '' : 'style="display:none;"'; ?>>
                         <?php do_settings_sections('lgl-settings-finance'); ?>
+                    </div>
+
+                    <div id="tab-search-filters" class="lgl-tab-content" <?php echo $active_tab == 'search-filters' ? '' : 'style="display:none;"'; ?>>
+                        <?php do_settings_sections('lgl-settings-search-filters'); ?>
                     </div>
 
                     <?php submit_button(); ?>
@@ -2039,6 +2059,18 @@ if (! class_exists('LGL_Shortcodes')) {
             $make_slug  = ! empty($form_data['listing_make'])  ? sanitize_text_field($form_data['listing_make'])  : '';
             $model_slug = ! empty($form_data['listing_model']) ? sanitize_text_field($form_data['listing_model']) : '';
 
+            // Custom Taxonomies
+            $tax_fields = array('listing-fuel-type', 'listing-chassis', 'listing-gearbox');
+            foreach ($tax_fields as $tax) {
+                if (!empty($form_data[$tax])) {
+                    $args['tax_query'][] = array(
+                        'taxonomy' => $tax,
+                        'field'    => 'slug',
+                        'terms'    => sanitize_text_field($form_data[$tax]),
+                    );
+                }
+            }
+
             if ($model_slug) {
                 $args['tax_query'][] = array(
                     'taxonomy' => 'listing-make-model',
@@ -2052,6 +2084,7 @@ if (! class_exists('LGL_Shortcodes')) {
                     'terms'    => $make_slug,
                 );
             }
+            
 
             // Execute Query
             $query = new WP_Query($args);
@@ -2827,6 +2860,80 @@ if (! class_exists('LGL_Shortcodes')) {
                 }
             }
             return $url;
+        }
+
+        public function render_search_filter_manager($args)
+        {
+            $post_type = $args['post_type'];
+            $options = get_option('lgl_settings', array());
+
+            $search_fields = array(
+                'condition'         => __('Condition', 'lgl-shortcodes'),
+                'berth'             => __('Berth', 'lgl-shortcodes'),
+                'price'             => __('Price Range', 'lgl-shortcodes'),
+                'listing-fuel-type' => __('Fuel Type', 'lgl-shortcodes'),
+                'listing-chassis'   => __('Chassis', 'lgl-shortcodes'),
+                'listing-gearbox'   => __('Gearbox', 'lgl-shortcodes'),
+            );
+
+            $saved_order = isset($options['search_order_' . $post_type]) ? $options['search_order_' . $post_type] : array_keys($search_fields);
+            $missing_fields = array_diff(array_keys($search_fields), $saved_order);
+            $current_order  = array_merge($saved_order, $missing_fields);
+
+            $visible_keys = array();
+            $hidden_keys  = array();
+
+            foreach ($current_order as $key) {
+                if (!isset($search_fields[$key])) continue;
+                if (!empty($options['hide_search_' . $post_type . '_' . $key])) {
+                    $hidden_keys[] = $key;
+                } else {
+                    $visible_keys[] = $key;
+                }
+            }
+
+            $final_render_order = array_merge($visible_keys, $hidden_keys);
+            $list_id = 'lgl-search-sortable-' . esc_attr($post_type);
+
+            echo '<ul id="' . $list_id . '" style="max-width: 600px; padding: 0; margin: 0; list-style: none;">';
+
+            foreach ($final_render_order as $key) {
+                $label     = $search_fields[$key];
+                $is_hidden = !empty($options['hide_search_' . $post_type . '_' . $key]);
+                $checked   = $is_hidden ? 'checked="checked"' : '';
+                $li_class       = $is_hidden ? 'is-hidden' : '';
+                $li_opacity     = $is_hidden ? '0.6' : '1';
+                $handle_cursor  = $is_hidden ? 'not-allowed' : 'grab';
+                $handle_opacity = $is_hidden ? '0.3' : '1';
+
+                echo '<li class="lgl-sortable-item ' . esc_attr($li_class) . '" style="background: #fff; border: 1px solid #ccd0d4; padding: 10px 15px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 1px 1px rgba(0,0,0,.04); opacity: ' . esc_attr($li_opacity) . ';">';
+                echo '<div style="display: flex; align-items: center;">';
+                echo '<span class="dashicons dashicons-menu lgl-drag-handle" style="margin-right: 15px; color: #a7aaad; cursor: ' . esc_attr($handle_cursor) . '; opacity: ' . esc_attr($handle_opacity) . ';"></span>';
+                echo '<strong style="font-weight: 500;">' . esc_html($label) . '</strong>';
+                echo '<input type="hidden" name="lgl_settings[search_order_' . esc_attr($post_type) . '][]" value="' . esc_attr($key) . '" />';
+                echo '</div><div><label style="cursor: pointer; color: #50575e;">';
+                echo '<input type="checkbox" class="lgl-hide-toggle" name="lgl_settings[hide_search_' . esc_attr($post_type) . '_' . esc_attr($key) . ']" value="1" ' . $checked . ' style="margin-right: 6px;" /> Hide';
+                echo '</label></div></li>';
+            }
+            echo '</ul>';
+
+            echo '<script>
+                jQuery(document).ready(function($) {
+                    var $list = $("#' . $list_id . '");
+                    $list.sortable({ containment: "parent", handle: ".lgl-drag-handle", items: "> li:not(.is-hidden)", cursor: "grabbing", opacity: 0.8 });
+                    $list.on("change", ".lgl-hide-toggle", function() {
+                        var $li = $(this).closest("li"), isChecked = $(this).is(":checked"), $handle = $li.find(".lgl-drag-handle");
+                        if (isChecked) {
+                            $li.addClass("is-hidden").css("opacity", "0.6"); $handle.css({ cursor: "not-allowed", opacity: "0.3" }); $li.appendTo($list);
+                        } else {
+                            $li.removeClass("is-hidden").css("opacity", "1"); $handle.css({ cursor: "grab", opacity: "1" });
+                            var $first = $list.children(".is-hidden").first();
+                            if ($first.length) { $li.insertBefore($first); } else { $li.appendTo($list); }
+                        }
+                        $list.sortable("refresh");
+                    });
+                });
+            </script>';
         }
     }
 

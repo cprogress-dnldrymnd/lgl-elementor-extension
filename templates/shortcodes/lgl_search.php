@@ -171,7 +171,7 @@ if ($post_type) {
             $is_live_search = filter_var($live_search, FILTER_VALIDATE_BOOLEAN);
             // Apply ajax class if live_search is true, otherwise apply no-ajax class to trigger a redirect
             $form_class = $is_live_search ? 'lgl-filter-form-ajax' : 'lgl-filter-form-no-ajax';
-            
+
             // Apply Layout Class
             $form_layout = isset($layout) ? $layout : 'horizontal';
             $form_class .= ' lgl-layout-' . $form_layout;
@@ -286,63 +286,106 @@ if ($post_type) {
                         </select>
                     </div>
 
-                    <?php if ($post_type != false || $search_type === 'tabs') { ?>
+                    <?php if ($post_type != false || $search_type === 'tabs') {
 
-                        <!-- Condition -->
-                        <div class="lgl-filter-group">
-                            <label for="lgl_condition">Condition</label>
-                            <select name="condition" id="lgl_condition" class="lgl-select2" data-placeholder="Any Condition">
-                                <option value="">Any Condition</option>
-                                <?php foreach ($conditions as $cond) : ?>
-                                    <option value="<?php echo esc_attr($cond); ?>"
-                                        <?php selected($active_condition, $cond); ?>>
-                                        <?php echo esc_html($cond); ?>
-                                    </option>
-                                <?php endforeach; ?>
-                            </select>
-                        </div>
+                        // Extract unique terms for the taxonomies
+                        $fuel_types   = get_terms(array('taxonomy' => 'listing-fuel-type', 'hide_empty' => true));
+                        $chassis_list = get_terms(array('taxonomy' => 'listing-chassis', 'hide_empty' => true));
+                        $gearboxes    = get_terms(array('taxonomy' => 'listing-gearbox', 'hide_empty' => true));
 
-                        <!-- Berth -->
-                        <div class="lgl-filter-group">
-                            <label for="lgl_berth">Berth</label>
-                            <select name="berth" id="lgl_berth" class="lgl-select2" data-placeholder="Any Berth">
-                                <option value="">Any Berth</option>
-                                <?php foreach ($berths as $berth) : ?>
-                                    <option value="<?php echo esc_attr($berth); ?>"
-                                        <?php selected($active_berth, $berth); ?>>
-                                        <?php echo esc_html($berth); ?>
-                                    </option>
-                                <?php endforeach; ?>
-                            </select>
-                        </div>
+                        // Active URL Parameters
+                        $active_fuel_type = isset($_GET['listing-fuel-type']) ? sanitize_text_field($_GET['listing-fuel-type']) : '';
+                        $active_chassis   = isset($_GET['listing-chassis'])   ? sanitize_text_field($_GET['listing-chassis'])   : '';
+                        $active_gearbox   = isset($_GET['listing-gearbox'])   ? sanitize_text_field($_GET['listing-gearbox'])   : '';
 
-                        <!-- Min Price -->
-                        <div class="lgl-filter-group">
-                            <select name="price_min" id="lgl_price_min" class="lgl-select2" data-placeholder="Min Price">
-                                <option value="">Min Price</option>
-                                <?php foreach ($prices as $price) : ?>
-                                    <option value="<?php echo esc_attr($price); ?>"
-                                        <?php selected((float) $active_price_min, $price); ?>>
-                                        <?php echo esc_html(LGL_Shortcodes::format_price($price)); ?>
-                                    </option>
-                                <?php endforeach; ?>
-                            </select>
-                        </div>
+                        $options = get_option('lgl_settings', array());
+                        $search_order = isset($options['search_order_' . $data_post_type]) ? $options['search_order_' . $data_post_type] : array('condition', 'berth', 'price', 'listing-fuel-type', 'listing-chassis', 'listing-gearbox');
 
-                        <!-- Max Price -->
-                        <div class="lgl-filter-group">
-                            <select name="price_max" id="lgl_price_max" class="lgl-select2" data-placeholder="Max Price">
-                                <option value="">Max Price</option>
-                                <?php foreach ($prices as $price) : ?>
-                                    <option value="<?php echo esc_attr($price); ?>"
-                                        <?php selected((float) $active_price_max, $price); ?>>
-                                        <?php echo esc_html(LGL_Shortcodes::format_price($price)); ?>
-                                    </option>
-                                <?php endforeach; ?>
-                            </select>
-                        </div>
+                        foreach ($search_order as $field_key) {
+                            if (!empty($options['hide_search_' . $data_post_type . '_' . $field_key])) continue;
 
-                    <?php } ?>
+                            switch ($field_key) {
+                                case 'condition': ?>
+                                    <div class="lgl-filter-group">
+                                        <label for="lgl_condition">Condition</label>
+                                        <select name="condition" id="lgl_condition" class="lgl-select2" data-placeholder="Any Condition">
+                                            <option value="">Any Condition</option>
+                                            <?php foreach ($conditions as $cond) : ?>
+                                                <option value="<?php echo esc_attr($cond); ?>" <?php selected($active_condition, $cond); ?>><?php echo esc_html($cond); ?></option>
+                                            <?php endforeach; ?>
+                                        </select>
+                                    </div>
+                                <?php break;
+
+                                case 'berth': ?>
+                                    <div class="lgl-filter-group">
+                                        <label for="lgl_berth">Berth</label>
+                                        <select name="berth" id="lgl_berth" class="lgl-select2" data-placeholder="Any Berth">
+                                            <option value="">Any Berth</option>
+                                            <?php foreach ($berths as $berth) : ?>
+                                                <option value="<?php echo esc_attr($berth); ?>" <?php selected($active_berth, $berth); ?>><?php echo esc_html($berth); ?></option>
+                                            <?php endforeach; ?>
+                                        </select>
+                                    </div>
+                                <?php break;
+
+                                case 'price': ?>
+                                    <div class="lgl-filter-group">
+                                        <select name="price_min" id="lgl_price_min" class="lgl-select2" data-placeholder="Min Price">
+                                            <option value="">Min Price</option>
+                                            <?php foreach ($prices as $price) : ?>
+                                                <option value="<?php echo esc_attr($price); ?>" <?php selected((float) $active_price_min, $price); ?>><?php echo esc_html(LGL_Shortcodes::format_price($price)); ?></option>
+                                            <?php endforeach; ?>
+                                        </select>
+                                    </div>
+                                    <div class="lgl-filter-group">
+                                        <select name="price_max" id="lgl_price_max" class="lgl-select2" data-placeholder="Max Price">
+                                            <option value="">Max Price</option>
+                                            <?php foreach ($prices as $price) : ?>
+                                                <option value="<?php echo esc_attr($price); ?>" <?php selected((float) $active_price_max, $price); ?>><?php echo esc_html(LGL_Shortcodes::format_price($price)); ?></option>
+                                            <?php endforeach; ?>
+                                        </select>
+                                    </div>
+                                <?php break;
+
+                                case 'listing-fuel-type': ?>
+                                    <div class="lgl-filter-group">
+                                        <label for="lgl_fuel_type">Fuel Type</label>
+                                        <select name="listing-fuel-type" id="lgl_fuel_type" class="lgl-select2" data-placeholder="Any Fuel Type">
+                                            <option value="">Any Fuel Type</option>
+                                            <?php if (!is_wp_error($fuel_types)) foreach ($fuel_types as $term) : ?>
+                                                <option value="<?php echo esc_attr($term->slug); ?>" <?php selected($active_fuel_type, $term->slug); ?>><?php echo esc_html($term->name); ?></option>
+                                            <?php endforeach; ?>
+                                        </select>
+                                    </div>
+                                <?php break;
+
+                                case 'listing-chassis': ?>
+                                    <div class="lgl-filter-group">
+                                        <label for="lgl_chassis">Chassis</label>
+                                        <select name="listing-chassis" id="lgl_chassis" class="lgl-select2" data-placeholder="Any Chassis">
+                                            <option value="">Any Chassis</option>
+                                            <?php if (!is_wp_error($chassis_list)) foreach ($chassis_list as $term) : ?>
+                                                <option value="<?php echo esc_attr($term->slug); ?>" <?php selected($active_chassis, $term->slug); ?>><?php echo esc_html($term->name); ?></option>
+                                            <?php endforeach; ?>
+                                        </select>
+                                    </div>
+                                <?php break;
+
+                                case 'listing-gearbox': ?>
+                                    <div class="lgl-filter-group">
+                                        <label for="lgl_gearbox">Gearbox</label>
+                                        <select name="listing-gearbox" id="lgl_gearbox" class="lgl-select2" data-placeholder="Any Gearbox">
+                                            <option value="">Any Gearbox</option>
+                                            <?php if (!is_wp_error($gearboxes)) foreach ($gearboxes as $term) : ?>
+                                                <option value="<?php echo esc_attr($term->slug); ?>" <?php selected($active_gearbox, $term->slug); ?>><?php echo esc_html($term->name); ?></option>
+                                            <?php endforeach; ?>
+                                        </select>
+                                    </div>
+                    <?php break;
+                            }
+                        }
+                    } ?>
 
                     <div class="lgl-filter-group lgl-submit-group">
                         <button type="submit" class="lgl-search-submit">
