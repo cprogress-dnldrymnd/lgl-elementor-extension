@@ -927,7 +927,7 @@ if (! class_exists('LGL_Shortcodes')) {
             wp_enqueue_style('slick', LGL_SHORTCODES_URL . 'assets/libs/slick/slick.css');
 
 
-            wp_enqueue_style('choices', LGL_SHORTCODES_URL . 'assets/libs/choices/choices.min');
+            wp_enqueue_style('choices', LGL_SHORTCODES_URL . 'assets/libs/choices/choices.min.css');
             wp_enqueue_script('choices', LGL_SHORTCODES_URL . 'assets/libs/choices/choices.min.js');
 
 
