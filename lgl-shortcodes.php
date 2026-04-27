@@ -265,9 +265,7 @@ if (! class_exists('LGL_Shortcodes')) {
             wp_enqueue_style('select2', LGL_SHORTCODES_URL . 'assets/libs/select2/select2.min.css');
             wp_enqueue_script('select2', LGL_SHORTCODES_URL . 'assets/libs/select2/select2.min.js', array('jquery'), '4.1.0', true);
 
-            // Enqueue TomSelect dependencies for the admin UI
-            wp_enqueue_style('tomselect', LGL_SHORTCODES_URL . 'assets/libs/tomselect/tom-select.default.min.css');
-            wp_enqueue_script('tomselect', LGL_SHORTCODES_URL . 'assets/libs/tomselect/tom-select.base.js');
+
 
             // Inline script to initialize the color picker and Select2 instances
             wp_add_inline_script('wp-color-picker', "
@@ -932,6 +930,10 @@ if (! class_exists('LGL_Shortcodes')) {
 
             wp_enqueue_script('slick', LGL_SHORTCODES_URL . 'assets/libs/slick/slick.min.js', array('jquery'), '4.1.0', true);
             wp_enqueue_script('select2', LGL_SHORTCODES_URL . 'assets/libs/select2/select2.min.js', array('jquery'), '4.1.0', true);
+
+            // Enqueue TomSelect dependencies for the admin UI
+            wp_enqueue_style('tomselect', LGL_SHORTCODES_URL . 'assets/libs/tomselect/tom-select.default.min.css');
+            wp_enqueue_script('tomselect', LGL_SHORTCODES_URL . 'assets/libs/tomselect/tom-select.base.js');
 
             // Enqueue main stylesheet
             wp_enqueue_style(
