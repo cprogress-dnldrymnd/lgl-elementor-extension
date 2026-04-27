@@ -2954,31 +2954,6 @@ if (! class_exists('LGL_Shortcodes')) {
             </script>
 <?php
         }
-
-        /**
-         * 3. Render the [lgl_manufacturer] Shortcode
-         */
-        public function lgl_manufacturer_slider_shortcode($atts)
-        {
-            $settings = get_option('lgl_manufacturer_settings', array());
-            if (empty($settings)) return '';
-
-            ob_start();
-            echo '<div class="lgl-manufacturer-slider">';
-            foreach ($settings as $term_id => $data) {
-                // Only render if the box is checked AND a logo exists
-                if (isset($data['display']) && $data['display'] == '1' && !empty($data['logo'])) {
-                    $term = get_term($term_id, 'listing-make-model');
-                    $alt_text = (!is_wp_error($term) && $term) ? esc_attr($term->name) : 'Manufacturer Logo';
-
-                    echo '<div class="lgl-manufacturer-slide">';
-                    echo '<img src="' . esc_url($data['logo']) . '" alt="' . $alt_text . '">';
-                    echo '</div>';
-                }
-            }
-            echo '</div>';
-            return ob_get_clean();
-        }
     }
 
     // Instantiate the plugin architecture
