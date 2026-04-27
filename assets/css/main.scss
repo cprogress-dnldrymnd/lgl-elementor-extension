@@ -2898,7 +2898,9 @@ $wt-cols: 110px 1fr 120px 110px 80px 80px 50px;
         .choices__list[aria-expanded] {
             border: 1px solid var(--lgl-color-tertiary);
             .choices__item {
-                padding: 10px 20px;
+                padding-top: 10px;
+                padding-bottom: 10px;
+                padding-left: 20px;
             }
         }
     }

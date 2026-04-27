@@ -2269,6 +2269,8 @@
     border: 1px solid var(--lgl-color-tertiary); }
     .lgl-filter-group .choices .choices__list--dropdown .choices__item,
     .lgl-filter-group .choices .choices__list[aria-expanded] .choices__item {
-      padding: 10px 20px; }
+      padding-top: 10px;
+      padding-bottom: 10px;
+      padding-left: 20px; }
 
 /*# sourceMappingURL=main.css.map */
