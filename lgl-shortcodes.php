@@ -877,7 +877,7 @@ if (! class_exists('LGL_Shortcodes')) {
 
             echo "<style id='lgl-dynamic-vars'>\n:root {\n";
             foreach ($vars as $key => $val) {
-                echo "\t{$key}: " . esc_attr($val) . ";\n";
+                echo "\t{$key}: " . $val . ";\n";
             }
             echo "}\n</style>\n";
         }
