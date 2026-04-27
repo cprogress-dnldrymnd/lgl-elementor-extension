@@ -77,10 +77,8 @@
   .lgl-search-container.lgl-search-container.lgl-search-container .lgl-filter-form .lgl-search-form-inner {
     display: flex;
     gap: 0;
-    align-items: center;
     background: #fff;
     border-radius: 10px;
-    overflow: hidden;
     flex-wrap: wrap; }
     @media (min-width: 1200px) {
       .lgl-search-container.lgl-search-container.lgl-search-container .lgl-filter-form .lgl-search-form-inner.lgl-filter-form-no-ajax .lgl-filter-group {
@@ -2239,5 +2237,11 @@
 
 .lgl-select2 {
   opacity: 0; }
+
+.lgl-filter-group .choices {
+  width: 100%;
+  height: 100%; }
+  .lgl-filter-group .choices .choices__inner {
+    height: 100%; }
 
 /*# sourceMappingURL=main.css.map */
