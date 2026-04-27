@@ -951,7 +951,8 @@
     box-sizing: border-box;
     text-transform: capitalize;
     position: relative;
-    transition: all 0.3s; }
+    transition: all 0.3s;
+    text-decoration: none; }
     .lgl-tabs--tbnav.lgl-tabs--tbnav .lgl-nav-item span {
       position: relative; }
     .lgl-tabs--tbnav.lgl-tabs--tbnav .lgl-nav-item:before {
