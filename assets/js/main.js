@@ -103,36 +103,28 @@
         let isUpdatingFilters = false;
         let activeSearchXhr = null;
 
-        /**
-   * Initializes Tom Select instances for elements with the .lgl-select2 class.
-   * Evaluates specific element IDs to toggle search functionality and dynamic option creation.
-   */
+        // Initialize Select2 on target classes
+        
         $('.lgl-select2').each(function () {
-            // Tom Select requires the native DOM element, not the jQuery wrapper
-            const nativeSelectElement = this;
-            const selectId = nativeSelectElement.id;
+            const $select = $(this);
             const noSearchIds = ['lgl_post_type', 'lgl_condition', 'lgl_berth', 'lgl_price_min', 'lgl_price_max', 'lgl_make', 'lgl-sort-order'];
 
-            if (noSearchIds.includes(selectId)) {
+            if (noSearchIds.includes($select.attr('id'))) {
                 // Disable search box for specific IDs
-                new TomSelect(nativeSelectElement, {
-                    // Passing null to controlInput removes the search text box entirely
-                    controlInput: null
+                $select.select2({
+                    width: '100%',
+                    minimumResultsForSearch: Infinity
                 });
             } else {
                 // Keep default behavior (with search) for Make, Model, etc.
-                // AND enable dynamic option creation
-                new TomSelect(nativeSelectElement, {
-                    // Allows users to type queries that don't exist in the list and create them as new options
-                    create: true,
-                    // UX enhancement: Instantiates the new option even if the user clicks outside the input before hitting Enter
-                    createOnBlur: true
+                $select.select2({
+                    width: '100%'
                 });
             }
         });
 
 
-
+        
 
         $('#lgl-search-form.lgl-filter-form-no-ajax').on('submit', function (e) {
             e.preventDefault();
