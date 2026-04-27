@@ -553,6 +553,10 @@
                     // Add Makes and Models to dynamic repopulation
                     _repopulate_object_select('#lgl_make', d.makes, 'All Makes');
 
+                    if (d.fuel_types) _repopulate_object_select('#lgl_fuel_type', d.fuel_types, 'Any Fuel Type');
+                    if (d.chassis_list) _repopulate_object_select('#lgl_chassis', d.chassis_list, 'Any Chassis');
+                    if (d.gearboxes) _repopulate_object_select('#lgl_gearbox', d.gearboxes, 'Any Gearbox');
+
                     let modelNode = $('#lgl_model')[0];
 
                     if ($('#lgl_make').val()) {
