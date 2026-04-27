@@ -508,16 +508,16 @@ if (! class_exists('LGL_Shortcodes')) {
                 );
             }
 
-         // --- TAB 8: Search Filters ---
+            // --- TAB 8: Search Filters ---
             add_settings_section('lgl_search_filters_section', 'Search Filter Layout per Post Type (Drag to reorder, check to hide. Make and Model are fixed.)', null, 'lgl-settings-search-filters');
 
             $lgl_cpts = array('caravan', 'motorhome', 'campervan');
-            
+
             // Fetch the lgl_pages option to check which vehicles are disabled
-            $lgl_pages_settings = get_option('lgl_pages', array()); 
+            $lgl_pages_settings = get_option('lgl_pages', array());
 
             foreach ($lgl_cpts as $cpt) {
-                
+
                 // Check if this specific post type is disabled.
                 // Note: Depending on how your lgl_pages array is structured, the key might be 'disable_caravan' or 'caravan_disable'. 
                 // This checks both common patterns to be safe!
@@ -1678,7 +1678,7 @@ if (! class_exists('LGL_Shortcodes')) {
          *
          * @return void
          */
-      public function ajax_get_filter_options()
+        public function ajax_get_filter_options()
         {
             check_ajax_referer('lgl_search_nonce', 'nonce');
 
@@ -1700,7 +1700,7 @@ if (! class_exists('LGL_Shortcodes')) {
             // 1. Build Base Meta Query (Dynamic Meta Fields)
             // ---------------------------------------------------------
             $base_meta_query = array('relation' => 'AND');
-            
+
             $listing_fields = class_exists('LGL_Import_Post_Types') ? LGL_Import_Post_Types::get_listing_detail_fields() : array();
             $all_possible_meta = array_merge(
                 isset($listing_fields['common']) ? $listing_fields['common'] : array(),
@@ -1711,8 +1711,8 @@ if (! class_exists('LGL_Shortcodes')) {
             $skip_meta_keys = array('price', 'listing-fuel-type', 'listing-chassis', 'listing-gearbox');
 
             foreach (array_keys($all_possible_meta) as $meta_key) {
-                if (in_array($meta_key, $skip_meta_keys)) continue; 
-                
+                if (in_array($meta_key, $skip_meta_keys)) continue;
+
                 if (!empty($form_data[$meta_key])) {
                     $base_meta_query[] = array(
                         'key'     => $meta_key,
@@ -1796,7 +1796,7 @@ if (! class_exists('LGL_Shortcodes')) {
                 // A. Dynamic Meta Options
                 foreach (array_keys($all_possible_meta) as $meta_key) {
                     if (in_array($meta_key, $skip_meta_keys)) continue;
-                    
+
                     $dynamic_meta_values[$meta_key] = $wpdb->get_col(
                         "SELECT DISTINCT meta_value FROM {$wpdb->postmeta}
                          WHERE post_id IN ({$ids_in}) AND meta_key = '" . esc_sql($meta_key) . "' AND meta_value != ''
@@ -1831,7 +1831,9 @@ if (! class_exists('LGL_Shortcodes')) {
                                 $seen[$t->term_id] = true;
                             }
                         }
-                        usort($arr, function($a, $b) { return strcmp($a['text'], $b['text']); });
+                        usort($arr, function ($a, $b) {
+                            return strcmp($a['text'], $b['text']);
+                        });
                     }
                 }
 
@@ -1864,8 +1866,12 @@ if (! class_exists('LGL_Shortcodes')) {
                     }
                 }
 
-                usort($makes, function ($a, $b) { return strcmp($a['text'], $b['text']); });
-                usort($models, function ($a, $b) { return strcmp($a['text'], $b['text']); });
+                usort($makes, function ($a, $b) {
+                    return strcmp($a['text'], $b['text']);
+                });
+                usort($models, function ($a, $b) {
+                    return strcmp($a['text'], $b['text']);
+                });
             }
 
             wp_send_json_success(array(
