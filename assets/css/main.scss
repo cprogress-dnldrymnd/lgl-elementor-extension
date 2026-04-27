@@ -101,6 +101,24 @@
                     }
                 }
             }
+            .lgl-reset-filters-btn.lgl-reset-filters-btn.lgl-reset-filters-btn.lgl-reset-filters-btn {
+                background-color: var(--lgl-color-accent);
+                color: var(--lgl-color-secondary);
+                font-family: var(--lgl-font-secondary);
+                border: none;
+                padding: 16px 32px;
+                font-size: 1rem;
+                letter-spacing: 0;
+                text-transform: uppercase;
+                border-radius: 6px;
+                font-weight: 600;
+                cursor: pointer;
+                transition:
+                    background-color 0.3s ease,
+                    transform 0.1s ease;
+                width: 100%;
+                line-height: 1;
+            }
         }
     }
     .lgl-reset-filters-btn.lgl-reset-filters-btn.lgl-reset-filters-btn.lgl-reset-filters-btn {

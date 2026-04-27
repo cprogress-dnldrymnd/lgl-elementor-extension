@@ -74,6 +74,21 @@
           font-weight: 500; }
           .lgl-search-container.lgl-search-container.lgl-search-container .lgl-filter-form.lgl-layout-vertical .lgl-search-form-inner .lgl-filter-group .choices .choices__inner {
             font-size: 0.875rem; }
+    .lgl-search-container.lgl-search-container.lgl-search-container .lgl-filter-form.lgl-layout-vertical .lgl-reset-filters-btn.lgl-reset-filters-btn.lgl-reset-filters-btn.lgl-reset-filters-btn {
+      background-color: var(--lgl-color-accent);
+      color: var(--lgl-color-secondary);
+      font-family: var(--lgl-font-secondary);
+      border: none;
+      padding: 16px 32px;
+      font-size: 1rem;
+      letter-spacing: 0;
+      text-transform: uppercase;
+      border-radius: 6px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color 0.3s ease, transform 0.1s ease;
+      width: 100%;
+      line-height: 1; }
   .lgl-search-container.lgl-search-container.lgl-search-container .lgl-reset-filters-btn.lgl-reset-filters-btn.lgl-reset-filters-btn.lgl-reset-filters-btn {
     padding: 0;
     font-size: 12px;
