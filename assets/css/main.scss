@@ -2888,7 +2888,11 @@ $wt-cols: 110px 1fr 120px 110px 80px 80px 50px;
         }
         .choices__list--dropdown,
         .choices__list[aria-expanded] {
-            border: none;
+            border: 1px solid var(--lgl-color-secondary);
+            .choices__list--dropdown .choices__item,
+            .choices__list[aria-expanded] .choices__item {
+                padding: 10px 20px;
+            }
         }
     }
 }
