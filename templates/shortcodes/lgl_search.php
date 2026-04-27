@@ -171,6 +171,10 @@ if ($post_type) {
             $is_live_search = filter_var($live_search, FILTER_VALIDATE_BOOLEAN);
             // Apply ajax class if live_search is true, otherwise apply no-ajax class to trigger a redirect
             $form_class = $is_live_search ? 'lgl-filter-form-ajax' : 'lgl-filter-form-no-ajax';
+            
+            // Apply Layout Class
+            $form_layout = isset($layout) ? $layout : 'horizontal';
+            $form_class .= ' lgl-layout-' . $form_layout;
             ?>
             <form id="lgl-search-form" class="lgl-filter-form <?php echo esc_attr($form_class); ?>">
                 <div class="lgl-search-form-inner">
