@@ -234,7 +234,7 @@
         $('#lgl_post_type').on('change', function () {
             const $selected = $(this).find('option:selected');
             const postTypeSlug = $selected.data('post-type');
-            
+
             let makeNode = $('#lgl_make')[0];
             let modelNode = $('#lgl_model')[0];
 
@@ -484,6 +484,7 @@
          * @param {Array} values Array of flat values
          * @param {string} placeholder Default input text
          */
+
         function _repopulate_select(selector, values, placeholder) {
             const el = $(selector)[0];
             if (!el || !el.choicesInstance) return;
@@ -491,10 +492,12 @@
             const instance = el.choicesInstance;
             const current = instance.getValue(true);
 
-            let choicesArray = [{ value: '', label: placeholder, selected: !current }];
+            // ADDED: placeholder: true to prevent duplication
+            let choicesArray = [{ value: '', label: placeholder, selected: !current, placeholder: true }];
             let stillValid = false;
 
             $.each(values, function (i, val) {
+                if (val === '' || val === null) return true; // SAFEGUARD: Skip empty backend values
                 const isSelected = String(val) === String(current);
                 if (isSelected) stillValid = true;
                 choicesArray.push({ value: val, label: val, selected: isSelected });
@@ -507,8 +510,8 @@
         }
 
         /**
-         * Rebuilds a price select with {value, label} objects directly handling Virtual DOM.
-         */
+           * Rebuilds a price select with {value, label} objects directly handling Virtual DOM.
+           */
         function _repopulate_price_select(selector, prices, placeholder) {
             const el = $(selector)[0];
             if (!el || !el.choicesInstance) return;
@@ -516,10 +519,12 @@
             const instance = el.choicesInstance;
             const current = parseFloat(instance.getValue(true)) || 0;
 
-            let choicesArray = [{ value: '', label: placeholder, selected: !current }];
+            // ADDED: placeholder: true to prevent duplication
+            let choicesArray = [{ value: '', label: placeholder, selected: !current, placeholder: true }];
             let stillValid = false;
 
             $.each(prices, function (i, item) {
+                if (item.value === '' || item.value === null) return true; // SAFEGUARD
                 const isSelected = item.value === current;
                 if (isSelected) stillValid = true;
                 choicesArray.push({ value: item.value, label: item.label, selected: isSelected });
@@ -532,8 +537,8 @@
         }
 
         /**
-         * Rebuilds a select with {id, text} object arrays safely parsing state objects.
-         */
+            * Rebuilds a select with {id, text} object arrays safely parsing state objects.
+            */
         function _repopulate_object_select(selector, items, placeholder) {
             const el = $(selector)[0];
             if (!el || !el.choicesInstance) return;
@@ -541,11 +546,13 @@
             const instance = el.choicesInstance;
             const current = String(instance.getValue(true) || '');
 
-            let choicesArray = [{ value: '', label: placeholder, selected: !current }];
+            // ADDED: placeholder: true to prevent duplication
+            let choicesArray = [{ value: '', label: placeholder, selected: !current, placeholder: true }];
             let stillValid = false;
 
             if (items && items.length > 0) {
                 $.each(items, function (i, item) {
+                    if (item.id === '' || item.id === null) return true; // SAFEGUARD
                     const isSelected = String(item.id) === current;
                     if (isSelected) stillValid = true;
                     choicesArray.push({ value: item.id, label: item.text, selected: isSelected });
