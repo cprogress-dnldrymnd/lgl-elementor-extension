@@ -82,6 +82,12 @@
                 .lgl-filter-group {
                     --width: 100%;
                     border: 1px solid var(--lgl-color-tertiary) !important;
+                    border-radius: 5px;
+                    .choices {
+                        .choices__inner {
+                            font-size: 0.875rem;
+                        }
+                    }
                 }
             }
         }
@@ -2877,8 +2883,10 @@ $wt-cols: 110px 1fr 120px 110px 80px 80px 50px;
             background-color: transparent;
             border: none;
             font-size: 1rem;
+            padding: 20px;
         }
-        .choices__list--dropdown, .choices__list[aria-expanded] {
+        .choices__list--dropdown,
+        .choices__list[aria-expanded] {
             border: none;
         }
     }
