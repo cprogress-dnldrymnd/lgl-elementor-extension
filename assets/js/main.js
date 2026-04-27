@@ -255,7 +255,7 @@
             }
             if (modelNode && modelNode.choicesInstance) {
                 modelNode.choicesInstance.clearChoices();
-                modelNode.choicesInstance.setChoices([{ value: '', label: 'Select Make First', selected: true }], 'value', 'label', true);
+                modelNode.choicesInstance.setChoices([{ value: '', label: 'All Models', selected: true }], 'value', 'label', true);
                 modelNode.choicesInstance.disable();
             }
 
