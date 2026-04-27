@@ -1076,10 +1076,14 @@
 .lgl-post--part-exchange {
     padding: 24px;
     text-align: center;
-    color: var(--lgl-color-secondary);
-    font-size: 1rem;
     line-height: 1;
-    font-weight: 600;
+    a {
+        text-decoration: none;
+        text-transform: uppercase;
+        font-weight: 600;
+        font-size: 1rem;
+        color: var(--lgl-color-secondary);
+    }
 }
 
 .lgl-finance-label {
