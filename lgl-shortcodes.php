@@ -992,7 +992,6 @@ if (! class_exists('LGL_Shortcodes')) {
             add_shortcode('lgl_breadcrumbs', array($this, 'render_shortcode'));
             add_shortcode('lgl_type_tabs', array($this, 'render_shortcode'));
             add_shortcode('lgl_manufacturer', array($this, 'render_shortcode'));
-
         }
 
         /**
@@ -2829,23 +2828,23 @@ if (! class_exists('LGL_Shortcodes')) {
         }
 
         /**
-         * 1. Register the Settings Page Menu
+         * 1. Register the Settings Page Menu (Moved to LGL Settings)
          */
         public function lgl_manufacturer_menu()
         {
+            // Change 'lgl-settings' below to match the exact menu slug of your LGL Settings page if it differs
             $page_hook = add_submenu_page(
-                'options-general.php', // Places it under Settings
+                'lgl-settings', // The parent menu slug (LGL Settings)
                 'LGL Manufacturers',
                 'Manufacturer Logos',
                 'manage_options',
                 'lgl-manufacturers',
-                array($this, 'lgl_manufacturers_page_html') // Note the array($this, ...) format
+                array($this, 'lgl_manufacturers_page_html')
             );
 
             // Load WP Media library only on this specific page
             add_action("admin_print_scripts-{$page_hook}", array($this, 'lgl_manufacturer_admin_scripts'));
         }
-
         /**
          * Load Media Scripts
          */
