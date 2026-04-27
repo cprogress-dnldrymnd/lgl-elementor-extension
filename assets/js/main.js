@@ -202,7 +202,7 @@
             // Soft reset model dropdown via Choices API natively
             if (modelNode && modelNode.choicesInstance) {
                 modelNode.choicesInstance.clearChoices();
-                modelNode.choicesInstance.setChoices([{ value: '', label: 'Select Model', selected: true }], 'value', 'label', true);
+                modelNode.choicesInstance.setChoices([{ value: '', label: 'All models', selected: true }], 'value', 'label', true);
                 modelNode.choicesInstance.disable();
             }
 
