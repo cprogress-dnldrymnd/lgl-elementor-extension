@@ -257,7 +257,7 @@ if ($post_type) {
                         ?>
                         <select name="listing_model" id="lgl_model" class="lgl-select2" data-placeholder="Select Model" <?php echo $is_disabled; ?>>
                             <?php if (empty($active_make_models) && empty($active_model)) : ?>
-                                <option value="">Models</option>
+                                <option value="">Select Make First</option>
                             <?php else : ?>
                                 <option value="">All Models</option>
 
