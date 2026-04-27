@@ -57,6 +57,8 @@
     background-position: calc(100% - 25px) center; }
   .lgl-search-container.lgl-search-container.lgl-search-container .lgl-filter-form {
     position: relative; }
+    .lgl-search-container.lgl-search-container.lgl-search-container .lgl-filter-form.lgl-layout-vertical .lgl-submit-group {
+      display: none !important; }
     .lgl-search-container.lgl-search-container.lgl-search-container .lgl-filter-form.lgl-layout-vertical .lgl-search-form-inner {
       flex-direction: column;
       gap: 20px; }

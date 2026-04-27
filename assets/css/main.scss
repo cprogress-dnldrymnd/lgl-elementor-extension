@@ -76,6 +76,9 @@
     .lgl-filter-form {
         position: relative;
         &.lgl-layout-vertical {
+            .lgl-submit-group {
+                display: none !important;
+            }
             .lgl-search-form-inner {
                 flex-direction: column;
                 gap: 20px;
