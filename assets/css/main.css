@@ -2247,6 +2247,10 @@
   .lgl-filter-group .choices .choices__inner {
     height: 100%;
     display: flex;
-    align-items: center; }
+    align-items: center;
+    background-color: transparent;
+    border: none; }
+  .lgl-filter-group .choices .choices__list--dropdown, .lgl-filter-group .choices .choices__list[aria-expanded] {
+    border: none; }
 
 /*# sourceMappingURL=main.css.map */
