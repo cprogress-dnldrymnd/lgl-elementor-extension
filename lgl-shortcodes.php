@@ -2867,24 +2867,36 @@ if (! class_exists('LGL_Shortcodes')) {
             $post_type = $args['post_type'];
             $options = get_option('lgl_settings', array());
 
-            $search_fields = array(
-                'condition'         => __('Condition', 'lgl-shortcodes'),
-                'berth'             => __('Berth', 'lgl-shortcodes'),
-                'price'             => __('Price Range', 'lgl-shortcodes'),
-                'listing-fuel-type' => __('Fuel Type', 'lgl-shortcodes'),
-                'listing-chassis'   => __('Chassis', 'lgl-shortcodes'),
-                'listing-gearbox'   => __('Gearbox', 'lgl-shortcodes'),
-            );
+            if (!class_exists('LGL_Import_Post_Types')) {
+                echo '<p style="color:red;">LGL Import plugin must be active to fetch field definitions.</p>';
+                return;
+            }
 
-            $saved_order = isset($options['search_order_' . $post_type]) ? $options['search_order_' . $post_type] : array_keys($search_fields);
-            $missing_fields = array_diff(array_keys($search_fields), $saved_order);
+            // Dynamically pull fields based on post type (exactly like field visibility)
+            $listing_fields = LGL_Import_Post_Types::get_listing_detail_fields();
+            $type_fields = isset($listing_fields['common']) ? $listing_fields['common'] : array();
+
+            if ($post_type === 'caravan' && isset($listing_fields['caravan'])) {
+                $type_fields = array_merge($type_fields, $listing_fields['caravan']);
+            } elseif (in_array($post_type, array('motorhome', 'campervan')) && isset($listing_fields['motorhome_campervan'])) {
+                $type_fields = array_merge($type_fields, $listing_fields['motorhome_campervan']);
+            }
+
+            // Append explicitly used specific taxonomies and price
+            $type_fields['price']             = __('Price Range', 'lgl-shortcodes');
+            $type_fields['listing-fuel-type'] = __('Fuel Type', 'lgl-shortcodes');
+            $type_fields['listing-chassis']   = __('Chassis', 'lgl-shortcodes');
+            $type_fields['listing-gearbox']   = __('Gearbox', 'lgl-shortcodes');
+
+            $saved_order = isset($options['search_order_' . $post_type]) ? $options['search_order_' . $post_type] : array_keys($type_fields);
+            $missing_fields = array_diff(array_keys($type_fields), $saved_order);
             $current_order  = array_merge($saved_order, $missing_fields);
 
             $visible_keys = array();
             $hidden_keys  = array();
 
             foreach ($current_order as $key) {
-                if (!isset($search_fields[$key])) continue;
+                if (!isset($type_fields[$key])) continue;
                 if (!empty($options['hide_search_' . $post_type . '_' . $key])) {
                     $hidden_keys[] = $key;
                 } else {
@@ -2895,10 +2907,10 @@ if (! class_exists('LGL_Shortcodes')) {
             $final_render_order = array_merge($visible_keys, $hidden_keys);
             $list_id = 'lgl-search-sortable-' . esc_attr($post_type);
 
-            echo '<ul id="' . $list_id . '" style="max-width: 600px; padding: 0; margin: 0; list-style: none;">';
+            echo '<ul id="' . $list_id . '" class="lgl-search-sortable-list" style="max-width: 600px; padding: 0; margin: 0; list-style: none;">';
 
             foreach ($final_render_order as $key) {
-                $label     = $search_fields[$key];
+                $label     = $type_fields[$key];
                 $is_hidden = !empty($options['hide_search_' . $post_type . '_' . $key]);
                 $checked   = $is_hidden ? 'checked="checked"' : '';
                 $li_class       = $is_hidden ? 'is-hidden' : '';
