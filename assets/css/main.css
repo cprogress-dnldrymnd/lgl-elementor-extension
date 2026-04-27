@@ -88,7 +88,9 @@
       cursor: pointer;
       transition: background-color 0.3s ease, transform 0.1s ease;
       width: 100%;
-      line-height: 1; }
+      line-height: 1;
+      position: static;
+      margin-top: 20px; }
   .lgl-search-container.lgl-search-container.lgl-search-container .lgl-reset-filters-btn.lgl-reset-filters-btn.lgl-reset-filters-btn.lgl-reset-filters-btn {
     padding: 0;
     font-size: 12px;
