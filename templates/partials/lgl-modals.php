@@ -43,7 +43,7 @@ $min_dep   = (float) ($fin['min_deposit'] ?? 100);
             
             <?php if ('custom' === $fin_mode && ! empty($fin['custom_code'])) : ?>
                 <div class="lgl-fc-custom-container">
-                    <?php echo $fin['custom_code']; // Safe execution: Escaped & sanitized on save based on user cap ?>
+                    <?php echo do_shortcode($fin['custom_code']); // Safe execution: Escaped & sanitized on save based on user cap ?>
                 </div>
             <?php else : ?>
                 <div class="lgl-fc-inputs">
