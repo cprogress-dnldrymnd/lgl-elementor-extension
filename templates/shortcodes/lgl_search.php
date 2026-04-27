@@ -363,7 +363,7 @@ if ($post_type) {
                     $reset_display_style = $has_active_filters ? '' : 'display: none;';
                 ?>
                     <button type="button" class="lgl-reset-filters-btn" aria-label="Reset all search filters" style="<?php echo $reset_display_style; ?>">
-                        Reset Filters
+                        RESET ALL
                     </button>
                 <?php } ?>
             </form>
