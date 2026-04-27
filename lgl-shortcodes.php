@@ -1698,20 +1698,25 @@ if (! class_exists('LGL_Shortcodes')) {
             // ------------------------------------------------------------------
             $base_meta_query = array('relation' => 'AND');
 
-            if (!empty($form_data['condition'])) {
-                $base_meta_query[] = array(
-                    'key'     => 'condition',
-                    'value'   => sanitize_text_field($form_data['condition']),
-                    'compare' => '=',
-                );
-            }
+            $listing_fields = class_exists('LGL_Import_Post_Types') ? LGL_Import_Post_Types::get_listing_detail_fields() : array();
+            $all_possible_meta = array_merge(
+                isset($listing_fields['common']) ? $listing_fields['common'] : array(),
+                isset($listing_fields['caravan']) ? $listing_fields['caravan'] : array(),
+                isset($listing_fields['motorhome_campervan']) ? $listing_fields['motorhome_campervan'] : array()
+            );
 
-            if (!empty($form_data['berth'])) {
-                $base_meta_query[] = array(
-                    'key'     => 'berth',
-                    'value'   => sanitize_text_field($form_data['berth']),
-                    'compare' => '=',
-                );
+            $skip_meta_keys = array('price', 'listing-fuel-type', 'listing-chassis', 'listing-gearbox');
+
+            foreach (array_keys($all_possible_meta) as $meta_key) {
+                if (in_array($meta_key, $skip_meta_keys)) continue;
+
+                if (!empty($form_data[$meta_key])) {
+                    $base_meta_query[] = array(
+                        'key'     => $meta_key,
+                        'value'   => sanitize_text_field($form_data[$meta_key]),
+                        'compare' => '=',
+                    );
+                }
             }
 
             $price_min = !empty($form_data['price_min']) ? floatval($form_data['price_min']) : 0;
@@ -1802,17 +1807,18 @@ if (! class_exists('LGL_Shortcodes')) {
                 global $wpdb;
                 $ids_in = implode(',', array_map('intval', $matching_ids));
 
-                $conditions = $wpdb->get_col(
-                    "SELECT DISTINCT meta_value FROM {$wpdb->postmeta}
-             WHERE post_id IN ({$ids_in}) AND meta_key = 'condition' AND meta_value != ''
-             ORDER BY meta_value ASC"
-                );
+                $dynamic_meta_values = array();
+                $skip_meta_keys = array('price', 'listing-fuel-type', 'listing-chassis', 'listing-gearbox');
 
-                $berths = $wpdb->get_col(
-                    "SELECT DISTINCT meta_value FROM {$wpdb->postmeta}
-             WHERE post_id IN ({$ids_in}) AND meta_key = 'berth' AND meta_value != ''
-             ORDER BY CAST(meta_value AS UNSIGNED) ASC"
-                );
+                foreach (array_keys($all_possible_meta) as $meta_key) {
+                    if (in_array($meta_key, $skip_meta_keys)) continue;
+
+                    $dynamic_meta_values[$meta_key] = $wpdb->get_col(
+                        "SELECT DISTINCT meta_value FROM {$wpdb->postmeta}
+                         WHERE post_id IN ({$ids_in}) AND meta_key = '" . esc_sql($meta_key) . "' AND meta_value != ''
+                         ORDER BY meta_value ASC"
+                    );
+                }
 
                 $prices_raw = $wpdb->get_col(
                     "SELECT DISTINCT meta_value FROM {$wpdb->postmeta}
