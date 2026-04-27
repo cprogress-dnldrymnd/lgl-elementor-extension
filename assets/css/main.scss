@@ -78,9 +78,10 @@
         &.lgl-layout-vertical {
             .lgl-search-form-inner {
                 flex-direction: column;
+                gap: 20px;
                 .lgl-filter-group {
                     --width: 100%;
-                    border-right: none !important;
+                    border: 1px solid var(--lgl-color-tertiary) !important;
                 }
             }
         }
