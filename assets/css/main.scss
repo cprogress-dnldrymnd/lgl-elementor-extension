@@ -75,6 +75,14 @@
     }
     .lgl-filter-form {
         position: relative;
+        &.lgl-layout-vertical {
+            .lgl-search-form-inner {
+                flex-direction: column;
+                .lgl-filter-group {
+                    --width: 100%;
+                }
+            }
+        }
     }
     .lgl-reset-filters-btn.lgl-reset-filters-btn.lgl-reset-filters-btn.lgl-reset-filters-btn {
         padding: 0;
