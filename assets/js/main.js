@@ -352,6 +352,20 @@
             if (e.type === 'submit') e.preventDefault();
             if (isUpdatingFilters) return;
 
+            // --- PRE-SERIALIZATION SANITATION ---
+            // If the user changed the Make, forcibly clear the Model value BEFORE capturing 
+            // the serialized data. This prevents an orphaned model from being passed to 
+            // the URL, AJAX payload, and Breadcrumbs.
+            if (e.target && e.target.id === 'lgl_make') {
+                const modelNode = $('#lgl_model')[0];
+                if (modelNode && modelNode.choicesInstance) {
+                    modelNode.choicesInstance.removeActiveItems();
+                    modelNode.choicesInstance.setChoiceByValue('');
+                } else {
+                    $('#lgl_model').val('');
+                }
+            }
+
             currentPage = 1;
 
             // Capture the serialized data immediately before the fields are disabled
@@ -364,12 +378,23 @@
             evaluateResetButtonVisibility();
         });
 
-        // NEW handler: Ensure filter options update on NO-AJAX forms when using tabs
+       // NEW handler: Ensure filter options update on NO-AJAX forms when using tabs
         $('#lgl-search-form.lgl-filter-form-no-ajax').on('change', 'select', function (e) {
             // Ignore post_type as its own handler manages base logic above
             if ($(this).attr('id') === 'lgl_post_type') return;
 
             if (isUpdatingFilters) return;
+
+            // --- PRE-SERIALIZATION SANITATION ---
+            if (e.target && e.target.id === 'lgl_make') {
+                const modelNode = $('#lgl_model')[0];
+                if (modelNode && modelNode.choicesInstance) {
+                    modelNode.choicesInstance.removeActiveItems();
+                    modelNode.choicesInstance.setChoiceByValue('');
+                } else {
+                    $('#lgl_model').val('');
+                }
+            }
 
             // Trigger the option constraint fetcher natively
             const currentFormData = $('#lgl-search-form').serialize();
