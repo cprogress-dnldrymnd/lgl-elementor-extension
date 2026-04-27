@@ -2231,4 +2231,49 @@
     .lgl-type-tabs-wrapper .lgl-type-tabs {
       padding-left: 10px; } }
 
+/* LGL Manufacturer Logo Marquee */
+.lgl-marquee-container {
+  width: 100%;
+  overflow: hidden;
+  white-space: nowrap;
+  padding: 30px 0;
+  box-sizing: border-box;
+  display: flex;
+  background: #ffffff;
+  /* Optional: sets a background color for the marquee */ }
+
+.lgl-marquee-track {
+  display: inline-flex;
+  /* 20s controls the speed. Lower = faster, Higher = slower */
+  animation: lgl-marquee-scroll 25s linear infinite; }
+
+/* Optional: Pauses the scrolling when a user hovers over the logos */
+.lgl-marquee-track:hover {
+  animation-play-state: paused; }
+
+.lgl-marquee-item {
+  padding: 0 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center; }
+  .lgl-marquee-item img {
+    max-height: 60px;
+    /* Forces all logos to uniform height */
+    width: auto;
+    object-fit: contain;
+    filter: grayscale(100%);
+    /* Optional: makes logos grey */
+    transition: filter 0.3s ease; }
+  .lgl-marquee-item img:hover {
+    filter: grayscale(0%);
+    /* Optional: brings color back on hover */ }
+
+/* The Infinite Scroll Animation */
+@keyframes lgl-marquee-scroll {
+  0% {
+    transform: translateX(0); }
+  100% {
+    /* Moves exactly half the track width (since we duplicated the logos in PHP) */
+    transform: translateX(-50%); } }
+
 /*# sourceMappingURL=main.css.map */
