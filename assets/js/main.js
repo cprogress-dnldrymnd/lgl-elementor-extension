@@ -191,18 +191,21 @@
         $('#lgl_make').on('change', function () {
             if (isUpdatingFilters) return; // Prevent conflicts with update_filter_options
 
-            // NEW: Abort this basic fetcher if full filter layout is present.
-            // Let update_filter_options() handle the tightly constrained fetch!
+            // Abort this basic fetcher if full filter layout is present.
             if ($('#lgl_condition').length > 0) return;
 
             let make_id = $(this).val();
             let modelNode = $('#lgl_model')[0];
             let postType = $('#lgl_target_post_type').val() || $('#lgl_post_type').find('option:selected').data('post-type') || '';
 
-            // Soft reset model dropdown via Choices API natively
+            // Soft reset model dropdown natively, using placeholder: true
             if (modelNode && modelNode.choicesInstance) {
                 modelNode.choicesInstance.clearChoices();
-                modelNode.choicesInstance.setChoices([{ value: '', label: 'Select Model', selected: true }], 'value', 'label', true);
+                if (!make_id) {
+                    modelNode.choicesInstance.setChoices([{ value: '', label: 'Select Make First', selected: true, placeholder: true }], 'value', 'label', true);
+                } else {
+                    modelNode.choicesInstance.setChoices([{ value: '', label: 'Loading models…', selected: true, placeholder: true }], 'value', 'label', true);
+                }
                 modelNode.choicesInstance.disable();
             }
 
@@ -217,19 +220,31 @@
                         post_type: postType
                     },
                     success: function (response) {
-                        if (response.success && response.data.length > 0 && modelNode && modelNode.choicesInstance) {
-                            let choicesArray = [{ value: '', label: 'All Models', selected: true }];
-                            $.each(response.data, function (index, item) {
-                                choicesArray.push({ value: item.id, label: item.text });
-                            });
-                            modelNode.choicesInstance.setChoices(choicesArray, 'value', 'label', true);
-                            modelNode.choicesInstance.enable();
+                        if (modelNode && modelNode.choicesInstance) {
+                            // Safely check length whether response is an array or an object
+                            const dataLength = response.data ? Object.keys(response.data).length : 0;
+
+                            if (response.success && dataLength > 0) {
+                                let choicesArray = [{ value: '', label: 'All Models', selected: true, placeholder: true }];
+                                $.each(response.data, function (index, item) {
+                                    choicesArray.push({ value: item.id, label: item.text });
+                                });
+                                modelNode.choicesInstance.setChoices(choicesArray, 'value', 'label', true);
+                                modelNode.choicesInstance.enable();
+                            } else {
+                                modelNode.choicesInstance.setChoices([{ value: '', label: 'No models available', selected: true, placeholder: true }], 'value', 'label', true);
+                            }
+                        }
+                    },
+                    error: function () {
+                        // Prevent infinite loading state on failure
+                        if (modelNode && modelNode.choicesInstance) {
+                            modelNode.choicesInstance.setChoices([{ value: '', label: 'Error loading models', selected: true, placeholder: true }], 'value', 'label', true);
                         }
                     }
                 });
             }
         });
-
         // Vehicle Type change → load Makes for the selected type
         $('#lgl_post_type').on('change', function () {
             const $selected = $(this).find('option:selected');
@@ -241,29 +256,30 @@
             // Update hidden target so backend knows what to query
             $('#lgl_target_post_type').val(postTypeSlug);
 
-            // NEW: If secondary fields are visible (Tabs mode), let update_filter_options handle ALL fetching holistically
+            // If secondary fields are visible (Tabs mode), let update_filter_options handle ALL fetching holistically
             if ($('#lgl_condition').length > 0 && typeof update_filter_options === 'function') {
                 update_filter_options($('#lgl-search-form').serialize());
                 return; // Abort the basic fetcher!
             }
 
-            // --- Basic Global Search Fetcher (Only runs if Condition/Berth are completely hidden) ---
+            // --- Basic Global Search Fetcher ---
             if (makeNode && makeNode.choicesInstance) {
                 makeNode.choicesInstance.clearChoices();
-                makeNode.choicesInstance.setChoices([{ value: '', label: 'Select Vehicle Type First', selected: true }], 'value', 'label', true);
+                makeNode.choicesInstance.setChoices([{ value: '', label: 'Select Vehicle Type First', selected: true, placeholder: true }], 'value', 'label', true);
                 makeNode.choicesInstance.disable();
             }
             if (modelNode && modelNode.choicesInstance) {
                 modelNode.choicesInstance.clearChoices();
-                modelNode.choicesInstance.setChoices([{ value: '', label: 'Select Make First', selected: true }], 'value', 'label', true);
+                modelNode.choicesInstance.setChoices([{ value: '', label: 'Select Make First', selected: true, placeholder: true }], 'value', 'label', true);
                 modelNode.choicesInstance.disable();
             }
 
             if (!postTypeSlug) return;
 
+            // Trigger Loading State safely
             if (makeNode && makeNode.choicesInstance) {
                 makeNode.choicesInstance.clearChoices();
-                makeNode.choicesInstance.setChoices([{ value: '', label: 'Loading makes…', selected: true }], 'value', 'label', true);
+                makeNode.choicesInstance.setChoices([{ value: '', label: 'Loading makes…', selected: true, placeholder: true }], 'value', 'label', true);
             }
 
             $.ajax({
@@ -277,16 +293,26 @@
                 success: function (response) {
                     if (makeNode && makeNode.choicesInstance) {
                         let choicesArray = [];
-                        if (response.success && response.data.length > 0) {
-                            choicesArray.push({ value: '', label: 'All Makes', selected: true });
+
+                        // Safely evaluate data structure length
+                        const dataLength = response.data ? Object.keys(response.data).length : 0;
+
+                        if (response.success && dataLength > 0) {
+                            choicesArray.push({ value: '', label: 'All Makes', selected: true, placeholder: true });
                             $.each(response.data, function (i, item) {
                                 choicesArray.push({ value: item.id, label: item.text });
                             });
                             makeNode.choicesInstance.setChoices(choicesArray, 'value', 'label', true);
                             makeNode.choicesInstance.enable();
                         } else {
-                            makeNode.choicesInstance.setChoices([{ value: '', label: 'No makes available', selected: true }], 'value', 'label', true);
+                            makeNode.choicesInstance.setChoices([{ value: '', label: 'No makes available', selected: true, placeholder: true }], 'value', 'label', true);
                         }
+                    }
+                },
+                error: function () {
+                    // Prevent infinite loading state on failure
+                    if (makeNode && makeNode.choicesInstance) {
+                        makeNode.choicesInstance.setChoices([{ value: '', label: 'Error loading makes', selected: true, placeholder: true }], 'value', 'label', true);
                     }
                 }
             });
