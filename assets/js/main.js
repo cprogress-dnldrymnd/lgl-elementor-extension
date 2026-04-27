@@ -399,7 +399,6 @@
 
         // Intercept Breadcrumb Clicks on Archive Pages for Seamless AJAX Routing
         $(document).on('click', '.lgl-ajax-breadcrumb', function (e) {
-            // Abort and allow standard navigation if the search form isn't present (e.g., Single Pages)
             if ($('#lgl-search-form.lgl-filter-form-ajax').length === 0) return;
 
             e.preventDefault();
@@ -408,15 +407,24 @@
             let action = $clicked.data('action');
             let text = $clicked.text();
 
-            // 1. Manipulate the Choices.js nodes based on the breadcrumb depth natively
+            // 1. Manipulate the Choices.js nodes natively
             let makeNode = $('#lgl_make')[0];
             let modelNode = $('#lgl_model')[0];
 
             if (action === 'clear-all') {
-                if (makeNode && makeNode.choicesInstance) makeNode.choicesInstance.setChoiceByValue('');
-                if (modelNode && modelNode.choicesInstance) modelNode.choicesInstance.setChoiceByValue('');
+                if (makeNode && makeNode.choicesInstance) {
+                    makeNode.choicesInstance.removeActiveItems();
+                    makeNode.choicesInstance.setChoiceByValue('');
+                }
+                if (modelNode && modelNode.choicesInstance) {
+                    modelNode.choicesInstance.removeActiveItems();
+                    modelNode.choicesInstance.setChoiceByValue('');
+                }
             } else if (action === 'clear-model') {
-                if (modelNode && modelNode.choicesInstance) modelNode.choicesInstance.setChoiceByValue('');
+                if (modelNode && modelNode.choicesInstance) {
+                    modelNode.choicesInstance.removeActiveItems();
+                    modelNode.choicesInstance.setChoiceByValue('');
+                }
             }
 
             // 2. Trigger the AJAX execution
@@ -424,12 +432,11 @@
 
             // 3. Mutate the DOM to reflect the new state instantly
             $clicked.nextAll().remove(); // Strip deeper levels and separators
-            $clicked.replaceWith('<span class="lgl-current-page">' + text + '</span>'); // Convert link to active plain text node
+            $clicked.replaceWith('<span class="lgl-current-page">' + text + '</span>');
         });
 
         /**
          * Intercepts the Reset Filters button click.
-         * Forcibly nullifies all Choices.js instances within the target form to clear the UI.
          */
         $(document).on('click', '.lgl-reset-filters-btn', function (e) {
             e.preventDefault();
@@ -439,13 +446,14 @@
             // 1. Flush the visual and internal state of all Choices.js nodes securely
             $form.find('select.lgl-select2').each(function () {
                 if (this.choicesInstance) {
+                    this.choicesInstance.removeActiveItems(); // Wipe stuck visual text
                     this.choicesInstance.setChoiceByValue('');
                 } else {
                     $(this).val('');
                 }
             });
 
-            // 2. Dispatch the submit event to trigger grid refresh and URL cleanup
+            // 2. Dispatch the submit event to trigger grid refresh
             if ($form.hasClass('lgl-filter-form-ajax')) {
                 $form.trigger('submit');
             }
@@ -523,7 +531,9 @@
                     } else {
                         if (modelNode && modelNode.choicesInstance) {
                             modelNode.choicesInstance.clearChoices();
-                            modelNode.choicesInstance.setChoices([{ value: '', label: 'Select Make First', selected: true }], 'value', 'label', true);
+                            modelNode.choicesInstance.removeActiveItems(); // Flush visual cache
+                            modelNode.choicesInstance.setChoices([{ value: '', label: 'Select Make First', selected: true, placeholder: true }], 'value', 'label', true);
+                            modelNode.choicesInstance.setChoiceByValue(''); // Sync the placeholder
                             modelNode.choicesInstance.disable();
                         }
                     }
@@ -540,6 +550,7 @@
          * @param {string} placeholder Default input text
          */
 
+
         function _repopulate_select(selector, values, placeholder) {
             const el = $(selector)[0];
             if (!el || !el.choicesInstance) return;
@@ -547,26 +558,31 @@
             const instance = el.choicesInstance;
             const current = instance.getValue(true);
 
-            // ADDED: placeholder: true to prevent duplication
             let choicesArray = [{ value: '', label: placeholder, selected: !current, placeholder: true }];
             let stillValid = false;
 
             $.each(values, function (i, val) {
-                if (val === '' || val === null) return true; // SAFEGUARD: Skip empty backend values
+                if (val === '' || val === null) return true;
                 const isSelected = String(val) === String(current);
                 if (isSelected) stillValid = true;
                 choicesArray.push({ value: val, label: val, selected: isSelected });
             });
 
             instance.clearChoices();
+            instance.removeActiveItems(); // Force UI to clear previous text
             instance.setChoices(choicesArray, 'value', 'label', true);
 
-            if (current && !stillValid) instance.setChoiceByValue('');
+            // Resync the active selection or force the placeholder
+            if (current && stillValid) {
+                instance.setChoiceByValue(current);
+            } else {
+                instance.setChoiceByValue('');
+            }
         }
 
         /**
-           * Rebuilds a price select with {value, label} objects directly handling Virtual DOM.
-           */
+         * Rebuilds a price select with {value, label} objects directly handling Virtual DOM.
+         */
         function _repopulate_price_select(selector, prices, placeholder) {
             const el = $(selector)[0];
             if (!el || !el.choicesInstance) return;
@@ -574,26 +590,30 @@
             const instance = el.choicesInstance;
             const current = parseFloat(instance.getValue(true)) || 0;
 
-            // ADDED: placeholder: true to prevent duplication
             let choicesArray = [{ value: '', label: placeholder, selected: !current, placeholder: true }];
             let stillValid = false;
 
             $.each(prices, function (i, item) {
-                if (item.value === '' || item.value === null) return true; // SAFEGUARD
+                if (item.value === '' || item.value === null) return true;
                 const isSelected = item.value === current;
                 if (isSelected) stillValid = true;
                 choicesArray.push({ value: item.value, label: item.label, selected: isSelected });
             });
 
             instance.clearChoices();
+            instance.removeActiveItems(); // Force UI to clear previous text
             instance.setChoices(choicesArray, 'value', 'label', true);
 
-            if (current && !stillValid) instance.setChoiceByValue('');
+            if (current && stillValid) {
+                instance.setChoiceByValue(current);
+            } else {
+                instance.setChoiceByValue('');
+            }
         }
 
         /**
-            * Rebuilds a select with {id, text} object arrays safely parsing state objects.
-            */
+         * Rebuilds a select with {id, text} object arrays safely parsing state objects.
+         */
         function _repopulate_object_select(selector, items, placeholder) {
             const el = $(selector)[0];
             if (!el || !el.choicesInstance) return;
@@ -601,13 +621,12 @@
             const instance = el.choicesInstance;
             const current = String(instance.getValue(true) || '');
 
-            // ADDED: placeholder: true to prevent duplication
             let choicesArray = [{ value: '', label: placeholder, selected: !current, placeholder: true }];
             let stillValid = false;
 
             if (items && items.length > 0) {
                 $.each(items, function (i, item) {
-                    if (item.id === '' || item.id === null) return true; // SAFEGUARD
+                    if (item.id === '' || item.id === null) return true;
                     const isSelected = String(item.id) === current;
                     if (isSelected) stillValid = true;
                     choicesArray.push({ value: item.id, label: item.text, selected: isSelected });
@@ -615,9 +634,14 @@
             }
 
             instance.clearChoices();
+            instance.removeActiveItems(); // Force UI to clear previous text
             instance.setChoices(choicesArray, 'value', 'label', true);
 
-            if (current && !stillValid) instance.setChoiceByValue('');
+            if (current && stillValid) {
+                instance.setChoiceByValue(current);
+            } else {
+                instance.setChoiceByValue('');
+            }
         }
 
         /**
