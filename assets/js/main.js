@@ -113,23 +113,21 @@
          */
         document.querySelectorAll('.lgl-select2').forEach(function (element) {
             const selectId = element.id;
-            const noSearchIds = ['lgl_post_type', 'lgl_condition', 'lgl_berth', 'lgl_price_min', 'lgl_price_max', 'lgl_make', 'lgl-sort-order'];
+            const allowSearchIds = ['lgl_make', 'lgl_model']; // Only specific long lists need search
 
-            if (noSearchIds.includes(selectId)) {
-                // Disable search functionality completely for specific IDs
+            if (!allowSearchIds.includes(selectId)) {
                 element.choicesInstance = new Choices(element, {
                     searchEnabled: false,
-                    itemSelectText: '', // Removes the default "Press to select" text on hover for a cleaner UI
-                    shouldSort: false   // Keeps your original HTML <option> order
+                    itemSelectText: '',
+                    shouldSort: false
                 });
             } else {
-                // Keep default behavior (with search) AND enable dynamic option creation
                 element.choicesInstance = new Choices(element, {
                     searchEnabled: true,
-                    removeItemButton: true, // Adds an 'x' to remove selected items
-                    addItems: true,         // Allows users to type and add custom values
+                    removeItemButton: true,
+                    addItems: true,
                     duplicateItemsAllowed: false,
-                    paste: false            // Optional: prevents weird formatting if a user pastes a comma-separated list
+                    paste: false
                 });
             }
         });
@@ -378,7 +376,7 @@
             evaluateResetButtonVisibility();
         });
 
-       // NEW handler: Ensure filter options update on NO-AJAX forms when using tabs
+        // NEW handler: Ensure filter options update on NO-AJAX forms when using tabs
         $('#lgl-search-form.lgl-filter-form-no-ajax').on('change', 'select', function (e) {
             // Ignore post_type as its own handler manages base logic above
             if ($(this).attr('id') === 'lgl_post_type') return;
@@ -495,11 +493,11 @@
         function evaluateResetButtonVisibility() {
             let hasActiveFilters = false;
 
-            // Iterate over all active filter fields
-            $('#lgl_make, #lgl_model, #lgl_condition, #lgl_berth, #lgl_price_min, #lgl_price_max').each(function () {
+            // Target ALL active dropdowns dynamically, explicitly excluding the root Post Type selector
+            $('#lgl-search-form select.lgl-select2').not('#lgl_post_type').each(function () {
                 if ($(this).val()) {
                     hasActiveFilters = true;
-                    return false; // Break the $.each loop early for performance
+                    return false; // Break early
                 }
             });
 
@@ -537,13 +535,20 @@
 
                     isUpdatingFilters = true;
 
-                    // Standard text value dropdowns
-                    _repopulate_select('#lgl_condition', d.conditions, 'Any Condition');
-                    _repopulate_select('#lgl_berth', d.berths, 'Any Berth');
-
                     // Complex object dropdowns
                     _repopulate_price_select('#lgl_price_min', d.prices, 'Min Price');
                     _repopulate_price_select('#lgl_price_max', d.prices, 'Max Price');
+
+                    // Automatically repopulate ALL dynamic fields retrieved from the backend
+                    if (d.dynamic_meta) {
+                        $.each(d.dynamic_meta, function (field_key, values) {
+                            let selector = '#lgl_' + field_key;
+                            if ($(selector).length) {
+                                let label = $(selector).data('placeholder') || 'Any';
+                                _repopulate_select(selector, values, label);
+                            }
+                        });
+                    }
 
                     // Add Makes and Models to dynamic repopulation
                     _repopulate_object_select('#lgl_make', d.makes, 'All Makes');
