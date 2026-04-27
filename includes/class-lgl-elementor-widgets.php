@@ -72,8 +72,8 @@ class LGL_Widget_Search extends \Elementor\Widget_Base
         $settings = $this->get_settings_for_display();
         $atts = '';
         if (!empty($settings['attr_post_type'])) $atts .= ' post_type="' . esc_attr($settings['attr_post_type']) . '"';
-        if (!empty($settings['attr_search_type'])) $atts .= ' search_type="' . esc_attr($settings['attr_search_type']) . '"';
         if (empty($settings['attr_live_search'])) $atts .= ' live_search="false"';
+        if (!empty($settings['attr_layout'])) $atts .= ' layout="' . esc_attr($settings['attr_layout']) . '"';
         echo do_shortcode('[lgl_search' . $atts . ']');
     }
 }
