@@ -764,16 +764,20 @@
   padding: 0;
   margin: 0;
   display: grid;
-  gap: 0px; }
+  gap: 0px;
+  line-height: 1;
+  gap: 8px; }
   .lgl-contact-list .lgl-contact-item {
-    font-family: var(--lgl-font-secondary);
-    font-weight: 600;
-    font-size: 1rem;
-    color: var(--lgl-color-secondary);
     text-decoration: none;
     display: flex;
     align-items: center;
     gap: 12px; }
+    .lgl-contact-list .lgl-contact-item a {
+      font-family: var(--lgl-font-secondary);
+      font-weight: 600;
+      font-size: 1rem;
+      color: var(--lgl-color-secondary);
+      text-decoration: none; }
 
 .lgl-sale-card {
   background: var(--lgl-color-secondary);
