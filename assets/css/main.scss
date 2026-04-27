@@ -2866,6 +2866,9 @@ $wt-cols: 110px 1fr 120px 110px 80px 80px 50px;
         color: var(--lgl-color-black);
         font-size: 1rem;
         font-weight: bold;
+        .choices__placeholder {
+            opacity: 1;
+        }
         .choices__inner {
             height: 100%;
             display: flex;

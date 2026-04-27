@@ -2244,6 +2244,8 @@
   color: var(--lgl-color-black);
   font-size: 1rem;
   font-weight: bold; }
+  .lgl-filter-group .choices .choices__placeholder {
+    opacity: 1; }
   .lgl-filter-group .choices .choices__inner {
     height: 100%;
     display: flex;
