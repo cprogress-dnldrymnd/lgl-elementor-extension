@@ -1954,14 +1954,10 @@ if (! class_exists('LGL_Shortcodes')) {
          * Reusable for both AJAX and non-AJAX (direct/server-side) rendering contexts.
          *
          * @param string $post_type     The post type to query.
-         * @param array  $form_data     Associative array of filter parameters (sort_order, condition, berth, price_min, price_max, listing_make, listing_model).
+         * @param array  $form_data     Associative array of filter parameters.
          * @param int    $paged         The current page number.
          * @param int    $posts_per_page Number of results to return per page.
-         * @return array {
-         * @type string $html        Rendered grid item HTML.
-         * @type string $pagination  Rendered pagination HTML.
-         * @type int    $count       Total number of matched posts.
-         * }
+         * @return array
          */
         public static function get_search_results_data($post_type = 'caravan', $form_data = array(), $paged = 1, $posts_per_page = 9, $is_carousel = false, $style = 'style-1', $is_featured = false)
         {
@@ -2009,23 +2005,29 @@ if (! class_exists('LGL_Shortcodes')) {
                 }
             }
 
-            // Meta Queries
-            if (! empty($form_data['condition'])) {
-                $args['meta_query'][] = array(
-                    'key'     => 'condition',
-                    'value'   => sanitize_text_field($form_data['condition']),
-                    'compare' => '=',
-                );
+            // ---------------------------------------------------------
+            // Dynamic Meta Queries (Replaces hardcoded condition/berth)
+            // ---------------------------------------------------------
+            $listing_fields = class_exists('LGL_Import_Post_Types') ? LGL_Import_Post_Types::get_listing_detail_fields() : array();
+            $all_possible_meta = array_merge(
+                isset($listing_fields['common']) ? $listing_fields['common'] : array(),
+                isset($listing_fields['caravan']) ? $listing_fields['caravan'] : array(),
+                isset($listing_fields['motorhome_campervan']) ? $listing_fields['motorhome_campervan'] : array()
+            );
+
+            // Automatically check and apply standard meta query constraints dynamically
+            foreach (array_keys($all_possible_meta) as $meta_key) {
+                if ($meta_key === 'price') continue; // Handled separately below
+                if (!empty($form_data[$meta_key])) {
+                    $args['meta_query'][] = array(
+                        'key'     => $meta_key,
+                        'value'   => sanitize_text_field($form_data[$meta_key]),
+                        'compare' => '=',
+                    );
+                }
             }
 
-            if (! empty($form_data['berth'])) {
-                $args['meta_query'][] = array(
-                    'key'     => 'berth',
-                    'value'   => sanitize_text_field($form_data['berth']),
-                    'compare' => '=',
-                );
-            }
-
+            // Featured toggle constraint
             if ($is_featured) {
                 $args['meta_query'][] = array(
                     'key'     => 'is_featured',
@@ -2034,7 +2036,7 @@ if (! class_exists('LGL_Shortcodes')) {
                 );
             }
 
-            // Price Range (Min/Max)
+            // Price Range (Min/Max) constraint
             $price_min = ! empty($form_data['price_min']) ? floatval($form_data['price_min']) : 0;
             $price_max = ! empty($form_data['price_max']) ? floatval($form_data['price_max']) : 0;
 
@@ -2056,10 +2058,9 @@ if (! class_exists('LGL_Shortcodes')) {
                 $args['meta_query'][] = $price_query;
             }
 
-            $make_slug  = ! empty($form_data['listing_make'])  ? sanitize_text_field($form_data['listing_make'])  : '';
-            $model_slug = ! empty($form_data['listing_model']) ? sanitize_text_field($form_data['listing_model']) : '';
-
-            // Custom Taxonomies
+            // ---------------------------------------------------------
+            // Dynamic Taxonomy Constraints
+            // ---------------------------------------------------------
             $tax_fields = array('listing-fuel-type', 'listing-chassis', 'listing-gearbox');
             foreach ($tax_fields as $tax) {
                 if (!empty($form_data[$tax])) {
@@ -2070,6 +2071,10 @@ if (! class_exists('LGL_Shortcodes')) {
                     );
                 }
             }
+
+            // Make and Model routing constraint
+            $make_slug  = ! empty($form_data['listing_make'])  ? sanitize_text_field($form_data['listing_make'])  : '';
+            $model_slug = ! empty($form_data['listing_model']) ? sanitize_text_field($form_data['listing_model']) : '';
 
             if ($model_slug) {
                 $args['tax_query'][] = array(
@@ -2084,7 +2089,6 @@ if (! class_exists('LGL_Shortcodes')) {
                     'terms'    => $make_slug,
                 );
             }
-            
 
             // Execute Query
             $query = new WP_Query($args);
@@ -2126,7 +2130,7 @@ if (! class_exists('LGL_Shortcodes')) {
                 'html'       => $html,
                 'pagination' => $pagination_html,
                 'count'      => $query->found_posts,
-                'args' => $args,
+                'args'       => $args,
             );
         }
 
