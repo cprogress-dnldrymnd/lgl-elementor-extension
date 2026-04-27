@@ -80,6 +80,7 @@
                 flex-direction: column;
                 .lgl-filter-group {
                     --width: 100%;
+                    border-right: none !important;
                 }
             }
         }
