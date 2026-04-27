@@ -2921,7 +2921,7 @@ $wt-cols: 110px 1fr 120px 110px 80px 80px 50px;
             background-color: transparent;
             border: none;
             font-size: 1rem;
-            padding: 20px;
+            padding: 15px 20px;
         }
         .choices__list {
             .choices__item {
@@ -2938,6 +2938,16 @@ $wt-cols: 110px 1fr 120px 110px 80px 80px 50px;
                 padding-bottom: 10px;
                 padding-left: 20px;
             }
+        }
+    }
+}
+
+.lgl-sort-field {
+    .choices {
+        min-width: 200px;
+        .choices__inner {
+            border-radius: 5px;
+            border-color: var(--color-primary);
         }
     }
 }

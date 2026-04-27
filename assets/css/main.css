@@ -2287,7 +2287,7 @@
     background-color: transparent;
     border: none;
     font-size: 1rem;
-    padding: 20px; }
+    padding: 15px 20px; }
   .lgl-filter-group .choices .choices__list .choices__item {
     white-space: nowrap;
     overflow: hidden;
@@ -2300,5 +2300,11 @@
       padding-top: 10px;
       padding-bottom: 10px;
       padding-left: 20px; }
+
+.lgl-sort-field .choices {
+  min-width: 200px; }
+  .lgl-sort-field .choices .choices__inner {
+    border-radius: 5px;
+    border-color: var(--color-primary); }
 
 /*# sourceMappingURL=main.css.map */
