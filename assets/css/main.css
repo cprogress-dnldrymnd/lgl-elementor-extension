@@ -314,8 +314,6 @@
   display: flex;
   flex-direction: column;
   transition: box-shadow 0.3s ease, transform 0.3s ease; }
-  .lgl-post.lgl-post.lgl-post:hover {
-    box-shadow: 0 12px 24px rgba(25, 42, 62, 0.08); }
   .lgl-post.lgl-post.lgl-post .lgl-post--info-inner {
     padding: 36px; }
     @media (max-width: 480px) {
