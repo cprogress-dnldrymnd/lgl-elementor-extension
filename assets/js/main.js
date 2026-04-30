@@ -118,11 +118,12 @@
             if (!allowSearchIds.includes(selectId)) {
                 element.choicesInstance = new Choices(element, {
                     searchEnabled: false,
-                    itemSelectText: 'Select',
+                    itemSelectText: '',
                     shouldSort: false
                 });
             } else {
                 element.choicesInstance = new Choices(element, {
+                    itemSelectText: '',
                     searchEnabled: true,
                     removeItemButton: true,
                     addItems: true,
