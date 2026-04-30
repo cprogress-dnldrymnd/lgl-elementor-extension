@@ -70,16 +70,26 @@ class LGL_Widget_Search extends \Elementor\Widget_Base
             'default' => 'yes',
             'return_value' => 'true',
         ]);
+
         $this->end_controls_section();
     }
     protected function render()
     {
         $settings = $this->get_settings_for_display();
         $atts = '';
+
         if (!empty($settings['attr_post_type'])) $atts .= ' post_type="' . esc_attr($settings['attr_post_type']) . '"';
+
+        // FIX: The widget was previously missing this line entirely, breaking Tabs mode!
+        if (!empty($settings['attr_search_type'])) $atts .= ' search_type="' . esc_attr($settings['attr_search_type']) . '"';
+
         if (empty($settings['attr_live_search'])) $atts .= ' live_search="false"';
-        if (empty($settings['attr_show_all_filters'])) $atts .= ' show_all_filters="false"'; 
         if (!empty($settings['attr_layout'])) $atts .= ' layout="' . esc_attr($settings['attr_layout']) . '"';
+
+        // Read the Elementor switcher securely (Defaults to true)
+        $show_filters = (isset($settings['attr_show_all_filters']) && $settings['attr_show_all_filters'] === '') ? 'false' : 'true';
+        $atts .= ' show_all_filters="' . $show_filters . '"';
+
         echo do_shortcode('[lgl_search' . $atts . ']');
     }
 }
