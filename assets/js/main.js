@@ -118,7 +118,7 @@
             if (!allowSearchIds.includes(selectId)) {
                 element.choicesInstance = new Choices(element, {
                     searchEnabled: false,
-                    itemSelectText: false,
+                    itemSelectText: ' ',
                     shouldSort: false
                 });
             } else {
