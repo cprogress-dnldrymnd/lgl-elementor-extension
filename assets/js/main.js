@@ -118,7 +118,7 @@
             if (!allowSearchIds.includes(selectId)) {
                 element.choicesInstance = new Choices(element, {
                     searchEnabled: false,
-                    itemSelectText: '',
+                    itemSelectText: false,
                     shouldSort: false
                 });
             } else {
@@ -177,7 +177,7 @@
 
             window.location.href = redirectUrl;
         });
-        
+
         // Dependent Dropdown Logic (Make -> Model) for global search or initial load
         $('#lgl_make').on('change', function () {
             if (isUpdatingFilters) return; // Prevent conflicts with update_filter_options
