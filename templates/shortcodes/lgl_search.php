@@ -202,7 +202,7 @@ if ($post_type) {
                         <?php if (!empty($vehicle_types)) : ?>
                             <div class="lgl-filter-group" <?php echo ($search_type === 'tabs') ? 'style="display: none;"' : ''; ?>>
                                 <label for="lgl_vehicle_type">Leisure Vehicle Type</label>
-                                <select name="post_type" id="lgl_post_type" class="lgl-select2" data-placeholder="Leisure Vehicle Type" >
+                                <select name="post_type" id="lgl_post_type" class="lgl-select2" data-placeholder="Leisure Vehicle Type">
                                     <option value="">Leisure Vehicle Type</option>
                                     <?php foreach ($vehicle_types as $type) :
                                         $is_selected = selected($active_post_type, $type['url'], false);
@@ -274,96 +274,99 @@ if ($post_type) {
                         </select>
                     </div>
 
-                    <?php if (!isset($show_all_filters) || $show_all_filters === 'true') : ?>
-                        <?php if ($post_type != false || $search_type === 'tabs') {
+                    <?php
+                    $show_filters_bool = filter_var($show_all_filters ?? true, FILTER_VALIDATE_BOOLEAN);
+                    if ($show_filters_bool) :
 
-                            $listing_fields = class_exists('LGL_Import_Post_Types') ? LGL_Import_Post_Types::get_listing_detail_fields() : array();
-                            $type_fields = isset($listing_fields['common']) ? $listing_fields['common'] : array();
-                            if ($data_post_type === 'caravan' && isset($listing_fields['caravan'])) {
-                                $type_fields = array_merge($type_fields, $listing_fields['caravan']);
-                            } elseif (in_array($data_post_type, array('motorhome', 'campervan')) && isset($listing_fields['motorhome_campervan'])) {
-                                $type_fields = array_merge($type_fields, $listing_fields['motorhome_campervan']);
-                            }
+                        $listing_fields = class_exists('LGL_Import_Post_Types') ? LGL_Import_Post_Types::get_listing_detail_fields() : array();
+                        $type_fields = isset($listing_fields['common']) ? $listing_fields['common'] : array();
 
-                            $fuel_types   = get_terms(array('taxonomy' => 'listing-fuel-type', 'hide_empty' => true));
-                            $chassis_list = get_terms(array('taxonomy' => 'listing-chassis', 'hide_empty' => true));
-                            $gearboxes    = get_terms(array('taxonomy' => 'listing-gearbox', 'hide_empty' => true));
+                        // Always merge fields so they exist in the DOM for JS to populate globally
+                        if ($data_post_type === 'caravan' || $data_post_type == false) {
+                            if (isset($listing_fields['caravan'])) $type_fields = array_merge($type_fields, $listing_fields['caravan']);
+                        }
+                        if (in_array($data_post_type, array('motorhome', 'campervan')) || $data_post_type == false) {
+                            if (isset($listing_fields['motorhome_campervan'])) $type_fields = array_merge($type_fields, $listing_fields['motorhome_campervan']);
+                        }
 
-                            $active_fuel_type = isset($_GET['listing-fuel-type']) ? sanitize_text_field($_GET['listing-fuel-type']) : '';
-                            $active_chassis   = isset($_GET['listing-chassis'])   ? sanitize_text_field($_GET['listing-chassis'])   : '';
-                            $active_gearbox   = isset($_GET['listing-gearbox'])   ? sanitize_text_field($_GET['listing-gearbox'])   : '';
+                        $fuel_types   = get_terms(array('taxonomy' => 'listing-fuel-type', 'hide_empty' => true));
+                        $chassis_list = get_terms(array('taxonomy' => 'listing-chassis', 'hide_empty' => true));
+                        $gearboxes    = get_terms(array('taxonomy' => 'listing-gearbox', 'hide_empty' => true));
 
-                            $options = get_option('lgl_settings', array());
-                            $default_order = array_merge(array_keys($type_fields), array('price', 'listing-fuel-type', 'listing-chassis', 'listing-gearbox'));
-                            $search_order = isset($options['search_order_' . $data_post_type]) ? $options['search_order_' . $data_post_type] : $default_order;
+                        $active_fuel_type = isset($_GET['listing-fuel-type']) ? sanitize_text_field($_GET['listing-fuel-type']) : '';
+                        $active_chassis   = isset($_GET['listing-chassis'])   ? sanitize_text_field($_GET['listing-chassis'])   : '';
+                        $active_gearbox   = isset($_GET['listing-gearbox'])   ? sanitize_text_field($_GET['listing-gearbox'])   : '';
 
-                            foreach ($search_order as $field_key) {
-                                if (!empty($options['hide_search_' . $data_post_type . '_' . $field_key])) continue;
+                        $options = get_option('lgl_settings', array());
+                        $default_order = array_merge(array_keys($type_fields), array('price', 'listing-fuel-type', 'listing-chassis', 'listing-gearbox'));
+                        $search_order = isset($options['search_order_' . $data_post_type]) ? $options['search_order_' . $data_post_type] : $default_order;
 
-                                if ($field_key === 'price') { ?>
-                                    <div class="lgl-filter-group">
-                                        <select name="price_min" id="lgl_price_min" class="lgl-select2" data-placeholder="Min Price">
-                                            <option value="">Min Price</option>
-                                            <?php foreach ($prices as $price) : ?>
-                                                <option value="<?php echo esc_attr($price); ?>" <?php selected((float) $active_price_min, $price); ?>><?php echo esc_html(LGL_Shortcodes::format_price($price)); ?></option>
-                                            <?php endforeach; ?>
-                                        </select>
-                                    </div>
-                                    <div class="lgl-filter-group">
-                                        <select name="price_max" id="lgl_price_max" class="lgl-select2" data-placeholder="Max Price">
-                                            <option value="">Max Price</option>
-                                            <?php foreach ($prices as $price) : ?>
-                                                <option value="<?php echo esc_attr($price); ?>" <?php selected((float) $active_price_max, $price); ?>><?php echo esc_html(LGL_Shortcodes::format_price($price)); ?></option>
-                                            <?php endforeach; ?>
-                                        </select>
-                                    </div>
-                                <?php } elseif ($field_key === 'listing-fuel-type') { ?>
-                                    <div class="lgl-filter-group">
-                                        <label for="lgl_fuel_type">Fuel Type</label>
-                                        <select name="listing-fuel-type" id="lgl_fuel_type" class="lgl-select2" data-placeholder="Any Fuel Type">
-                                            <option value="">Any Fuel Type</option>
-                                            <?php if (!is_wp_error($fuel_types)) foreach ($fuel_types as $term) : ?>
-                                                <option value="<?php echo esc_attr($term->slug); ?>" <?php selected($active_fuel_type, $term->slug); ?>><?php echo esc_html($term->name); ?></option>
-                                            <?php endforeach; ?>
-                                        </select>
-                                    </div>
-                                <?php } elseif ($field_key === 'listing-chassis') { ?>
-                                    <div class="lgl-filter-group">
-                                        <label for="lgl_chassis">Chassis</label>
-                                        <select name="listing-chassis" id="lgl_chassis" class="lgl-select2" data-placeholder="Any Chassis">
-                                            <option value="">Any Chassis</option>
-                                            <?php if (!is_wp_error($chassis_list)) foreach ($chassis_list as $term) : ?>
-                                                <option value="<?php echo esc_attr($term->slug); ?>" <?php selected($active_chassis, $term->slug); ?>><?php echo esc_html($term->name); ?></option>
-                                            <?php endforeach; ?>
-                                        </select>
-                                    </div>
-                                <?php } elseif ($field_key === 'listing-gearbox') { ?>
-                                    <div class="lgl-filter-group">
-                                        <label for="lgl_gearbox">Gearbox</label>
-                                        <select name="listing-gearbox" id="lgl_gearbox" class="lgl-select2" data-placeholder="Any Gearbox">
-                                            <option value="">Any Gearbox</option>
-                                            <?php if (!is_wp_error($gearboxes)) foreach ($gearboxes as $term) : ?>
-                                                <option value="<?php echo esc_attr($term->slug); ?>" <?php selected($active_gearbox, $term->slug); ?>><?php echo esc_html($term->name); ?></option>
-                                            <?php endforeach; ?>
-                                        </select>
-                                    </div>
-                                <?php } elseif (isset($type_fields[$field_key])) {
-                                    // DYNAMIC META FIELD RENDERER
-                                    $label = $type_fields[$field_key];
-                                    $active_val = isset($_GET[$field_key]) ? sanitize_text_field($_GET[$field_key]) : '';
-                                    $meta_values = LGL_Shortcodes::get_unique_meta_values($data_post_type, $field_key);
-                                ?>
-                                    <div class="lgl-filter-group">
-                                        <label for="lgl_<?php echo esc_attr($field_key); ?>"><?php echo esc_html($label); ?></label>
-                                        <select name="<?php echo esc_attr($field_key); ?>" id="lgl_<?php echo esc_attr($field_key); ?>" class="lgl-select2" data-placeholder="Any <?php echo esc_attr($label); ?>">
-                                            <option value="">Any <?php echo esc_html($label); ?></option>
-                                            <?php foreach ($meta_values as $val) : ?>
-                                                <option value="<?php echo esc_attr($val); ?>" <?php selected($active_val, $val); ?>><?php echo esc_html($val); ?></option>
-                                            <?php endforeach; ?>
-                                        </select>
-                                    </div>
+                        foreach ($search_order as $field_key) {
+                            if (!empty($options['hide_search_' . $data_post_type . '_' . $field_key])) continue;
+
+                            if ($field_key === 'price') { ?>
+                                <div class="lgl-filter-group">
+                                    <select name="price_min" id="lgl_price_min" class="lgl-select2" data-placeholder="Min Price">
+                                        <option value="">Min Price</option>
+                                        <?php foreach ($prices as $price) : ?>
+                                            <option value="<?php echo esc_attr($price); ?>" <?php selected((float) $active_price_min, $price); ?>><?php echo esc_html(LGL_Shortcodes::format_price($price)); ?></option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                </div>
+                                <div class="lgl-filter-group">
+                                    <select name="price_max" id="lgl_price_max" class="lgl-select2" data-placeholder="Max Price">
+                                        <option value="">Max Price</option>
+                                        <?php foreach ($prices as $price) : ?>
+                                            <option value="<?php echo esc_attr($price); ?>" <?php selected((float) $active_price_max, $price); ?>><?php echo esc_html(LGL_Shortcodes::format_price($price)); ?></option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                </div>
+                            <?php } elseif ($field_key === 'listing-fuel-type') { ?>
+                                <div class="lgl-filter-group">
+                                    <label for="lgl_fuel_type">Fuel Type</label>
+                                    <select name="listing-fuel-type" id="lgl_fuel_type" class="lgl-select2" data-placeholder="Any Fuel Type">
+                                        <option value="">Any Fuel Type</option>
+                                        <?php if (!is_wp_error($fuel_types)) foreach ($fuel_types as $term) : ?>
+                                            <option value="<?php echo esc_attr($term->slug); ?>" <?php selected($active_fuel_type, $term->slug); ?>><?php echo esc_html($term->name); ?></option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                </div>
+                            <?php } elseif ($field_key === 'listing-chassis') { ?>
+                                <div class="lgl-filter-group">
+                                    <label for="lgl_chassis">Chassis</label>
+                                    <select name="listing-chassis" id="lgl_chassis" class="lgl-select2" data-placeholder="Any Chassis">
+                                        <option value="">Any Chassis</option>
+                                        <?php if (!is_wp_error($chassis_list)) foreach ($chassis_list as $term) : ?>
+                                            <option value="<?php echo esc_attr($term->slug); ?>" <?php selected($active_chassis, $term->slug); ?>><?php echo esc_html($term->name); ?></option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                </div>
+                            <?php } elseif ($field_key === 'listing-gearbox') { ?>
+                                <div class="lgl-filter-group">
+                                    <label for="lgl_gearbox">Gearbox</label>
+                                    <select name="listing-gearbox" id="lgl_gearbox" class="lgl-select2" data-placeholder="Any Gearbox">
+                                        <option value="">Any Gearbox</option>
+                                        <?php if (!is_wp_error($gearboxes)) foreach ($gearboxes as $term) : ?>
+                                            <option value="<?php echo esc_attr($term->slug); ?>" <?php selected($active_gearbox, $term->slug); ?>><?php echo esc_html($term->name); ?></option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                </div>
+                            <?php } elseif (isset($type_fields[$field_key])) {
+                                // DYNAMIC META FIELD RENDERER
+                                $label = $type_fields[$field_key];
+                                $active_val = isset($_GET[$field_key]) ? sanitize_text_field($_GET[$field_key]) : '';
+                                $meta_values = LGL_Shortcodes::get_unique_meta_values($data_post_type, $field_key);
+                            ?>
+                                <div class="lgl-filter-group">
+                                    <label for="lgl_<?php echo esc_attr($field_key); ?>"><?php echo esc_html($label); ?></label>
+                                    <select name="<?php echo esc_attr($field_key); ?>" id="lgl_<?php echo esc_attr($field_key); ?>" class="lgl-select2" data-placeholder="Any <?php echo esc_attr($label); ?>">
+                                        <option value="">Any <?php echo esc_html($label); ?></option>
+                                        <?php foreach ($meta_values as $val) : ?>
+                                            <option value="<?php echo esc_attr($val); ?>" <?php selected($active_val, $val); ?>><?php echo esc_html($val); ?></option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                </div>
                         <?php }
-                            }
                         } ?>
                     <?php endif; ?>
 
