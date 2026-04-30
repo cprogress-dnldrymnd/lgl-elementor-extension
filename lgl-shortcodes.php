@@ -1048,6 +1048,7 @@ if (! class_exists('LGL_Shortcodes')) {
                 $attributes_arr['search_type'] = 'default';
                 $attributes_arr['live_search'] = 'true';
                 $attributes_arr['layout'] = 'horizontal';
+                $attributes_arr['show_all_filters'] = 'true';
             }
 
             if ($shortcode_tag == 'lgl_listing') {

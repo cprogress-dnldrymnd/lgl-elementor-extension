@@ -165,17 +165,16 @@
                 }
             }
 
-            // Capture secondary filters to pass as query parameters during the redirect
+            // Capture all secondary form fields dynamically for query parameters
             const params = new URLSearchParams();
-            const condition = $('#lgl_condition').val();
-            const berth = $('#lgl_berth').val();
-            const priceMin = $('#lgl_price_min').val();
-            const priceMax = $('#lgl_price_max').val();
+            const formData = $(this).serializeArray();
 
-            if (condition) params.append('condition', condition);
-            if (berth) params.append('berth', berth);
-            if (priceMin) params.append('price_min', priceMin);
-            if (priceMax) params.append('price_max', priceMax);
+            $.each(formData, function (i, field) {
+                // Exclude the path-based parameters and the base URL
+                if (field.value && field.name !== 'post_type' && field.name !== 'listing_make' && field.name !== 'listing_model') {
+                    params.append(field.name, field.value);
+                }
+            });
 
             const queryString = params.toString();
             if (queryString) {
@@ -184,7 +183,6 @@
 
             window.location.href = redirectUrl;
         });
-
         // Dependent Dropdown Logic (Make -> Model) for global search or initial load
         $('#lgl_make').on('change', function () {
             if (isUpdatingFilters) return; // Prevent conflicts with update_filter_options

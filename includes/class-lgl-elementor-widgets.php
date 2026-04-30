@@ -64,15 +64,21 @@ class LGL_Widget_Search extends \Elementor\Widget_Base
                 'vertical' => 'Vertical'
             ],
         ]);
+        $this->add_control('attr_show_all_filters', [
+            'label' => __('Show All Filters', 'lgl-shortcodes'),
+            'type' => \Elementor\Controls_Manager::SWITCHER,
+            'default' => 'yes',
+            'return_value' => 'true',
+        ]);
         $this->end_controls_section();
     }
-
     protected function render()
     {
         $settings = $this->get_settings_for_display();
         $atts = '';
         if (!empty($settings['attr_post_type'])) $atts .= ' post_type="' . esc_attr($settings['attr_post_type']) . '"';
         if (empty($settings['attr_live_search'])) $atts .= ' live_search="false"';
+        if (empty($settings['attr_show_all_filters'])) $atts .= ' show_all_filters="false"'; 
         if (!empty($settings['attr_layout'])) $atts .= ' layout="' . esc_attr($settings['attr_layout']) . '"';
         echo do_shortcode('[lgl_search' . $atts . ']');
     }
