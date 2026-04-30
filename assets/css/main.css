@@ -47,7 +47,8 @@
     background-color: var(--lgl-color-secondary); }
   .lgl-search-container.lgl-search-container.lgl-search-container .lgl-filter-group select {
     border: none;
-    height: 64px;
+    background-color: transparent;
+    height: 100%;
     font-size: 16px;
     font-weight: 600;
     color: var(--lgl-color-black);
