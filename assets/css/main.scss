@@ -107,6 +107,8 @@
                     select {
                         font-size: 0.875rem;
                         font-weight: 500;
+                        min-height: 57px;;
+                        width: 100%;
                     }
                     &.lgl-submit-group {
                         padding: 0;

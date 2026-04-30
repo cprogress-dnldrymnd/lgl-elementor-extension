@@ -77,7 +77,9 @@
         border-radius: 5px; }
         .lgl-search-container.lgl-search-container.lgl-search-container .lgl-filter-form.lgl-layout-vertical .lgl-search-form-inner .lgl-filter-group select {
           font-size: 0.875rem;
-          font-weight: 500; }
+          font-weight: 500;
+          min-height: 57px;
+          width: 100%; }
         .lgl-search-container.lgl-search-container.lgl-search-container .lgl-filter-form.lgl-layout-vertical .lgl-search-form-inner .lgl-filter-group.lgl-submit-group {
           padding: 0; }
         .lgl-search-container.lgl-search-container.lgl-search-container .lgl-filter-form.lgl-layout-vertical .lgl-search-form-inner .lgl-filter-group:not(.lgl-submit-group) {
