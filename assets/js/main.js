@@ -135,54 +135,49 @@
         $('#lgl-search-form.lgl-filter-form-no-ajax').on('submit', function (e) {
             e.preventDefault();
 
-            // Try to get base URL from dropdown (if global search), fallback to hidden input (if specific post_type search)
-            let destUrl = $('#lgl_post_type').val();
-            if (!destUrl) {
-                destUrl = $('#lgl_base_archive_url').val();
-            }
+            const $form = $(this);
+            
+            // Try to get base URL natively, fallback to hidden input
+            let destUrl = $form.find('#lgl_post_type').length ? $form.find('#lgl_post_type').val() : '';
+            if (!destUrl) destUrl = $form.find('#lgl_base_archive_url').val();
+            
+            // Final fallback to prevent dead clicks
+            if (!destUrl) destUrl = window.location.pathname;
 
-            if (!destUrl) {
-                $('#lgl_post_type').closest('.lgl-filter-group').addClass('lgl-field-error');
-                setTimeout(function () {
-                    $('#lgl_post_type').closest('.lgl-filter-group').removeClass('lgl-field-error');
-                }, 1200);
-                return;
-            }
+            const makeVal = $form.find('#lgl_make').val() || '';
+            const modelVal = $form.find('#lgl_model').val() || '';
 
-            const makeVal = $('#lgl_make').val() || '';
-            const modelVal = $('#lgl_model').val() || '';
+            // Safely split existing query strings if destUrl natively contains them
+            let baseUrl = destUrl.split('?')[0];
+            let existingQuery = destUrl.split('?')[1] ? '?' + destUrl.split('?')[1] : '';
 
-            let redirectUrl = destUrl;
+            // Ensure trailing slash for rewrite rules
+            if (!baseUrl.endsWith('/')) baseUrl += '/';
 
-            // Ensure trailing slash on base URL
-            if (!redirectUrl.endsWith('/')) redirectUrl += '/';
-
-            // Append Make and Model as path segments
+            // Append Make and Model cleanly
             if (makeVal) {
-                redirectUrl += encodeURIComponent(makeVal) + '/';
+                baseUrl += encodeURIComponent(makeVal) + '/';
                 if (modelVal) {
-                    redirectUrl += encodeURIComponent(modelVal) + '/';
+                    baseUrl += encodeURIComponent(modelVal) + '/';
                 }
             }
 
-            // Capture all secondary form fields dynamically for query parameters
-            const params = new URLSearchParams();
-            const formData = $(this).serializeArray();
-
-            $.each(formData, function (i, field) {
-                // Exclude the path-based parameters and the base URL
+            // Capture secondary filters dynamically, merging with any existing query
+            const params = new URLSearchParams(existingQuery);
+            const formData = $form.serializeArray();
+            
+            $.each(formData, function(i, field) {
                 if (field.value && field.name !== 'post_type' && field.name !== 'listing_make' && field.name !== 'listing_model') {
                     params.append(field.name, field.value);
                 }
             });
 
             const queryString = params.toString();
-            if (queryString) {
-                redirectUrl += '?' + queryString;
-            }
+            const redirectUrl = baseUrl + (queryString ? '?' + queryString : '');
 
             window.location.href = redirectUrl;
         });
+        
         // Dependent Dropdown Logic (Make -> Model) for global search or initial load
         $('#lgl_make').on('change', function () {
             if (isUpdatingFilters) return; // Prevent conflicts with update_filter_options
@@ -465,7 +460,7 @@
             const $form = $(this).closest('form');
 
             // 1. Flush the visual and internal state of all Choices.js nodes securely
-            $form.find('select.lgl-select2').each(function () {
+            $form.find('select.lgl-select2').not('#lgl_post_type').each(function () {
                 if (this.choicesInstance) {
                     this.choicesInstance.removeActiveItems(); // Wipe stuck visual text
                     this.choicesInstance.setChoiceByValue('');

@@ -202,7 +202,7 @@ if ($post_type) {
                         <?php if (!empty($vehicle_types)) : ?>
                             <div class="lgl-filter-group" <?php echo ($search_type === 'tabs') ? 'style="display: none;"' : ''; ?>>
                                 <label for="lgl_vehicle_type">Leisure Vehicle Type</label>
-                                <select name="post_type" id="lgl_post_type" class="lgl-select2" data-placeholder="Leisure Vehicle Type" required>
+                                <select name="post_type" id="lgl_post_type" class="lgl-select2" data-placeholder="Leisure Vehicle Type" >
                                     <option value="">Leisure Vehicle Type</option>
                                     <?php foreach ($vehicle_types as $type) :
                                         $is_selected = selected($active_post_type, $type['url'], false);
