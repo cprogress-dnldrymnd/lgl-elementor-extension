@@ -75,6 +75,22 @@
     }
     .lgl-filter-form {
         position: relative;
+        &.lgl-layout-horizontal {
+            .lgl-search-form-inner {
+                flex-direction: column;
+                gap: 20px;
+                .lgl-filter-group {
+                    flex-grow: 1;
+                    --width: auto;
+                    .choices {
+                        .choices__inner {
+                            padding-left: 10px;
+                            padding-right: 10px;
+                        }
+                    }
+                }
+            }
+        }
         &.lgl-layout-vertical {
             .lgl-submit-group {
                 display: none !important;
