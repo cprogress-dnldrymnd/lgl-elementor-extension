@@ -77,8 +77,6 @@
         position: relative;
         &.lgl-layout-horizontal {
             .lgl-search-form-inner {
-                flex-direction: column;
-                gap: 20px;
                 .lgl-filter-group {
                     flex-grow: 1;
                     --width: auto;
