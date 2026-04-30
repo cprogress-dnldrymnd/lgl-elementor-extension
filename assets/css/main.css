@@ -60,7 +60,7 @@
     position: relative; }
     .lgl-search-container.lgl-search-container.lgl-search-container .lgl-filter-form.lgl-layout-horizontal .lgl-search-form-inner .lgl-filter-group {
       flex-grow: 1;
-      --width: auto; }
+      --width: 10%; }
       .lgl-search-container.lgl-search-container.lgl-search-container .lgl-filter-form.lgl-layout-horizontal .lgl-search-form-inner .lgl-filter-group .choices .choices__inner {
         padding-left: 10px;
         padding-right: 10px; }
