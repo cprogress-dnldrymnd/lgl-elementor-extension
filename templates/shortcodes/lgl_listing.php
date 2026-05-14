@@ -10,12 +10,14 @@ if ($post_type) {
     );
     if ($is_carousel) {
         echo '<div class="vehicle-slider-holder">';
-        echo '<div class="vehicle-slider-js">';
+        echo '<div class="vehicle-slider-js swiper">';
+        echo '<div class="swiper-wrapper">';
     } else {
         echo '<div class="lgl-grid-layout lgl-cols--3 lgl-layout-default ">';
     }
     echo $results['html'];
     if ($is_carousel) {
+        echo '</div>';
         echo '</div>';
     }
     echo '</div>';
