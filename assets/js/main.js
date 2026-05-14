@@ -1092,8 +1092,8 @@
                 slidesPerView: 1,
                 spaceBetween: 15,
                 navigation: {
-                    nextEl: '.swiper-button-next',
-                    prevEl: '.swiper-button-prev',
+                    nextEl: '.vehicle-slider-js + .swiper-button-next',
+                    prevEl: '.vehicle-slider-js + .swiper-button-next + .swiper-button-prev',
                 },
                 breakpoints: {
                     767: { slidesPerView: 2 },
