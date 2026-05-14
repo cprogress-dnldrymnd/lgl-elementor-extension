@@ -750,6 +750,7 @@ class LGL_Forms
        SAVE SETTINGS
     ═══════════════════════════════════════════════════════════════ */
 
+
 	/**
 	 * Executes sanitization and option mapping during Finance Builder POST processing.
 	 */
@@ -768,6 +769,8 @@ class LGL_Forms
 		update_option('lgl_finance_form', [
 			'mode'               => $mode,
 			'custom_code'        => $custom_code,
+			'afo_referrer'       => sanitize_text_field($_POST['afo_referrer']       ?? 'tony-giles-caravans'),
+			'afo_deposit'        => sanitize_text_field($_POST['afo_deposit']        ?? '1000'),
 			'button_text'        => sanitize_text_field($_POST['button_text']        ?? 'Finance Calculator'),
 			'title'              => sanitize_text_field($_POST['title']              ?? ''),
 			'subtitle'           => sanitize_text_field($_POST['subtitle']           ?? ''),
