@@ -1841,14 +1841,14 @@
             width: 20px;
             height: 20px;
         }
-        &.slick-prev {
+        &.swiper-button-prev {
             left: var(--offset);
             @media (max-width: 767px) {
                 left: auto;
                 right: 55px;
             }
         }
-        &.slick-next {
+        &.swiper-button-next {
             right: var(--offset);
         }
         &:hover {
