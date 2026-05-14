@@ -38,11 +38,13 @@ if (!defined('ABSPATH')) {
                 </form>
             </div>
         </div>
-        
+
         <div class="lgl-filter-results">
-            <span class="lgl-loading-wave" id="lgl-loader" style="display: none;">Loading...</span>
+            <div id="lgl-loader" style="display: none;">
+                <div class="lgl-spinner"></div>
+            </div>
             <div class="lgl-grid-layout lgl-cols--3 lgl-layout-default" id="lgl-results-grid" data-limit="9">
-                </div>
+            </div>
             <div class="lgl-pagination-wrap"></div>
         </div>
     </div>

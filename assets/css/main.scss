@@ -107,7 +107,7 @@
                     select {
                         font-size: 0.875rem;
                         font-weight: 500;
-                        min-height: 57px;;
+                        min-height: 57px;
                         width: 100%;
                     }
                     &.lgl-submit-group {
@@ -367,9 +367,13 @@
 // ==========================================================================
 // 3. Search Results Grid & Cards
 // ==========================================================================
+
 .lgl-results-wrapper {
     width: 100%;
-
+    .lgl-filter-results {
+        position: relative;
+        min-height: 500px;
+    }
     // Topbar Controls (Count & Sorting)
     .lgl-topbar {
         display: flex;
@@ -555,7 +559,7 @@
             margin-top: 10px;
             line-height: 1;
             img {
-                max-height: 85px
+                max-height: 85px;
             }
         }
 
@@ -776,13 +780,30 @@
 }
 // Loader State
 #lgl-loader {
-    display: block;
-    text-align: center;
-    padding: 40px;
-    font-weight: bold;
-    color: var(--lgl-color-primary);
+    display: none;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 10;
+}
+.lgl-spinner {
+    width: 60px;
+    height: 60px;
+    border: 6px solid #f3f3f3; /* Light grey track */
+    border-top: 6px solid var(--lgl-color-accent, #f6d100); /* Accent color head */
+    border-radius: 50%;
+    animation: lgl-spin 1s linear infinite;
 }
 
+@keyframes lgl-spin {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
 #lgl-notification-container {
     position: fixed;
     top: 40px;
