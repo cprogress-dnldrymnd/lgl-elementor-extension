@@ -1109,7 +1109,6 @@
             const galleryNav = new Swiper('.js-gallery-slider-nav', {
                 spaceBetween: 10,
                 slidesPerView: 4,
-                freeMode: true,
                 watchSlidesProgress: true,
                 breakpoints: {
                     0: { slidesPerView: 3 },
