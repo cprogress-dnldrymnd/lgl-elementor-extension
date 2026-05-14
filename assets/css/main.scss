@@ -1021,11 +1021,9 @@
     }
 }
 
-.js-gallery-slider-nav {
-    .swiper:not(.swiper-initialized) {
-        .swiper-wrapper {
-            gap: 10px;
-        }
+.js-gallery-slider-nav:not(.swiper-initialized) {
+    .swiper-wrapper {
+        gap: 10px;
     }
 }
 

@@ -782,7 +782,7 @@
     .lgl-post--gallery .lgl-cover-image {
       border-radius: 10px; } }
 
-.js-gallery-slider-nav .swiper:not(.swiper-initialized) .swiper-wrapper {
+.js-gallery-slider-nav:not(.swiper-initialized) .swiper-wrapper {
   gap: 10px; }
 
 .lgl-contact-list {
