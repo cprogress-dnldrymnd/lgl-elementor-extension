@@ -1818,10 +1818,8 @@
 }
 
 .vehicle-slider-holder {
-    .slick-arrow {
-        position: absolute;
-        top: 50%;
-        transform: translateY(-50%);
+    .swiper-button-next,
+    .swiper-button-prev {
         width: 45px;
         height: 45px;
         padding: 0;

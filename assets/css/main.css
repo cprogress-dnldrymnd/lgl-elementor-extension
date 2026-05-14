@@ -1429,10 +1429,8 @@
   .vehicle-slider-js .slick-track {
     display: flex !important; }
 
-.vehicle-slider-holder .slick-arrow {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
+.vehicle-slider-holder .swiper-button-next,
+.vehicle-slider-holder .swiper-button-prev {
   width: 45px;
   height: 45px;
   padding: 0;
@@ -1446,23 +1444,29 @@
   justify-content: center;
   color: var(--lgl-color-secondary);
   --offset: -60px; }
-  .vehicle-slider-holder .slick-arrow svg {
+  .vehicle-slider-holder .swiper-button-next svg,
+  .vehicle-slider-holder .swiper-button-prev svg {
     transition: 400ms;
     width: 20px;
     height: 20px; }
-  .vehicle-slider-holder .slick-arrow.slick-prev {
+  .vehicle-slider-holder .swiper-button-next.slick-prev,
+  .vehicle-slider-holder .swiper-button-prev.slick-prev {
     left: var(--offset); }
     @media (max-width: 767px) {
-      .vehicle-slider-holder .slick-arrow.slick-prev {
+      .vehicle-slider-holder .swiper-button-next.slick-prev,
+      .vehicle-slider-holder .swiper-button-prev.slick-prev {
         left: auto;
         right: 55px; } }
-  .vehicle-slider-holder .slick-arrow.slick-next {
+  .vehicle-slider-holder .swiper-button-next.slick-next,
+  .vehicle-slider-holder .swiper-button-prev.slick-next {
     right: var(--offset); }
-  .vehicle-slider-holder .slick-arrow:hover {
+  .vehicle-slider-holder .swiper-button-next:hover,
+  .vehicle-slider-holder .swiper-button-prev:hover {
     background-color: var(--lgl-color-secondary);
     color: var(--lgl-color-white); }
   @media (max-width: 767px) {
-    .vehicle-slider-holder .slick-arrow {
+    .vehicle-slider-holder .swiper-button-next,
+    .vehicle-slider-holder .swiper-button-prev {
       --offset: 0;
       top: auto;
       transform: none;
