@@ -1120,7 +1120,6 @@
             // Initialize the main slider and link it to the thumbnails
             const galleryFor = new Swiper('.js-gallery-slider-for', {
                 spaceBetween: 10,
-                effect: 'fade', // Swiper handles fading natively without lightbox bugs
                 navigation: {
                     nextEl: '.js-gallery-slider-for .swiper-button-next',
                     prevEl: '.js-gallery-slider-for .swiper-button-prev',
