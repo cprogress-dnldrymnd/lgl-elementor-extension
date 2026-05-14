@@ -405,7 +405,7 @@ class LGL_Forms
 								<tr class="row_afo_settings" style="<?php echo ($s['mode'] ?? '') === 'afo' ? '' : 'display:none;'; ?>">
 									<th><label for="afo_referrer"><?php _e('AFO Referrer', 'lgl-shortcodes'); ?></label></th>
 									<td>
-										<input type="text" id="afo_referrer" name="afo_referrer" value="<?php echo esc_attr($s['afo_referrer'] ?? 'tony-giles-caravans'); ?>" class="regular-text">
+										<input type="text" id="afo_referrer" name="afo_referrer" value="<?php echo esc_attr($s['afo_referrer'] ?? ''); ?>" class="regular-text">
 										<p class="description"><?php _e('The referrer code designated for the AFO iframe.', 'lgl-shortcodes'); ?></p>
 									</td>
 								</tr>
