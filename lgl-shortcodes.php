@@ -978,19 +978,17 @@ if (! class_exists('LGL_Shortcodes')) {
                 $swiper_handle = 'swiper-fallback';
             }
 
-            // Enqueue main stylesheet
             wp_enqueue_style(
                 'lgl-main-css',
                 LGL_SHORTCODES_URL . 'assets/css/main.css',
-                array('select2', 'slick'),
+                array('select2', $swiper_handle),
                 LGL_SHORTCODES_VERSION
             );
 
-            // Enqueue main JavaScript file (footer loaded)
             wp_enqueue_script(
                 'lgl-main-js',
                 LGL_SHORTCODES_URL . 'assets/js/main.js',
-                array('jquery', 'select2', 'slick'),
+                array('jquery', 'select2', $swiper_handle),
                 LGL_SHORTCODES_VERSION,
                 true
             );
