@@ -28,7 +28,7 @@ $min_dep   = (float) ($fin['min_deposit'] ?? 100);
 <div class="lgl-modal-overlay" id="lgl-modal-overlay"></div>
 
 <?php if ('off' !== $fin_mode) : ?>
-    <div class="lgl-modal" id="lgl-modal-finance" role="dialog" aria-modal="true" aria-labelledby="lgl-fc-title">
+    <div class="lgl-modal <?= $fin_mode ?>" id="lgl-modal-finance" role="dialog" aria-modal="true" aria-labelledby="lgl-fc-title">
         <div class="lgl-modal-inner">
             <div class="lgl-modal-header">
                 <div>
