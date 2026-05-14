@@ -244,12 +244,13 @@ class LGL_Forms
                     $(this).val()==="select"?$r.find(".lgl-fg--opts").show():$r.find(".lgl-fg--opts").hide();
                 });
 
-                // Show/hide custom iframe / AFO fields and Financial Parameters based on the mode
+               // Show/hide custom iframe / AFO fields and Financial Parameters based on the mode
                 $(document).on("change", "#fc_mode", function(){
                     var val = $(this).val();
                     val === "custom" ? $("#row_custom_code").show() : $("#row_custom_code").hide();
                     val === "afo" ? $(".row_afo_settings").show() : $(".row_afo_settings").hide();
                     val === "native" ? $("#section_financial_parameters").show() : $("#section_financial_parameters").hide();
+                    val === "off" ? $("#section_popup_labels, #section_disclaimer").hide() : $("#section_popup_labels, #section_disclaimer").show();
                 });
                 
                 // Add field
@@ -419,7 +420,7 @@ class LGL_Forms
 								</tr>
 							</table>
 						</div>
-						<div class="lgl-fbl-section">
+						<div class="lgl-fbl-section" id="section_popup_labels" style="<?php echo ($s['mode'] ?? 'native') === 'off' ? 'display:none;' : ''; ?>">
 							<h3><?php _e('Popup Labels', 'lgl-shortcodes'); ?></h3>
 							<p class="description"><?php _e('You can use <code>{{make}}</code> and <code>{{model}}</code> dynamically here.', 'lgl-shortcodes'); ?></p>
 							<table class="form-table" style="margin:0">
@@ -499,7 +500,7 @@ class LGL_Forms
 								</tr>
 							</table>
 						</div>
-						<div class="lgl-fbl-section">
+					<div class="lgl-fbl-section" id="section_disclaimer" style="<?php echo ($s['mode'] ?? 'native') === 'off' ? 'display:none;' : ''; ?>">
 							<h3><?php _e('Disclaimer (Legal / Compliance)', 'lgl-shortcodes'); ?></h3>
 							<textarea name="disclaimer_text" rows="4" class="large-text widefat"><?php echo esc_textarea($s['disclaimer_text'] ?? 'Finance examples are for illustration purposes only. The figures shown are based on assumptions and may not reflect the exact terms you are offered. All finance is subject to status, affordability checks, credit approval and terms & conditions.'); ?></textarea>
 							<p class="description"><?php _e('Must include statements like "Finance subject to status" and "Illustration purposes only" for UK compliance.', 'lgl-shortcodes'); ?></p>
@@ -749,7 +750,6 @@ class LGL_Forms
     /* ═══════════════════════════════════════════════════════════════
        SAVE SETTINGS
     ═══════════════════════════════════════════════════════════════ */
-
 
 	/**
 	 * Executes sanitization and option mapping during Finance Builder POST processing.
