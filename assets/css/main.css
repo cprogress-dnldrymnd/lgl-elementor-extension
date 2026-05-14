@@ -400,7 +400,8 @@
         .lgl-post.lgl-post.lgl-post .lgl-post--infor .lgl-post--price {
           font-size: 1rem; } }
     .lgl-post.lgl-post.lgl-post .lgl-post--infor .lgl-post--interior-image {
-      margin-top: 10px; }
+      margin-top: 10px;
+      line-height: 1; }
       .lgl-post.lgl-post.lgl-post .lgl-post--infor .lgl-post--interior-image img {
         max-height: 85px; }
     .lgl-post.lgl-post.lgl-post .lgl-post--infor .lgl-post--title {
