@@ -1444,6 +1444,9 @@
   justify-content: center;
   color: var(--lgl-color-secondary);
   --offset: -60px; }
+  .vehicle-slider-holder .swiper-button-next:after,
+  .vehicle-slider-holder .swiper-button-prev:after {
+    display: none; }
   .vehicle-slider-holder .swiper-button-next svg,
   .vehicle-slider-holder .swiper-button-prev svg {
     transition: 400ms;

@@ -1820,6 +1820,9 @@
 .vehicle-slider-holder {
     .swiper-button-next,
     .swiper-button-prev {
+        &:after {
+            display: none;
+        }
         width: 45px;
         height: 45px;
         padding: 0;
