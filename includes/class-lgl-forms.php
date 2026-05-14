@@ -244,13 +244,17 @@ class LGL_Forms
                     $(this).val()==="select"?$r.find(".lgl-fg--opts").show():$r.find(".lgl-fg--opts").hide();
                 });
 
-               // Show/hide custom iframe / AFO fields and Financial Parameters based on the mode
+              // Show/hide custom iframe / AFO fields and Financial Parameters based on the mode
                 $(document).on("change", "#fc_mode", function(){
                     var val = $(this).val();
                     val === "custom" ? $("#row_custom_code").show() : $("#row_custom_code").hide();
                     val === "afo" ? $(".row_afo_settings").show() : $(".row_afo_settings").hide();
-                    val === "native" ? $("#section_financial_parameters").show() : $("#section_financial_parameters").hide();
-                    val === "off" ? $("#section_popup_labels, #section_disclaimer").hide() : $("#section_popup_labels, #section_disclaimer").show();
+                    
+                    // Financial Parameters and Disclaimer ONLY show for the native calculator
+                    val === "native" ? $("#section_financial_parameters, #section_disclaimer").show() : $("#section_financial_parameters, #section_disclaimer").hide();
+                    
+                    // Popup Labels show for everything except "off"
+                    val === "off" ? $("#section_popup_labels").hide() : $("#section_popup_labels").show();
                 });
                 
                 // Add field
