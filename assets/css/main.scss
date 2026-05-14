@@ -1023,9 +1023,10 @@
 
 .js-gallery-slider-nav:not(.swiper-initialized) {
     .swiper-wrapper {
-        .swiper-slide {
-            margin-right: 10px;;
-        }
+        gap: 10px;
+        display: grid;
+        /* Defines four equal columns */
+        grid-template-columns: repeat(4, 1fr);
     }
 }
 
