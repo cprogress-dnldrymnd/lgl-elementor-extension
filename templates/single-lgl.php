@@ -107,7 +107,7 @@ $hide_interior  = !empty($lgl_options['disable_interior_image']);
                                     <div class="lgl-slider-item-wrap">
                                         <div class="lgl-slider-item">
                                             <div class="lgl-cover-image">
-                                                <?php the_post_thumbnail('full'); ?>
+                                                <?php the_post_thumbnail('medium'); ?>
                                             </div>
                                         </div>
                                     </div>
