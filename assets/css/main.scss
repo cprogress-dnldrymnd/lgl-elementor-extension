@@ -1019,19 +1019,7 @@
             border-radius: 10px;
         }
     }
-    .lgl-slider-nav {
-        --spacing: 10px;
-        margin-left: calc(var(--spacing) - var(--spacing) - var(--spacing));
-        margin-right: calc(var(--spacing) - var(--spacing) - var(--spacing));
-        .lgl-slider-item {
-            padding-left: var(--spacing);
-            padding-right: var(--spacing);
-            display: block;
-        }
-        @media (max-width: 767px) {
-            --spacing: 5px;
-        }
-    }
+   
 }
 
 .lgl-contact-list {
