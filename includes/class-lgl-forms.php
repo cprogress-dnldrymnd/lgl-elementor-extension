@@ -244,9 +244,11 @@ class LGL_Forms
                     $(this).val()==="select"?$r.find(".lgl-fg--opts").show():$r.find(".lgl-fg--opts").hide();
                 });
 
-                // Show/hide custom iframe code field in finance settings
+                // Show/hide custom iframe / AFO fields in finance settings based on the mode
                 $(document).on("change", "#fc_mode", function(){
-                    $(this).val() === "custom" ? $("#row_custom_code").show() : $("#row_custom_code").hide();
+                    var val = $(this).val();
+                    val === "custom" ? $("#row_custom_code").show() : $("#row_custom_code").hide();
+                    val === "afo" ? $(".row_afo_settings").show() : $(".row_afo_settings").hide();
                 });
                 
                 // Add field
@@ -388,6 +390,7 @@ class LGL_Forms
 										<select id="fc_mode" name="mode">
 											<option value="native" <?php selected($s['mode'] ?? 'native', 'native'); ?>><?php _e('On (Use our Finance Calculator)', 'lgl-shortcodes'); ?></option>
 											<option value="custom" <?php selected($s['mode'] ?? '', 'custom'); ?>><?php _e('Custom (Input own iframe/code)', 'lgl-shortcodes'); ?></option>
+											<option value="afo" <?php selected($s['mode'] ?? '', 'afo'); ?>><?php _e('Auto Finance Online (AFO)', 'lgl-shortcodes'); ?></option>
 											<option value="off" <?php selected($s['mode'] ?? '', 'off'); ?>><?php _e('Off (Hide finance buttons entirely)', 'lgl-shortcodes'); ?></option>
 										</select>
 									</td>
@@ -397,6 +400,20 @@ class LGL_Forms
 									<td>
 										<textarea id="fc_custom_code" name="custom_code" rows="5" class="large-text widefat" placeholder="<iframe src='...'></iframe>"><?php echo esc_textarea($s['custom_code'] ?? ''); ?></textarea>
 										<p class="description"><?php _e('Enter your custom iframe or HTML code from your finance provider.', 'lgl-shortcodes'); ?></p>
+									</td>
+								</tr>
+								<tr class="row_afo_settings" style="<?php echo ($s['mode'] ?? '') === 'afo' ? '' : 'display:none;'; ?>">
+									<th><label for="afo_referrer"><?php _e('AFO Referrer', 'lgl-shortcodes'); ?></label></th>
+									<td>
+										<input type="text" id="afo_referrer" name="afo_referrer" value="<?php echo esc_attr($s['afo_referrer'] ?? 'tony-giles-caravans'); ?>" class="regular-text">
+										<p class="description"><?php _e('The referrer code designated for the AFO iframe.', 'lgl-shortcodes'); ?></p>
+									</td>
+								</tr>
+								<tr class="row_afo_settings" style="<?php echo ($s['mode'] ?? '') === 'afo' ? '' : 'display:none;'; ?>">
+									<th><label for="afo_deposit"><?php _e('AFO Default Deposit (£)', 'lgl-shortcodes'); ?></label></th>
+									<td>
+										£ <input type="number" id="afo_deposit" name="afo_deposit" value="<?php echo esc_attr($s['afo_deposit'] ?? '1000'); ?>" step="1" min="0" class="small-text">
+										<p class="description"><?php _e('The default deposit amount embedded into the iframe request.', 'lgl-shortcodes'); ?></p>
 									</td>
 								</tr>
 							</table>
@@ -653,80 +670,80 @@ class LGL_Forms
 	}
 
 	/**
-     * Renders a single field item row inside the builder repeater.
-     * Uses CSS grid structure for rigorous column alignment.
-     * @param int|string $i Current index of the builder loop.
-     * @param array $f Field data.
-     */
-    private function render_field_row($i, $f)
-    {
-        $types = [
-            'text'       => 'Text', 
-            'email'      => 'Email', 
-            'tel'        => 'Phone', 
-            'number'     => 'Number', 
-            'date'       => 'Date', 
-            'time'       => 'Time', 
-            'textarea'   => 'Textarea', 
-            'select'     => 'Select',
-            'acceptance' => 'Acceptance (Checkbox)'
-        ];
-        $cur   = $f['type'] ?? 'text';
-        $opts_style = $cur === 'select' ? '' : 'display:none;';
-    ?>
-        <div class="lgl-field-row" data-i="<?php echo esc_attr($i); ?>">
-            <div class="lgl-field-handle" title="Drag to reorder"><span class="dashicons dashicons-menu"></span></div>
-            <div class="lgl-field-body">
-                
-                <div class="lgl-field-top">
-                    <div class="lgl-fg">
-                        <label><?php _e('Label', 'lgl-shortcodes'); ?></label>
-                        <input type="text" name="fields[<?php echo esc_attr($i); ?>][label]" value="<?php echo esc_attr($f['label'] ?? ''); ?>" placeholder="Label (HTML allowed)" class="lgl-label-inp">
-                    </div>
-                    <div class="lgl-fg">
-                        <label><?php _e('ID / Name', 'lgl-shortcodes'); ?></label>
-                        <input type="text" name="fields[<?php echo esc_attr($i); ?>][id]" value="<?php echo esc_attr($f['id'] ?? ''); ?>" placeholder="auto" class="lgl-id-inp" style="font-family:monospace;">
-                    </div>
-                    <div class="lgl-fg">
-                        <label><?php _e('Type', 'lgl-shortcodes'); ?></label>
-                        <select name="fields[<?php echo esc_attr($i); ?>][type]" class="lgl-type-sel">
-                            <?php foreach ($types as $v => $l) : ?>
-                                <option value="<?php echo esc_attr($v); ?>" <?php selected($cur, $v); ?>><?php echo esc_html($l); ?></option>
-                            <?php endforeach; ?>
-                        </select>
-                    </div>
-                    <div class="lgl-fg">
-                        <label><?php _e('Width', 'lgl-shortcodes'); ?></label>
-                        <select name="fields[<?php echo esc_attr($i); ?>][width]">
-                            <option value="half" <?php selected($f['width'] ?? 'half', 'half'); ?>>Half</option>
-                            <option value="full" <?php selected($f['width'] ?? '', 'full'); ?>>Full</option>
-                        </select>
-                    </div>
-                    <div class="lgl-fg-inline">
-                        <label><input type="checkbox" name="fields[<?php echo esc_attr($i); ?>][required]" value="1" <?php checked(! empty($f['required'])); ?>> <?php _e('Required', 'lgl-shortcodes'); ?></label>
-                    </div>
-                    <div class="lgl-field-actions">
-                        <button type="button" class="lgl-toggle-field" title="Edit Settings"><span class="dashicons dashicons-arrow-down-alt2"></span></button>
-                        <button type="button" class="lgl-clone-field" title="Duplicate Field"><span class="dashicons dashicons-admin-page"></span></button>
-                        <button type="button" class="lgl-rm-field" title="Remove Field"><span class="dashicons dashicons-trash"></span></button>
-                    </div>
-                </div>
+	 * Renders a single field item row inside the builder repeater.
+	 * Uses CSS grid structure for rigorous column alignment.
+	 * @param int|string $i Current index of the builder loop.
+	 * @param array $f Field data.
+	 */
+	private function render_field_row($i, $f)
+	{
+		$types = [
+			'text'       => 'Text',
+			'email'      => 'Email',
+			'tel'        => 'Phone',
+			'number'     => 'Number',
+			'date'       => 'Date',
+			'time'       => 'Time',
+			'textarea'   => 'Textarea',
+			'select'     => 'Select',
+			'acceptance' => 'Acceptance (Checkbox)'
+		];
+		$cur   = $f['type'] ?? 'text';
+		$opts_style = $cur === 'select' ? '' : 'display:none;';
+	?>
+		<div class="lgl-field-row" data-i="<?php echo esc_attr($i); ?>">
+			<div class="lgl-field-handle" title="Drag to reorder"><span class="dashicons dashicons-menu"></span></div>
+			<div class="lgl-field-body">
 
-                <div class="lgl-field-bottom">
-                    <div class="lgl-fg">
-                        <label><?php _e('Placeholder', 'lgl-shortcodes'); ?></label>
-                        <input type="text" name="fields[<?php echo esc_attr($i); ?>][placeholder]" value="<?php echo esc_attr($f['placeholder'] ?? ''); ?>">
-                    </div>
-                    <div class="lgl-fg lgl-fg--opts" style="<?php echo $opts_style; ?>">
-                        <label><?php _e('Options (one per line)', 'lgl-shortcodes'); ?></label>
-                        <textarea name="fields[<?php echo esc_attr($i); ?>][options]" rows="2"><?php echo esc_textarea($f['options'] ?? ''); ?></textarea>
-                    </div>
-                </div>
+				<div class="lgl-field-top">
+					<div class="lgl-fg">
+						<label><?php _e('Label', 'lgl-shortcodes'); ?></label>
+						<input type="text" name="fields[<?php echo esc_attr($i); ?>][label]" value="<?php echo esc_attr($f['label'] ?? ''); ?>" placeholder="Label (HTML allowed)" class="lgl-label-inp">
+					</div>
+					<div class="lgl-fg">
+						<label><?php _e('ID / Name', 'lgl-shortcodes'); ?></label>
+						<input type="text" name="fields[<?php echo esc_attr($i); ?>][id]" value="<?php echo esc_attr($f['id'] ?? ''); ?>" placeholder="auto" class="lgl-id-inp" style="font-family:monospace;">
+					</div>
+					<div class="lgl-fg">
+						<label><?php _e('Type', 'lgl-shortcodes'); ?></label>
+						<select name="fields[<?php echo esc_attr($i); ?>][type]" class="lgl-type-sel">
+							<?php foreach ($types as $v => $l) : ?>
+								<option value="<?php echo esc_attr($v); ?>" <?php selected($cur, $v); ?>><?php echo esc_html($l); ?></option>
+							<?php endforeach; ?>
+						</select>
+					</div>
+					<div class="lgl-fg">
+						<label><?php _e('Width', 'lgl-shortcodes'); ?></label>
+						<select name="fields[<?php echo esc_attr($i); ?>][width]">
+							<option value="half" <?php selected($f['width'] ?? 'half', 'half'); ?>>Half</option>
+							<option value="full" <?php selected($f['width'] ?? '', 'full'); ?>>Full</option>
+						</select>
+					</div>
+					<div class="lgl-fg-inline">
+						<label><input type="checkbox" name="fields[<?php echo esc_attr($i); ?>][required]" value="1" <?php checked(! empty($f['required'])); ?>> <?php _e('Required', 'lgl-shortcodes'); ?></label>
+					</div>
+					<div class="lgl-field-actions">
+						<button type="button" class="lgl-toggle-field" title="Edit Settings"><span class="dashicons dashicons-arrow-down-alt2"></span></button>
+						<button type="button" class="lgl-clone-field" title="Duplicate Field"><span class="dashicons dashicons-admin-page"></span></button>
+						<button type="button" class="lgl-rm-field" title="Remove Field"><span class="dashicons dashicons-trash"></span></button>
+					</div>
+				</div>
 
-            </div>
-        </div>
-    <?php
-    }
+				<div class="lgl-field-bottom">
+					<div class="lgl-fg">
+						<label><?php _e('Placeholder', 'lgl-shortcodes'); ?></label>
+						<input type="text" name="fields[<?php echo esc_attr($i); ?>][placeholder]" value="<?php echo esc_attr($f['placeholder'] ?? ''); ?>">
+					</div>
+					<div class="lgl-fg lgl-fg--opts" style="<?php echo $opts_style; ?>">
+						<label><?php _e('Options (one per line)', 'lgl-shortcodes'); ?></label>
+						<textarea name="fields[<?php echo esc_attr($i); ?>][options]" rows="2"><?php echo esc_textarea($f['options'] ?? ''); ?></textarea>
+					</div>
+				</div>
+
+			</div>
+		</div>
+	<?php
+	}
 
     /* ═══════════════════════════════════════════════════════════════
        SAVE SETTINGS
@@ -740,7 +757,8 @@ class LGL_Forms
 		check_admin_referer('lgl_save_finance_form');
 		if (! current_user_can('manage_options')) wp_die('Unauthorized');
 
-		$mode = in_array($_POST['mode'] ?? '', ['native', 'custom', 'off'], true) ? $_POST['mode'] : 'native';
+		// Add 'afo' to the allowed mode array during validation
+		$mode = in_array($_POST['mode'] ?? '', ['native', 'custom', 'afo', 'off'], true) ? $_POST['mode'] : 'native';
 		$calc = in_array($_POST['calculation_type'] ?? '', ['apr', 'flat'], true) ? $_POST['calculation_type'] : 'apr';
 
 		// Unfiltered HTML cap checks to ensure safe iframe storage
@@ -1186,6 +1204,16 @@ class LGL_Forms
 		$dur_raw   = $fin['term_options'] ?? "24\n36\n48\n60";
 		$durations = array_values(array_filter(array_map('trim', explode("\n", $dur_raw))));
 
+		// Assemble AFO variables natively to construct the iframe URL
+		$afo_referrer = $fin['afo_referrer'] ?? 'tony-giles-caravans';
+		$afo_deposit  = $fin['afo_deposit'] ?? 1000;
+		$afo_url = sprintf(
+			'https://www.autofinanceonline.co.uk/third-party-calculator-large/?default-amount=%d&default-length=10&deposit=%d&referrer=%s',
+			$cash_price,
+			$afo_deposit,
+			urlencode($afo_referrer)
+		);
+
 		wp_localize_script('lgl-forms-js', 'lglForms', [
 			'ajaxUrl'           => admin_url('admin-ajax.php'),
 			'nonce'             => wp_create_nonce('lgl_forms_nonce'),
@@ -1193,6 +1221,10 @@ class LGL_Forms
 			'cashPrice'         => $cash_price,
 			'reserveMode'       => $reserve_mode,
 			'financeMode'       => $fin['mode'] ?? 'native',
+			// Expose the dynamically generated iframe payload to the frontend client
+			'afoIframeHtml'     => sprintf('<iframe id="iframe" width="100%%" src="%s" frameborder="0"></iframe>', esc_url($afo_url)),
+			'afoReferrer'       => $afo_referrer,
+			'afoDeposit'        => (float) $afo_deposit,
 			'isReserved'        => $is_reserved,
 			'reservedBtnText'   => $rs['reserved_button_text'] ?? __('Reserved', 'lgl-shortcodes'),
 			'reserveBtnText'    => $rs['button_text'] ?? __('Reserve Now', 'lgl-shortcodes'),
