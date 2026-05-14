@@ -468,3 +468,11 @@
     width: auto;
     margin: 0 !important;
 }
+
+#lgl-modal-finance.fin-mode-afo{
+	max-width: 1400px
+}
+
+#lgl-modal-finance.fin-mode-afo  .lgl-modal-body{
+    padding: 0;
+}
