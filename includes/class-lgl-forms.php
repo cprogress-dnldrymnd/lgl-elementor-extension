@@ -244,11 +244,12 @@ class LGL_Forms
                     $(this).val()==="select"?$r.find(".lgl-fg--opts").show():$r.find(".lgl-fg--opts").hide();
                 });
 
-                // Show/hide custom iframe / AFO fields in finance settings based on the mode
+                // Show/hide custom iframe / AFO fields and Financial Parameters based on the mode
                 $(document).on("change", "#fc_mode", function(){
                     var val = $(this).val();
                     val === "custom" ? $("#row_custom_code").show() : $("#row_custom_code").hide();
                     val === "afo" ? $(".row_afo_settings").show() : $(".row_afo_settings").hide();
+                    val === "native" ? $("#section_financial_parameters").show() : $("#section_financial_parameters").hide();
                 });
                 
                 // Add field
@@ -436,7 +437,7 @@ class LGL_Forms
 								</tr>
 							</table>
 						</div>
-						<div class="lgl-fbl-section">
+						<div class="lgl-fbl-section" id="section_financial_parameters" style="<?php echo ($s['mode'] ?? 'native') === 'native' ? '' : 'display:none;'; ?>">
 							<h3><?php _e('Financial Parameters', 'lgl-shortcodes'); ?></h3>
 							<table class="form-table" style="margin:0">
 								<tr>
