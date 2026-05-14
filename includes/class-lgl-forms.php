@@ -1206,7 +1206,7 @@ class LGL_Forms
 		$durations = array_values(array_filter(array_map('trim', explode("\n", $dur_raw))));
 
 		// Assemble AFO variables natively to construct the iframe URL
-		$afo_referrer = $fin['afo_referrer'] ?? 'tony-giles-caravans';
+		$afo_referrer = $fin['afo_referrer'] ?? '';
 		$afo_deposit  = $fin['afo_deposit'] ?? 1000;
 		$afo_url = sprintf(
 			'https://www.autofinanceonline.co.uk/third-party-calculator-large/?default-amount=%d&default-length=10&deposit=%d&referrer=%s',
