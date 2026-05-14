@@ -104,8 +104,6 @@ $hide_interior  = !empty($lgl_options['disable_interior_image']);
                                         </div>
                                     <?php } ?>
                                 </div>
-                                <div class="swiper-button-next"></div>
-                                <div class="swiper-button-prev"></div>
                             </div>
 
                             <div class="swiper js-gallery-slider-nav lgl-gallery-slider lgl-slider-nav" style="margin-top: 10px;">
