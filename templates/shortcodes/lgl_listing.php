@@ -18,6 +18,8 @@ if ($post_type) {
     echo $results['html'];
     if ($is_carousel) {
         echo '</div>';
+        echo '<div class="swiper-button-next"></div>';
+        echo '<div class="swiper-button-prev"></div>';
         echo '</div>';
     }
     echo '</div>';
