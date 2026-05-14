@@ -504,7 +504,7 @@ class LGL_Forms
 								</tr>
 							</table>
 						</div>
-					<div class="lgl-fbl-section" id="section_disclaimer" style="<?php echo ($s['mode'] ?? 'native') === 'off' ? 'display:none;' : ''; ?>">
+						<div class="lgl-fbl-section" id="section_disclaimer" style="<?php echo ($s['mode'] ?? 'native') === 'native' ? '' : 'display:none;'; ?>">
 							<h3><?php _e('Disclaimer (Legal / Compliance)', 'lgl-shortcodes'); ?></h3>
 							<textarea name="disclaimer_text" rows="4" class="large-text widefat"><?php echo esc_textarea($s['disclaimer_text'] ?? 'Finance examples are for illustration purposes only. The figures shown are based on assumptions and may not reflect the exact terms you are offered. All finance is subject to status, affordability checks, credit approval and terms & conditions.'); ?></textarea>
 							<p class="description"><?php _e('Must include statements like "Finance subject to status" and "Illustration purposes only" for UK compliance.', 'lgl-shortcodes'); ?></p>
