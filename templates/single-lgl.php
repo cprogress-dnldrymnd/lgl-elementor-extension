@@ -59,7 +59,7 @@ $condition = get_post_meta($post_id, 'condition', true);
 $warranty  = get_post_meta($post_id, 'warranty', true);
 $feature   = get_post_meta($post_id, 'feature', true);
 $sub_title = get_post_meta($post_id, 'sub_title', true);
-$interior_image = get_post_meta($post_id, 'interior_image', true);
+$interior_image = get_post_meta($post_id, '_listing_interior_image_id', true);
 $hide_interior  = !empty($lgl_options['disable_interior_image']);
 ?>
 <main id="lgl-primary" class="lgl-site-main single-lgl">
