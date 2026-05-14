@@ -137,11 +137,11 @@
             e.preventDefault();
 
             const $form = $(this);
-            
+
             // Try to get base URL natively, fallback to hidden input
             let destUrl = $form.find('#lgl_post_type').length ? $form.find('#lgl_post_type').val() : '';
             if (!destUrl) destUrl = $form.find('#lgl_base_archive_url').val();
-            
+
             // Final fallback to prevent dead clicks
             if (!destUrl) destUrl = window.location.pathname;
 
@@ -166,8 +166,8 @@
             // Capture secondary filters dynamically, merging with any existing query
             const params = new URLSearchParams(existingQuery);
             const formData = $form.serializeArray();
-            
-            $.each(formData, function(i, field) {
+
+            $.each(formData, function (i, field) {
                 if (field.value && field.name !== 'post_type' && field.name !== 'listing_make' && field.name !== 'listing_model') {
                     params.append(field.name, field.value);
                 }
@@ -1115,6 +1115,14 @@
         });
         /* Gallery Slider */
         if ($('.js-gallery-slider').length > 0) {
+
+            // ADD THIS BLOCK: Strip lightbox triggers from Slick clones
+            $('.js-gallery-slider-for').on('init', function (event, slick) {
+                $(this).find('.slick-cloned a')
+                    .removeAttr('data-elementor-lightbox-slideshow')
+                    .removeClass('elementor-clickable');
+            });
+            
             $('.js-gallery-slider-for').slick({
                 slidesToShow: 1,
                 slidesToScroll: 1,
