@@ -17,7 +17,9 @@ $year = get_post_meta($post_id, 'year', true);
 $axles = get_post_meta($post_id, 'axles', true);
 $link = get_the_permalink();
 $title = get_the_title();
-$lgl_options = get_option('lgl_settings', array());
+$lgl_options    = get_option('lgl_settings', array()); // (Ensure this is available)
+$interior_image = get_post_meta($post_id, 'interior_image', true);
+$hide_interior  = !empty($lgl_options['disable_interior_image']);
 $disable_wishlist = !empty($lgl_options['disable_wishlist']);
 $disable_compare  = !empty($lgl_options['disable_compare']);
 $reserve_settings  = LGL_Forms::get_reserve_settings();
@@ -60,6 +62,11 @@ $is_reserved       = LGL_Forms::is_reserved($post_id);
                 <h3 class="lgl-post--title">
                     <a href="<?php echo esc_url($link); ?>"><?php echo esc_html($title); ?></a>
                 </h3>
+                <?php if (!empty($interior_image) && !$hide_interior) { ?>
+                    <div class="lgl-post--interior-image">
+                        <?php echo '<img src="' . esc_url(wp_get_attachment_image_url($interior_image, 'medium', false)) . '" alt="Interior Image" />'; ?>
+                    </div>
+                <?php } ?>
             </div>
 
             <?php
