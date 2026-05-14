@@ -1841,16 +1841,7 @@
             width: 20px;
             height: 20px;
         }
-        &.swiper-button-prev {
-            left: var(--offset);
-            @media (max-width: 767px) {
-                left: auto;
-                right: 55px;
-            }
-        }
-        &.swiper-button-next {
-            right: var(--offset);
-        }
+       
         &:hover {
             background-color: var(--lgl-color-secondary);
             color: var(--lgl-color-white);

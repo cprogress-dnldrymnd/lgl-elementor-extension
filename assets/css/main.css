@@ -1452,17 +1452,6 @@
     transition: 400ms;
     width: 20px;
     height: 20px; }
-  .vehicle-slider-holder .swiper-button-next.swiper-button-prev,
-  .vehicle-slider-holder .swiper-button-prev.swiper-button-prev {
-    left: var(--offset); }
-    @media (max-width: 767px) {
-      .vehicle-slider-holder .swiper-button-next.swiper-button-prev,
-      .vehicle-slider-holder .swiper-button-prev.swiper-button-prev {
-        left: auto;
-        right: 55px; } }
-  .vehicle-slider-holder .swiper-button-next.swiper-button-next,
-  .vehicle-slider-holder .swiper-button-prev.swiper-button-next {
-    right: var(--offset); }
   .vehicle-slider-holder .swiper-button-next:hover,
   .vehicle-slider-holder .swiper-button-prev:hover {
     background-color: var(--lgl-color-secondary);
