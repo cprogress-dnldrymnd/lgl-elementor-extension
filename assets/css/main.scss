@@ -1019,12 +1019,13 @@
             border-radius: 10px;
         }
     }
-   
 }
 
 .js-gallery-slider-nav {
-    .swiper {
-        gap: 10px;
+    .swiper:not(.swiper-initialized) {
+        .swiper-wrapper {
+            gap: 10px;
+        }
     }
 }
 
