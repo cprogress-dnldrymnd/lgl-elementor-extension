@@ -959,15 +959,24 @@ if (! class_exists('LGL_Shortcodes')) {
         {
             // Enqueue Select2 dependencies
             wp_enqueue_style('select2', LGL_SHORTCODES_URL . 'assets/libs/select2/select2.min.css');
-            wp_enqueue_style('slick', LGL_SHORTCODES_URL . 'assets/libs/slick/slick.css');
-
+            wp_enqueue_script('select2', LGL_SHORTCODES_URL . 'assets/libs/select2/select2.min.js', array('jquery'), '4.1.0', true);
 
             wp_enqueue_style('choices', LGL_SHORTCODES_URL . 'assets/libs/choices/choices.min.css');
             wp_enqueue_script('choices', LGL_SHORTCODES_URL . 'assets/libs/choices/choices.min.js');
 
-
-            wp_enqueue_script('slick', LGL_SHORTCODES_URL . 'assets/libs/slick/slick.min.js', array('jquery'), '4.1.0', true);
-            wp_enqueue_script('select2', LGL_SHORTCODES_URL . 'assets/libs/select2/select2.min.js', array('jquery'), '4.1.0', true);
+            // Check if Elementor is active by checking its core action hook
+            if (did_action('elementor/loaded')) {
+                // Elementor is active and already registers the 'swiper' handle natively.
+                // We just need to tell WordPress to enqueue it on our pages.
+                wp_enqueue_style('swiper');
+                wp_enqueue_script('swiper');
+                $swiper_handle = 'swiper';
+            } else {
+                // Fallback to CDN if Elementor is deactivated or missing
+                wp_enqueue_style('swiper-fallback', 'https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css');
+                wp_enqueue_script('swiper-fallback', 'https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js', array(), null, true);
+                $swiper_handle = 'swiper-fallback';
+            }
 
             // Enqueue main stylesheet
             wp_enqueue_style(
