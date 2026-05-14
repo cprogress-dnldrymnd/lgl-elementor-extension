@@ -73,63 +73,52 @@ $hide_interior  = !empty($lgl_options['disable_interior_image']);
                             <?php if ($is_reserved) { ?>
                                 <div class="reserved-tag"><?= $reserve_settings['reserved_button_text']  ?></div>
                             <?php } ?>
-                            <div class="lgl-gallery-slider lgl-slider-for js-gallery-slider-for">
-                                <?php if (has_post_thumbnail()) { ?>
-                                    <div class="lgl-slider-item-wrap">
-                                        <a href="<?php echo get_the_post_thumbnail_url() ?>" class="lgl-slider-item elementor-clickable" data-elementor-lightbox-slideshow="lgl-gallery-car">
-                                            <div class="lgl-cover-image">
-                                                <?php the_post_thumbnail('full'); ?>
-                                            </div>
-                                        </a>
-                                    </div>
-                                <?php } ?>
-                                <?php if (!empty($interior_image) && !$hide_interior) { ?>
-                                    <div class="lgl-slider-item-wrap">
-                                        <a href="<?php echo esc_url(wp_get_attachment_image_url($interior_image, 'full', false)) ?>" class="lgl-slider-item elementor-clickable" data-elementor-lightbox-slideshow="lgl-gallery-car">
-                                            <div class="lgl-cover-image">
-                                                <?php echo '<img src="' . esc_url(wp_get_attachment_image_url($interior_image, 'full', false)) . '" alt="Interior Image" />'; ?>
-                                            </div>
-                                        </a>
-                                    </div>
-                                <?php } ?>
-                                <?php foreach ($gallery as $key => $item) { ?>
-                                    <div class="lgl-slider-item-wrap">
-                                        <a href="<?php echo esc_url(wp_get_attachment_image_url($item, 'full', false)) ?>" class="lgl-slider-item elementor-clickable" data-elementor-lightbox-slideshow="lgl-gallery-car">
-                                            <div class="lgl-cover-image">
-                                                <?php echo '<img src="' . esc_url(wp_get_attachment_image_url($item, 'full', false)) . '" alt="' . esc_html(get_the_title($item)) . '" />'; ?>
-                                            </div>
-                                        </a>
-                                    </div>
-                                <?php } ?>
+
+                            <div class="swiper js-gallery-slider-for lgl-gallery-slider lgl-slider-for">
+                                <div class="swiper-wrapper">
+                                    <?php if (has_post_thumbnail()) { ?>
+                                        <div class="swiper-slide lgl-slider-item-wrap">
+                                            <a href="<?php echo get_the_post_thumbnail_url() ?>" class="lgl-slider-item elementor-clickable" data-elementor-lightbox-slideshow="lgl-gallery-car">
+                                                <div class="lgl-cover-image">
+                                                    <?php the_post_thumbnail('full'); ?>
+                                                </div>
+                                            </a>
+                                        </div>
+                                    <?php } ?>
+                                    <?php foreach ($gallery as $key => $item) { ?>
+                                        <div class="swiper-slide lgl-slider-item-wrap">
+                                            <a href="<?php echo esc_url(wp_get_attachment_image_url($item, 'full', false)) ?>" class="lgl-slider-item elementor-clickable" data-elementor-lightbox-slideshow="lgl-gallery-car">
+                                                <div class="lgl-cover-image">
+                                                    <?php echo '<img src="' . esc_url(wp_get_attachment_image_url($item, 'full', false)) . '" alt="' . esc_html(get_the_title($item)) . '" />'; ?>
+                                                </div>
+                                            </a>
+                                        </div>
+                                    <?php } ?>
+                                </div>
+                                <div class="swiper-button-next"></div>
+                                <div class="swiper-button-prev"></div>
                             </div>
-                            <div class="lgl-gallery-slider lgl-slider-nav js-gallery-slider-nav">
-                                <?php if (has_post_thumbnail()) { ?>
-                                    <div class="lgl-slider-item-wrap">
-                                        <div class="lgl-slider-item">
-                                            <div class="lgl-cover-image">
-                                                <?php the_post_thumbnail('medium'); ?>
+
+                            <div class="swiper js-gallery-slider-nav lgl-gallery-slider lgl-slider-nav" style="margin-top: 10px;">
+                                <div class="swiper-wrapper">
+                                    <?php if (has_post_thumbnail()) { ?>
+                                        <div class="swiper-slide lgl-slider-item-wrap">
+                                            <div class="lgl-slider-item">
+                                                <div class="lgl-cover-image">
+                                                    <?php the_post_thumbnail('medium'); ?> </div>
                                             </div>
                                         </div>
-                                    </div>
-                                <?php } ?>
-                                <?php if (!empty($interior_image) && !$hide_interior) { ?>
-                                    <div class="lgl-slider-item-wrap">
-                                        <div class="lgl-slider-item">
-                                            <div class="lgl-cover-image">
-                                                <?php echo '<img src="' . esc_url(wp_get_attachment_image_url($interior_image, 'medium', false)) . '" alt="Interior Image Thumbnail" />'; ?>
+                                    <?php } ?>
+                                    <?php foreach ($gallery as $key => $item) { ?>
+                                        <div class="swiper-slide lgl-slider-item-wrap">
+                                            <div class="lgl-slider-item">
+                                                <div class="lgl-cover-image">
+                                                    <?php echo '<img src="' . esc_url(wp_get_attachment_image_url($item, 'medium', false)) . '" alt="' . esc_html(get_the_title($item)) . '" />'; ?>
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
-                                <?php } ?>
-                                <?php foreach ($gallery as $key => $item) { ?>
-                                    <div class="lgl-slider-item-wrap">
-                                        <div class="lgl-slider-item">
-                                            <div class="lgl-cover-image">
-                                                <?php echo '<img src="' . esc_url(wp_get_attachment_image_url($item, 'medium', false)) . '" alt="' . esc_html(get_the_title($item)) . '" />'; ?>
-                                            </div>
-                                        </div>
-                                    </div>
-                                <?php } ?>
+                                    <?php } ?>
+                                </div>
                             </div>
                         </div>
                     <?php } else { ?>
