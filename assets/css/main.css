@@ -265,7 +265,7 @@
   width: 100%; }
   .lgl-results-wrapper .lgl-filter-results {
     position: relative;
-    min-height: 500px; }
+    min-height: 300px; }
   .lgl-results-wrapper .lgl-topbar {
     display: flex;
     justify-content: space-between;
