@@ -785,8 +785,8 @@
 .js-gallery-slider-nav:not(.swiper-initialized) .swiper-wrapper {
   gap: 10px;
   display: grid;
-  /* Defines four equal columns */
-  grid-template-columns: repeat(4, 1fr); }
+  grid-template-columns: repeat(4, 1fr);
+  grid-auto-flow: column; }
 
 .lgl-contact-list {
   list-style: none;
