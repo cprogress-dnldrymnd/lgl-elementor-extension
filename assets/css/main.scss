@@ -551,6 +551,13 @@
             }
         }
 
+        .lgl-post--interior-image {
+            margin-top: 10px;
+            img {
+                max-height: 85px
+            }
+        }
+
         .lgl-post--title {
             margin: 0;
             line-height: 1;
