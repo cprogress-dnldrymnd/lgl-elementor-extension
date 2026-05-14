@@ -244,11 +244,9 @@ class LGL_Forms
                     $(this).val()==="select"?$r.find(".lgl-fg--opts").show():$r.find(".lgl-fg--opts").hide();
                 });
 
-                // Show/hide custom iframe / AFO fields in finance settings based on the mode
+                // Show/hide custom iframe code field in finance settings
                 $(document).on("change", "#fc_mode", function(){
-                    var val = $(this).val();
-                    val === "custom" ? $("#row_custom_code").show() : $("#row_custom_code").hide();
-                    val === "afo" ? $(".row_afo_settings").show() : $(".row_afo_settings").hide();
+                    $(this).val() === "custom" ? $("#row_custom_code").show() : $("#row_custom_code").hide();
                 });
                 
                 // Add field
@@ -390,7 +388,6 @@ class LGL_Forms
 										<select id="fc_mode" name="mode">
 											<option value="native" <?php selected($s['mode'] ?? 'native', 'native'); ?>><?php _e('On (Use our Finance Calculator)', 'lgl-shortcodes'); ?></option>
 											<option value="custom" <?php selected($s['mode'] ?? '', 'custom'); ?>><?php _e('Custom (Input own iframe/code)', 'lgl-shortcodes'); ?></option>
-											<option value="afo" <?php selected($s['mode'] ?? '', 'afo'); ?>><?php _e('Auto Finance Online (AFO)', 'lgl-shortcodes'); ?></option>
 											<option value="off" <?php selected($s['mode'] ?? '', 'off'); ?>><?php _e('Off (Hide finance buttons entirely)', 'lgl-shortcodes'); ?></option>
 										</select>
 									</td>
@@ -400,20 +397,6 @@ class LGL_Forms
 									<td>
 										<textarea id="fc_custom_code" name="custom_code" rows="5" class="large-text widefat" placeholder="<iframe src='...'></iframe>"><?php echo esc_textarea($s['custom_code'] ?? ''); ?></textarea>
 										<p class="description"><?php _e('Enter your custom iframe or HTML code from your finance provider.', 'lgl-shortcodes'); ?></p>
-									</td>
-								</tr>
-								<tr class="row_afo_settings" style="<?php echo ($s['mode'] ?? '') === 'afo' ? '' : 'display:none;'; ?>">
-									<th><label for="afo_referrer"><?php _e('AFO Referrer', 'lgl-shortcodes'); ?></label></th>
-									<td>
-										<input type="text" id="afo_referrer" name="afo_referrer" value="<?php echo esc_attr($s['afo_referrer'] ?? 'tony-giles-caravans'); ?>" class="regular-text">
-										<p class="description"><?php _e('The referrer code designated for the AFO iframe.', 'lgl-shortcodes'); ?></p>
-									</td>
-								</tr>
-								<tr class="row_afo_settings" style="<?php echo ($s['mode'] ?? '') === 'afo' ? '' : 'display:none;'; ?>">
-									<th><label for="afo_deposit"><?php _e('AFO Default Deposit (£)', 'lgl-shortcodes'); ?></label></th>
-									<td>
-										£ <input type="number" id="afo_deposit" name="afo_deposit" value="<?php echo esc_attr($s['afo_deposit'] ?? '1000'); ?>" step="1" min="0" class="small-text">
-										<p class="description"><?php _e('The default deposit amount embedded into the iframe request.', 'lgl-shortcodes'); ?></p>
 									</td>
 								</tr>
 							</table>
@@ -757,7 +740,7 @@ class LGL_Forms
 		check_admin_referer('lgl_save_finance_form');
 		if (! current_user_can('manage_options')) wp_die('Unauthorized');
 
-		$mode = in_array($_POST['mode'] ?? '', ['native', 'custom', 'afo', 'off'], true) ? $_POST['mode'] : 'native';
+		$mode = in_array($_POST['mode'] ?? '', ['native', 'custom', 'off'], true) ? $_POST['mode'] : 'native';
 		$calc = in_array($_POST['calculation_type'] ?? '', ['apr', 'flat'], true) ? $_POST['calculation_type'] : 'apr';
 
 		// Unfiltered HTML cap checks to ensure safe iframe storage
@@ -766,8 +749,6 @@ class LGL_Forms
 		update_option('lgl_finance_form', [
 			'mode'               => $mode,
 			'custom_code'        => $custom_code,
-			'afo_referrer'       => sanitize_text_field($_POST['afo_referrer']       ?? 'tony-giles-caravans'),
-			'afo_deposit'        => sanitize_text_field($_POST['afo_deposit']        ?? '1000'),
 			'button_text'        => sanitize_text_field($_POST['button_text']        ?? 'Finance Calculator'),
 			'title'              => sanitize_text_field($_POST['title']              ?? ''),
 			'subtitle'           => sanitize_text_field($_POST['subtitle']           ?? ''),
@@ -1189,7 +1170,6 @@ class LGL_Forms
 
 	/**
 	 * Broadcasts internal structured PHP configuration objects exposing payload map configurations arrays out towards frontend client JavaScript maps hooks structures.
-	 * Now injects the dynamically assembled AFO iframe source payload.
 	 */
 	public function localize_forms_data()
 	{
@@ -1206,16 +1186,6 @@ class LGL_Forms
 		$dur_raw   = $fin['term_options'] ?? "24\n36\n48\n60";
 		$durations = array_values(array_filter(array_map('trim', explode("\n", $dur_raw))));
 
-		// Assemble AFO variables natively
-		$afo_referrer = $fin['afo_referrer'] ?? 'tony-giles-caravans';
-		$afo_deposit  = $fin['afo_deposit'] ?? 1000;
-		$afo_url = sprintf(
-			'https://www.autofinanceonline.co.uk/third-party-calculator-large/?default-amount=%d&default-length=10&deposit=%d&referrer=%s',
-			$cash_price,
-			$afo_deposit,
-			urlencode($afo_referrer)
-		);
-
 		wp_localize_script('lgl-forms-js', 'lglForms', [
 			'ajaxUrl'           => admin_url('admin-ajax.php'),
 			'nonce'             => wp_create_nonce('lgl_forms_nonce'),
@@ -1223,9 +1193,6 @@ class LGL_Forms
 			'cashPrice'         => $cash_price,
 			'reserveMode'       => $reserve_mode,
 			'financeMode'       => $fin['mode'] ?? 'native',
-			'afoIframeHtml'     => sprintf('<iframe id="iframe" width="100%%" src="%s" frameborder="0"></iframe>', esc_url($afo_url)),
-			'afoReferrer'       => $afo_referrer,
-			'afoDeposit'        => (float) $afo_deposit,
 			'isReserved'        => $is_reserved,
 			'reservedBtnText'   => $rs['reserved_button_text'] ?? __('Reserved', 'lgl-shortcodes'),
 			'reserveBtnText'    => $rs['button_text'] ?? __('Reserve Now', 'lgl-shortcodes'),
@@ -1468,6 +1435,4 @@ class LGL_Forms
 			],
 		];
 	}
-}
-
 }
