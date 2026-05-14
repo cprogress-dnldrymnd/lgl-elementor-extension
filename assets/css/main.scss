@@ -3004,3 +3004,20 @@ $wt-cols: 110px 1fr 120px 110px 80px 80px 50px;
         }
     }
 }
+
+Add breathing room to Elementor Lightbox toolbar icons */
+.elementor-slideshow__header {
+    padding: 20px !important;
+}
+
+/* Space out the individual icons */
+.elementor-slideshow__header i, 
+.elementor-slideshow__header svg {
+    margin-left: 20px !important;
+    transition: all 0.3s ease;
+}
+
+/* Optional: Bump it down slightly if the WP Admin bar is overlapping */
+.admin-bar .elementor-slideshow__header {
+    top: 32px !important; 
+}
