@@ -1517,6 +1517,54 @@ if (! class_exists('LGL_Shortcodes')) {
         }
 
         /**
+         * Converts any delimited string into a sanitized HTML list (ul or ol).
+         *
+         * This utility function splits a string based on a specified delimiter, 
+         * trims whitespace, escapes the output for security, and ignores empty segments.
+         *
+         * @param string $string    The delimited string to process (e.g., "Item 1, Item 2").
+         * @param string $list_type Optional. The type of HTML list to generate ('ul' or 'ol'). Default 'ul'.
+         * @param string $css_class Optional. CSS class name to apply to the list element. Default empty.
+         * @param string $delimiter Optional. The character(s) separating the items. Default ','.
+         * @return string           The generated HTML string containing the list, or empty if invalid.
+         */
+        public static function render_html_list_from_string($string, $list_type = 'ul', $css_class = '', $delimiter = ',')
+        {
+            // Return early if the input is empty or not a valid string to save processing time.
+            if (empty($string) || ! is_string($string)) {
+                return '';
+            }
+
+            // Strictly validate the list type to prevent HTML injection. Default to 'ul' if anything else is passed.
+            $list_type = (strtolower($list_type) === 'ol') ? 'ol' : 'ul';
+
+            // Explode the string into an array based on the provided delimiter.
+            $items_array = explode($delimiter, $string);
+
+            // Build the class attribute string only if a CSS class is provided.
+            $class_attr = ! empty($css_class) ? sprintf(' class="%s"', esc_attr($css_class)) : '';
+
+            // Initialize the HTML output with the validated list tag and optional class.
+            $html = sprintf('<%s%s>', $list_type, $class_attr);
+
+            // Iterate through the array to process and sanitize each individual item.
+            foreach ($items_array as $item) {
+                // Strip out accidental leading/trailing spaces created by the explode function.
+                $clean_item = trim($item);
+
+                // Ensure we don't render empty <li> tags if the string had consecutive delimiters.
+                if (! empty($clean_item)) {
+                    // Apply esc_html() to secure the output against injection payloads before rendering to the DOM.
+                    $html .= sprintf('<li>%s</li>', esc_html($clean_item));
+                }
+            }
+
+            // Close the list container dynamically.
+            $html .= sprintf('</%s>', $list_type);
+
+            return $html;
+        }
+        /**
          * AJAX handler to fetch top-level taxonomy terms (makes) that have at least one
          * published post of the requested post type.
          * Traverses assigned model terms back to their parent make to build the filtered list.

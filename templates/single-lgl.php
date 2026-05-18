@@ -309,7 +309,7 @@ $hide_interior  = !empty($lgl_options['disable_interior_image']);
                         <div id="lgl_panel_interior" class="lgl-panel-item lgl-panel-interior">
                             <div class="lgl-panel-item--inner">
                                 <h3 class="lgl-title-ss"><span><?php echo esc_html__('Features', 'lgl'); ?></span></h3>
-                                <div class="lgl-content-ss"><?php echo wp_kses_post($feature); ?></div>
+                                <div class="lgl-content-ss"><?php echo LGL_Shortcodes::render_html_list_from_string($feature); ?></div>
                             </div>
                         </div>
                     <?php } ?>
