@@ -61,6 +61,31 @@ $feature   = get_post_meta($post_id, 'feature', true);
 $sub_title = get_post_meta($post_id, 'sub_title', true);
 $interior_image = get_post_meta($post_id, '_listing_interior_image_id', true);
 $hide_interior  = !empty($lgl_options['disable_interior_image']);
+
+/**
+ * Consolidate image IDs (Featured, Interior, Gallery) to prevent duplication.
+ * Removes empty values and ensures a single iteration array for sliders.
+ */
+$all_image_ids = array();
+
+// 1. Fetch and merge Featured Image ID
+$featured_image_id = get_post_thumbnail_id($post_id);
+if ($featured_image_id) {
+    $all_image_ids[] = $featured_image_id;
+}
+
+// 2. Fetch and merge Interior Image ID
+if (!empty($interior_image) && !$hide_interior) {
+    $all_image_ids[] = $interior_image;
+}
+
+// 3. Merge existing gallery IDs
+if (!empty($gallery) && is_array($gallery)) {
+    $all_image_ids = array_merge($all_image_ids, $gallery);
+}
+
+// 4. Sanitize: filter out empty values, enforce unique IDs, and re-index
+$all_image_ids = array_values(array_unique(array_filter($all_image_ids)));
 ?>
 <main id="lgl-primary" class="lgl-site-main single-lgl">
     <div class="lgl-holder">
@@ -68,7 +93,7 @@ $hide_interior  = !empty($lgl_options['disable_interior_image']);
         <article <?php post_class('lgl-post'); ?>>
             <div class="lgl-post--wrap">
                 <div class="lgl-post--main">
-                    <?php if (!empty($gallery)) { ?>
+                    <?php if (count($all_image_ids) > 1) { ?>
                         <div class="lgl-post--gallery js-gallery-slider">
                             <?php if ($is_reserved) { ?>
                                 <div class="reserved-tag"><?= $reserve_settings['reserved_button_text']  ?></div>
@@ -76,29 +101,11 @@ $hide_interior  = !empty($lgl_options['disable_interior_image']);
 
                             <div class="swiper js-gallery-slider-for lgl-gallery-slider lgl-slider-for">
                                 <div class="swiper-wrapper">
-                                    <?php if (has_post_thumbnail()) { ?>
+                                    <?php foreach ($all_image_ids as $image_id) { ?>
                                         <div class="swiper-slide lgl-slider-item-wrap">
-                                            <a href="<?php echo get_the_post_thumbnail_url() ?>" class="lgl-slider-item elementor-clickable" data-elementor-lightbox-slideshow="lgl-gallery-car">
+                                            <a href="<?php echo esc_url(wp_get_attachment_image_url($image_id, 'full', false)); ?>" class="lgl-slider-item elementor-clickable" data-elementor-lightbox-slideshow="lgl-gallery-car">
                                                 <div class="lgl-cover-image">
-                                                    <?php the_post_thumbnail('full'); ?>
-                                                </div>
-                                            </a>
-                                        </div>
-                                    <?php } ?>
-                                    <?php if (!empty($interior_image) && !$hide_interior) { ?>
-                                        <div class="lgl-slider-item-wrap">
-                                            <a href="<?php echo esc_url(wp_get_attachment_image_url($interior_image, 'full', false)) ?>" class="lgl-slider-item elementor-clickable" data-elementor-lightbox-slideshow="lgl-gallery-car">
-                                                <div class="lgl-cover-image">
-                                                    <?php echo '<img src="' . esc_url(wp_get_attachment_image_url($interior_image, 'full', false)) . '" alt="Interior Image" />'; ?>
-                                                </div>
-                                            </a>
-                                        </div>
-                                    <?php } ?>
-                                    <?php foreach ($gallery as $key => $item) { ?>
-                                        <div class="swiper-slide lgl-slider-item-wrap">
-                                            <a href="<?php echo esc_url(wp_get_attachment_image_url($item, 'full', false)) ?>" class="lgl-slider-item elementor-clickable" data-elementor-lightbox-slideshow="lgl-gallery-car">
-                                                <div class="lgl-cover-image">
-                                                    <?php echo '<img src="' . esc_url(wp_get_attachment_image_url($item, 'full', false)) . '" alt="' . esc_html(get_the_title($item)) . '" />'; ?>
+                                                    <?php echo wp_get_attachment_image($image_id, 'full', false, array('alt' => get_the_title($image_id))); ?>
                                                 </div>
                                             </a>
                                         </div>
@@ -108,28 +115,11 @@ $hide_interior  = !empty($lgl_options['disable_interior_image']);
 
                             <div class="swiper js-gallery-slider-nav lgl-gallery-slider lgl-slider-nav" style="margin-top: 10px;">
                                 <div class="swiper-wrapper">
-                                    <?php if (has_post_thumbnail()) { ?>
+                                    <?php foreach ($all_image_ids as $image_id) { ?>
                                         <div class="swiper-slide lgl-slider-item-wrap">
                                             <div class="lgl-slider-item">
                                                 <div class="lgl-cover-image">
-                                                    <?php the_post_thumbnail('medium'); ?> </div>
-                                            </div>
-                                        </div>
-                                    <?php } ?>
-                                    <?php if (!empty($interior_image) && !$hide_interior) { ?>
-                                        <div class="swiper-slide lgl-slider-item-wrap">
-                                            <div class="lgl-slider-item">
-                                                <div class="lgl-cover-image">
-                                                    <?php echo '<img src="' . esc_url(wp_get_attachment_image_url($interior_image, 'medium', false)) . '" alt="Interior Image Thumbnail" />'; ?>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    <?php } ?>
-                                    <?php foreach ($gallery as $key => $item) { ?>
-                                        <div class="swiper-slide lgl-slider-item-wrap">
-                                            <div class="lgl-slider-item">
-                                                <div class="lgl-cover-image">
-                                                    <?php echo '<img src="' . esc_url(wp_get_attachment_image_url($item, 'medium', false)) . '" alt="' . esc_html(get_the_title($item)) . '" />'; ?>
+                                                    <?php echo wp_get_attachment_image($image_id, 'medium', false, array('alt' => get_the_title($image_id))); ?>
                                                 </div>
                                             </div>
                                         </div>
@@ -137,14 +127,21 @@ $hide_interior  = !empty($lgl_options['disable_interior_image']);
                                 </div>
                             </div>
                         </div>
+                    <?php } elseif (count($all_image_ids) === 1) { 
+                        $single_image_id = $all_image_ids[0];    
+                    ?>
+                        <div class="lgl-post--thumbnail">
+                            <?php if ($is_reserved) { ?>
+                                <div class="reserved-tag"><?= $reserve_settings['reserved_button_text']  ?></div>
+                            <?php } ?>
+                            <div class="lgl-cover-image">
+                                <?php echo wp_get_attachment_image($single_image_id, 'full', false, array('alt' => get_the_title($single_image_id))); ?>
+                            </div>
+                        </div>
                     <?php } else { ?>
                         <div class="lgl-post--thumbnail">
                             <div class="lgl-cover-image">
-                                <?php
-                                if (has_post_thumbnail()) {
-                                    the_post_thumbnail('full');
-                                }
-                                ?>
+                                <p><?php echo esc_html__('No images available.', 'lgl'); ?></p>
                             </div>
                         </div>
                     <?php } ?>
@@ -160,7 +157,6 @@ $hide_interior  = !empty($lgl_options['disable_interior_image']);
                                         <?php echo esc_html($condition); ?>
                                     </div>
                                     <div class="lgl-sale-icon-btn">
-                                        <!-- Share -->
                                         <a class="lgl-icon-btn lgl-vehicle-share-btn" href="#" data-url="<?php echo esc_url(get_permalink()); ?>" data-title="<?php echo esc_attr(get_the_title()); ?>">
                                             <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
                                                 <path fill-rule="evenodd" clip-rule="evenodd" d="M16.3739 0.666304C15.4022-0.608175 13.3404 0.0678549 13.3404 1.66094V3.2606C10.1969 3.22339 8.04656 4.30394 6.61418 5.81295C5.08297 7.42608 4.45317 9.44283 4.18925 10.8218C4.0573 11.5112 4.50954 12.0115 4.98483 12.1842C5.43888 12.3492 6.04559 12.2786 6.45048 11.8157C7.59965 10.5022 9.83227 8.669 13.3404 8.78867V10.8391C13.3404 12.4322 15.4022 13.1082 16.3739 11.8337L19.4938 7.74195C20.1678 6.85783 20.1678 5.64217 19.4938 4.75805L16.3739 0.666304ZM6.23436 9.67458C7.73869 8.36175 9.8981 7.12973 13.3404 7.12973H14.1833C14.6487 7.12973 15.0259 7.50086 15.0259 7.95864L15.0258 10.8391L18.1455 6.74732C18.3703 6.45261 18.3703 6.04739 18.1455 5.75268L15.0258 1.66094V4.08948C15.0258 4.54725 14.6485 4.91834 14.1831 4.91834H13.3404C9.54877 4.91834 7.84598 6.94428 7.84598 6.94428C7.06205 7.77015 6.55755 8.75167 6.23436 9.67458Z" />
@@ -198,10 +194,8 @@ $hide_interior  = !empty($lgl_options['disable_interior_image']);
                                 </div>
                             </div>
 
-                            <!-- ── Button Group (now triggers modals) ── -->
                             <div class="lgl-btn-group">
                                 <?php if ('off' !== $fin_mode) : ?>
-                                    <!-- Finance Calculator -->
                                     <button
                                         type="button"
                                         class="lgl-btn lgl-btn-secondary"
@@ -212,7 +206,6 @@ $hide_interior  = !empty($lgl_options['disable_interior_image']);
                                     </button>
                                 <?php endif; ?>
 
-                                <!-- Enquire Now -->
                                 <button
                                     type="button"
                                     class="lgl-btn lgl-btn-accent"
@@ -233,7 +226,6 @@ $hide_interior  = !empty($lgl_options['disable_interior_image']);
 
                             </div>
 
-                            <!-- Contact Information -->
                             <div class="lgl-contact-info">
                                 <h4 class="lgl-contact-title">Contact Information</h4>
                                 <ul class="lgl-contact-list">
@@ -282,7 +274,6 @@ $hide_interior  = !empty($lgl_options['disable_interior_image']);
                 </div>
             </div>
 
-            <!-- Tabs -->
             <div class="lgl-post--tabs lgl-tabs lgl-tabs-js">
                 <div class="lgl-tabs--tbnav">
                     <a href="#lgl_panel_overview" class="lgl-nav-item lgl-is-active"><span><?php echo esc_html__('Key Information', 'lgl'); ?></span></a>
