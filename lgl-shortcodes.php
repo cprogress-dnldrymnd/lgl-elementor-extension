@@ -3058,9 +3058,25 @@ if (! class_exists('LGL_Shortcodes')) {
             $options  = get_option('lgl_settings', array());
             $lgl_cpts = array('caravan', 'motorhome', 'campervan');
 
+            // 1. Fetch available fields (matching Field Visibility logic)
+            $all_fields = array();
+            if (class_exists('LGL_Import_Post_Types')) {
+                $listing_fields = LGL_Import_Post_Types::get_listing_detail_fields();
+                $all_fields = array_merge(
+                    isset($listing_fields['common']) ? $listing_fields['common'] : array(),
+                    isset($listing_fields['motorhome_campervan']) ? $listing_fields['motorhome_campervan'] : array(),
+                    isset($listing_fields['caravan']) ? $listing_fields['caravan'] : array()
+                );
+                // Append taxonomies and price
+                $all_fields['listing-fuel-type'] = __('Fuel Type', 'lgl-shortcodes');
+                $all_fields['listing-chassis']   = __('Chassis', 'lgl-shortcodes');
+                $all_fields['listing-gearbox']   = __('Gearbox', 'lgl-shortcodes');
+                $all_fields['price']             = __('Price', 'lgl-shortcodes');
+            }
+
             echo '<div class="lgl-inner-tabs-wrap" style="margin-top: 15px;">';
 
-            // 1. Render internal tabs for logical partitioning
+            // 2. Render internal tabs for logical partitioning
             echo '<h3 class="nav-tab-wrapper" id="lgl-short-meta-tabs" style="margin-bottom: 20px;">';
             foreach ($lgl_cpts as $index => $cpt) {
                 $active = $index === 0 ? 'nav-tab-active' : '';
@@ -3068,7 +3084,7 @@ if (! class_exists('LGL_Shortcodes')) {
             }
             echo '</h3>';
 
-            // 2. Render Repeater Content Panels
+            // 3. Render Repeater Content Panels
             foreach ($lgl_cpts as $index => $cpt) {
                 $display = $index === 0 ? 'block' : 'none';
                 $saved_meta = isset($options['short_meta_' . $cpt]) ? $options['short_meta_' . $cpt] : array();
@@ -3078,7 +3094,7 @@ if (! class_exists('LGL_Shortcodes')) {
 
                 if (!empty($saved_meta)) {
                     foreach ($saved_meta as $meta) {
-                        $this->render_repeater_row_html($cpt, $meta);
+                        $this->render_repeater_row_html($cpt, $meta, $all_fields);
                     }
                 }
 
@@ -3088,12 +3104,12 @@ if (! class_exists('LGL_Shortcodes')) {
             }
             echo '</div>';
 
-            // 3. Render HTML Template for JS instantiation
+            // 4. Render HTML Template for JS instantiation
             echo '<script type="text/template" id="lgl-repeater-template">';
-            $this->render_repeater_row_html('{{cpt}}', array('meta_key' => '', 'label' => '', 'icon_id' => '', 'icon_url' => ''));
+            $this->render_repeater_row_html('{{cpt}}', array('meta_key' => '', 'icon_id' => '', 'icon_url' => ''), $all_fields);
             echo '</script>';
 
-            // 4. Inject JS logic for Repeater & Tabs
+            // 5. Inject JS logic for Repeater & Tabs
         ?>
             <style>
                 .lgl-repeater-row {
@@ -3141,7 +3157,6 @@ if (! class_exists('LGL_Shortcodes')) {
             </style>
             <script>
                 jQuery(document).ready(function($) {
-                    // Tab routing logic
                     $('#lgl-short-meta-tabs a').on('click', function(e) {
                         e.preventDefault();
                         $('#lgl-short-meta-tabs a').removeClass('nav-tab-active');
@@ -3150,16 +3165,14 @@ if (! class_exists('LGL_Shortcodes')) {
                         $('#sm-tab-' + $(this).data('smtab')).show();
                     });
 
-                    // Initialize sortable
                     $('.lgl-sortable-list').sortable({
                         handle: '.lgl-drag-handle',
                         cursor: 'grabbing'
                     });
 
-                    // Update indexes on sort or DOM mutation
                     function reindexRepeater(cpt) {
                         $('.lgl-sortable-list[data-cpt="' + cpt + '"] .lgl-repeater-row').each(function(index) {
-                            $(this).find('input').each(function() {
+                            $(this).find('input, select').each(function() {
                                 var name = $(this).attr('name');
                                 if (name) {
                                     $(this).attr('name', name.replace(/\[\d+\]/, '[' + index + ']'));
@@ -3168,7 +3181,6 @@ if (! class_exists('LGL_Shortcodes')) {
                         });
                     }
 
-                    // Add Row
                     $('.lgl-add-repeater-row').on('click', function(e) {
                         e.preventDefault();
                         var cpt = $(this).data('cpt');
@@ -3177,16 +3189,18 @@ if (! class_exists('LGL_Shortcodes')) {
                         reindexRepeater(cpt);
                     });
 
-                    // Duplicate Row
                     $(document).on('click', '.lgl-clone-row', function(e) {
                         e.preventDefault();
                         var $row = $(this).closest('.lgl-repeater-row');
                         var $clone = $row.clone();
+                        // Fix select values on clone (jQuery clone bug)
+                        $clone.find('select').each(function(i) {
+                            $(this).val($row.find('select').eq(i).val());
+                        });
                         $row.after($clone);
                         reindexRepeater($row.closest('.lgl-sortable-list').data('cpt'));
                     });
 
-                    // Delete Row
                     $(document).on('click', '.lgl-delete-row', function(e) {
                         e.preventDefault();
                         var $list = $(this).closest('.lgl-sortable-list');
@@ -3194,13 +3208,11 @@ if (! class_exists('LGL_Shortcodes')) {
                         reindexRepeater($list.data('cpt'));
                     });
 
-                    // Collapse/Expand Row
                     $(document).on('click', '.lgl-collapse-row', function(e) {
                         e.preventDefault();
                         $(this).closest('.lgl-repeater-row').find('.lgl-repeater-body').slideToggle();
                     });
 
-                    // SVG Uploader Integration
                     $(document).on('click', '.lgl-upload-svg', function(e) {
                         e.preventDefault();
                         var $btn = $(this);
@@ -3229,20 +3241,18 @@ if (! class_exists('LGL_Shortcodes')) {
 
         /**
          * Output helper for generating a single repeater row.
-         * Used for both initial PHP rendering and JS templating.
          *
          * @param string $cpt The targeted custom post type.
          * @param array $meta Associative array of stored row data.
+         * @param array $available_fields Array of keys/labels for the select dropdown.
          * @return void
          */
-        private function render_repeater_row_html($cpt, $meta)
+        private function render_repeater_row_html($cpt, $meta, $available_fields = array())
         {
             $meta_key = esc_attr($meta['meta_key'] ?? '');
-            $label    = esc_attr($meta['label'] ?? '');
             $icon_id  = esc_attr($meta['icon_id'] ?? '');
             $icon_url = esc_url($meta['icon_url'] ?? '');
 
-            // JS placeholder index. Reindexed via JS `reindexRepeater`
             $base_name = 'lgl_settings[short_meta_' . $cpt . '][0]';
         ?>
             <li class="lgl-repeater-row">
@@ -3253,15 +3263,260 @@ if (! class_exists('LGL_Shortcodes')) {
                 </div>
                 <div class="lgl-repeater-body">
                     <div>
-                        <label>Meta Key</label><br>
-                        <input type="text" name="<?php echo $base_name; ?>[meta_key]" value="<?php echo $meta_key; ?>" />
+                        <label style="font-weight:600; margin-bottom:5px; display:block;">Select Field</label>
+                        <select name="<?php echo $base_name; ?>[meta_key]" style="min-width: 250px;">
+                            <option value="">&mdash; Select a Field &mdash;</option>
+                            <?php foreach ($available_fields as $key => $label) : ?>
+                                <option value="<?php echo esc_attr($key); ?>" <?php selected($meta_key, $key); ?>><?php echo esc_html($label); ?></option>
+                            <?php endforeach; ?>
+                        </select>
                     </div>
                     <div>
-                        <label>Frontend Label</label><br>
-                        <input type="text" name="<?php echo $base_name; ?>[label]" value="<?php echo $label; ?>" />
+                        <label style="font-weight:600; margin-bottom:5px; display:block;">Icon Override</label>
+                        <div style="display: flex; gap: 10px; align-items: center;">
+                            <div class="lgl-icon-preview">
+                                <?php if ($icon_url) echo '<img src="' . $icon_url . '" />'; ?>
+                            </div>
+                            <input type="hidden" name="<?php echo $base_name; ?>[icon_id]" class="icon-id-input" value="<?php echo $icon_id; ?>" />
+                            <input type="hidden" name="<?php echo $base_name; ?>[icon_url]" class="icon-url-input" value="<?php echo $icon_url; ?>" />
+                            <button type="button" class="button lgl-upload-svg">Select SVG</button>
+                        </div>
+                    </div>
+                    <div style="flex-basis: 100%; display: flex; gap: 10px; margin-top: 5px;">
+                        <button type="button" class="button lgl-clone-row">Duplicate</button>
+                        <button type="button" class="button button-link-delete lgl-delete-row">Delete</button>
+                    </div>
+                </div>
+            </li>
+        <?php
+        }
+
+        /**
+         * Renders the tabbed interface and repeater fields for managing Short Meta values.
+         * Features drag-and-drop reordering, row duplication, collapsing, and media uploads.
+         *
+         * @return void
+         */
+        public function render_short_meta_manager()
+        {
+            $options  = get_option('lgl_settings', array());
+            $lgl_cpts = array('caravan', 'motorhome', 'campervan');
+
+            // 1. Fetch available fields (matching Field Visibility logic)
+            $all_fields = array();
+            if (class_exists('LGL_Import_Post_Types')) {
+                $listing_fields = LGL_Import_Post_Types::get_listing_detail_fields();
+                $all_fields = array_merge(
+                    isset($listing_fields['common']) ? $listing_fields['common'] : array(),
+                    isset($listing_fields['motorhome_campervan']) ? $listing_fields['motorhome_campervan'] : array(),
+                    isset($listing_fields['caravan']) ? $listing_fields['caravan'] : array()
+                );
+                // Append taxonomies and price
+                $all_fields['listing-fuel-type'] = __('Fuel Type', 'lgl-shortcodes');
+                $all_fields['listing-chassis']   = __('Chassis', 'lgl-shortcodes');
+                $all_fields['listing-gearbox']   = __('Gearbox', 'lgl-shortcodes');
+                $all_fields['price']             = __('Price', 'lgl-shortcodes');
+            }
+
+            echo '<div class="lgl-inner-tabs-wrap" style="margin-top: 15px;">';
+
+            // 2. Render internal tabs for logical partitioning
+            echo '<h3 class="nav-tab-wrapper" id="lgl-short-meta-tabs" style="margin-bottom: 20px;">';
+            foreach ($lgl_cpts as $index => $cpt) {
+                $active = $index === 0 ? 'nav-tab-active' : '';
+                echo '<a href="#sm-tab-' . esc_attr($cpt) . '" class="nav-tab ' . esc_attr($active) . '" data-smtab="' . esc_attr($cpt) . '">' . esc_html(ucfirst($cpt)) . 's</a>';
+            }
+            echo '</h3>';
+
+            // 3. Render Repeater Content Panels
+            foreach ($lgl_cpts as $index => $cpt) {
+                $display = $index === 0 ? 'block' : 'none';
+                $saved_meta = isset($options['short_meta_' . $cpt]) ? $options['short_meta_' . $cpt] : array();
+
+                echo '<div id="sm-tab-' . esc_attr($cpt) . '" class="lgl-sm-tab-content" style="display: ' . esc_attr($display) . ';">';
+                echo '<ul class="lgl-repeater-list lgl-sortable-list" data-cpt="' . esc_attr($cpt) . '" style="max-width: 800px;">';
+
+                if (!empty($saved_meta)) {
+                    foreach ($saved_meta as $meta) {
+                        $this->render_repeater_row_html($cpt, $meta, $all_fields);
+                    }
+                }
+
+                echo '</ul>';
+                echo '<button type="button" class="button button-primary lgl-add-repeater-row" data-cpt="' . esc_attr($cpt) . '">Add Field</button>';
+                echo '</div>';
+            }
+            echo '</div>';
+
+            // 4. Render HTML Template for JS instantiation
+            echo '<script type="text/template" id="lgl-repeater-template">';
+            $this->render_repeater_row_html('{{cpt}}', array('meta_key' => '', 'icon_id' => '', 'icon_url' => ''), $all_fields);
+            echo '</script>';
+
+            // 5. Inject JS logic for Repeater & Tabs
+        ?>
+            <style>
+                .lgl-repeater-row {
+                    border: 1px solid #ccd0d4;
+                    background: #fff;
+                    margin-bottom: 10px;
+                }
+
+                .lgl-repeater-header {
+                    display: flex;
+                    align-items: center;
+                    padding: 10px 15px;
+                    background: #f9f9f9;
+                    border-bottom: 1px solid #ccd0d4;
+                    cursor: grab;
+                }
+
+                .lgl-repeater-header .title {
+                    flex-grow: 1;
+                    font-weight: 600;
+                    padding-left: 10px;
+                }
+
+                .lgl-repeater-body {
+                    padding: 15px;
+                    display: flex;
+                    gap: 15px;
+                    align-items: center;
+                    flex-wrap: wrap;
+                }
+
+                .lgl-icon-preview {
+                    width: 30px;
+                    height: 30px;
+                    border: 1px dashed #ccc;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                }
+
+                .lgl-icon-preview img {
+                    max-width: 100%;
+                    max-height: 100%;
+                }
+            </style>
+            <script>
+                jQuery(document).ready(function($) {
+                    $('#lgl-short-meta-tabs a').on('click', function(e) {
+                        e.preventDefault();
+                        $('#lgl-short-meta-tabs a').removeClass('nav-tab-active');
+                        $('.lgl-sm-tab-content').hide();
+                        $(this).addClass('nav-tab-active');
+                        $('#sm-tab-' + $(this).data('smtab')).show();
+                    });
+
+                    $('.lgl-sortable-list').sortable({
+                        handle: '.lgl-drag-handle',
+                        cursor: 'grabbing'
+                    });
+
+                    function reindexRepeater(cpt) {
+                        $('.lgl-sortable-list[data-cpt="' + cpt + '"] .lgl-repeater-row').each(function(index) {
+                            $(this).find('input, select').each(function() {
+                                var name = $(this).attr('name');
+                                if (name) {
+                                    $(this).attr('name', name.replace(/\[\d+\]/, '[' + index + ']'));
+                                }
+                            });
+                        });
+                    }
+
+                    $('.lgl-add-repeater-row').on('click', function(e) {
+                        e.preventDefault();
+                        var cpt = $(this).data('cpt');
+                        var template = $('#lgl-repeater-template').html().replace(/{{cpt}}/g, cpt);
+                        $('.lgl-sortable-list[data-cpt="' + cpt + '"]').append(template);
+                        reindexRepeater(cpt);
+                    });
+
+                    $(document).on('click', '.lgl-clone-row', function(e) {
+                        e.preventDefault();
+                        var $row = $(this).closest('.lgl-repeater-row');
+                        var $clone = $row.clone();
+                        // Fix select values on clone (jQuery clone bug)
+                        $clone.find('select').each(function(i) {
+                            $(this).val($row.find('select').eq(i).val());
+                        });
+                        $row.after($clone);
+                        reindexRepeater($row.closest('.lgl-sortable-list').data('cpt'));
+                    });
+
+                    $(document).on('click', '.lgl-delete-row', function(e) {
+                        e.preventDefault();
+                        var $list = $(this).closest('.lgl-sortable-list');
+                        $(this).closest('.lgl-repeater-row').remove();
+                        reindexRepeater($list.data('cpt'));
+                    });
+
+                    $(document).on('click', '.lgl-collapse-row', function(e) {
+                        e.preventDefault();
+                        $(this).closest('.lgl-repeater-row').find('.lgl-repeater-body').slideToggle();
+                    });
+
+                    $(document).on('click', '.lgl-upload-svg', function(e) {
+                        e.preventDefault();
+                        var $btn = $(this);
+                        var $row = $btn.closest('.lgl-repeater-row');
+
+                        var customUploader = wp.media({
+                            title: 'Select SVG Icon',
+                            button: {
+                                text: 'Use this SVG'
+                            },
+                            multiple: false,
+                            library: {
+                                type: 'image/svg+xml'
+                            }
+                        }).on('select', function() {
+                            var attachment = customUploader.state().get('selection').first().toJSON();
+                            $row.find('.icon-id-input').val(attachment.id);
+                            $row.find('.icon-url-input').val(attachment.url);
+                            $row.find('.lgl-icon-preview').html('<img src="' + attachment.url + '" />');
+                        }).open();
+                    });
+                });
+            </script>
+        <?php
+        }
+
+        /**
+         * Output helper for generating a single repeater row.
+         *
+         * @param string $cpt The targeted custom post type.
+         * @param array $meta Associative array of stored row data.
+         * @param array $available_fields Array of keys/labels for the select dropdown.
+         * @return void
+         */
+        private function render_repeater_row_html($cpt, $meta, $available_fields = array())
+        {
+            $meta_key = esc_attr($meta['meta_key'] ?? '');
+            $icon_id  = esc_attr($meta['icon_id'] ?? '');
+            $icon_url = esc_url($meta['icon_url'] ?? '');
+
+            $base_name = 'lgl_settings[short_meta_' . $cpt . '][0]';
+        ?>
+            <li class="lgl-repeater-row">
+                <div class="lgl-repeater-header">
+                    <span class="dashicons dashicons-menu lgl-drag-handle"></span>
+                    <span class="title">Meta Item</span>
+                    <button type="button" class="button-link lgl-collapse-row"><span class="dashicons dashicons-arrow-down-alt2"></span></button>
+                </div>
+                <div class="lgl-repeater-body">
+                    <div>
+                        <label style="font-weight:600; margin-bottom:5px; display:block;">Select Field</label>
+                        <select name="<?php echo $base_name; ?>[meta_key]" style="min-width: 250px;">
+                            <option value="">&mdash; Select a Field &mdash;</option>
+                            <?php foreach ($available_fields as $key => $label) : ?>
+                                <option value="<?php echo esc_attr($key); ?>" <?php selected($meta_key, $key); ?>><?php echo esc_html($label); ?></option>
+                            <?php endforeach; ?>
+                        </select>
                     </div>
                     <div>
-                        <label>Icon</label><br>
+                        <label style="font-weight:600; margin-bottom:5px; display:block;">Icon Override</label>
                         <div style="display: flex; gap: 10px; align-items: center;">
                             <div class="lgl-icon-preview">
                                 <?php if ($icon_url) echo '<img src="' . $icon_url . '" />'; ?>
