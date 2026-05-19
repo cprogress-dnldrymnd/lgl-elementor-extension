@@ -129,9 +129,25 @@ if (! class_exists('LGL_Shortcodes')) {
 
             add_filter('display_post_states', array($this, 'add_lgl_page_states'), 10, 2);
 
+            // Allow SVG uploads in the Media Library
+add_filter('upload_mimes', array($this, 'allow_svg_uploads'));
+
 
             new LGL_Forms();
             new LGL_Email_Builder();
+        }
+
+        /**
+         * Overrides WordPress core restrictions to permit SVG file uploads.
+         * * @param array $mimes Array of natively allowed MIME types.
+         * @return array Modified array including image/svg+xml.
+         */
+        public function allow_svg_uploads($mimes)
+        {
+            // Authorize the SVG file extension and its exact MIME type
+            $mimes['svg'] = 'image/svg+xml';
+
+            return $mimes;
         }
 
         /**
@@ -3046,7 +3062,7 @@ if (! class_exists('LGL_Shortcodes')) {
                 echo '<span class="dashicons dashicons-warning" aria-hidden="true"></span>';
             }
         }
-       /**
+        /**
          * Renders the tabbed interface and repeater fields for managing Meta Summary values.
          * Features drag-and-drop reordering, row duplication, collapsing, and media uploads.
          *
@@ -3074,7 +3090,7 @@ if (! class_exists('LGL_Shortcodes')) {
             }
 
             echo '<div class="lgl-inner-tabs-wrap" style="margin-top: 15px;">';
-            
+
             // 2. Render internal tabs for logical partitioning
             echo '<h3 class="nav-tab-wrapper" id="lgl-meta-summary-tabs" style="margin-bottom: 20px;">';
             foreach ($lgl_cpts as $index => $cpt) {
@@ -3087,10 +3103,10 @@ if (! class_exists('LGL_Shortcodes')) {
             foreach ($lgl_cpts as $index => $cpt) {
                 $display = $index === 0 ? 'block' : 'none';
                 $saved_meta = isset($options['meta_summary_' . $cpt]) ? $options['meta_summary_' . $cpt] : array();
-                
+
                 echo '<div id="ms-tab-' . esc_attr($cpt) . '" class="lgl-ms-tab-content" style="display: ' . esc_attr($display) . ';">';
                 echo '<ul class="lgl-repeater-list lgl-sortable-list" data-cpt="' . esc_attr($cpt) . '" style="max-width: 800px;">';
-                
+
                 if (!empty($saved_meta)) {
                     $row_idx = 0; // Track proper indexes for initial load
                     foreach ($saved_meta as $meta) {
@@ -3098,7 +3114,7 @@ if (! class_exists('LGL_Shortcodes')) {
                         $row_idx++;
                     }
                 }
-                
+
                 echo '</ul>';
                 echo '<button type="button" class="button button-primary lgl-add-repeater-row" data-cpt="' . esc_attr($cpt) . '">Add Field</button>';
                 echo '</div>';
@@ -3111,103 +3127,143 @@ if (! class_exists('LGL_Shortcodes')) {
             echo '</script>';
 
             // 5. Inject JS logic for Repeater & Tabs
-            ?>
+        ?>
             <style>
-                .lgl-repeater-row { border: 1px solid #ccd0d4; background: #fff; margin-bottom: 10px; }
-                .lgl-repeater-header { display: flex; align-items: center; padding: 10px 15px; background: #f9f9f9; border-bottom: 1px solid #ccd0d4; cursor: grab; }
-                .lgl-repeater-header .title { flex-grow: 1; font-weight: 600; padding-left: 10px; }
-                .lgl-repeater-body { padding: 15px; display: flex; gap: 15px; align-items: center; flex-wrap: wrap; }
-                .lgl-icon-preview { width: 30px; height: 30px; border: 1px dashed #ccc; display: flex; align-items: center; justify-content: center; }
-                .lgl-icon-preview img { max-width: 100%; max-height: 100%; }
-            </style>
-            <script>
-            jQuery(document).ready(function($) {
-                $('#lgl-meta-summary-tabs a').on('click', function(e) {
-                    e.preventDefault();
-                    $('#lgl-meta-summary-tabs a').removeClass('nav-tab-active');
-                    $('.lgl-ms-tab-content').hide();
-                    $(this).addClass('nav-tab-active');
-                    $('#ms-tab-' + $(this).data('mstab')).show();
-                });
-
-                function reindexRepeater(cpt) {
-                    $('.lgl-sortable-list[data-cpt="' + cpt + '"] .lgl-repeater-row').each(function(index) {
-                        $(this).find('input, select').each(function() {
-                            var name = $(this).attr('name');
-                            if (name) {
-                                // Explicit regex to strictly target this specific CPT's array index
-                                var regex = new RegExp('\\\[meta_summary_' + cpt + '\\\]\\\[\\d+\\\]');
-                                $(this).attr('name', name.replace(regex, '[meta_summary_' + cpt + '][' + index + ']'));
-                            }
-                        });
-                    });
+                .lgl-repeater-row {
+                    border: 1px solid #ccd0d4;
+                    background: #fff;
+                    margin-bottom: 10px;
                 }
 
-                // Initialize sortable WITH the update callback to reindex on drag-and-drop
-                $('.lgl-sortable-list').sortable({ 
-                    handle: '.lgl-drag-handle', 
-                    cursor: 'grabbing',
-                    update: function(event, ui) {
-                        var cpt = $(this).data('cpt');
-                        reindexRepeater(cpt);
-                    }
-                });
+                .lgl-repeater-header {
+                    display: flex;
+                    align-items: center;
+                    padding: 10px 15px;
+                    background: #f9f9f9;
+                    border-bottom: 1px solid #ccd0d4;
+                    cursor: grab;
+                }
 
-                $('.lgl-add-repeater-row').on('click', function(e) {
-                    e.preventDefault();
-                    var cpt = $(this).data('cpt');
-                    var template = $('#lgl-repeater-template').html().replace(/{{cpt}}/g, cpt);
-                    $('.lgl-sortable-list[data-cpt="' + cpt + '"]').append(template);
-                    reindexRepeater(cpt);
-                });
+                .lgl-repeater-header .title {
+                    flex-grow: 1;
+                    font-weight: 600;
+                    padding-left: 10px;
+                }
 
-                $(document).on('click', '.lgl-clone-row', function(e) {
-                    e.preventDefault();
-                    var $row = $(this).closest('.lgl-repeater-row');
-                    var $clone = $row.clone();
-                    // Fix select values on clone (jQuery clone bug)
-                    $clone.find('select').each(function(i) {
-                        $(this).val($row.find('select').eq(i).val());
+                .lgl-repeater-body {
+                    padding: 15px;
+                    display: flex;
+                    gap: 15px;
+                    align-items: center;
+                    flex-wrap: wrap;
+                }
+
+                .lgl-icon-preview {
+                    width: 30px;
+                    height: 30px;
+                    border: 1px dashed #ccc;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                }
+
+                .lgl-icon-preview img {
+                    max-width: 100%;
+                    max-height: 100%;
+                }
+            </style>
+            <script>
+                jQuery(document).ready(function($) {
+                    $('#lgl-meta-summary-tabs a').on('click', function(e) {
+                        e.preventDefault();
+                        $('#lgl-meta-summary-tabs a').removeClass('nav-tab-active');
+                        $('.lgl-ms-tab-content').hide();
+                        $(this).addClass('nav-tab-active');
+                        $('#ms-tab-' + $(this).data('mstab')).show();
                     });
-                    $row.after($clone);
-                    reindexRepeater($row.closest('.lgl-sortable-list').data('cpt'));
-                });
 
-                $(document).on('click', '.lgl-delete-row', function(e) {
-                    e.preventDefault();
-                    var $list = $(this).closest('.lgl-sortable-list');
-                    $(this).closest('.lgl-repeater-row').remove();
-                    reindexRepeater($list.data('cpt'));
-                });
+                    function reindexRepeater(cpt) {
+                        $('.lgl-sortable-list[data-cpt="' + cpt + '"] .lgl-repeater-row').each(function(index) {
+                            $(this).find('input, select').each(function() {
+                                var name = $(this).attr('name');
+                                if (name) {
+                                    // Explicit regex to strictly target this specific CPT's array index
+                                    var regex = new RegExp('\\\[meta_summary_' + cpt + '\\\]\\\[\\d+\\\]');
+                                    $(this).attr('name', name.replace(regex, '[meta_summary_' + cpt + '][' + index + ']'));
+                                }
+                            });
+                        });
+                    }
 
-                $(document).on('click', '.lgl-collapse-row', function(e) {
-                    e.preventDefault();
-                    $(this).closest('.lgl-repeater-row').find('.lgl-repeater-body').slideToggle();
-                });
+                    // Initialize sortable WITH the update callback to reindex on drag-and-drop
+                    $('.lgl-sortable-list').sortable({
+                        handle: '.lgl-drag-handle',
+                        cursor: 'grabbing',
+                        update: function(event, ui) {
+                            var cpt = $(this).data('cpt');
+                            reindexRepeater(cpt);
+                        }
+                    });
 
-                $(document).on('click', '.lgl-upload-svg', function(e) {
-                    e.preventDefault();
-                    var $btn = $(this);
-                    var $row = $btn.closest('.lgl-repeater-row');
-                    
-                    var customUploader = wp.media({
-                        title: 'Select SVG Icon',
-                        button: { text: 'Use this SVG' },
-                        multiple: false,
-                        library: { type: 'image/svg+xml' } 
-                    }).on('select', function() {
-                        var attachment = customUploader.state().get('selection').first().toJSON();
-                        $row.find('.icon-id-input').val(attachment.id);
-                        $row.find('.icon-url-input').val(attachment.url);
-                        $row.find('.lgl-icon-preview').html('<img src="' + attachment.url + '" />');
-                    }).open();
+                    $('.lgl-add-repeater-row').on('click', function(e) {
+                        e.preventDefault();
+                        var cpt = $(this).data('cpt');
+                        var template = $('#lgl-repeater-template').html().replace(/{{cpt}}/g, cpt);
+                        $('.lgl-sortable-list[data-cpt="' + cpt + '"]').append(template);
+                        reindexRepeater(cpt);
+                    });
+
+                    $(document).on('click', '.lgl-clone-row', function(e) {
+                        e.preventDefault();
+                        var $row = $(this).closest('.lgl-repeater-row');
+                        var $clone = $row.clone();
+                        // Fix select values on clone (jQuery clone bug)
+                        $clone.find('select').each(function(i) {
+                            $(this).val($row.find('select').eq(i).val());
+                        });
+                        $row.after($clone);
+                        reindexRepeater($row.closest('.lgl-sortable-list').data('cpt'));
+                    });
+
+                    $(document).on('click', '.lgl-delete-row', function(e) {
+                        e.preventDefault();
+                        var $list = $(this).closest('.lgl-sortable-list');
+                        $(this).closest('.lgl-repeater-row').remove();
+                        reindexRepeater($list.data('cpt'));
+                    });
+
+                    $(document).on('click', '.lgl-collapse-row', function(e) {
+                        e.preventDefault();
+                        $(this).closest('.lgl-repeater-row').find('.lgl-repeater-body').slideToggle();
+                    });
+
+                    $(document).on('click', '.lgl-upload-svg', function(e) {
+                        e.preventDefault();
+                        var $btn = $(this);
+                        var $row = $btn.closest('.lgl-repeater-row');
+
+                        var customUploader = wp.media({
+                            title: 'Select SVG Icon',
+                            button: {
+                                text: 'Use this SVG'
+                            },
+                            multiple: false,
+                            library: {
+                                type: 'image/svg+xml'
+                            }
+                        }).on('select', function() {
+                            var attachment = customUploader.state().get('selection').first().toJSON();
+                            $row.find('.icon-id-input').val(attachment.id);
+                            $row.find('.icon-url-input').val(attachment.url);
+                            $row.find('.lgl-icon-preview').html('<img src="' + attachment.url + '" />');
+                        }).open();
+                    });
                 });
-            });
             </script>
-            <?php
+        <?php
         }
 
-       /**
+        /**
          * Output helper for generating a single repeater row.
          *
          * @param string $cpt The targeted custom post type.
@@ -3216,14 +3272,15 @@ if (! class_exists('LGL_Shortcodes')) {
          * @param int $index The current array index for input naming.
          * @return void
          */
-        private function render_repeater_row_html($cpt, $meta, $available_fields = array(), $index = 0) {
+        private function render_repeater_row_html($cpt, $meta, $available_fields = array(), $index = 0)
+        {
             $meta_key = esc_attr($meta['meta_key'] ?? '');
             $icon_id  = esc_attr($meta['icon_id'] ?? '');
             $icon_url = esc_url($meta['icon_url'] ?? '');
-            
+
             // Replaced hardcoded '0' with dynamic `$index`
-            $base_name = 'lgl_settings[meta_summary_' . $cpt . '][' . $index . ']'; 
-            ?>
+            $base_name = 'lgl_settings[meta_summary_' . $cpt . '][' . $index . ']';
+        ?>
             <li class="lgl-repeater-row">
                 <div class="lgl-repeater-header">
                     <span class="dashicons dashicons-menu lgl-drag-handle"></span>
@@ -3257,7 +3314,7 @@ if (! class_exists('LGL_Shortcodes')) {
                     </div>
                 </div>
             </li>
-            <?php
+<?php
         }
     }
 
