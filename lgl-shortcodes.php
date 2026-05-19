@@ -538,16 +538,7 @@ if (! class_exists('LGL_Shortcodes')) {
                 );
             }
 
-            // --- TAB 9: Meta Summary Variables ---
-            add_settings_section('lgl_meta_summary_section', 'Meta Summary Layout (Tabs & Repeater)', null, 'lgl-settings-meta-summary');
-
-            add_settings_field(
-                'lgl_meta_summary_manager',
-                'Manage Meta Summary',
-                array($this, 'render_meta_summary_manager'),
-                'lgl-settings-meta-summary',
-                'lgl_meta_summary_section'
-            );
+          
         }
 
         /**
