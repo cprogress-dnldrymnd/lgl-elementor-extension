@@ -8,7 +8,7 @@ $post_type = get_post_type($post_id);
 $options   = get_option('lgl_settings', array());
 
 // Fetch the dynamic layout mapping for this specific CPT
-$short_meta = isset($options['short_meta_' . $post_type]) ? $options['short_meta_' . $post_type] : array();
+$meta_summary = isset($options['meta_summary_' . $post_type]) ? $options['meta_summary_' . $post_type] : array();
 
 // Fetch all possible field labels dynamically to replace the removed 'Frontend Label' setting
 $all_fields = array();
@@ -26,8 +26,8 @@ if (class_exists('LGL_Import_Post_Types')) {
 }
 
 // Establish safe defaults if the user has not configured the repeater yet
-if (empty($short_meta)) {
-    $short_meta = array(
+if (empty($meta_summary)) {
+    $meta_summary = array(
         array('meta_key' => 'berth', 'icon_key' => 'berth'),
         array('meta_key' => 'year',  'icon_key' => 'year'),
         array(
@@ -39,7 +39,7 @@ if (empty($short_meta)) {
 ?>
 <div class="lgl-post--meta">
     <div class="lgl-post--meta-row">
-        <?php foreach ($short_meta as $meta) : 
+        <?php foreach ($meta_summary as $meta) : 
             if (empty($meta['meta_key'])) continue; // Skip unselected rows
 
             // Taxonomies need get_the_terms(), standard meta needs get_post_meta()

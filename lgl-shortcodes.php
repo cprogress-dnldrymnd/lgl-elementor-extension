@@ -539,14 +539,14 @@ if (! class_exists('LGL_Shortcodes')) {
             }
 
             // --- TAB 9: Meta Summary Variables ---
-            add_settings_section('lgl_short_meta_section', 'Meta Summary Layout (Tabs & Repeater)', null, 'lgl-settings-short-meta');
+            add_settings_section('lgl_meta_summary_section', 'Meta Summary Layout (Tabs & Repeater)', null, 'lgl-settings-meta-summary');
 
             add_settings_field(
-                'lgl_short_meta_manager',
+                'lgl_meta_summary_manager',
                 'Manage Meta Summary',
-                array($this, 'render_short_meta_manager'),
-                'lgl-settings-short-meta',
-                'lgl_short_meta_section'
+                array($this, 'render_meta_summary_manager'),
+                'lgl-settings-meta-summary',
+                'lgl_meta_summary_section'
             );
         }
 
@@ -822,7 +822,7 @@ if (! class_exists('LGL_Shortcodes')) {
                     <a href="#lgl-pages" class="nav-tab <?php echo $active_tab == 'lgl-pages' ? 'nav-tab-active' : ''; ?>" data-tab="lgl-pages">LGL Pages</a>
                     <a href="#featured" class="nav-tab <?php echo $active_tab == 'featured' ? 'nav-tab-active' : ''; ?>" data-tab="featured">Featured Vehicles</a>
                     <a href="#search-filters" class="nav-tab <?php echo $active_tab == 'search-filters' ? 'nav-tab-active' : ''; ?>" data-tab="search-filters">Search Filters</a>
-                    <a href="#short-meta" class="nav-tab <?php echo $active_tab == 'short-meta' ? 'nav-tab-active' : ''; ?>" data-tab="short-meta">Meta Summary</a>
+                    <a href="#meta-summary" class="nav-tab <?php echo $active_tab == 'meta-summary' ? 'nav-tab-active' : ''; ?>" data-tab="meta-summary">Meta Summary</a>
                 </h2>
 
                 <form method="post" action="options.php">
@@ -863,8 +863,8 @@ if (! class_exists('LGL_Shortcodes')) {
                     <div id="tab-search-filters" class="lgl-tab-content" <?php echo $active_tab == 'search-filters' ? '' : 'style="display:none;"'; ?>>
                         <?php do_settings_sections('lgl-settings-search-filters'); ?>
                     </div>
-                    <div id="tab-short-meta" class="lgl-tab-content" <?php echo $active_tab == 'short-meta' ? '' : 'style="display:none;"'; ?>>
-                        <?php do_settings_sections('lgl-settings-short-meta'); ?>
+                    <div id="tab-meta-summary" class="lgl-tab-content" <?php echo $active_tab == 'meta-summary' ? '' : 'style="display:none;"'; ?>>
+                        <?php do_settings_sections('lgl-settings-meta-summary'); ?>
                     </div>
 
                     <?php submit_button(); ?>
@@ -3053,7 +3053,7 @@ if (! class_exists('LGL_Shortcodes')) {
          *
          * @return void
          */
-        public function render_short_meta_manager()
+        public function render_meta_summary_manager()
         {
             $options  = get_option('lgl_settings', array());
             $lgl_cpts = array('caravan', 'motorhome', 'campervan');
@@ -3077,7 +3077,7 @@ if (! class_exists('LGL_Shortcodes')) {
             echo '<div class="lgl-inner-tabs-wrap" style="margin-top: 15px;">';
 
             // 2. Render internal tabs for logical partitioning
-            echo '<h3 class="nav-tab-wrapper" id="lgl-short-meta-tabs" style="margin-bottom: 20px;">';
+            echo '<h3 class="nav-tab-wrapper" id="lgl-meta-summary-tabs" style="margin-bottom: 20px;">';
             foreach ($lgl_cpts as $index => $cpt) {
                 $active = $index === 0 ? 'nav-tab-active' : '';
                 echo '<a href="#sm-tab-' . esc_attr($cpt) . '" class="nav-tab ' . esc_attr($active) . '" data-smtab="' . esc_attr($cpt) . '">' . esc_html(ucfirst($cpt)) . 's</a>';
@@ -3087,7 +3087,7 @@ if (! class_exists('LGL_Shortcodes')) {
             // 3. Render Repeater Content Panels
             foreach ($lgl_cpts as $index => $cpt) {
                 $display = $index === 0 ? 'block' : 'none';
-                $saved_meta = isset($options['short_meta_' . $cpt]) ? $options['short_meta_' . $cpt] : array();
+                $saved_meta = isset($options['meta_summary_' . $cpt]) ? $options['meta_summary_' . $cpt] : array();
 
                 echo '<div id="sm-tab-' . esc_attr($cpt) . '" class="lgl-sm-tab-content" style="display: ' . esc_attr($display) . ';">';
                 echo '<ul class="lgl-repeater-list lgl-sortable-list" data-cpt="' . esc_attr($cpt) . '" style="max-width: 800px;">';
@@ -3157,9 +3157,9 @@ if (! class_exists('LGL_Shortcodes')) {
             </style>
             <script>
                 jQuery(document).ready(function($) {
-                    $('#lgl-short-meta-tabs a').on('click', function(e) {
+                    $('#lgl-meta-summary-tabs a').on('click', function(e) {
                         e.preventDefault();
-                        $('#lgl-short-meta-tabs a').removeClass('nav-tab-active');
+                        $('#lgl-meta-summary-tabs a').removeClass('nav-tab-active');
                         $('.lgl-sm-tab-content').hide();
                         $(this).addClass('nav-tab-active');
                         $('#sm-tab-' + $(this).data('smtab')).show();
@@ -3253,7 +3253,7 @@ if (! class_exists('LGL_Shortcodes')) {
             $icon_id  = esc_attr($meta['icon_id'] ?? '');
             $icon_url = esc_url($meta['icon_url'] ?? '');
 
-            $base_name = 'lgl_settings[short_meta_' . $cpt . '][0]';
+            $base_name = 'lgl_settings[meta_summary_' . $cpt . '][0]';
         ?>
             <li class="lgl-repeater-row">
                 <div class="lgl-repeater-header">
@@ -3297,7 +3297,7 @@ if (! class_exists('LGL_Shortcodes')) {
          *
          * @return void
          */
-        public function render_short_meta_manager()
+        public function render_meta_summary_manager()
         {
             $options  = get_option('lgl_settings', array());
             $lgl_cpts = array('caravan', 'motorhome', 'campervan');
@@ -3321,7 +3321,7 @@ if (! class_exists('LGL_Shortcodes')) {
             echo '<div class="lgl-inner-tabs-wrap" style="margin-top: 15px;">';
 
             // 2. Render internal tabs for logical partitioning
-            echo '<h3 class="nav-tab-wrapper" id="lgl-short-meta-tabs" style="margin-bottom: 20px;">';
+            echo '<h3 class="nav-tab-wrapper" id="lgl-meta-summary-tabs" style="margin-bottom: 20px;">';
             foreach ($lgl_cpts as $index => $cpt) {
                 $active = $index === 0 ? 'nav-tab-active' : '';
                 echo '<a href="#sm-tab-' . esc_attr($cpt) . '" class="nav-tab ' . esc_attr($active) . '" data-smtab="' . esc_attr($cpt) . '">' . esc_html(ucfirst($cpt)) . 's</a>';
@@ -3331,7 +3331,7 @@ if (! class_exists('LGL_Shortcodes')) {
             // 3. Render Repeater Content Panels
             foreach ($lgl_cpts as $index => $cpt) {
                 $display = $index === 0 ? 'block' : 'none';
-                $saved_meta = isset($options['short_meta_' . $cpt]) ? $options['short_meta_' . $cpt] : array();
+                $saved_meta = isset($options['meta_summary_' . $cpt]) ? $options['meta_summary_' . $cpt] : array();
 
                 echo '<div id="sm-tab-' . esc_attr($cpt) . '" class="lgl-sm-tab-content" style="display: ' . esc_attr($display) . ';">';
                 echo '<ul class="lgl-repeater-list lgl-sortable-list" data-cpt="' . esc_attr($cpt) . '" style="max-width: 800px;">';
@@ -3401,9 +3401,9 @@ if (! class_exists('LGL_Shortcodes')) {
             </style>
             <script>
                 jQuery(document).ready(function($) {
-                    $('#lgl-short-meta-tabs a').on('click', function(e) {
+                    $('#lgl-meta-summary-tabs a').on('click', function(e) {
                         e.preventDefault();
-                        $('#lgl-short-meta-tabs a').removeClass('nav-tab-active');
+                        $('#lgl-meta-summary-tabs a').removeClass('nav-tab-active');
                         $('.lgl-sm-tab-content').hide();
                         $(this).addClass('nav-tab-active');
                         $('#sm-tab-' + $(this).data('smtab')).show();
@@ -3497,7 +3497,7 @@ if (! class_exists('LGL_Shortcodes')) {
             $icon_id  = esc_attr($meta['icon_id'] ?? '');
             $icon_url = esc_url($meta['icon_url'] ?? '');
 
-            $base_name = 'lgl_settings[short_meta_' . $cpt . '][0]';
+            $base_name = 'lgl_settings[meta_summary_' . $cpt . '][0]';
         ?>
             <li class="lgl-repeater-row">
                 <div class="lgl-repeater-header">
