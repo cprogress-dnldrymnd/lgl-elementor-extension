@@ -130,7 +130,7 @@ if (! class_exists('LGL_Shortcodes')) {
             add_filter('display_post_states', array($this, 'add_lgl_page_states'), 10, 2);
 
             // Allow SVG uploads in the Media Library
-add_filter('upload_mimes', array($this, 'allow_svg_uploads'));
+            add_filter('upload_mimes', array($this, 'allow_svg_uploads'));
 
 
             new LGL_Forms();
@@ -1067,6 +1067,9 @@ add_filter('upload_mimes', array($this, 'allow_svg_uploads'));
             add_shortcode('lgl_mini_account', array($this, 'render_shortcode'));
             add_shortcode('lgl_breadcrumbs', array($this, 'render_shortcode'));
             add_shortcode('lgl_type_tabs', array($this, 'render_shortcode'));
+            add_shortcode('lgl_finance_form', array($this, 'render_shortcode'));
+            add_shortcode('lgl_enquiry_form', array($this, 'render_shortcode'));
+            add_shortcode('lgl_reserve_form', array($this, 'render_shortcode'));
         }
 
         /**
@@ -1108,6 +1111,10 @@ add_filter('upload_mimes', array($this, 'allow_svg_uploads'));
             }
 
             $attributes = shortcode_atts($attributes_arr, $atts, $shortcode_tag);
+
+            if (in_array($shortcode_tag, ['lgl_finance_form', 'lgl_enquiry_form', 'lgl_reserve_form'])) {
+                $attributes_arr['post_id'] = 0;
+            }
 
             // Hand over execution to the template loader
             return $this->load_template($shortcode_tag, $attributes, $content);

@@ -545,3 +545,133 @@ class LGL_Widget_Mini_Wishlist extends \Elementor\Widget_Base
         echo do_shortcode('[lgl_mini_wishlist]');
     }
 }
+
+/* ==========================================================================
+   7. Form Widgets (Finance, Enquiry, Reserve)
+   ========================================================================== */
+
+class LGL_Widget_Finance_Form extends \Elementor\Widget_Base
+{
+    public function get_name()
+    {
+        return 'lgl_finance_form_widget';
+    }
+    public function get_title()
+    {
+        return __('Finance Calculator Form', 'lgl-shortcodes');
+    }
+    public function get_icon()
+    {
+        return 'eicon-calculator';
+    }
+    public function get_categories()
+    {
+        return ['lgl-elements'];
+    }
+    public function get_keywords()
+    {
+        return ['lgl', 'finance', 'calculator', 'form', 'credit'];
+    }
+
+    protected function register_controls()
+    {
+        $this->start_controls_section('content_section', ['label' => __('Form Settings', 'lgl-shortcodes'), 'tab' => \Elementor\Controls_Manager::TAB_CONTENT]);
+        $this->add_control('attr_post_id', [
+            'label' => __('Vehicle ID (Optional)', 'lgl-shortcodes'),
+            'type' => \Elementor\Controls_Manager::NUMBER,
+            'description' => 'Leave blank to auto-detect the current vehicle. Enter an ID to lock this form to a specific vehicle.',
+        ]);
+        $this->end_controls_section();
+    }
+
+    protected function render()
+    {
+        $settings = $this->get_settings_for_display();
+        $atts = !empty($settings['attr_post_id']) ? ' post_id="' . esc_attr($settings['attr_post_id']) . '"' : '';
+        echo do_shortcode('[lgl_finance_form' . $atts . ']');
+    }
+}
+
+class LGL_Widget_Enquiry_Form extends \Elementor\Widget_Base
+{
+    public function get_name()
+    {
+        return 'lgl_enquiry_form_widget';
+    }
+    public function get_title()
+    {
+        return __('Enquiry Form', 'lgl-shortcodes');
+    }
+    public function get_icon()
+    {
+        return 'eicon-envelope';
+    }
+    public function get_categories()
+    {
+        return ['lgl-elements'];
+    }
+    public function get_keywords()
+    {
+        return ['lgl', 'enquiry', 'contact', 'form', 'message'];
+    }
+
+    protected function register_controls()
+    {
+        $this->start_controls_section('content_section', ['label' => __('Form Settings', 'lgl-shortcodes'), 'tab' => \Elementor\Controls_Manager::TAB_CONTENT]);
+        $this->add_control('attr_post_id', [
+            'label' => __('Vehicle ID (Optional)', 'lgl-shortcodes'),
+            'type' => \Elementor\Controls_Manager::NUMBER,
+            'description' => 'Leave blank to auto-detect the current vehicle. Enter an ID to lock this form to a specific vehicle.',
+        ]);
+        $this->end_controls_section();
+    }
+
+    protected function render()
+    {
+        $settings = $this->get_settings_for_display();
+        $atts = !empty($settings['attr_post_id']) ? ' post_id="' . esc_attr($settings['attr_post_id']) . '"' : '';
+        echo do_shortcode('[lgl_enquiry_form' . $atts . ']');
+    }
+}
+
+class LGL_Widget_Reserve_Form extends \Elementor\Widget_Base
+{
+    public function get_name()
+    {
+        return 'lgl_reserve_form_widget';
+    }
+    public function get_title()
+    {
+        return __('Reserve Form', 'lgl-shortcodes');
+    }
+    public function get_icon()
+    {
+        return 'eicon-calendar-check';
+    }
+    public function get_categories()
+    {
+        return ['lgl-elements'];
+    }
+    public function get_keywords()
+    {
+        return ['lgl', 'reserve', 'booking', 'form', 'deposit'];
+    }
+
+    protected function register_controls()
+    {
+        $this->start_controls_section('content_section', ['label' => __('Form Settings', 'lgl-shortcodes'), 'tab' => \Elementor\Controls_Manager::TAB_CONTENT]);
+        $this->add_control('attr_post_id', [
+            'label' => __('Vehicle ID (Optional)', 'lgl-shortcodes'),
+            'type' => \Elementor\Controls_Manager::NUMBER,
+            'description' => 'Leave blank to auto-detect the current vehicle. Enter an ID to lock this form to a specific vehicle.',
+        ]);
+        $this->end_controls_section();
+    }
+
+    protected function render()
+    {
+        $settings = $this->get_settings_for_display();
+        $atts = !empty($settings['attr_post_id']) ? ' post_id="' . esc_attr($settings['attr_post_id']) . '"' : '';
+        echo do_shortcode('[lgl_reserve_form' . $atts . ']');
+    }
+}
