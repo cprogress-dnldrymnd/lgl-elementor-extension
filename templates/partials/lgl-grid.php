@@ -70,7 +70,7 @@ $is_reserved       = LGL_Forms::is_reserved($post_id);
             </div>
 
             <?php
-            include LGL_SHORTCODES_PATH . 'templates/partials/lgl-meta-short.php';
+            include LGL_SHORTCODES_PATH . 'templates/partials/lgl-meta-summary.php';
             ?>
 
             <?php if ($style == 'style-1') { ?>

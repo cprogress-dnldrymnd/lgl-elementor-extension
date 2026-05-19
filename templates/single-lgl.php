@@ -188,7 +188,7 @@ $all_image_ids = array_values(array_unique(array_filter($all_image_ids)));
                             </div>
 
                             <div class="lgl-sale-meta-bottom">
-                                <?php include LGL_SHORTCODES_PATH . 'templates/partials/lgl-meta-short.php'; ?>
+                                <?php include LGL_SHORTCODES_PATH . 'templates/partials/lgl-meta-summary.php'; ?>
                                 <div class="lgl-post--part-exchange">
                                     <a href="#"><?php echo esc_html__('Part-exchange available', 'lgl'); ?></a>
                                 </div>

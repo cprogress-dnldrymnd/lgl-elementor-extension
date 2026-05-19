@@ -538,12 +538,12 @@ if (! class_exists('LGL_Shortcodes')) {
                 );
             }
 
-            // --- TAB 9: Short Meta Variables ---
-            add_settings_section('lgl_short_meta_section', 'Short Meta Layout (Tabs & Repeater)', null, 'lgl-settings-short-meta');
+            // --- TAB 9: Meta Summary Variables ---
+            add_settings_section('lgl_short_meta_section', 'Meta Summary Layout (Tabs & Repeater)', null, 'lgl-settings-short-meta');
 
             add_settings_field(
                 'lgl_short_meta_manager',
-                'Manage Short Meta',
+                'Manage Meta Summary',
                 array($this, 'render_short_meta_manager'),
                 'lgl-settings-short-meta',
                 'lgl_short_meta_section'
@@ -822,7 +822,7 @@ if (! class_exists('LGL_Shortcodes')) {
                     <a href="#lgl-pages" class="nav-tab <?php echo $active_tab == 'lgl-pages' ? 'nav-tab-active' : ''; ?>" data-tab="lgl-pages">LGL Pages</a>
                     <a href="#featured" class="nav-tab <?php echo $active_tab == 'featured' ? 'nav-tab-active' : ''; ?>" data-tab="featured">Featured Vehicles</a>
                     <a href="#search-filters" class="nav-tab <?php echo $active_tab == 'search-filters' ? 'nav-tab-active' : ''; ?>" data-tab="search-filters">Search Filters</a>
-                    <a href="#short-meta" class="nav-tab <?php echo $active_tab == 'short-meta' ? 'nav-tab-active' : ''; ?>" data-tab="short-meta">Short Meta</a>
+                    <a href="#short-meta" class="nav-tab <?php echo $active_tab == 'short-meta' ? 'nav-tab-active' : ''; ?>" data-tab="short-meta">Meta Summary</a>
                 </h2>
 
                 <form method="post" action="options.php">
@@ -3048,7 +3048,7 @@ if (! class_exists('LGL_Shortcodes')) {
         }
 
         /**
-         * Renders the tabbed interface and repeater fields for managing Short Meta values.
+         * Renders the tabbed interface and repeater fields for managing Meta Summary values.
          * Features drag-and-drop reordering, row duplication, collapsing, and media uploads.
          *
          * @return void
@@ -3292,7 +3292,7 @@ if (! class_exists('LGL_Shortcodes')) {
         }
 
         /**
-         * Renders the tabbed interface and repeater fields for managing Short Meta values.
+         * Renders the tabbed interface and repeater fields for managing Meta Summary values.
          * Features drag-and-drop reordering, row duplication, collapsing, and media uploads.
          *
          * @return void
