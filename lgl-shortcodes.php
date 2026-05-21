@@ -528,31 +528,13 @@ if (! class_exists('LGL_Shortcodes')) {
             // --- TAB 8: Search Filters ---
             add_settings_section('lgl_search_filters_section', 'Search Filter Layout per Post Type (Drag to reorder, check to hide. Make and Model are fixed.)', null, 'lgl-settings-search-filters');
 
-            $lgl_cpts = array('caravan', 'motorhome', 'campervan');
-
-            // Fetch the lgl_pages option to check which vehicles are disabled
-            $lgl_pages_settings = get_option('lgl_pages', array());
-
-            foreach ($lgl_cpts as $cpt) {
-
-                // Check if this specific post type is disabled.
-                // Note: Depending on how your lgl_pages array is structured, the key might be 'disable_caravan' or 'caravan_disable'. 
-                // This checks both common patterns to be safe!
-                $is_disabled = !empty($lgl_pages_settings['disable_' . $cpt]) || !empty($lgl_pages_settings[$cpt . '_disable']);
-
-                if ($is_disabled) {
-                    continue; // Skip rendering the drag-and-drop builder for this post type
-                }
-
-                add_settings_field(
-                    'search_manager_' . $cpt,
-                    ucfirst($cpt) . ' Filters',
-                    array($this, 'render_search_filter_manager'),
-                    'lgl-settings-search-filters',
-                    'lgl_search_filters_section',
-                    array('post_type' => $cpt)
-                );
-            }
+            add_settings_field(
+                'search_manager_all',
+                'Manage Search Filters',
+                array($this, 'render_search_filter_manager'),
+                'lgl-settings-search-filters',
+                'lgl_search_filters_section'
+            );
 
             // --- TAB 9: Meta Summary Variables ---
             add_settings_section('lgl_meta_summary_section', 'Meta Summary Layout (Tabs & Repeater)', null, 'lgl-settings-meta-summary');
@@ -568,10 +550,6 @@ if (! class_exists('LGL_Shortcodes')) {
 
         /**
          * Renders the drag-and-drop sortable list for managing field visibility, order, and overrides.
-         * Separates visible and hidden fields, auto-moving hidden fields to the bottom.
-         * Includes image uploader with reset functionality for SVG overrides.
-         *
-         * @return void
          */
         public function render_field_manager()
         {
@@ -584,14 +562,12 @@ if (! class_exists('LGL_Shortcodes')) {
 
             $listing_fields = LGL_Import_Post_Types::get_listing_detail_fields();
 
-            // Compile all possible fields
             $all_fields = array_merge(
                 isset($listing_fields['common']) ? $listing_fields['common'] : array(),
                 isset($listing_fields['motorhome_campervan']) ? $listing_fields['motorhome_campervan'] : array(),
                 isset($listing_fields['caravan']) ? $listing_fields['caravan'] : array()
             );
 
-            // Append explicitly used taxonomies
             $all_fields['listing-fuel-type'] = __('Fuel Type', 'lgl-shortcodes');
             $all_fields['listing-chassis']   = __('Chassis', 'lgl-shortcodes');
             $all_fields['listing-gearbox']   = __('Gearbox', 'lgl-shortcodes');
@@ -621,7 +597,6 @@ if (! class_exists('LGL_Shortcodes')) {
                 $is_hidden = !empty($options['hide_field_' . $key]);
                 $checked   = $is_hidden ? 'checked="checked"' : '';
 
-                // Fetch Overrides
                 $saved_label = isset($options['label_override_' . $key]) ? $options['label_override_' . $key] : '';
                 $icon_id     = isset($options['icon_id_' . $key]) ? $options['icon_id_' . $key] : '';
                 $icon_url    = isset($options['icon_url_' . $key]) ? $options['icon_url_' . $key] : '';
@@ -644,7 +619,11 @@ if (! class_exists('LGL_Shortcodes')) {
                             <label style="cursor: pointer; color: #50575e; display: flex; align-items: center; font-weight: 500;">
                                 <input type="checkbox" class="lgl-hide-toggle" name="lgl_settings[hide_field_<?php echo esc_attr($key); ?>]" value="1" <?php echo $checked; ?> style="margin-right: 6px;" /> Hide
                             </label>
-                            <button type="button" class="button-link lgl-collapse-row" style="padding: 0;"><span class="dashicons dashicons-arrow-down-alt2"></span></button>
+                            <button type="button" class="button-link lgl-collapse-row" style="padding: 4px; outline: none;">
+                                <svg class="lgl-chevron" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#50575e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="transition: transform 0.2s ease;">
+                                    <polyline points="6 9 12 15 18 9"></polyline>
+                                </svg>
+                            </button>
                         </div>
                     </div>
 
@@ -683,11 +662,14 @@ if (! class_exists('LGL_Shortcodes')) {
                     background: #fff;
                     margin-bottom: 10px;
                     transition: opacity 0.2s;
+                    border-radius: 4px;
+                    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
                 }
 
                 .lgl-repeater-header {
-                    padding: 10px 15px;
+                    padding: 12px 16px;
                     background: #fff;
+                    border-radius: 4px;
                 }
 
                 .lgl-repeater-body {
@@ -759,6 +741,20 @@ if (! class_exists('LGL_Shortcodes')) {
                         $sortableList.sortable("refresh");
                     });
 
+                    // Handle Collapse Toggle with chevron rotation
+                    $(document).on("click", ".lgl-collapse-row", function(e) {
+                        e.preventDefault();
+                        var $btn = $(this);
+                        var $body = $btn.closest(".lgl-repeater-row").find(".lgl-repeater-body");
+                        $body.slideToggle(200, function() {
+                            if ($body.is(":visible")) {
+                                $btn.find(".lgl-chevron").css("transform", "rotate(180deg)");
+                            } else {
+                                $btn.find(".lgl-chevron").css("transform", "rotate(0deg)");
+                            }
+                        });
+                    });
+
                     // Handle SVG Override Upload
                     $sortableList.on("click", ".lgl-fv-upload-svg", function(e) {
                         e.preventDefault();
@@ -779,7 +775,6 @@ if (! class_exists('LGL_Shortcodes')) {
                             $row.find('.icon-id-input').val(attachment.id);
                             $row.find('.icon-url-input').val(attachment.url);
 
-                            // Toggle preview UI
                             $row.find('.custom-icon-img').attr('src', attachment.url).show();
                             $row.find('.default-icon-svg').hide();
                             $row.find('.lgl-fv-remove-svg').show();
@@ -791,11 +786,9 @@ if (! class_exists('LGL_Shortcodes')) {
                         e.preventDefault();
                         var $row = $(this).closest(".lgl-repeater-body");
 
-                        // Clear hidden payload
                         $row.find('.icon-id-input').val('');
                         $row.find('.icon-url-input').val('');
 
-                        // Revert preview UI to default SVG
                         $row.find('.custom-icon-img').attr('src', '').hide();
                         $row.find('.default-icon-svg').show();
                         $(this).hide();
@@ -3058,17 +3051,150 @@ if (! class_exists('LGL_Shortcodes')) {
             return $url;
         }
 
-        public function render_search_filter_manager($args)
+        /**
+         * Renders the tabbed interface for managing Search Filters per post type.
+         */
+        public function render_search_filter_manager()
         {
-            $post_type = $args['post_type'];
             $options = get_option('lgl_settings', array());
+            $lgl_pages_settings = get_option('lgl_pages', array());
+            $lgl_cpts = array('caravan', 'motorhome', 'campervan');
+            $active_cpts = array();
 
-            if (!class_exists('LGL_Import_Post_Types')) {
-                echo '<p style="color:red;">LGL Import plugin must be active to fetch field definitions.</p>';
+            foreach ($lgl_cpts as $cpt) {
+                $is_disabled = !empty($lgl_pages_settings['disable_' . $cpt]) || !empty($lgl_pages_settings[$cpt . '_disable']);
+                if (!$is_disabled) {
+                    $active_cpts[] = $cpt;
+                }
+            }
+
+            if (empty($active_cpts)) {
+                echo '<p style="color:red;">All vehicle types are currently disabled in LGL Pages.</p>';
                 return;
             }
 
-            // Dynamically pull fields based on post type (exactly like field visibility)
+            echo '<div class="lgl-inner-tabs-wrap" style="margin-top: 15px;">';
+
+            // Render Modern Tabs
+            echo '<div class="lgl-modern-tabs-nav" id="lgl-search-filter-tabs">';
+            foreach ($active_cpts as $index => $cpt) {
+                $active = $index === 0 ? 'is-active' : '';
+                echo '<a href="#sf-tab-' . esc_attr($cpt) . '" class="lgl-modern-tab ' . esc_attr($active) . '" data-sftab="' . esc_attr($cpt) . '">' . esc_html(ucfirst($cpt)) . 's</a>';
+            }
+            echo '</div>';
+
+            // Render Tab Contents
+            foreach ($active_cpts as $index => $cpt) {
+                $display = $index === 0 ? 'block' : 'none';
+                echo '<div id="sf-tab-' . esc_attr($cpt) . '" class="lgl-sf-tab-content" style="display: ' . esc_attr($display) . ';">';
+                $this->render_search_sortable_list($cpt, $options);
+                echo '</div>';
+            }
+            echo '</div>';
+
+        ?>
+            <style>
+                /* Modern Tab Design */
+                .lgl-modern-tabs-nav {
+                    display: flex;
+                    border-bottom: 1px solid #ccd0d4;
+                    margin-bottom: 20px;
+                    gap: 5px;
+                }
+
+                .lgl-modern-tab {
+                    text-decoration: none;
+                    color: #646970;
+                    font-size: 14px;
+                    font-weight: 600;
+                    padding: 10px 16px;
+                    border-bottom: 2px solid transparent;
+                    margin-bottom: -1px;
+                    transition: all 0.2s ease;
+                    outline: none;
+                    box-shadow: none;
+                }
+
+                .lgl-modern-tab:hover {
+                    color: #2271b1;
+                }
+
+                .lgl-modern-tab.is-active {
+                    color: #2271b1;
+                    border-bottom-color: #2271b1;
+                }
+
+                /* Search Filter Rows */
+                .lgl-search-sortable-list .lgl-sortable-item {
+                    border: 1px solid #ccd0d4;
+                    background: #fff;
+                    margin-bottom: 8px;
+                    border-radius: 4px;
+                    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+                    transition: opacity 0.2s;
+                    padding: 12px 16px;
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                }
+            </style>
+            <script>
+                jQuery(document).ready(function($) {
+                    $('#lgl-search-filter-tabs a').on('click', function(e) {
+                        e.preventDefault();
+                        $('#lgl-search-filter-tabs a').removeClass('is-active');
+                        $('.lgl-sf-tab-content').hide();
+                        $(this).addClass('is-active');
+                        $('#sf-tab-' + $(this).data('sftab')).show();
+                    });
+
+                    $('.lgl-search-sortable-list').sortable({
+                        containment: "parent",
+                        handle: ".lgl-drag-handle",
+                        items: "> li:not(.is-hidden)",
+                        cursor: "grabbing",
+                        opacity: 0.8
+                    });
+
+                    $('.lgl-search-sortable-list').on("change", ".lgl-hide-toggle", function() {
+                        var $list = $(this).closest('.lgl-search-sortable-list');
+                        var $li = $(this).closest("li"),
+                            isChecked = $(this).is(":checked"),
+                            $handle = $li.find(".lgl-drag-handle");
+                        if (isChecked) {
+                            $li.addClass("is-hidden").css("opacity", "0.6");
+                            $handle.css({
+                                cursor: "not-allowed",
+                                opacity: "0.3"
+                            });
+                            $li.appendTo($list);
+                        } else {
+                            $li.removeClass("is-hidden").css("opacity", "1");
+                            $handle.css({
+                                cursor: "grab",
+                                opacity: "1"
+                            });
+                            var $first = $list.children(".is-hidden").first();
+                            if ($first.length) {
+                                $li.insertBefore($first);
+                            } else {
+                                $li.appendTo($list);
+                            }
+                        }
+                        $list.sortable("refresh");
+                    });
+                });
+            </script>
+        <?php
+        }
+
+        /**
+         * Helper output for generating the sortable list per specific post type for Search Filters.
+         */
+        private function render_search_sortable_list($post_type, $options)
+        {
+            if (!class_exists('LGL_Import_Post_Types')) return;
+
             $listing_fields = LGL_Import_Post_Types::get_listing_detail_fields();
             $type_fields = isset($listing_fields['common']) ? $listing_fields['common'] : array();
 
@@ -3078,7 +3204,6 @@ if (! class_exists('LGL_Shortcodes')) {
                 $type_fields = array_merge($type_fields, $listing_fields['motorhome_campervan']);
             }
 
-            // Append explicitly used specific taxonomies and price
             $type_fields['price']             = __('Price Range', 'lgl-shortcodes');
             $type_fields['listing-fuel-type'] = __('Fuel Type', 'lgl-shortcodes');
             $type_fields['listing-chassis']   = __('Chassis', 'lgl-shortcodes');
@@ -3103,11 +3228,12 @@ if (! class_exists('LGL_Shortcodes')) {
             $final_render_order = array_merge($visible_keys, $hidden_keys);
             $list_id = 'lgl-search-sortable-' . esc_attr($post_type);
 
-            echo '<ul id="' . $list_id . '" class="lgl-search-sortable-list" style="max-width: 600px; padding: 0; margin: 0; list-style: none;">';
+            echo '<ul id="' . $list_id . '" class="lgl-search-sortable-list" style="max-width: 800px; padding: 0; margin: 0; list-style: none;">';
 
             foreach ($final_render_order as $key) {
                 $default_label = $type_fields[$key];
                 $label = !empty($options['label_override_' . $key]) ? $options['label_override_' . $key] : $default_label;
+
                 $is_hidden = !empty($options['hide_search_' . $post_type . '_' . $key]);
                 $checked   = $is_hidden ? 'checked="checked"' : '';
                 $li_class       = $is_hidden ? 'is-hidden' : '';
@@ -3115,35 +3241,18 @@ if (! class_exists('LGL_Shortcodes')) {
                 $handle_cursor  = $is_hidden ? 'not-allowed' : 'grab';
                 $handle_opacity = $is_hidden ? '0.3' : '1';
 
-                echo '<li class="lgl-sortable-item ' . esc_attr($li_class) . '" style="background: #fff; border: 1px solid #ccd0d4; padding: 10px 15px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 1px 1px rgba(0,0,0,.04); opacity: ' . esc_attr($li_opacity) . ';">';
+                echo '<li class="lgl-sortable-item ' . esc_attr($li_class) . '" style="opacity: ' . esc_attr($li_opacity) . ';">';
                 echo '<div style="display: flex; align-items: center;">';
                 echo '<span class="dashicons dashicons-menu lgl-drag-handle" style="margin-right: 15px; color: #a7aaad; cursor: ' . esc_attr($handle_cursor) . '; opacity: ' . esc_attr($handle_opacity) . ';"></span>';
                 echo '<strong style="font-weight: 500;">' . esc_html($label) . ' <span style="color:#999;font-weight:normal;font-size:12px;">(' . esc_html($key) . ')</span></strong>';
                 echo '<input type="hidden" name="lgl_settings[search_order_' . esc_attr($post_type) . '][]" value="' . esc_attr($key) . '" />';
-                echo '</div><div><label style="cursor: pointer; color: #50575e;">';
+                echo '</div><div><label style="cursor: pointer; color: #50575e; font-weight: 500;">';
                 echo '<input type="checkbox" class="lgl-hide-toggle" name="lgl_settings[hide_search_' . esc_attr($post_type) . '_' . esc_attr($key) . ']" value="1" ' . $checked . ' style="margin-right: 6px;" /> Hide';
                 echo '</label></div></li>';
             }
             echo '</ul>';
-
-            echo '<script>
-                jQuery(document).ready(function($) {
-                    var $list = $("#' . $list_id . '");
-                    $list.sortable({ containment: "parent", handle: ".lgl-drag-handle", items: "> li:not(.is-hidden)", cursor: "grabbing", opacity: 0.8 });
-                    $list.on("change", ".lgl-hide-toggle", function() {
-                        var $li = $(this).closest("li"), isChecked = $(this).is(":checked"), $handle = $li.find(".lgl-drag-handle");
-                        if (isChecked) {
-                            $li.addClass("is-hidden").css("opacity", "0.6"); $handle.css({ cursor: "not-allowed", opacity: "0.3" }); $li.appendTo($list);
-                        } else {
-                            $li.removeClass("is-hidden").css("opacity", "1"); $handle.css({ cursor: "grab", opacity: "1" });
-                            var $first = $list.children(".is-hidden").first();
-                            if ($first.length) { $li.insertBefore($first); } else { $li.appendTo($list); }
-                        }
-                        $list.sortable("refresh");
-                    });
-                });
-            </script>';
         }
+
         /**
          * Renders raw SVG markup inline into the DOM from a Media Library attachment ID.
          * Strips XML and DOCTYPE declarations to ensure valid HTML inline nesting.
@@ -3175,16 +3284,12 @@ if (! class_exists('LGL_Shortcodes')) {
         }
         /**
          * Renders the tabbed interface and repeater fields for managing Meta Summary values.
-         * Features drag-and-drop reordering, row duplication, collapsing, and media uploads.
-         *
-         * @return void
          */
         public function render_meta_summary_manager()
         {
             $options  = get_option('lgl_settings', array());
             $lgl_cpts = array('caravan', 'motorhome', 'campervan');
 
-            // 1. Fetch available fields (matching Field Visibility logic)
             $all_fields = array();
             if (class_exists('LGL_Import_Post_Types')) {
                 $listing_fields = LGL_Import_Post_Types::get_listing_detail_fields();
@@ -3193,7 +3298,6 @@ if (! class_exists('LGL_Shortcodes')) {
                     isset($listing_fields['motorhome_campervan']) ? $listing_fields['motorhome_campervan'] : array(),
                     isset($listing_fields['caravan']) ? $listing_fields['caravan'] : array()
                 );
-                // Append taxonomies and price
                 $all_fields['listing-fuel-type'] = __('Fuel Type', 'lgl-shortcodes');
                 $all_fields['listing-chassis']   = __('Chassis', 'lgl-shortcodes');
                 $all_fields['listing-gearbox']   = __('Gearbox', 'lgl-shortcodes');
@@ -3202,15 +3306,14 @@ if (! class_exists('LGL_Shortcodes')) {
 
             echo '<div class="lgl-inner-tabs-wrap" style="margin-top: 15px;">';
 
-            // 2. Render internal tabs for logical partitioning
-            echo '<h3 class="nav-tab-wrapper" id="lgl-meta-summary-tabs" style="margin-bottom: 20px;">';
+            // Modern Tabs implementation
+            echo '<div class="lgl-modern-tabs-nav" id="lgl-meta-summary-tabs">';
             foreach ($lgl_cpts as $index => $cpt) {
-                $active = $index === 0 ? 'nav-tab-active' : '';
-                echo '<a href="#ms-tab-' . esc_attr($cpt) . '" class="nav-tab ' . esc_attr($active) . '" data-mstab="' . esc_attr($cpt) . '">' . esc_html(ucfirst($cpt)) . 's</a>';
+                $active = $index === 0 ? 'is-active' : '';
+                echo '<a href="#ms-tab-' . esc_attr($cpt) . '" class="lgl-modern-tab ' . esc_attr($active) . '" data-mstab="' . esc_attr($cpt) . '">' . esc_html(ucfirst($cpt)) . 's</a>';
             }
-            echo '</h3>';
+            echo '</div>';
 
-            // 3. Render Repeater Content Panels
             foreach ($lgl_cpts as $index => $cpt) {
                 $display = $index === 0 ? 'block' : 'none';
                 $saved_meta = isset($options['meta_summary_' . $cpt]) ? $options['meta_summary_' . $cpt] : array();
@@ -3219,7 +3322,7 @@ if (! class_exists('LGL_Shortcodes')) {
                 echo '<ul class="lgl-repeater-list lgl-sortable-list" data-cpt="' . esc_attr($cpt) . '" style="max-width: 800px;">';
 
                 if (!empty($saved_meta)) {
-                    $row_idx = 0; // Track proper indexes for initial load
+                    $row_idx = 0;
                     foreach ($saved_meta as $meta) {
                         $this->render_repeater_row_html($cpt, $meta, $all_fields, $row_idx);
                         $row_idx++;
@@ -3232,27 +3335,29 @@ if (! class_exists('LGL_Shortcodes')) {
             }
             echo '</div>';
 
-            // 4. Render HTML Template for JS instantiation
             echo '<script type="text/template" id="lgl-repeater-template">';
             $this->render_repeater_row_html('{{cpt}}', array('meta_key' => '', 'icon_id' => '', 'icon_url' => ''), $all_fields, 0);
             echo '</script>';
 
-            // 5. Inject JS logic for Repeater & Tabs
         ?>
             <style>
                 .lgl-repeater-row {
                     border: 1px solid #ccd0d4;
                     background: #fff;
                     margin-bottom: 10px;
+                    transition: opacity 0.2s;
+                    border-radius: 4px;
+                    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
                 }
 
                 .lgl-repeater-header {
                     display: flex;
                     align-items: center;
-                    padding: 10px 15px;
+                    padding: 12px 16px;
                     background: #f9f9f9;
                     border-bottom: 1px solid #ccd0d4;
                     cursor: grab;
+                    border-radius: 4px 4px 0 0;
                 }
 
                 .lgl-repeater-header .title {
@@ -3287,9 +3392,9 @@ if (! class_exists('LGL_Shortcodes')) {
                 jQuery(document).ready(function($) {
                     $('#lgl-meta-summary-tabs a').on('click', function(e) {
                         e.preventDefault();
-                        $('#lgl-meta-summary-tabs a').removeClass('nav-tab-active');
+                        $('#lgl-meta-summary-tabs a').removeClass('is-active');
                         $('.lgl-ms-tab-content').hide();
-                        $(this).addClass('nav-tab-active');
+                        $(this).addClass('is-active');
                         $('#ms-tab-' + $(this).data('mstab')).show();
                     });
 
@@ -3298,7 +3403,6 @@ if (! class_exists('LGL_Shortcodes')) {
                             $(this).find('input, select').each(function() {
                                 var name = $(this).attr('name');
                                 if (name) {
-                                    // Explicit regex to strictly target this specific CPT's array index
                                     var regex = new RegExp('\\\[meta_summary_' + cpt + '\\\]\\\[\\d+\\\]');
                                     $(this).attr('name', name.replace(regex, '[meta_summary_' + cpt + '][' + index + ']'));
                                 }
@@ -3306,7 +3410,6 @@ if (! class_exists('LGL_Shortcodes')) {
                         });
                     }
 
-                    // Initialize sortable WITH the update callback to reindex on drag-and-drop
                     $('.lgl-sortable-list').sortable({
                         handle: '.lgl-drag-handle',
                         cursor: 'grabbing',
@@ -3328,7 +3431,6 @@ if (! class_exists('LGL_Shortcodes')) {
                         e.preventDefault();
                         var $row = $(this).closest('.lgl-repeater-row');
                         var $clone = $row.clone();
-                        // Fix select values on clone (jQuery clone bug)
                         $clone.find('select').each(function(i) {
                             $(this).val($row.find('select').eq(i).val());
                         });
@@ -3343,34 +3445,60 @@ if (! class_exists('LGL_Shortcodes')) {
                         reindexRepeater($list.data('cpt'));
                     });
 
-                    $(document).on('click', '.lgl-collapse-row', function(e) {
-                        e.preventDefault();
-                        $(this).closest('.lgl-repeater-row').find('.lgl-repeater-body').slideToggle();
-                    });
-
-                    $(document).on('click', '.lgl-upload-svg', function(e) {
-                        e.preventDefault();
-                        var $btn = $(this);
-                        var $row = $btn.closest('.lgl-repeater-row');
-
-                        var customUploader = wp.media({
-                            title: 'Select SVG Icon',
-                            button: {
-                                text: 'Use this SVG'
-                            },
-                            multiple: false,
-                            library: {
-                                type: 'image/svg+xml'
-                            }
-                        }).on('select', function() {
-                            var attachment = customUploader.state().get('selection').first().toJSON();
-                            $row.find('.icon-id-input').val(attachment.id);
-                            $row.find('.icon-url-input').val(attachment.url);
-                            $row.find('.lgl-icon-preview').html('<img src="' + attachment.url + '" />');
-                        }).open();
-                    });
+                    // Shared Chevron logic applies here too if they click collapse
                 });
             </script>
+        <?php
+        }
+
+        /**
+         * Output helper for generating a single repeater row.
+         */
+        private function render_repeater_row_html($cpt, $meta, $available_fields = array(), $index = 0)
+        {
+            $meta_key = esc_attr($meta['meta_key'] ?? '');
+            $icon_id  = esc_attr($meta['icon_id'] ?? '');
+            $icon_url = esc_url($meta['icon_url'] ?? '');
+
+            $base_name = 'lgl_settings[meta_summary_' . $cpt . '][' . $index . ']';
+        ?>
+            <li class="lgl-repeater-row">
+                <div class="lgl-repeater-header">
+                    <span class="dashicons dashicons-menu lgl-drag-handle" style="color: #a7aaad;"></span>
+                    <span class="title">Meta Item</span>
+                    <button type="button" class="button-link lgl-collapse-row" style="padding: 4px; outline: none;">
+                        <svg class="lgl-chevron" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#50575e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="transition: transform 0.2s ease;">
+                            <polyline points="6 9 12 15 18 9"></polyline>
+                        </svg>
+                    </button>
+                </div>
+                <div class="lgl-repeater-body">
+                    <div>
+                        <label style="font-weight:600; margin-bottom:5px; display:block;">Select Field</label>
+                        <select name="<?php echo $base_name; ?>[meta_key]" style="min-width: 250px;">
+                            <option value="">&mdash; Select a Field &mdash;</option>
+                            <?php foreach ($available_fields as $key => $label) : ?>
+                                <option value="<?php echo esc_attr($key); ?>" <?php selected($meta_key, $key); ?>><?php echo esc_html($label); ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                    <div>
+                        <label style="font-weight:600; margin-bottom:5px; display:block;">Icon Override</label>
+                        <div style="display: flex; gap: 10px; align-items: center;">
+                            <div class="lgl-icon-preview">
+                                <?php if ($icon_url) echo '<img src="' . $icon_url . '" />'; ?>
+                            </div>
+                            <input type="hidden" name="<?php echo $base_name; ?>[icon_id]" class="icon-id-input" value="<?php echo $icon_id; ?>" />
+                            <input type="hidden" name="<?php echo $base_name; ?>[icon_url]" class="icon-url-input" value="<?php echo $icon_url; ?>" />
+                            <button type="button" class="button lgl-upload-svg">Select SVG</button>
+                        </div>
+                    </div>
+                    <div style="flex-basis: 100%; display: flex; gap: 10px; margin-top: 5px;">
+                        <button type="button" class="button lgl-clone-row">Duplicate</button>
+                        <button type="button" class="button button-link-delete lgl-delete-row">Delete</button>
+                    </div>
+                </div>
+            </li>
         <?php
         }
 
