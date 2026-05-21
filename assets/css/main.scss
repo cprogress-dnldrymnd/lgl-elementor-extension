@@ -1868,12 +1868,14 @@
             bottom: -60px;
         }
     }
-    @media (max-width: 767px) {
-        padding-bottom: 70px;
-    }
-    @media (min-width: 768px) {
-        padding-left: 60px;
-        padding-right: 60px;
+    &.vehicle-slider-holder {
+        @media (max-width: 767px) {
+            padding-bottom: 70px;
+        }
+        @media (min-width: 768px) {
+            padding-left: 60px;
+            padding-right: 60px;
+        }
     }
 }
 
