@@ -304,18 +304,24 @@ if ($post_type) {
                         foreach ($search_order as $field_key) {
                             if (!empty($options['hide_search_' . $data_post_type . '_' . $field_key])) continue;
 
+                            // Fetch global label overrides
+                            $default_label = isset($type_fields[$field_key]) ? $type_fields[$field_key] : ucfirst(str_replace('-', ' ', $field_key));
+                            $label = !empty($options['label_override_' . $field_key]) ? $options['label_override_' . $field_key] : $default_label;
+
                             if ($field_key === 'price') { ?>
                                 <div class="lgl-filter-group">
-                                    <select name="price_min" id="lgl_price_min" class="lgl-select2" data-placeholder="Min Price">
-                                        <option value="">Min Price</option>
+                                    <label for="lgl_price_min">Min <?php echo esc_html($label); ?></label>
+                                    <select name="price_min" id="lgl_price_min" class="lgl-select2" data-placeholder="Min <?php echo esc_attr($label); ?>">
+                                        <option value="">Min <?php echo esc_html($label); ?></option>
                                         <?php foreach ($prices as $price) : ?>
                                             <option value="<?php echo esc_attr($price); ?>" <?php selected((float) $active_price_min, $price); ?>><?php echo esc_html(LGL_Shortcodes::format_price($price)); ?></option>
                                         <?php endforeach; ?>
                                     </select>
                                 </div>
                                 <div class="lgl-filter-group">
-                                    <select name="price_max" id="lgl_price_max" class="lgl-select2" data-placeholder="Max Price">
-                                        <option value="">Max Price</option>
+                                    <label for="lgl_price_max">Max <?php echo esc_html($label); ?></label>
+                                    <select name="price_max" id="lgl_price_max" class="lgl-select2" data-placeholder="Max <?php echo esc_attr($label); ?>">
+                                        <option value="">Max <?php echo esc_html($label); ?></option>
                                         <?php foreach ($prices as $price) : ?>
                                             <option value="<?php echo esc_attr($price); ?>" <?php selected((float) $active_price_max, $price); ?>><?php echo esc_html(LGL_Shortcodes::format_price($price)); ?></option>
                                         <?php endforeach; ?>
@@ -323,9 +329,9 @@ if ($post_type) {
                                 </div>
                             <?php } elseif ($field_key === 'listing-fuel-type') { ?>
                                 <div class="lgl-filter-group">
-                                    <label for="lgl_fuel_type">Fuel Type</label>
-                                    <select name="listing-fuel-type" id="lgl_fuel_type" class="lgl-select2" data-placeholder="Any Fuel Type">
-                                        <option value="">Any Fuel Type</option>
+                                    <label for="lgl_fuel_type"><?php echo esc_html($label); ?></label>
+                                    <select name="listing-fuel-type" id="lgl_fuel_type" class="lgl-select2" data-placeholder="Any <?php echo esc_attr($label); ?>">
+                                        <option value="">Any <?php echo esc_html($label); ?></option>
                                         <?php if (!is_wp_error($fuel_types)) foreach ($fuel_types as $term) : ?>
                                             <option value="<?php echo esc_attr($term->slug); ?>" <?php selected($active_fuel_type, $term->slug); ?>><?php echo esc_html($term->name); ?></option>
                                         <?php endforeach; ?>
@@ -333,9 +339,9 @@ if ($post_type) {
                                 </div>
                             <?php } elseif ($field_key === 'listing-chassis') { ?>
                                 <div class="lgl-filter-group">
-                                    <label for="lgl_chassis">Chassis</label>
-                                    <select name="listing-chassis" id="lgl_chassis" class="lgl-select2" data-placeholder="Any Chassis">
-                                        <option value="">Any Chassis</option>
+                                    <label for="lgl_chassis"><?php echo esc_html($label); ?></label>
+                                    <select name="listing-chassis" id="lgl_chassis" class="lgl-select2" data-placeholder="Any <?php echo esc_attr($label); ?>">
+                                        <option value="">Any <?php echo esc_html($label); ?></option>
                                         <?php if (!is_wp_error($chassis_list)) foreach ($chassis_list as $term) : ?>
                                             <option value="<?php echo esc_attr($term->slug); ?>" <?php selected($active_chassis, $term->slug); ?>><?php echo esc_html($term->name); ?></option>
                                         <?php endforeach; ?>
@@ -343,9 +349,9 @@ if ($post_type) {
                                 </div>
                             <?php } elseif ($field_key === 'listing-gearbox') { ?>
                                 <div class="lgl-filter-group">
-                                    <label for="lgl_gearbox">Gearbox</label>
-                                    <select name="listing-gearbox" id="lgl_gearbox" class="lgl-select2" data-placeholder="Any Gearbox">
-                                        <option value="">Any Gearbox</option>
+                                    <label for="lgl_gearbox"><?php echo esc_html($label); ?></label>
+                                    <select name="listing-gearbox" id="lgl_gearbox" class="lgl-select2" data-placeholder="Any <?php echo esc_attr($label); ?>">
+                                        <option value="">Any <?php echo esc_html($label); ?></option>
                                         <?php if (!is_wp_error($gearboxes)) foreach ($gearboxes as $term) : ?>
                                             <option value="<?php echo esc_attr($term->slug); ?>" <?php selected($active_gearbox, $term->slug); ?>><?php echo esc_html($term->name); ?></option>
                                         <?php endforeach; ?>
@@ -353,7 +359,6 @@ if ($post_type) {
                                 </div>
                             <?php } elseif (isset($type_fields[$field_key])) {
                                 // DYNAMIC META FIELD RENDERER
-                                $label = $type_fields[$field_key];
                                 $active_val = isset($_GET[$field_key]) ? sanitize_text_field($_GET[$field_key]) : '';
                                 $meta_values = LGL_Shortcodes::get_unique_meta_values($data_post_type, $field_key);
                             ?>

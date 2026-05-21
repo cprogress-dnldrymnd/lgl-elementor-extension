@@ -566,7 +566,7 @@ if (! class_exists('LGL_Shortcodes')) {
             );
         }
 
-       /**
+        /**
          * Renders the drag-and-drop sortable list for managing field visibility, order, and overrides.
          * Separates visible and hidden fields, auto-moving hidden fields to the bottom.
          * Includes image uploader with reset functionality for SVG overrides.
@@ -631,7 +631,7 @@ if (! class_exists('LGL_Shortcodes')) {
                 $handle_cursor  = $is_hidden ? 'not-allowed' : 'grab';
                 $handle_opacity = $is_hidden ? '0.3' : '1';
 
-                ?>
+?>
                 <li class="lgl-repeater-row lgl-sortable-item <?php echo esc_attr($li_class); ?>" style="opacity: <?php echo esc_attr($li_opacity); ?>;">
                     <div class="lgl-repeater-header" style="display: flex; justify-content: space-between; align-items: center;">
                         <div style="display: flex; align-items: center; flex-grow: 1;">
@@ -647,7 +647,7 @@ if (! class_exists('LGL_Shortcodes')) {
                             <button type="button" class="button-link lgl-collapse-row" style="padding: 0;"><span class="dashicons dashicons-arrow-down-alt2"></span></button>
                         </div>
                     </div>
-                    
+
                     <div class="lgl-repeater-body" style="display: none; border-top: 1px solid #ccd0d4; background: #fafafa;">
                         <div>
                             <label style="font-weight:600; margin-bottom:5px; display:block;">Label Override</label>
@@ -671,18 +671,51 @@ if (! class_exists('LGL_Shortcodes')) {
                         </div>
                     </div>
                 </li>
-                <?php
+            <?php
             }
 
             echo '</ul>';
 
             ?>
             <style>
-                .lgl-repeater-row { border: 1px solid #ccd0d4; background: #fff; margin-bottom: 10px; transition: opacity 0.2s; }
-                .lgl-repeater-header { padding: 10px 15px; background: #fff; }
-                .lgl-repeater-body { padding: 15px; display: flex; gap: 20px; align-items: flex-start; flex-wrap: wrap; }
-                .lgl-icon-preview { width: 34px; height: 34px; border: 1px dashed #ccc; display: flex; align-items: center; justify-content: center; background: #fff; }
-                .lgl-icon-preview img, .lgl-icon-preview svg { max-width: 20px; max-height: 20px; width: auto; height: auto; display: block; }
+                .lgl-repeater-row {
+                    border: 1px solid #ccd0d4;
+                    background: #fff;
+                    margin-bottom: 10px;
+                    transition: opacity 0.2s;
+                }
+
+                .lgl-repeater-header {
+                    padding: 10px 15px;
+                    background: #fff;
+                }
+
+                .lgl-repeater-body {
+                    padding: 15px;
+                    display: flex;
+                    gap: 20px;
+                    align-items: flex-start;
+                    flex-wrap: wrap;
+                }
+
+                .lgl-icon-preview {
+                    width: 34px;
+                    height: 34px;
+                    border: 1px dashed #ccc;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    background: #fff;
+                }
+
+                .lgl-icon-preview img,
+                .lgl-icon-preview svg {
+                    max-width: 20px;
+                    max-height: 20px;
+                    width: auto;
+                    height: auto;
+                    display: block;
+                }
             </style>
             <script>
                 jQuery(document).ready(function($) {
@@ -698,18 +731,24 @@ if (! class_exists('LGL_Shortcodes')) {
 
                     // Handle Visibility Toggle
                     $sortableList.on("change", ".lgl-hide-toggle", function() {
-                        var $listItem  = $(this).closest("li");
-                        var isChecked  = $(this).is(":checked");
-                        var $handle    = $listItem.find(".lgl-drag-handle");
+                        var $listItem = $(this).closest("li");
+                        var isChecked = $(this).is(":checked");
+                        var $handle = $listItem.find(".lgl-drag-handle");
 
                         if (isChecked) {
                             $listItem.addClass("is-hidden").css("opacity", "0.6");
-                            $handle.css({ cursor: "not-allowed", opacity: "0.3" });
+                            $handle.css({
+                                cursor: "not-allowed",
+                                opacity: "0.3"
+                            });
                             $listItem.appendTo($sortableList);
                         } else {
                             $listItem.removeClass("is-hidden").css("opacity", "1");
-                            $handle.css({ cursor: "grab", opacity: "1" });
-                            
+                            $handle.css({
+                                cursor: "grab",
+                                opacity: "1"
+                            });
+
                             var $firstHidden = $sortableList.children(".is-hidden").first();
                             if ($firstHidden.length) {
                                 $listItem.insertBefore($firstHidden);
@@ -725,17 +764,21 @@ if (! class_exists('LGL_Shortcodes')) {
                         e.preventDefault();
                         var $btn = $(this);
                         var $row = $btn.closest(".lgl-repeater-body");
-                        
+
                         var customUploader = wp.media({
                             title: 'Select SVG Icon',
-                            button: { text: 'Use this SVG' },
+                            button: {
+                                text: 'Use this SVG'
+                            },
                             multiple: false,
-                            library: { type: 'image/svg+xml' } 
+                            library: {
+                                type: 'image/svg+xml'
+                            }
                         }).on('select', function() {
                             var attachment = customUploader.state().get('selection').first().toJSON();
                             $row.find('.icon-id-input').val(attachment.id);
                             $row.find('.icon-url-input').val(attachment.url);
-                            
+
                             // Toggle preview UI
                             $row.find('.custom-icon-img').attr('src', attachment.url).show();
                             $row.find('.default-icon-svg').hide();
@@ -747,11 +790,11 @@ if (! class_exists('LGL_Shortcodes')) {
                     $sortableList.on("click", ".lgl-fv-remove-svg", function(e) {
                         e.preventDefault();
                         var $row = $(this).closest(".lgl-repeater-body");
-                        
+
                         // Clear hidden payload
                         $row.find('.icon-id-input').val('');
                         $row.find('.icon-url-input').val('');
-                        
+
                         // Revert preview UI to default SVG
                         $row.find('.custom-icon-img').attr('src', '').hide();
                         $row.find('.default-icon-svg').show();
@@ -759,7 +802,7 @@ if (! class_exists('LGL_Shortcodes')) {
                     });
                 });
             </script>
-            <?php
+        <?php
         }
 
         /**
@@ -886,7 +929,7 @@ if (! class_exists('LGL_Shortcodes')) {
 
             // Default to 'general' tab for standard UX flow
             $active_tab = isset($_GET['tab']) ? sanitize_text_field($_GET['tab']) : 'general';
-?>
+        ?>
             <div class="wrap">
                 <h1>LGL Shortcodes Settings</h1>
                 <h2 class="nav-tab-wrapper" id="lgl-settings-tabs">
@@ -3063,7 +3106,8 @@ if (! class_exists('LGL_Shortcodes')) {
             echo '<ul id="' . $list_id . '" class="lgl-search-sortable-list" style="max-width: 600px; padding: 0; margin: 0; list-style: none;">';
 
             foreach ($final_render_order as $key) {
-                $label     = $type_fields[$key];
+                $default_label = $type_fields[$key];
+                $label = !empty($options['label_override_' . $key]) ? $options['label_override_' . $key] : $default_label;
                 $is_hidden = !empty($options['hide_search_' . $post_type . '_' . $key]);
                 $checked   = $is_hidden ? 'checked="checked"' : '';
                 $li_class       = $is_hidden ? 'is-hidden' : '';
@@ -3074,7 +3118,7 @@ if (! class_exists('LGL_Shortcodes')) {
                 echo '<li class="lgl-sortable-item ' . esc_attr($li_class) . '" style="background: #fff; border: 1px solid #ccd0d4; padding: 10px 15px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 1px 1px rgba(0,0,0,.04); opacity: ' . esc_attr($li_opacity) . ';">';
                 echo '<div style="display: flex; align-items: center;">';
                 echo '<span class="dashicons dashicons-menu lgl-drag-handle" style="margin-right: 15px; color: #a7aaad; cursor: ' . esc_attr($handle_cursor) . '; opacity: ' . esc_attr($handle_opacity) . ';"></span>';
-                echo '<strong style="font-weight: 500;">' . esc_html($label) . '</strong>';
+                echo '<strong style="font-weight: 500;">' . esc_html($label) . ' <span style="color:#999;font-weight:normal;font-size:12px;">(' . esc_html($key) . ')</span></strong>';
                 echo '<input type="hidden" name="lgl_settings[search_order_' . esc_attr($post_type) . '][]" value="' . esc_attr($key) . '" />';
                 echo '</div><div><label style="cursor: pointer; color: #50575e;">';
                 echo '<input type="checkbox" class="lgl-hide-toggle" name="lgl_settings[hide_search_' . esc_attr($post_type) . '_' . esc_attr($key) . ']" value="1" ' . $checked . ' style="margin-right: 6px;" /> Hide';

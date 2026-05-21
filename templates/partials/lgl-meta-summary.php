@@ -10,7 +10,7 @@ $options   = get_option('lgl_settings', array());
 // Fetch the dynamic layout mapping for this specific CPT
 $meta_summary = isset($options['meta_summary_' . $post_type]) ? $options['meta_summary_' . $post_type] : array();
 
-// Fetch all possible field labels dynamically to replace the removed 'Frontend Label' setting
+// Fetch all possible field labels dynamically
 $all_fields = array();
 if (class_exists('LGL_Import_Post_Types')) {
     $listing_fields = LGL_Import_Post_Types::get_listing_detail_fields();
@@ -40,7 +40,7 @@ if (empty($meta_summary)) {
 <div class="lgl-post--meta">
     <div class="lgl-post--meta-row">
         <?php foreach ($meta_summary as $meta) : 
-            if (empty($meta['meta_key'])) continue; // Skip unselected rows
+            if (empty($meta['meta_key'])) continue; 
 
             // Taxonomies need get_the_terms(), standard meta needs get_post_meta()
             if (in_array($meta['meta_key'], array('listing-fuel-type', 'listing-chassis', 'listing-gearbox'))) {
@@ -50,21 +50,30 @@ if (empty($meta_summary)) {
                 $meta_value = get_post_meta($post_id, $meta['meta_key'], true);
             }
 
-            // Determine the correct label from our unified array fallback
-            $label = isset($all_fields[$meta['meta_key']]) ? $all_fields[$meta['meta_key']] : ucfirst(str_replace('_', ' ', $meta['meta_key']));
+            // Determine the correct label with global override priority
+            $default_label = isset($all_fields[$meta['meta_key']]) ? $all_fields[$meta['meta_key']] : ucfirst(str_replace('_', ' ', $meta['meta_key']));
+            $label = !empty($options['label_override_' . $meta['meta_key']]) ? $options['label_override_' . $meta['meta_key']] : $default_label;
         ?>
             <div class="lgl-post--meta-col">
                 <div class="lgl-post--meta-item lgl-post--<?php echo esc_attr($meta['meta_key']); ?>">
-                    <?php
-                    // Priority 1: Admin-uploaded Media Library SVG
-                    if (!empty($meta['icon_id'])) {
-                        LGL_Shortcodes::render_attachment_svg((int) $meta['icon_id']);
-                    } 
-                    // Priority 2: Legacy local hardcoded SVG fallback (for defaults)
-                    elseif (!empty($meta['icon_key'])) {
-                        LGL_Shortcodes::render_inline_svg($meta['icon_key']);
-                    }
-                    ?>
+                    <div class="lgl-meta-icon" style="flex-shrink: 0; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; margin-right: 8px;">
+                        <?php
+                        // Priority 1: Meta Summary Repeater SVG
+                        if (!empty($meta['icon_id'])) {
+                            LGL_Shortcodes::render_attachment_svg((int) $meta['icon_id']);
+                        } 
+                        // Priority 2: Global Field Visibility SVG Override
+                        elseif (!empty($options['icon_id_' . $meta['meta_key']])) {
+                            LGL_Shortcodes::render_attachment_svg((int) $options['icon_id_' . $meta['meta_key']]);
+                        }
+                        // Priority 3: Legacy local hardcoded SVG fallback
+                        elseif (!empty($meta['icon_key'])) {
+                            LGL_Shortcodes::render_inline_svg($meta['icon_key']);
+                        } else {
+                            LGL_Shortcodes::render_inline_svg($meta['meta_key']);
+                        }
+                        ?>
+                    </div>
                     <div class="label-val">
                         <span class="lgl-label"><?php echo esc_html($label); ?></span>
                         <span class="lgl-value"><?php echo esc_html($meta_value ? $meta_value : 'N/A'); ?></span>
