@@ -111,6 +111,8 @@ $all_image_ids = array_values(array_unique(array_filter($all_image_ids)));
                                         </div>
                                     <?php } ?>
                                 </div>
+                                <div class="swiper-button-next"></div>
+                                <div class="swiper-button-prev"></div>
                             </div>
 
                             <div class="swiper js-gallery-slider-nav lgl-gallery-slider lgl-slider-nav" style="margin-top: 10px;">
@@ -127,8 +129,8 @@ $all_image_ids = array_values(array_unique(array_filter($all_image_ids)));
                                 </div>
                             </div>
                         </div>
-                    <?php } elseif (count($all_image_ids) === 1) { 
-                        $single_image_id = $all_image_ids[0];    
+                    <?php } elseif (count($all_image_ids) === 1) {
+                        $single_image_id = $all_image_ids[0];
                     ?>
                         <div class="lgl-post--thumbnail">
                             <?php if ($is_reserved) { ?>
