@@ -1105,7 +1105,6 @@ if (! class_exists('LGL_Shortcodes')) {
             <script>
                 iFrameResize({
                     log: false,
-                    enablePublicMethods: true
                 }, "#iframe");
             </script>
         <?php
