@@ -2852,7 +2852,7 @@ $wt-cols: 110px 1fr 120px 110px 80px 80px 50px;
 .lgl-breadcrumbs-light a,
 .lgl-breadcrumbs-light .lgl-separator,
 .lgl-breadcrumbs-light .lgl-current-page {
-    color: #ffffff;
+    color: var(--lgl-color-white, #fff);
 }
 .lgl-breadcrumbs-light.lgl-breadcrumbs-light.lgl-breadcrumbs-light a {
     &:hover {
@@ -2942,7 +2942,9 @@ $wt-cols: 110px 1fr 120px 110px 80px 80px 50px;
             @media (max-width: 1024px) {
                 border-radius: 10px;
                 width: 100%;
-                &:hover, &:active, &:focus {
+                &:hover,
+                &:active,
+                &:focus {
                     background-color: var(--lgl-color-secondary);
                     color: var(--lgl-color-white);
                 }
@@ -2951,11 +2953,11 @@ $wt-cols: 110px 1fr 120px 110px 80px 80px 50px;
                 padding: 15px 15px;
             }
         }
-         @media (max-width: 1024px) {
+        @media (max-width: 1024px) {
             gap: 1rem;
         }
         @media (max-width: 575px) {
-           flex-direction: column;
+            flex-direction: column;
         }
         @media (min-width: 1025px) {
             padding-left: clamp(20px, 3vw, 50px);
