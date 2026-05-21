@@ -87,7 +87,7 @@ class LGL_Widget_Search extends \Elementor\Widget_Base
         if (!empty($settings['attr_layout'])) $atts .= ' layout="' . esc_attr($settings['attr_layout']) . '"';
 
         // Read the Elementor switcher securely (Defaults to true)
-        $show_filters = (isset($settings['attr_show_all_filters']) && $settings['attr_show_all_filters'] === '') ? 'false' : 'true';
+        $show_filters = (isset($settings['attr_show_all_filters']) && $settings['attr_show_all_filters'] === '') ? 'false' : 'false';
         $atts .= ' show_all_filters="' . $show_filters . '"';
 
         echo do_shortcode('[lgl_search' . $atts . ']');
