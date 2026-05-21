@@ -8,12 +8,13 @@
     $(document).ready(function () {
         search_form();
         add_to_wishlist();
-        vehicle_slider();
+        initSwiperSliders();
         tabs();
         initLGLMiniWishlist();
         sharevehicle();
         initBreadcrumbs();
         initTypeTabs();
+        initFancyboxGallery();
     });
 
     /**
@@ -40,7 +41,7 @@
                 } else {
                     $select.val(url);
                 }
-                
+
                 // Trigger change to auto-update backend form states
                 $select.trigger('change');
 
@@ -1092,7 +1093,7 @@
         });
     }
 
-    function vehicle_slider() {
+    function initSwiperSliders() {
         // 1. Generic Vehicle Slider
         if ($('.vehicle-slider-js').length > 0) {
             // Ensure you add the proper HTML wrapper (.swiper-wrapper, .swiper-slide) to the grid template if this is used there!
@@ -1135,6 +1136,40 @@
                 thumbs: {
                     swiper: galleryNav // This syncs the two sliders automatically
                 }
+            });
+        }
+    }
+    /**
+     * Initializes Fancybox v5 for the vehicle gallery.
+     * Explicitly binds the UI controls and modern thumbnail navigation to the designated data attribute,
+     * overriding default Elementor lightbox behavior.
+     * * @returns {void}
+     */
+    function initFancyboxGallery() {
+        if (typeof Fancybox !== 'undefined') {
+            Fancybox.bind('[data-fancybox="lgl-gallery-car"]', {
+                // Configures the Thumbnail Navigation Plugin
+                Thumbs: {
+                    type: "modern", // Utilizes the modern sliding track logic
+                    showOnStart: true,
+                },
+                // Explicitly maps the UI controls in the top toolbar
+                Toolbar: {
+                    display: {
+                        left: ["infobar"],
+                        middle: [
+                            "zoomIn",
+                            "zoomOut",
+                            "toggle1to1",
+                            "rotateCCW",
+                            "rotateCW"
+                        ],
+                        right: ["slideshow", "thumbs", "close"],
+                    }
+                },
+                // UX enhancements for touch/pointer devices
+                dragToClose: false,
+                animated: true
             });
         }
     }

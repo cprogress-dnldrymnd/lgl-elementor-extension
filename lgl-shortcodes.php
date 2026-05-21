@@ -1158,17 +1158,20 @@ if (! class_exists('LGL_Shortcodes')) {
                 $swiper_handle = 'swiper-fallback';
             }
 
+            wp_enqueue_style('fancybox-v5', 'https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0/dist/fancybox/fancybox.css', array(), '5.0');
+            wp_enqueue_script('fancybox-v5', 'https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0/dist/fancybox/fancybox.umd.js', array(), '5.0', true);
+
             wp_enqueue_style(
                 'lgl-main-css',
                 LGL_SHORTCODES_URL . 'assets/css/main.css',
-                array('select2', $swiper_handle),
+                array('select2', $swiper_handle, 'fancybox-v5'),
                 LGL_SHORTCODES_VERSION
             );
 
             wp_enqueue_script(
                 'lgl-main-js',
                 LGL_SHORTCODES_URL . 'assets/js/main.js',
-                array('jquery', 'select2', $swiper_handle),
+                array('jquery', 'select2', $swiper_handle, 'fancybox-v5'),
                 LGL_SHORTCODES_VERSION,
                 true
             );
