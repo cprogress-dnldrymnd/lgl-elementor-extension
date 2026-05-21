@@ -1,33 +1,14 @@
 <?php
-if (!defined('ABSPATH')) {
-    exit;
-}
+if (!defined('ABSPATH')) exit;
 
 $target_post_id = !empty($post_id) ? intval($post_id) : get_the_ID();
-$enq = LGL_Forms::get_enquiry_settings();
+$enq            = LGL_Forms::get_enquiry_settings();
 ?>
 <div class="lgl-inline-form-wrapper lgl-enquiry-inline">
     <div class="lgl-form-header">
         <h2 class="lgl-inline-form-title"><?php echo esc_html(LGL_Forms::parse_modal_string($enq['title'] ?? __('Make an Enquiry', 'lgl-shortcodes'), $target_post_id)); ?></h2>
     </div>
     <div class="lgl-form-body">
-        <form id="lgl-enquiry-form" class="lgl-modal-form lgl-form-inline-instance" novalidate>
-            <input type="hidden" name="action" value="lgl_submit_enquiry">
-            <input type="hidden" name="lgl_forms_nonce" value="<?php echo esc_attr(wp_create_nonce('lgl_forms_nonce')); ?>">
-            <input type="hidden" name="product_id" value="<?php echo esc_attr($target_post_id); ?>">
-            
-            <div class="lgl-form-grid">
-                <?php foreach (($enq['fields'] ?? []) as $field) : ?>
-                    <?php echo LGL_Forms::render_form_field($field); ?>
-                <?php endforeach; ?>
-            </div>
-            
-            <div class="lgl-form-msg" style="display:none"></div>
-            
-            <button type="submit" class="lgl-btn lgl-btn-accent lgl-form-submit-btn">
-                <span class="lgl-submit-txt"><?php echo esc_html($enq['submit_text'] ?? __('SUBMIT ENQUIRY', 'lgl-shortcodes')); ?></span>
-                <span class="lgl-submit-spin" style="display:none"></span>
-            </button>
-        </form>
+        <?php include LGL_SHORTCODES_PATH . 'templates/partials/lgl-form-enquiry.php'; ?>
     </div>
 </div>
