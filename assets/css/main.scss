@@ -103,7 +103,9 @@
         }
         &.lgl-layout-vertical {
             .lgl-submit-group {
-                display: none !important;
+                @media (min-width: 1025px) {
+                    display: none;
+                }
             }
             .lgl-search-form-inner {
                 flex-direction: column;
