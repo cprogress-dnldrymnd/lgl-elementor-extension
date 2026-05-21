@@ -2349,6 +2349,9 @@
       .lgl-type-tabs-wrapper .lgl-type-tabs .lgl-tab-btn {
         padding: 15px 5px;
         font-size: 8px; } }
+  @media (max-width: 1024px) {
+    .lgl-type-tabs-wrapper .lgl-type-tabs {
+      gap: 1rem; } }
   @media (max-width: 575px) {
     .lgl-type-tabs-wrapper .lgl-type-tabs {
       padding-left: 10px; } }

@@ -2963,6 +2963,9 @@ $wt-cols: 110px 1fr 120px 110px 80px 80px 50px;
                 font-size: 8px;
             }
         }
+         @media (max-width: 1024px) {
+            gap: 1rem;
+        }
         @media (max-width: 575px) {
             padding-left: 10px;
         }
