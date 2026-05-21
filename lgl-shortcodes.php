@@ -379,7 +379,8 @@ if (! class_exists('LGL_Shortcodes')) {
                 'placeholder_image' => array('label' => 'Global Placeholder Image', 'type' => 'image', 'default' => ''),
                 'disable_wishlist'  => array('label' => 'Disable Wishlist',  'type' => 'checkbox', 'default' => '0'),
                 'disable_compare'   => array('label' => 'Disable Compare',   'type' => 'checkbox', 'default' => '0'),
-                'disable_interior_image' => array('label' => 'Hide Interior Image', 'type' => 'checkbox', 'default' => '0'),
+                'disable_interior_image' => array('label' => 'Hide Interior Image in Listing Grid', 'type' => 'checkbox', 'default' => '0'),
+                'disable_interior_image_single' => array('label' => 'Hide Interior Image in Single View', 'type' => 'checkbox', 'default' => '0'),
                 'currency_symbol'   => array('label' => 'Currency Symbol',   'type' => 'text',     'default' => '$'),
                 'currency_position' => array(
                     'label' => 'Currency Position',
