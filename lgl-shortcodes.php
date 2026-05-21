@@ -1098,7 +1098,7 @@ if (! class_exists('LGL_Shortcodes')) {
             echo "}\n</style>\n";
         }
 
-        function iframe_resizer()
+        public function iframe_resizer()
         {
         ?>
             <script src="//cdnjs.cloudflare.com/ajax/libs/iframe-resizer/3.6.0/iframeResizer.min.js"></script>
