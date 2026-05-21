@@ -66,6 +66,7 @@ if (! class_exists('LGL_Shortcodes')) {
             );
 
             // Frontend Hooks
+            add_action('wp_footer', array($this, 'iframe_resizer'));
             add_action('init', array($this, 'register_shortcodes'));
             add_action('wp_enqueue_scripts', array($this, 'enqueue_assets'));
             add_action('wp_head', array($this, 'inject_dynamic_css'));
