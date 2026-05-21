@@ -2389,4 +2389,10 @@
   .hide--desktop {
     display: none !important; } }
 
+.f-button.f-button {
+  background-color: transparent; }
+
+.fancybox__container.fancybox__container {
+  z-index: 99999; }
+
 /*# sourceMappingURL=main.css.map */

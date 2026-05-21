@@ -3024,3 +3024,10 @@ $wt-cols: 110px 1fr 120px 110px 80px 80px 50px;
         display: none !important;
     }
 }
+
+.f-button.f-button {
+    background-color: transparent;
+}
+.fancybox__container.fancybox__container {
+    z-index: 99999;
+}
