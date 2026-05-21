@@ -150,7 +150,7 @@ if ($search_type === 'tabs') {
 
     <?php if ($search_type === 'tabs') : ?>
         <style>
-            @media (min-width: 992px) {
+            @media (min-width: 1025px) {
                 .lgl-search-offcanvas.lgl-force-modal {
                     position: fixed !important;
                     top: 0 !important;
