@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Plugin Name: LGL Shortcodes
  * Plugin URI: https://digitallydisruptive.co.uk/
@@ -36,6 +37,12 @@ if (! class_exists('LGL_Shortcodes')) {
          * @var array
          */
         protected $custom_templates;
+
+        // 1. Define properties to hold the option values
+        private $enable_caravan;
+        private $enable_motorhome;
+        private $enable_campervan;
+
 
         /**
          * Initializes the plugin by hooking into the WordPress lifecycle.
@@ -131,7 +138,10 @@ if (! class_exists('LGL_Shortcodes')) {
             // Allow SVG uploads in the Media Library
             add_filter('upload_mimes', array($this, 'allow_svg_uploads'));
 
-
+            $this->enable_caravan   = get_option(LGL_IMPORT_OPT_ENABLE_CARAVAN, false);
+            $this->enable_motorhome = get_option(LGL_IMPORT_OPT_ENABLE_MOTORHOME, false);
+            $this->enable_campervan = get_option(LGL_IMPORT_OPT_ENABLE_CAMPERVAN, false);
+            
             new LGL_Forms();
             new LGL_Email_Builder();
         }
