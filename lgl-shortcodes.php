@@ -509,18 +509,29 @@ if (! class_exists('LGL_Shortcodes')) {
             // --- TAB 6: Comparison Table Settings ---
             add_settings_section('lgl_pages', 'LGL Pages & Active Vehicles', array($this, 'render_lgl_pages_description'), 'lgl-pages');
 
+            // 1. Define your base pages that are ALWAYS required
             $lgl_pages_fields = array(
-                'enable_caravan'             => array('label' => 'Enable Caravans', 'type' => 'checkbox', 'default' => '1'),
-                'enable_motorhome'           => array('label' => 'Enable Motorhomes', 'type' => 'checkbox', 'default' => '1'),
-                'enable_campervan'           => array('label' => 'Enable Campervans', 'type' => 'checkbox', 'default' => '1'),
                 'vehicle_comparison_page_id' => array('label' => 'Vehicle Comparison Page', 'type' => 'select_page', 'default' => ''),
-                'wishlist_page_id' => array('label' => 'Wishlist Page', 'type' => 'select_page', 'default' => ''),
-                'my_account_page_id'         => array('label' => 'My Account Page',          'type' => 'select_page', 'default' => ''),
-                'caravan_page' => array('label' => 'Caravan Page', 'type' => 'select_page', 'default' => ''),
-                'motorhome_page' => array('label' => 'Motorhome Page', 'type' => 'select_page', 'default' => ''),
-                'campervan_page' => array('label' => 'Campervan Page', 'type' => 'select_page', 'default' => ''),
+                'wishlist_page_id'           => array('label' => 'Wishlist Page',           'type' => 'select_page', 'default' => ''),
+                'my_account_page_id'         => array('label' => 'My Account Page',         'type' => 'select_page', 'default' => ''),
             );
 
+            // 2. Dynamically add the vehicle pages ONLY if they are enabled
+            foreach ($this->cpt_toggles as $cpt => $is_enabled) {
+
+                if ($is_enabled) {
+                    // Automatically formats "caravan" to "Caravan Page"
+                    $label = ucfirst($cpt) . ' Page';
+
+                    // Appends to the array with the key "caravan_page"
+                    $lgl_pages_fields[$cpt . '_page'] = array(
+                        'label'   => $label,
+                        'type'    => 'select_page',
+                        'default' => ''
+                    );
+                }
+            }
+            
             foreach ($lgl_pages_fields as $id => $field) {
                 add_settings_field(
                     $id,
