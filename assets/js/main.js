@@ -18,8 +18,7 @@
 
     /**
      * Initializes the newly added Vehicle Type Tabs shortcode.
-     * Listens for clicks on the tabs and syncs the selection with the main Search Form dropdown.
-     * If the search form isn't present (e.g., on a different page), it redirects the user.
+     * Listens for clicks on the tabs, syncs the selection, and triggers the modal popup.
      */
     function initTypeTabs() {
         $(document).on('click', '.lgl-tab-btn', function (e) {
@@ -41,7 +40,14 @@
                 } else {
                     $select.val(url);
                 }
+
+                // Trigger change to auto-update backend form states
                 $select.trigger('change');
+
+                // Trigger Modal Popup
+                if (typeof window.openLglPanel === 'function') {
+                    window.openLglPanel();
+                }
             } else {
                 if (url) window.location.href = url;
             }
