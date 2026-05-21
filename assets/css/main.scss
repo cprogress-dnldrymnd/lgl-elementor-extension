@@ -34,6 +34,55 @@
 // ==========================================================================
 // 2. Search Filter Form Styles
 // ==========================================================================
+@mixin layout-vertical {
+    .lgl-search-form-inner {
+        flex-direction: column;
+        gap: 20px;
+        .lgl-filter-group {
+            --width: 100%;
+            border-radius: 5px;
+            select {
+                font-size: 0.875rem;
+                font-weight: 500;
+                min-height: 57px;
+                width: 100%;
+            }
+            &.lgl-submit-group {
+                padding: 0;
+            }
+            &:not(.lgl-submit-group) {
+                border: 1px solid var(--lgl-color-tertiary) !important;
+            }
+            .choices {
+                font-weight: 500;
+
+                .choices__inner {
+                    font-size: 0.875rem;
+                }
+            }
+        }
+    }
+    .lgl-reset-filters-btn.lgl-reset-filters-btn.lgl-reset-filters-btn.lgl-reset-filters-btn {
+        background-color: var(--lgl-color-accent);
+        color: var(--lgl-color-secondary);
+        font-family: var(--lgl-font-secondary);
+        border: none;
+        padding: 16px 32px;
+        font-size: 1rem;
+        letter-spacing: 0;
+        text-transform: uppercase;
+        border-radius: 6px;
+        font-weight: 600;
+        cursor: pointer;
+        transition:
+            background-color 0.3s ease,
+            transform 0.1s ease;
+        width: 100%;
+        line-height: 1;
+        position: static;
+        margin-top: 20px;
+    }
+}
 .lgl-holder {
     font-family: var(--lgl-font-primary);
 }
@@ -100,6 +149,9 @@
                     }
                 }
             }
+            @media (max-width: 1024px) {
+                @include layout-vertical;
+            }
         }
         &.lgl-layout-vertical {
             .lgl-submit-group {
@@ -107,53 +159,7 @@
                     display: none;
                 }
             }
-            .lgl-search-form-inner {
-                flex-direction: column;
-                gap: 20px;
-                .lgl-filter-group {
-                    --width: 100%;
-                    border-radius: 5px;
-                    select {
-                        font-size: 0.875rem;
-                        font-weight: 500;
-                        min-height: 57px;
-                        width: 100%;
-                    }
-                    &.lgl-submit-group {
-                        padding: 0;
-                    }
-                    &:not(.lgl-submit-group) {
-                        border: 1px solid var(--lgl-color-tertiary) !important;
-                    }
-                    .choices {
-                        font-weight: 500;
-
-                        .choices__inner {
-                            font-size: 0.875rem;
-                        }
-                    }
-                }
-            }
-            .lgl-reset-filters-btn.lgl-reset-filters-btn.lgl-reset-filters-btn.lgl-reset-filters-btn {
-                background-color: var(--lgl-color-accent);
-                color: var(--lgl-color-secondary);
-                font-family: var(--lgl-font-secondary);
-                border: none;
-                padding: 16px 32px;
-                font-size: 1rem;
-                letter-spacing: 0;
-                text-transform: uppercase;
-                border-radius: 6px;
-                font-weight: 600;
-                cursor: pointer;
-                transition:
-                    background-color 0.3s ease,
-                    transform 0.1s ease;
-                width: 100%;
-                line-height: 1;
-                position: static;
-                margin-top: 20px;
-            }
+            @include layout-vertical;
         }
     }
     .lgl-reset-filters-btn.lgl-reset-filters-btn.lgl-reset-filters-btn.lgl-reset-filters-btn {
@@ -2928,7 +2934,7 @@ $wt-cols: 110px 1fr 120px 110px 80px 80px 50px;
             @media (min-width: 768px) {
                 min-width: 160px;
             }
-             @media (max-width: 1024px) {
+            @media (max-width: 1024px) {
                 border-radius: 10px;
             }
             @media (max-width: 767px) {

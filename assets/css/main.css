@@ -73,6 +73,43 @@
           --width: 25%; }
           .lgl-search-container.lgl-search-container.lgl-search-container .lgl-filter-form.lgl-layout-horizontal .lgl-search-form-inner .lgl-filter-group:nth-child(4) {
             border-right: none; } }
+    @media (max-width: 1024px) {
+      .lgl-search-container.lgl-search-container.lgl-search-container .lgl-filter-form.lgl-layout-horizontal .lgl-search-form-inner {
+        flex-direction: column;
+        gap: 20px; }
+        .lgl-search-container.lgl-search-container.lgl-search-container .lgl-filter-form.lgl-layout-horizontal .lgl-search-form-inner .lgl-filter-group {
+          --width: 100%;
+          border-radius: 5px; }
+          .lgl-search-container.lgl-search-container.lgl-search-container .lgl-filter-form.lgl-layout-horizontal .lgl-search-form-inner .lgl-filter-group select {
+            font-size: 0.875rem;
+            font-weight: 500;
+            min-height: 57px;
+            width: 100%; }
+          .lgl-search-container.lgl-search-container.lgl-search-container .lgl-filter-form.lgl-layout-horizontal .lgl-search-form-inner .lgl-filter-group.lgl-submit-group {
+            padding: 0; }
+          .lgl-search-container.lgl-search-container.lgl-search-container .lgl-filter-form.lgl-layout-horizontal .lgl-search-form-inner .lgl-filter-group:not(.lgl-submit-group) {
+            border: 1px solid var(--lgl-color-tertiary) !important; }
+          .lgl-search-container.lgl-search-container.lgl-search-container .lgl-filter-form.lgl-layout-horizontal .lgl-search-form-inner .lgl-filter-group .choices {
+            font-weight: 500; }
+            .lgl-search-container.lgl-search-container.lgl-search-container .lgl-filter-form.lgl-layout-horizontal .lgl-search-form-inner .lgl-filter-group .choices .choices__inner {
+              font-size: 0.875rem; }
+      .lgl-search-container.lgl-search-container.lgl-search-container .lgl-filter-form.lgl-layout-horizontal .lgl-reset-filters-btn.lgl-reset-filters-btn.lgl-reset-filters-btn.lgl-reset-filters-btn {
+        background-color: var(--lgl-color-accent);
+        color: var(--lgl-color-secondary);
+        font-family: var(--lgl-font-secondary);
+        border: none;
+        padding: 16px 32px;
+        font-size: 1rem;
+        letter-spacing: 0;
+        text-transform: uppercase;
+        border-radius: 6px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background-color 0.3s ease, transform 0.1s ease;
+        width: 100%;
+        line-height: 1;
+        position: static;
+        margin-top: 20px; } }
     @media (min-width: 1025px) {
       .lgl-search-container.lgl-search-container.lgl-search-container .lgl-filter-form.lgl-layout-vertical .lgl-submit-group {
         display: none; } }
