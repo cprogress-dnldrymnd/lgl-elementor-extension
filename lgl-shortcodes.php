@@ -72,7 +72,6 @@ if (! class_exists('LGL_Shortcodes')) {
             add_filter('has_post_thumbnail', array($this, 'fallback_has_post_thumbnail'), 10, 3);
             add_filter('post_thumbnail_html', array($this, 'fallback_placeholder_image'), 20, 5);
             add_filter('post_thumbnail_url', array($this, 'fallback_post_thumbnail_url'), 10, 3);;
-            add_action('wp_footer', array($this, 'iframe_resizer'));
 
 
             // AJAX endpoints for dependent dropdowns and search results
@@ -1096,18 +1095,6 @@ if (! class_exists('LGL_Shortcodes')) {
                 echo "\t{$key}: " . $val . ";\n";
             }
             echo "}\n</style>\n";
-        }
-
-        public function iframe_resizer()
-        {
-        ?>
-          <script src="//cdnjs.cloudflare.com/ajax/libs/iframe-resizer/3.6.0/iframeResizer.min.js"></script>
-            <script>
-                iFrameResize({
-                    log: false,
-                }, "#iframe");
-            </script>
-        <?php
         }
 
         /**

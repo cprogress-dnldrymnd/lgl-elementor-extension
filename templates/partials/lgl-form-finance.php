@@ -67,3 +67,12 @@ $min_dep   = (float) ($fin['min_deposit'] ?? 100);
 
     <p class="lgl-fc-disclaimer"><?php echo esc_html(LGL_Forms::parse_modal_string($fin['disclaimer_text'] ?? '', $target_post_id)); ?></p>
 <?php endif; ?>
+
+<script src="//cdnjs.cloudflare.com/ajax/libs/iframe-resizer/3.6.0/iframeResizer.min.js"></script>
+
+<script>
+    iFrameResize({
+        log: false,
+        enablePublicMethods: true
+    }, "#iframe");
+</script>
