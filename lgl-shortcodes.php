@@ -42,6 +42,7 @@ if (! class_exists('LGL_Shortcodes')) {
         private $enable_caravan;
         private $enable_motorhome;
         private $enable_campervan;
+        private $cpt_toggles;
 
 
         /**
@@ -56,6 +57,13 @@ if (! class_exists('LGL_Shortcodes')) {
             $this->enable_caravan   = get_option(LGL_IMPORT_OPT_ENABLE_CARAVAN, false);
             $this->enable_motorhome = get_option(LGL_IMPORT_OPT_ENABLE_MOTORHOME, false);
             $this->enable_campervan = get_option(LGL_IMPORT_OPT_ENABLE_CAMPERVAN, false);
+
+            // 2. Map the CPT slugs to their specific toggle states
+            $this->cpt_toggles = array(
+                'caravan'   => $this->enable_caravan,
+                'motorhome' => $this->enable_motorhome,
+                'campervan' => $this->enable_campervan,
+            );
 
             // Frontend Hooks
             add_action('init', array($this, 'register_shortcodes'));
@@ -116,15 +124,7 @@ if (! class_exists('LGL_Shortcodes')) {
             add_action('delete_term', array($this, 'clear_lgl_taxonomy_cache'), 10, 3);
 
 
-            // 2. Map the CPT slugs to their specific toggle states
-            $cpt_toggles = array(
-                'caravan'   => $this->enable_caravan,
-                'motorhome' => $this->enable_motorhome,
-                'campervan' => $this->enable_campervan,
-            );
-
-            // 3. Loop through and dynamically add hooks only for enabled CPTs
-            foreach ($cpt_toggles as $cpt => $is_enabled) {
+            foreach ($this->cpt_toggles as $cpt => $is_enabled) {
 
                 // Skip if this specific vehicle type is disabled in the settings
                 if (! $is_enabled) {
