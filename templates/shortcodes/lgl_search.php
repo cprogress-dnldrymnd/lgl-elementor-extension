@@ -120,32 +120,29 @@ if ($post_type) {
         $base_archive_url = get_post_type_archive_link($post_type);
     }
 }
-
-// Evaluate if the offcanvas markup should be loaded
-$is_offcanvas = ($post_type || $search_type === 'tabs');
-$offcanvas_class = 'lgl-search-offcanvas';
-$backdrop_class = 'lgl-search-offcanvas-backdrop';
 ?>
 
-<?php if ($post_type && $search_type !== 'tabs') : ?>
-    <div class="lgl-search-mobile-toggle-wrapper">
-        <button type="button"
-            class="lgl-search-mobile-toggle"
-            aria-expanded="false"
-            aria-controls="lgl-search-offcanvas"
-            aria-label="Start a new search">
-            <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" fill="currentColor" viewBox="0 0 16 16">
-                <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0" />
-            </svg>
-            Start a New Search
-        </button>
-    </div>
+<?php if ($post_type || $search_type === 'tabs') : ?>
+    <?php if ($post_type) : ?>
+        <div class="lgl-search-mobile-toggle-wrapper">
+            <button type="button"
+                class="lgl-search-mobile-toggle"
+                aria-expanded="false"
+                aria-controls="lgl-search-offcanvas"
+                aria-label="Start a new search">
+                <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" fill="currentColor" viewBox="0 0 16 16">
+                    <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0" />
+                </svg>
+                Start a New Search
+            </button>
+        </div>
+    <?php endif; ?>
+
+    <div class="lgl-search-offcanvas-backdrop" id="lgl-search-backdrop" aria-hidden="true"></div>
 <?php endif; ?>
 
-<?php if ($is_offcanvas) : ?>
-    <div class="<?php echo esc_attr($backdrop_class); ?>" id="lgl-search-backdrop" aria-hidden="true"></div>
-
-    <div class="<?php echo esc_attr($offcanvas_class); ?>"
+<?php if ($post_type || $search_type === 'tabs') : ?>
+    <div class="lgl-search-offcanvas"
         id="lgl-search-offcanvas"
         role="dialog"
         aria-modal="true"
@@ -161,7 +158,8 @@ $backdrop_class = 'lgl-search-offcanvas-backdrop';
         </div>
 
         <div class="lgl-offcanvas-body">
-        <?php endif; ?>
+<?php endif; ?>
+
         <div class="lgl-search-container lgl-holder">
             <?php
             // Evaluate string 'true' or 'false' into an actual boolean
@@ -219,7 +217,6 @@ $backdrop_class = 'lgl-search-offcanvas-backdrop';
                         <?php endif; ?>
                     <?php } ?>
 
-                    <!-- Make -->
                     <div class="lgl-filter-group">
                         <label for="lgl_make">Make</label>
                         <select name="listing_make" id="lgl_make" class="lgl-select2" data-placeholder="Select Make" <?php echo ($data_post_type == false) ? 'disabled' : ''; ?>>
@@ -234,7 +231,6 @@ $backdrop_class = 'lgl-search-offcanvas-backdrop';
                         </select>
                     </div>
 
-                    <!-- Model -->
                     <div class="lgl-filter-group">
                         <label for="lgl_model">Model</label>
                         <?php
@@ -395,15 +391,10 @@ $backdrop_class = 'lgl-search-offcanvas-backdrop';
                     </button>
                 <?php } ?>
             </form>
-
-
         </div>
 
-
-        <?php if ($is_offcanvas) : ?>
-        </div><!-- /.lgl-offcanvas-body -->
-    </div><!-- /.lgl-search-offcanvas -->
-    <script>
+<?php if ($post_type || $search_type === 'tabs') : ?>
+        </div></div><script>
         (function() {
             var toggleBtn = document.querySelector('.lgl-search-mobile-toggle');
             var panel = document.getElementById('lgl-search-offcanvas');
@@ -411,13 +402,14 @@ $backdrop_class = 'lgl-search-offcanvas-backdrop';
             var closeBtn = panel ? panel.querySelector('.lgl-offcanvas-close') : null;
             var searchForm = document.getElementById('lgl-search-form');
 
-            if (!toggleBtn || !panel || !backdrop) return;
+            // Form container panel & backdrop are required elements
+            if (!panel || !backdrop) return;
 
             function openPanel() {
                 panel.classList.add('is-open');
                 backdrop.classList.add('is-visible');
                 document.body.classList.add('lgl-offcanvas-open');
-                toggleBtn.setAttribute('aria-expanded', 'true');
+                if (toggleBtn) toggleBtn.setAttribute('aria-expanded', 'true');
                 // Shift focus to the close button for keyboard accessibility
                 if (closeBtn) closeBtn.focus();
             }
@@ -426,13 +418,29 @@ $backdrop_class = 'lgl-search-offcanvas-backdrop';
                 panel.classList.remove('is-open');
                 backdrop.classList.remove('is-visible');
                 document.body.classList.remove('lgl-offcanvas-open');
-                toggleBtn.setAttribute('aria-expanded', 'false');
-                toggleBtn.focus();
+                if (toggleBtn) {
+                    toggleBtn.setAttribute('aria-expanded', 'false');
+                    toggleBtn.focus();
+                }
             }
 
-            toggleBtn.addEventListener('click', openPanel);
+            // Bind click for standard archive pages trigger button if it exists
+            if (toggleBtn) {
+                toggleBtn.addEventListener('click', openPanel);
+            }
             if (closeBtn) closeBtn.addEventListener('click', closePanel);
             backdrop.addEventListener('click', closePanel);
+
+            // AUTO-BIND TAB CLICK ACTIONS FOR MOBILE VIEWPORTS (<= 1024px)
+            // Finds potential container tabs matching common layouts
+            var tabs = document.querySelectorAll('.lgl-search-tabs button, .lgl-tabs-nav button, .search-tab, [data-post-type]');
+            tabs.forEach(function(tab) {
+                tab.addEventListener('click', function() {
+                    if (window.innerWidth <= 1024) {
+                        openPanel();
+                    }
+                });
+            });
 
             // Intercept form submission to automatically collapse the mobile offcanvas
             if (searchForm) {
