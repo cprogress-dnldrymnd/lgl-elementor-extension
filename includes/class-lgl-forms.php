@@ -28,6 +28,7 @@ class LGL_Forms
 		add_action('admin_post_lgl_save_finance_form',  [$this, 'save_finance']);
 		add_action('admin_post_lgl_save_enquiry_form',  [$this, 'save_enquiry']);
 		add_action('admin_post_lgl_save_reserve_form',  [$this, 'save_reserve']);
+		add_action('admin_post_lgl_save_integrations_form', [$this, 'save_integrations']); // NEW: Integrations Save Hook
 
 		// ── Per-product meta box ─────────────────────────────────────
 		add_action('add_meta_boxes', [$this, 'add_product_meta_box']);
@@ -350,9 +351,10 @@ class LGL_Forms
 		// Native WordPress Nav Tabs
 		echo '<h2 class="nav-tab-wrapper">';
 		$tabs = [
-			'finance' => __('Finance Calculator', 'lgl-shortcodes'),
-			'enquiry' => __('Enquiry Form', 'lgl-shortcodes'),
-			'reserve' => __('Reserve Form', 'lgl-shortcodes'),
+			'finance'      => __('Finance Calculator', 'lgl-shortcodes'),
+			'enquiry'      => __('Enquiry Form', 'lgl-shortcodes'),
+			'reserve'      => __('Reserve Form', 'lgl-shortcodes'),
+			'integrations' => __('Integrations', 'lgl-shortcodes'), // NEW: Integrations Tab
 		];
 
 		foreach ($tabs as $key => $name) {
@@ -369,6 +371,8 @@ class LGL_Forms
 			$this->page_enquiry();
 		} elseif ($active_tab === 'reserve') {
 			$this->page_reserve();
+		} elseif ($active_tab === 'integrations') {
+			$this->page_integrations(); // NEW: Render Integrations UI
 		}
 
 		echo '</div>';
@@ -838,6 +842,108 @@ class LGL_Forms
 	}
 
 	/**
+	 * Initializes the Integrations setting UI mapping API payloads.
+	 */
+	private function page_integrations()
+	{
+		$s = get_option('lgl_integrations_form', []);
+		?>
+		<div class="lgl-form-builder-wrap">
+			<form method="post" action="<?php echo admin_url('admin-post.php'); ?>">
+				<?php wp_nonce_field('lgl_save_integrations_form'); ?>
+				<input type="hidden" name="action" value="lgl_save_integrations_form">
+				<div class="lgl-fbl-layout">
+					<div>
+						<div class="lgl-fbl-section">
+							<h3><?php _e('Google reCAPTCHA v3', 'lgl-shortcodes'); ?></h3>
+							<p class="description"><?php _e('Protects Enquiry and Reserve forms from spam without user friction.', 'lgl-shortcodes'); ?></p>
+							<table class="form-table" style="margin:0">
+								<tr>
+									<th><label for="recaptcha_enable"><?php _e('Enable reCAPTCHA v3', 'lgl-shortcodes'); ?></label></th>
+									<td><input type="checkbox" id="recaptcha_enable" name="recaptcha_enable" value="1" <?php checked(! empty($s['recaptcha_enable'])); ?>></td>
+								</tr>
+								<tr>
+									<th><label for="recaptcha_site_key"><?php _e('Site Key', 'lgl-shortcodes'); ?></label></th>
+									<td><input type="text" id="recaptcha_site_key" name="recaptcha_site_key" value="<?php echo esc_attr($s['recaptcha_site_key'] ?? ''); ?>" class="regular-text"></td>
+								</tr>
+								<tr>
+									<th><label for="recaptcha_secret_key"><?php _e('Secret Key', 'lgl-shortcodes'); ?></label></th>
+									<td><input type="text" id="recaptcha_secret_key" name="recaptcha_secret_key" value="<?php echo esc_attr($s['recaptcha_secret_key'] ?? ''); ?>" class="regular-text"></td>
+								</tr>
+								<tr>
+									<th><label for="recaptcha_score"><?php _e('Minimum Score Threshold', 'lgl-shortcodes'); ?></label></th>
+									<td>
+										<input type="number" step="0.1" min="0" max="1" id="recaptcha_score" name="recaptcha_score" value="<?php echo esc_attr($s['recaptcha_score'] ?? '0.5'); ?>" class="small-text">
+										<p class="description"><?php _e('1.0 is very likely a good interaction, 0.0 is very likely a bot. Default is 0.5.', 'lgl-shortcodes'); ?></p>
+									</td>
+								</tr>
+							</table>
+						</div>
+					</div>
+				</div>
+				<?php submit_button(__('Save Integrations', 'lgl-shortcodes')); ?>
+			</form>
+		</div>
+		<?php
+	}
+
+	/**
+	 * Executes sanitization and option mapping during Integrations Builder POST processing.
+	 */
+	public function save_integrations()
+	{
+		check_admin_referer('lgl_save_integrations_form');
+		if (! current_user_can('manage_options')) wp_die('Unauthorized');
+		
+		update_option('lgl_integrations_form', [
+			'recaptcha_enable'     => ! empty($_POST['recaptcha_enable']) ? '1' : '',
+			'recaptcha_site_key'   => sanitize_text_field($_POST['recaptcha_site_key'] ?? ''),
+			'recaptcha_secret_key' => sanitize_text_field($_POST['recaptcha_secret_key'] ?? ''),
+			'recaptcha_score'      => floatval($_POST['recaptcha_score'] ?? '0.5'),
+		]);
+
+		wp_redirect(admin_url('admin.php?page=lgl-form-builder&tab=integrations&saved=1'));
+		exit;
+	}
+
+	/**
+	 * Resolves server-side validation against Google's API to ensure the token payload is secure and human.
+	 * * @param string $action The targeted action metric (e.g. 'enquiry' or 'reserve').
+	 * @return bool True if verification passed or is disabled, false if bot activity is detected.
+	 */
+	private function verify_recaptcha($action)
+	{
+		$integ = get_option('lgl_integrations_form', []);
+		$recaptcha_enable = ! empty($integ['recaptcha_enable']) && ! empty($integ['recaptcha_site_key']) && ! empty($integ['recaptcha_secret_key']);
+		
+		if (! $recaptcha_enable) return true;
+
+		$token = $_POST['recaptcha_token'] ?? '';
+		if (empty($token)) return false;
+
+		$response = wp_remote_post('https://www.google.com/recaptcha/api/siteverify', [
+			'body' => [
+				'secret'   => $integ['recaptcha_secret_key'],
+				'response' => $token,
+				'remoteip' => $_SERVER['REMOTE_ADDR'] ?? ''
+			]
+		]);
+
+		if (is_wp_error($response)) return false;
+
+		$body = wp_remote_retrieve_body($response);
+		$result = json_decode($body, true);
+
+		if (empty($result['success'])) return false;
+		
+		$min_score = isset($integ['recaptcha_score']) ? (float)$integ['recaptcha_score'] : 0.5;
+		if (isset($result['score']) && $result['score'] < $min_score) return false;
+		if (isset($result['action']) && $result['action'] !== $action) return false;
+
+		return true;
+	}
+
+	/**
 	 * Helper mapping method handling multi-dimensional repeater fields sanitation.
 	 * Updated to allow safe HTML (wp_kses_post) in labels for privacy policy links.
 	 * * @return array Array structure of cleaned specific form fields.
@@ -1099,6 +1205,11 @@ class LGL_Forms
 		if (! wp_verify_nonce($_POST['lgl_forms_nonce'] ?? '', 'lgl_forms_nonce')) {
 			wp_send_json_error(['message' => __('Security check failed.', 'lgl-shortcodes')]);
 		}
+		
+		// NEW: reCAPTCHA verification trap
+		if (! $this->verify_recaptcha('enquiry')) {
+			wp_send_json_error(['message' => __('Security verification failed. Bot activity detected.', 'lgl-shortcodes')]);
+		}
 		$product_id = absint($_POST['product_id'] ?? 0);
 		$s          = get_option('lgl_enquiry_form', $this->default_enquiry());
 		$fields     = $s['fields'] ?? [];
@@ -1127,6 +1238,11 @@ class LGL_Forms
 	{
 		if (! wp_verify_nonce($_POST['lgl_forms_nonce'] ?? '', 'lgl_forms_nonce')) {
 			wp_send_json_error(['message' => __('Security check failed.', 'lgl-shortcodes')]);
+		}
+
+		// NEW: reCAPTCHA verification trap
+		if (! $this->verify_recaptcha('reserve')) {
+			wp_send_json_error(['message' => __('Security verification failed. Bot activity detected.', 'lgl-shortcodes')]);
 		}
 		$product_id = absint($_POST['product_id'] ?? 0);
 		if ($product_id && get_post_meta($product_id, '_lgl_is_reserved', true)) {
@@ -1209,6 +1325,13 @@ class LGL_Forms
 		$cash_price   = (float) get_post_meta($post_id, 'price', true);
 		if (! $reserve_mode) $reserve_mode = $rs['default_reserve_mode'] ?? 'form_only';
 
+		$integ = get_option('lgl_integrations_form', []);
+		$recaptcha_enable = ! empty($integ['recaptcha_enable']) && ! empty($integ['recaptcha_site_key']) && ! empty($integ['recaptcha_secret_key']);
+
+		if ($recaptcha_enable) {
+			wp_enqueue_script('google-recaptcha-v3', 'https://www.google.com/recaptcha/api.js?render=' . esc_attr($integ['recaptcha_site_key']), [], null, true);
+		}
+
 		$dur_raw   = $fin['term_options'] ?? "24\n36\n48\n60";
 		$durations = array_values(array_filter(array_map('trim', explode("\n", $dur_raw))));
 
@@ -1222,9 +1345,11 @@ class LGL_Forms
 			urlencode($afo_referrer)
 		);
 
-		wp_localize_script('lgl-forms-js', 'lglForms', [
+	wp_localize_script('lgl-forms-js', 'lglForms', [
 			'ajaxUrl'           => admin_url('admin-ajax.php'),
 			'nonce'             => wp_create_nonce('lgl_forms_nonce'),
+			'recaptchaEnabled'  => $recaptcha_enable,
+			'recaptchaSiteKey'  => $integ['recaptcha_site_key'] ?? '', 
 			'productId'         => $post_id,
 			'cashPrice'         => $cash_price,
 			'reserveMode'       => $reserve_mode,
@@ -1475,4 +1600,6 @@ class LGL_Forms
 			],
 		];
 	}
+
+	
 }

@@ -211,10 +211,15 @@
             .removeAttr('data-lgl-action');
     }
 
-    /* ────────────────────────────────────────────────────────────
-       SHARED FORM SUBMISSION
+   /* ────────────────────────────────────────────────────────────
+       SHARED FORM SUBMISSION WITH RECAPTCHA LOGIC
     ──────────────────────────────────────────────────────────── */
 
+    /**
+     * Executes the form submission workflow natively injecting reCAPTCHA tokens.
+     * * @param {jQuery} $form DOM node of targeted form 
+     * @param {string} type Action string (enquiry|reserve)
+     */
     function submitForm($form, type) {
         var $btn = $form.find('.lgl-form-submit-btn');
         var $txt = $btn.find('.lgl-submit-txt');
@@ -225,8 +230,33 @@
         $spin.show();
         $form.find('.lgl-form-msg').hide().removeClass('lgl-msg-error lgl-msg-success');
 
+        if (F.recaptchaEnabled && typeof grecaptcha !== 'undefined') {
+            grecaptcha.ready(function () {
+                grecaptcha.execute(F.recaptchaSiteKey, { action: type }).then(function (token) {
+                    executeAjax($form, type, token, $btn, $txt, $spin);
+                });
+            });
+        } else {
+            executeAjax($form, type, '', $btn, $txt, $spin);
+        }
+    }
+
+    /**
+     * Internal processor delegating AJAX execution.
+     * * @param {jQuery} $form Targeted form DOM
+     * @param {string} type Expected payload hook string
+     * @param {string} recaptchaToken Resolved reCAPTCHA key from Google
+     * @param {jQuery} $btn Targeting submit trigger
+     * @param {jQuery} $txt Target button string
+     * @param {jQuery} $spin Target spinner
+     */
+    function executeAjax($form, type, recaptchaToken, $btn, $txt, $spin) {
         var data = $form.serialize();
         data += '&lgl_forms_nonce=' + encodeURIComponent(F.nonce);
+        
+        if (recaptchaToken) {
+            data += '&recaptcha_token=' + encodeURIComponent(recaptchaToken);
+        }
 
         $.ajax({
             url: F.ajaxUrl,
@@ -238,7 +268,6 @@
                 $spin.hide();
 
                 if (res.success) {
-                    // ── NEW LOGIC: Hide form fields and button on success ──
                     $form.find('.lgl-form-grid, .lgl-form-submit-btn').hide();
 
                     showFormMsg($form, res.data.message, 'success');
@@ -252,7 +281,6 @@
                             .removeAttr('data-lgl-modal');
                     }
 
-                    /* Auto-close after a delay to let them read the message */
                     setTimeout(closeAllModals, 4000);
                 } else {
                     showFormMsg($form, res.data.message || 'Something went wrong.', 'error');
@@ -266,7 +294,6 @@
             }
         });
     }
-
     /* ────────────────────────────────────────────────────────────
        FORM VALIDATION
     ──────────────────────────────────────────────────────────── */
