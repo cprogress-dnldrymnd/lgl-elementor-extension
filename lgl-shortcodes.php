@@ -531,7 +531,7 @@ if (! class_exists('LGL_Shortcodes')) {
                     );
                 }
             }
-            
+
             foreach ($lgl_pages_fields as $id => $field) {
                 add_settings_field(
                     $id,
@@ -547,24 +547,24 @@ if (! class_exists('LGL_Shortcodes')) {
             add_settings_section('lgl_featured_section', 'Select Featured Vehicles for Frontend Carousels', null, 'lgl-settings-featured');
 
             // 1. Initialize an empty array
-$featured_fields = array();
+            $featured_fields = array();
 
-// 2. Loop through toggles to dynamically build fields
-foreach ( $this->cpt_toggles as $cpt => $is_enabled ) {
-    
-    if ( $is_enabled ) {
-        // Formats "caravan" to "Featured Caravans"
-        $label = 'Featured ' . ucfirst( $cpt ) . 's'; 
-        
-        // Build the dynamic field array
-        $featured_fields[ 'featured_' . $cpt ] = array(
-            'label'     => $label,
-            'type'      => 'multi_select_cpt',
-            'post_type' => $cpt,
-            'default'   => array(),
-        );
-    }
-}
+            // 2. Loop through toggles to dynamically build fields
+            foreach ($this->cpt_toggles as $cpt => $is_enabled) {
+
+                if ($is_enabled) {
+                    // Formats "caravan" to "Featured Caravans"
+                    $label = 'Featured ' . ucfirst($cpt) . 's';
+
+                    // Build the dynamic field array
+                    $featured_fields['featured_' . $cpt] = array(
+                        'label'     => $label,
+                        'type'      => 'multi_select_cpt',
+                        'post_type' => $cpt,
+                        'default'   => array(),
+                    );
+                }
+            }
 
             foreach ($featured_fields as $id => $field) {
                 add_settings_field(
@@ -3110,7 +3110,7 @@ foreach ( $this->cpt_toggles as $cpt => $is_enabled ) {
         {
             $options = get_option('lgl_settings', array());
             $lgl_pages_settings = get_option('lgl_pages', array());
-            $lgl_cpts = array('caravan', 'motorhome', 'campervan');
+            $lgl_cpts = array_keys($this->cpt_toggles);
             $active_cpts = array();
 
             foreach ($lgl_cpts as $cpt) {
