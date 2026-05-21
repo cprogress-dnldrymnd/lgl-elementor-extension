@@ -2352,9 +2352,6 @@
   @media (max-width: 1024px) {
     .lgl-type-tabs-wrapper .lgl-type-tabs {
       gap: 1rem; } }
-  @media (max-width: 575px) {
-    .lgl-type-tabs-wrapper .lgl-type-tabs {
-      padding-left: 10px; } }
   @media (min-width: 1025px) {
     .lgl-type-tabs-wrapper .lgl-type-tabs {
       padding-left: clamp(20px, 3vw, 50px); } }
