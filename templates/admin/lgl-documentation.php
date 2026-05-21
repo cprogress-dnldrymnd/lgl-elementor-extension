@@ -229,6 +229,45 @@ if (!current_user_can('manage_options')) {
                     ),
                 ),
 
+                array(
+                    'tag'         => 'lgl_finance_form',
+                    'label'       => 'Inline Finance Calculator',
+                    'description' => 'Renders the Finance Calculator directly onto the page instead of hiding it inside a modal popup. Uses the settings configured under LGL Settings → Form Builder.',
+                    'examples'    => array(
+                        '[lgl_finance_form]',
+                        '[lgl_finance_form post_id="123"]',
+                    ),
+                    'attributes'  => array(
+                        array('name' => 'post_id', 'default' => '(current post)', 'description' => 'Optional. Target a specific vehicle ID to read the cash price for the calculator. Defaults to the current global <code>$post</code> if placed on a single vehicle page.'),
+                    ),
+                ),
+
+                array(
+                    'tag'         => 'lgl_enquiry_form',
+                    'label'       => 'Inline Enquiry Form',
+                    'description' => 'Renders the Enquiry form directly onto the page instead of a modal. Submissions are saved to the Enquiry Submissions CPT.',
+                    'examples'    => array(
+                        '[lgl_enquiry_form]',
+                        '[lgl_enquiry_form post_id="123"]',
+                    ),
+                    'attributes'  => array(
+                        array('name' => 'post_id', 'default' => '(current post)', 'description' => 'Optional. Target a specific vehicle ID so the submission is linked to that vehicle.'),
+                    ),
+                ),
+
+                array(
+                    'tag'         => 'lgl_reserve_form',
+                    'label'       => 'Inline Reserve Form',
+                    'description' => 'Renders the Reserve form directly onto the page instead of a modal. Will automatically handle the vehicle reservation lockout logic upon submission.',
+                    'examples'    => array(
+                        '[lgl_reserve_form]',
+                        '[lgl_reserve_form post_id="123"]',
+                    ),
+                    'attributes'  => array(
+                        array('name' => 'post_id', 'default' => '(current post)', 'description' => 'Optional. Target a specific vehicle ID so the reservation is linked correctly.'),
+                    ),
+                ),
+
             );
 
             foreach ($shortcodes as $sc) : ?>
@@ -561,7 +600,7 @@ if (!current_user_can('manage_options')) {
                 <?php esc_html_e('Form Builder', 'lgl-shortcodes'); ?>
             </h2>
             <p class="lgl-docs__settings-intro">
-                <?php esc_html_e('The Form Builder lives under LGL Settings → Form Builder and controls the Finance Calculator modal, the Enquiry form modal, and the Reserve form modal rendered on every single vehicle page. No shortcode is required — modals are injected automatically via the wp_footer hook on single vehicle pages.', 'lgl-shortcodes'); ?>
+                <?php esc_html_e('The Form Builder lives under LGL Settings → Form Builder and controls the Finance Calculator modal, the Enquiry form modal, and the Reserve form modal rendered on every single vehicle page. While they are automatically injected as modals on single vehicle pages by default, you can also render them inline anywhere using their respective shortcodes (see the Shortcodes tab).', 'lgl-shortcodes'); ?>
             </p>
 
             <?php
@@ -570,26 +609,28 @@ if (!current_user_can('manage_options')) {
                 array(
                     'slug'        => 'finance',
                     'label'       => 'Finance Calculator',
-                    'description' => 'Configures the Finance Calculator modal that appears when a visitor clicks the Finance Calculator button on a single vehicle page. Supports a native built-in calculator, a custom iframe/HTML embed from a third-party provider, or the button can be hidden entirely.',
+                    'description' => 'Configures the Finance Calculator modal that appears when a visitor clicks the Finance Calculator button on a single vehicle page. Supports a native built-in calculator, a custom iframe/HTML embed from a third-party provider, the Auto Finance Online (AFO) integration, or the button can be hidden entirely.',
                     'fields'      => array(
-                        array('name' => 'Calculator Mode',    'type' => 'Select',   'default' => 'On (Native)',  'description' => '<code>On</code> — uses the built-in APR/flat-rate calculator. <code>Custom</code> — renders your own iframe or HTML code. <code>Off</code> — hides the Finance Calculator button completely.'),
-                        array('name' => 'Custom Calculator Code', 'type' => 'Textarea', 'default' => '(empty)', 'description' => 'Only shown when mode is set to <code>Custom</code>. Paste your finance provider\'s <code>&lt;iframe&gt;</code> or embed code here.'),
-                        array('name' => 'Button Text',        'type' => 'Text',     'default' => 'Finance Calculator', 'description' => 'Label on the button that opens the modal. Supports <code>{{make}}</code> and <code>{{model}}</code> merge tags.'),
-                        array('name' => 'Modal Title',        'type' => 'Text',     'default' => 'Finance Calculator', 'description' => 'Heading inside the modal. Supports <code>{{make}}</code> and <code>{{model}}</code> merge tags.'),
-                        array('name' => 'Subtitle',           'type' => 'Text',     'default' => '(example APR string)', 'description' => 'Optional subtitle displayed below the modal title.'),
-                        array('name' => 'Calculation Type',   'type' => 'Select',   'default' => 'APR',          'description' => '<code>APR</code> uses compound interest (standard). <code>Flat Rate</code> calculates simple interest on the original principal.'),
-                        array('name' => 'APR Rate (%)',        'type' => 'Number',   'default' => '10.90',        'description' => 'The interest rate used in calculations. For APR mode this is the annual percentage rate; for flat rate it is the annual flat rate.'),
-                        array('name' => 'Representative APR', 'type' => 'Text',     'default' => '10.9% APR Representative', 'description' => 'Display-only string shown in the output table. Does not affect calculations.'),
-                        array('name' => 'Finance Provider',   'type' => 'Text',     'default' => '(empty)',      'description' => 'Optional display label for the finance provider name.'),
-                        array('name' => 'Term Options',        'type' => 'Textarea', 'default' => '24, 36, 48, 60', 'description' => 'One term duration per line (in months). These populate the Duration dropdown in the modal.'),
-                        array('name' => 'Default Term',        'type' => 'Number',   'default' => '60',           'description' => 'The term (in months) pre-selected when the modal opens.'),
-                        array('name' => 'Default Deposit (£)', 'type' => 'Number',  'default' => '500',          'description' => 'The deposit amount pre-filled when the modal opens.'),
-                        array('name' => 'Minimum Deposit (£)', 'type' => 'Number',  'default' => '100',          'description' => 'Validation floor for the deposit input. An error is shown if the user enters less.'),
-                        array('name' => 'Purchase Fee (£)',    'type' => 'Number',   'default' => '10',           'description' => 'A fixed fee added to the total amount repayable (e.g. option-to-purchase fee).'),
-                        array('name' => 'Admin Fee (£)',        'type' => 'Number',   'default' => '0',            'description' => 'Optional admin fee also added to the total repayable.'),
-                        array('name' => 'Disclaimer Text',    'type' => 'Textarea', 'default' => '(compliance text)', 'description' => 'Legal disclaimer displayed below the output table. Must include statements such as "Finance subject to status" and "Illustration purposes only" for UK FCA compliance.'),
+                        array('name' => 'Calculator Mode',         'type' => 'Select',   'default' => 'On (Native)', 'description' => '<code>On</code> — uses the built-in APR/flat-rate calculator. <code>Custom</code> — renders your own iframe or HTML code. <code>AFO</code> — Auto Finance Online iframe integration. <code>Off</code> — hides the Finance Calculator button completely.'),
+                        array('name' => 'Custom Calculator Code',  'type' => 'Textarea', 'default' => '(empty)',     'description' => 'Only shown when mode is set to <code>Custom</code>. Paste your finance provider\'s <code>&lt;iframe&gt;</code> or embed code here.'),
+                        array('name' => 'AFO Referrer',            'type' => 'Text',     'default' => 'tony-giles-caravans', 'description' => 'Only shown when mode is set to <code>AFO</code>. The referrer code designated for the AFO iframe request.'),
+                        array('name' => 'AFO Default Deposit (£)', 'type' => 'Number',   'default' => '1000',        'description' => 'Only shown when mode is set to <code>AFO</code>. The default deposit amount embedded into the iframe request.'),
+                        array('name' => 'Button Text',             'type' => 'Text',     'default' => 'Finance Calculator', 'description' => 'Label on the button that opens the modal. Supports <code>{{make}}</code> and <code>{{model}}</code> merge tags.'),
+                        array('name' => 'Modal Title',             'type' => 'Text',     'default' => 'Finance Calculator', 'description' => 'Heading inside the modal. Supports <code>{{make}}</code> and <code>{{model}}</code> merge tags.'),
+                        array('name' => 'Subtitle',                'type' => 'Text',     'default' => '(example APR string)', 'description' => 'Optional subtitle displayed below the modal title.'),
+                        array('name' => 'Calculation Type',        'type' => 'Select',   'default' => 'APR',          'description' => '<strong>(Native Mode Only)</strong> <code>APR</code> uses compound interest. <code>Flat Rate</code> calculates simple interest.'),
+                        array('name' => 'APR Rate (%)',             'type' => 'Number',   'default' => '10.90',        'description' => '<strong>(Native Mode Only)</strong> The interest rate used in calculations.'),
+                        array('name' => 'Representative APR',      'type' => 'Text',     'default' => '10.9% APR Representative', 'description' => '<strong>(Native Mode Only)</strong> Display-only string shown in the output table.'),
+                        array('name' => 'Finance Provider',        'type' => 'Text',     'default' => '(empty)',      'description' => '<strong>(Native Mode Only)</strong> Optional display label for the finance provider name.'),
+                        array('name' => 'Term Options',             'type' => 'Textarea', 'default' => "24\n36\n48\n60", 'description' => '<strong>(Native Mode Only)</strong> One term duration per line (in months).'),
+                        array('name' => 'Default Term',             'type' => 'Number',   'default' => '60',           'description' => '<strong>(Native Mode Only)</strong> The term (in months) pre-selected when the modal opens.'),
+                        array('name' => 'Default Deposit (£)',      'type' => 'Number',   'default' => '500',          'description' => '<strong>(Native Mode Only)</strong> The deposit amount pre-filled when the modal opens.'),
+                        array('name' => 'Minimum Deposit (£)',      'type' => 'Number',   'default' => '100',          'description' => '<strong>(Native Mode Only)</strong> Validation floor for the deposit input.'),
+                        array('name' => 'Purchase Fee (£)',         'type' => 'Number',   'default' => '10',           'description' => '<strong>(Native Mode Only)</strong> A fixed fee added to the total amount repayable.'),
+                        array('name' => 'Admin Fee (£)',             'type' => 'Number',   'default' => '0',            'description' => '<strong>(Native Mode Only)</strong> Optional admin fee also added to the total repayable.'),
+                        array('name' => 'Disclaimer Text',         'type' => 'Textarea', 'default' => '(compliance text)', 'description' => '<strong>(Native Mode Only)</strong> Legal disclaimer displayed below the output table.'),
                     ),
-                    'notes' => '<span>The cash price is read from the <code>price</code> post meta key on each vehicle — the same key used across all other plugin components. No separate price field is required here.</span>',
+                    'notes' => '<span>The cash price is read from the <code>price</code> post meta key on each vehicle. Financial Parameters and Disclaimers only apply when the Calculator Mode is set to <strong>Native</strong>.</span>',
                 ),
 
                 array(
