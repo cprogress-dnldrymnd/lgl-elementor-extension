@@ -563,9 +563,6 @@ if (!current_user_can('manage_options')) {
                     'label'       => 'LGL Pages & Active Vehicles',
                     'description' => 'Maps key plugin features to specific WordPress pages and controls which vehicle types are active site-wide.',
                     'fields'      => array(
-                        array('name' => 'Enable Caravans',         'type' => 'Checkbox',      'default' => 'On',     'description' => 'Global toggle. Disabling this removes Caravans from the Type Tabs, Search Dropdowns, and Comparison features.'),
-                        array('name' => 'Enable Motorhomes',       'type' => 'Checkbox',      'default' => 'On',     'description' => 'Global toggle for Motorhomes.'),
-                        array('name' => 'Enable Campervans',       'type' => 'Checkbox',      'default' => 'On',     'description' => 'Global toggle for Campervans.'),
                         array('name' => 'Vehicle Comparison Page', 'type' => 'Page selector', 'default' => '(none)', 'description' => 'The page containing the <code>[lgl_compare]</code> shortcode. Used as the destination for all "Compare" links across the site, including the mini compare button and the compare duo card CTA.'),
                         array('name' => 'Wishlist Page',           'type' => 'Page selector', 'default' => '(none)', 'description' => 'The page containing the <code>[lgl_wishlist]</code> shortcode. Used as the "View Your Wishlist" link in the mini wishlist dropdown footer.'),
                         array('name' => 'My Account Page',         'type' => 'Page selector', 'default' => '(none)', 'description' => 'The page containing the <code>[lgl_my_account]</code> shortcode. Used as the destination for the mini account bar links and as the post-logout redirect target.'),
