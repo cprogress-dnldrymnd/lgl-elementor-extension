@@ -52,6 +52,11 @@ if (! class_exists('LGL_Shortcodes')) {
          */
         public function __construct()
         {
+
+            $this->enable_caravan   = get_option(LGL_IMPORT_OPT_ENABLE_CARAVAN, false);
+            $this->enable_motorhome = get_option(LGL_IMPORT_OPT_ENABLE_MOTORHOME, false);
+            $this->enable_campervan = get_option(LGL_IMPORT_OPT_ENABLE_CAMPERVAN, false);
+
             // Frontend Hooks
             add_action('init', array($this, 'register_shortcodes'));
             add_action('wp_enqueue_scripts', array($this, 'enqueue_assets'));
@@ -110,9 +115,23 @@ if (! class_exists('LGL_Shortcodes')) {
             add_action('saved_term', array($this, 'clear_lgl_taxonomy_cache'), 10, 3);
             add_action('delete_term', array($this, 'clear_lgl_taxonomy_cache'), 10, 3);
 
-            // Hooks for WP Admin List Table Featured Star Integration
-            $lgl_cpts = array('caravan', 'motorhome', 'campervan');
-            foreach ($lgl_cpts as $cpt) {
+
+            // 2. Map the CPT slugs to their specific toggle states
+            $cpt_toggles = array(
+                'caravan'   => $this->enable_caravan,
+                'motorhome' => $this->enable_motorhome,
+                'campervan' => $this->enable_campervan,
+            );
+
+            // 3. Loop through and dynamically add hooks only for enabled CPTs
+            foreach ($cpt_toggles as $cpt => $is_enabled) {
+
+                // Skip if this specific vehicle type is disabled in the settings
+                if (! $is_enabled) {
+                    continue;
+                }
+
+                // Hooks for WP Admin List Table Featured Star Integration
                 add_filter("manage_{$cpt}_posts_columns", array($this, 'add_featured_list_column'));
                 add_action("manage_{$cpt}_posts_custom_column", array($this, 'render_featured_list_column'), 10, 2);
             }
@@ -138,10 +157,8 @@ if (! class_exists('LGL_Shortcodes')) {
             // Allow SVG uploads in the Media Library
             add_filter('upload_mimes', array($this, 'allow_svg_uploads'));
 
-            $this->enable_caravan   = get_option(LGL_IMPORT_OPT_ENABLE_CARAVAN, false);
-            $this->enable_motorhome = get_option(LGL_IMPORT_OPT_ENABLE_MOTORHOME, false);
-            $this->enable_campervan = get_option(LGL_IMPORT_OPT_ENABLE_CAMPERVAN, false);
-            
+
+
             new LGL_Forms();
             new LGL_Email_Builder();
         }
