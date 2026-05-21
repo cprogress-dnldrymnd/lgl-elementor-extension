@@ -546,11 +546,25 @@ if (! class_exists('LGL_Shortcodes')) {
             // --- TAB 7: Featured Vehicles (New Module) ---
             add_settings_section('lgl_featured_section', 'Select Featured Vehicles for Frontend Carousels', null, 'lgl-settings-featured');
 
-            $featured_fields = array(
-                'featured_caravan'   => array('label' => 'Featured Caravans', 'type' => 'multi_select_cpt', 'post_type' => 'caravan', 'default' => array()),
-                'featured_motorhome' => array('label' => 'Featured Motorhomes', 'type' => 'multi_select_cpt', 'post_type' => 'motorhome', 'default' => array()),
-                'featured_campervan' => array('label' => 'Featured Campervans', 'type' => 'multi_select_cpt', 'post_type' => 'campervan', 'default' => array()),
-            );
+            // 1. Initialize an empty array
+$featured_fields = array();
+
+// 2. Loop through toggles to dynamically build fields
+foreach ( $this->cpt_toggles as $cpt => $is_enabled ) {
+    
+    if ( $is_enabled ) {
+        // Formats "caravan" to "Featured Caravans"
+        $label = 'Featured ' . ucfirst( $cpt ) . 's'; 
+        
+        // Build the dynamic field array
+        $featured_fields[ 'featured_' . $cpt ] = array(
+            'label'     => $label,
+            'type'      => 'multi_select_cpt',
+            'post_type' => $cpt,
+            'default'   => array(),
+        );
+    }
+}
 
             foreach ($featured_fields as $id => $field) {
                 add_settings_field(
