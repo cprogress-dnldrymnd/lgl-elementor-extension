@@ -362,7 +362,7 @@ if (!current_user_can('manage_options')) {
                 <?php esc_html_e('Elementor Widget Integration', 'lgl-shortcodes'); ?>
             </h2>
             <p class="lgl-docs__settings-intro">
-                <?php esc_html_e('The plugin provides native Elementor widgets that mirror the functionality of the core shortcodes. These widgets offer visual controls for styling and configuration directly within the Elementor editor, eliminating the need to write shortcodes manually. You can find them in the Elementor panel under the "LGL Elements" category.', 'lgl-shortcodes'); ?>
+                <?php esc_html_e('The plugin provides native Elementor widgets that mirror the functionality of the core shortcodes. These widgets offer visual controls for styling and configuration directly within the Elementor editor, eliminating the need to write shortcodes manually. You can find them in the Elementor panel under the "LGL Leisure Vehicles" category.', 'lgl-shortcodes'); ?>
             </p>
 
             <?php
@@ -377,10 +377,10 @@ if (!current_user_can('manage_options')) {
                     'name'        => 'LGL Search Form',
                     'icon'        => 'eicon-search',
                     'description' => 'The visual counterpart to <code>[lgl_search]</code>. Inserts the dynamic vehicle search form.',
-                    'controls'    => 'Post Type lock, Search Type (Default/Tabs), Layout (Horizontal/Vertical), and Live Search (AJAX) toggle.',
+                    'controls'    => 'Post Type lock, Search Type (Default/Tabs), Layout (Horizontal/Vertical), Show All Filters, and Live Search (AJAX) toggle.',
                 ),
                 array(
-                    'name'        => 'LGL Search Results',
+                    'name'        => 'LGL Search Results Grid',
                     'icon'        => 'eicon-archive-posts',
                     'description' => 'The visual counterpart to <code>[lgl_search_results]</code>. Must be placed on the same page as the LGL Search Form to act as the target for AJAX updates.',
                     'controls'    => 'Standard Elementor spacing and alignment controls. Requires no complex setup.',
@@ -389,14 +389,80 @@ if (!current_user_can('manage_options')) {
                     'name'        => 'LGL Vehicle Type Tabs',
                     'icon'        => 'eicon-tabs',
                     'description' => 'The visual counterpart to <code>[lgl_type_tabs]</code>. Generates interactive toggle buttons to switch search context between Caravans, Motorhomes, and Campervans.',
-                    'controls'    => 'Automatically reads enabled vehicle types from LGL Settings. Provides visual styling controls for active/inactive tab states.',
+                    'controls'    => 'Automatically reads enabled vehicle types from LGL Settings. Standard Elementor alignment controls.',
                 ),
                 array(
-                    'name'        => 'LGL Compare Duo',
+                    'name'        => 'LGL Compare Table',
+                    'icon'        => 'eicon-table',
+                    'description' => 'The visual counterpart to <code>[lgl_compare]</code>. Full side-by-side vehicle comparison interface.',
+                    'controls'    => 'No complex setup required. Automatically pulls vehicles from the URL or session.',
+                ),
+                array(
+                    'name'        => 'LGL Compare Duo Card',
                     'icon'        => 'eicon-columns',
                     'description' => 'The visual counterpart to <code>[lgl_compare_duo]</code>. Creates a compact A/B comparison card.',
-                    'controls'    => 'Provides two searchable dropdowns to easily select specific published vehicles by title without needing to look up their IDs.',
-                )
+                    'controls'    => 'Provides two text inputs to specify the numeric IDs of the two vehicles to compare.',
+                ),
+                array(
+                    'name'        => 'LGL Full Wishlist Page',
+                    'icon'        => 'eicon-heart',
+                    'description' => 'The visual counterpart to <code>[lgl_wishlist]</code>. Displays the user\'s saved vehicles table.',
+                    'controls'    => 'Standard Elementor spacing and alignment controls.',
+                ),
+                array(
+                    'name'        => 'LGL My Account Dashboard',
+                    'icon'        => 'eicon-lock-user',
+                    'description' => 'The visual counterpart to <code>[lgl_my_account]</code>. Renders the login/register forms or the user dashboard.',
+                    'controls'    => 'Standard Elementor spacing and alignment controls.',
+                ),
+                array(
+                    'name'        => 'LGL Breadcrumbs',
+                    'icon'        => 'eicon-navigation-horizontal',
+                    'description' => 'The visual counterpart to <code>[lgl_breadcrumbs]</code>. Contextual breadcrumb trail.',
+                    'controls'    => 'Standard Elementor spacing and alignment controls.',
+                ),
+                array(
+                    'name'        => 'LGL Related Vehicles',
+                    'icon'        => 'eicon-post-list',
+                    'description' => 'The visual counterpart to <code>[lgl_related_vehicles]</code>. Shows vehicles sharing the same Make/Model taxonomy.',
+                    'controls'    => 'Vehicle Type selection and Display Count limit.',
+                ),
+                array(
+                    'name'        => 'LGL Mini Account Bar',
+                    'icon'        => 'eicon-person',
+                    'description' => 'The visual counterpart to <code>[lgl_mini_account]</code>. Compact account status for headers.',
+                    'controls'    => 'No attributes required.',
+                ),
+                array(
+                    'name'        => 'LGL Mini Compare Button',
+                    'icon'        => 'eicon-exchange',
+                    'description' => 'The visual counterpart to <code>[lgl_mini_compare]</code>. Small icon button linking to the compare page.',
+                    'controls'    => 'No attributes required.',
+                ),
+                array(
+                    'name'        => 'LGL Mini Wishlist Dropdown',
+                    'icon'        => 'eicon-heart-o',
+                    'description' => 'The visual counterpart to <code>[lgl_mini_wishlist]</code>. Interactive heart icon with live count badge.',
+                    'controls'    => 'No attributes required.',
+                ),
+                array(
+                    'name'        => 'LGL Finance Calculator Form',
+                    'icon'        => 'eicon-number-field',
+                    'description' => 'The visual counterpart to <code>[lgl_finance_form]</code>. Inline finance calculator.',
+                    'controls'    => 'Optional Vehicle ID text input override.',
+                ),
+                array(
+                    'name'        => 'LGL Enquiry Form',
+                    'icon'        => 'eicon-envelope',
+                    'description' => 'The visual counterpart to <code>[lgl_enquiry_form]</code>. Inline enquiry form.',
+                    'controls'    => 'Optional Vehicle ID text input override.',
+                ),
+                array(
+                    'name'        => 'LGL Reserve Form',
+                    'icon'        => 'eicon-calendar',
+                    'description' => 'The visual counterpart to <code>[lgl_reserve_form]</code>. Inline reservation form.',
+                    'controls'    => 'Optional Vehicle ID text input override.',
+                ),
             );
 
             foreach ($elementor_widgets as $widget) : ?>
@@ -486,6 +552,8 @@ if (!current_user_can('manage_options')) {
                     'fields'      => array(
                         array('name' => 'Drag handles',   'type' => 'Sortable list',       'default' => '(plugin default order)', 'description' => 'Drag rows to reorder fields. The saved order is applied to both the single vehicle spec list (<code>lgl-meta-list</code>) and the comparison table rows.'),
                         array('name' => 'Hide checkbox',  'type' => 'Checkbox per field',  'default' => 'Off (all visible)',      'description' => 'Check the checkbox next to any field to hide it from the front end. Hidden fields move to the bottom of the list and cannot be sorted until unhidden.'),
+                        array('name' => 'Label Override', 'type' => 'Text',                'default' => '(default label)',        'description' => 'Allows you to overwrite the default field name displayed on the frontend (e.g., changing "MTPLM" to "Maximum Weight").'),
+                        array('name' => 'Icon Override',  'type' => 'Textarea',            'default' => '(default SVG)',          'description' => 'Allows you to overwrite the default icon by pasting a custom SVG code block for the field.'),
                     ),
                     'notes' => 'Fields available for ordering include all common meta fields (price, berth, year, mileage, condition, etc.) plus type-specific fields for caravans and motorhomes/campervans, and taxonomy fields (Fuel Type, Chassis, Gearbox).',
                 ),
