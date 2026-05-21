@@ -1606,10 +1606,10 @@
 /* ============================================================
    LGL Search Offcanvas
    ============================================================ */
-.lgl-offcanvas-close {
+.lgl-offcanvas-close.lgl-offcanvas-close.lgl-offcanvas-close {
   padding: 0 !important; }
 
-.lgl-search-mobile-toggle {
+.lgl-search-mobile-toggle.lgl-search-mobile-toggle.lgl-search-mobile-toggle {
   display: flex;
   align-items: center;
   gap: 10px;
