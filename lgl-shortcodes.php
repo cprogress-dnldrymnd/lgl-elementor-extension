@@ -569,6 +569,7 @@ if (! class_exists('LGL_Shortcodes')) {
        /**
          * Renders the drag-and-drop sortable list for managing field visibility, order, and overrides.
          * Separates visible and hidden fields, auto-moving hidden fields to the bottom.
+         * Includes image uploader with reset functionality for SVG overrides.
          *
          * @return void
          */
@@ -657,18 +658,15 @@ if (! class_exists('LGL_Shortcodes')) {
                             <label style="font-weight:600; margin-bottom:5px; display:block;">Icon</label>
                             <div style="display: flex; gap: 10px; align-items: center;">
                                 <div class="lgl-icon-preview">
-                                    <?php 
-                                    if ($icon_url) {
-                                        echo '<img src="' . esc_url($icon_url) . '" />'; 
-                                    } else {
-                                        // Fallback to local hardcoded SVG if no custom image is selected
-                                        LGL_Shortcodes::render_inline_svg($key);
-                                    }
-                                    ?>
+                                    <img src="<?php echo esc_url($icon_url); ?>" class="custom-icon-img" style="<?php echo $icon_url ? 'display:block;' : 'display:none;'; ?>" />
+                                    <div class="default-icon-svg" style="<?php echo $icon_url ? 'display:none;' : 'display:block;'; ?>">
+                                        <?php LGL_Shortcodes::render_inline_svg($key); ?>
+                                    </div>
                                 </div>
                                 <input type="hidden" name="lgl_settings[icon_id_<?php echo esc_attr($key); ?>]" class="icon-id-input" value="<?php echo esc_attr($icon_id); ?>" />
                                 <input type="hidden" name="lgl_settings[icon_url_<?php echo esc_attr($key); ?>]" class="icon-url-input" value="<?php echo esc_url($icon_url); ?>" />
-                                <button type="button" class="button lgl-upload-svg">Select SVG</button>
+                                <button type="button" class="button lgl-fv-upload-svg">Select SVG</button>
+                                <button type="button" class="button button-link-delete lgl-fv-remove-svg" style="<?php echo $icon_url ? 'display:inline-block;' : 'display:none;'; ?>">Remove</button>
                             </div>
                         </div>
                     </div>
@@ -684,7 +682,6 @@ if (! class_exists('LGL_Shortcodes')) {
                 .lgl-repeater-header { padding: 10px 15px; background: #fff; }
                 .lgl-repeater-body { padding: 15px; display: flex; gap: 20px; align-items: flex-start; flex-wrap: wrap; }
                 .lgl-icon-preview { width: 34px; height: 34px; border: 1px dashed #ccc; display: flex; align-items: center; justify-content: center; background: #fff; }
-                /* Updated CSS to ensure both uploaded images and raw SVGs fit the preview box */
                 .lgl-icon-preview img, .lgl-icon-preview svg { max-width: 20px; max-height: 20px; width: auto; height: auto; display: block; }
             </style>
             <script>
@@ -699,6 +696,7 @@ if (! class_exists('LGL_Shortcodes')) {
                         opacity: 0.8
                     });
 
+                    // Handle Visibility Toggle
                     $sortableList.on("change", ".lgl-hide-toggle", function() {
                         var $listItem  = $(this).closest("li");
                         var isChecked  = $(this).is(":checked");
@@ -720,6 +718,44 @@ if (! class_exists('LGL_Shortcodes')) {
                             }
                         }
                         $sortableList.sortable("refresh");
+                    });
+
+                    // Handle SVG Override Upload
+                    $sortableList.on("click", ".lgl-fv-upload-svg", function(e) {
+                        e.preventDefault();
+                        var $btn = $(this);
+                        var $row = $btn.closest(".lgl-repeater-body");
+                        
+                        var customUploader = wp.media({
+                            title: 'Select SVG Icon',
+                            button: { text: 'Use this SVG' },
+                            multiple: false,
+                            library: { type: 'image/svg+xml' } 
+                        }).on('select', function() {
+                            var attachment = customUploader.state().get('selection').first().toJSON();
+                            $row.find('.icon-id-input').val(attachment.id);
+                            $row.find('.icon-url-input').val(attachment.url);
+                            
+                            // Toggle preview UI
+                            $row.find('.custom-icon-img').attr('src', attachment.url).show();
+                            $row.find('.default-icon-svg').hide();
+                            $row.find('.lgl-fv-remove-svg').show();
+                        }).open();
+                    });
+
+                    // Handle SVG Override Reset/Remove
+                    $sortableList.on("click", ".lgl-fv-remove-svg", function(e) {
+                        e.preventDefault();
+                        var $row = $(this).closest(".lgl-repeater-body");
+                        
+                        // Clear hidden payload
+                        $row.find('.icon-id-input').val('');
+                        $row.find('.icon-url-input').val('');
+                        
+                        // Revert preview UI to default SVG
+                        $row.find('.custom-icon-img').attr('src', '').hide();
+                        $row.find('.default-icon-svg').show();
+                        $(this).hide();
                     });
                 });
             </script>
