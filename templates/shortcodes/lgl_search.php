@@ -120,10 +120,18 @@ if ($post_type) {
         $base_archive_url = get_post_type_archive_link($post_type);
     }
 }
-?>
 
-<?php if ($post_type) : ?>
-    <!-- ① Mobile trigger button (only when a post_type is set) -->
+$is_offcanvas = ($post_type || $search_type === 'tabs');
+$offcanvas_class = 'lgl-search-offcanvas';
+$backdrop_class = 'lgl-search-offcanvas-backdrop';
+
+// Add override classes to enforce modal behavior on all devices when in tabs mode
+if ($search_type === 'tabs') {
+    $offcanvas_class .= ' lgl-force-modal';
+    $backdrop_class .= ' lgl-force-modal';
+}
+?>
+<?php if ($post_type && $search_type !== 'tabs') : ?>
     <div class="lgl-search-mobile-toggle-wrapper">
         <button type="button"
             class="lgl-search-mobile-toggle"
@@ -136,23 +144,67 @@ if ($post_type) {
             Start a New Search
         </button>
     </div>
-
-    <!-- ② Backdrop (mobile only, fades in behind panel) -->
-    <div class="lgl-search-offcanvas-backdrop" id="lgl-search-backdrop" aria-hidden="true"></div>
 <?php endif; ?>
 
-<!-- ③ Offcanvas — static on desktop, fixed sliding panel on mobile.
-        The form lives here once; no duplication, no ID conflicts.
-        When no post_type is set, the offcanvas chrome is skipped entirely
-        and the form renders as a plain inline container. -->
-<?php if ($post_type) : ?>
-    <div class="lgl-search-offcanvas"
+<?php if ($is_offcanvas) : ?>
+
+    <?php if ($search_type === 'tabs') : ?>
+        <style>
+            @media (min-width: 992px) {
+                .lgl-search-offcanvas.lgl-force-modal {
+                    position: fixed !important;
+                    top: 0 !important;
+                    left: -100% !important;
+                    width: 380px !important;
+                    max-width: 100% !important;
+                    height: 100vh !important;
+                    background: #fff !important;
+                    z-index: 99999 !important;
+                    transition: left 0.3s ease !important;
+                    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+                    display: flex !important;
+                    flex-direction: column !important;
+                }
+
+                .lgl-search-offcanvas.lgl-force-modal.is-open {
+                    left: 0 !important;
+                }
+
+                .lgl-search-offcanvas-backdrop.lgl-force-modal {
+                    display: none;
+                    position: fixed !important;
+                    top: 0 !important;
+                    left: 0 !important;
+                    width: 100vw !important;
+                    height: 100vh !important;
+                    background: rgba(0, 0, 0, 0.5) !important;
+                    z-index: 99998 !important;
+                }
+
+                .lgl-search-offcanvas-backdrop.lgl-force-modal.is-visible {
+                    display: block !important;
+                }
+
+                .lgl-search-offcanvas.lgl-force-modal .lgl-offcanvas-header {
+                    display: flex !important;
+                }
+
+                .lgl-search-offcanvas.lgl-force-modal .lgl-offcanvas-body {
+                    overflow-y: auto !important;
+                    flex-grow: 1 !important;
+                }
+            }
+        </style>
+    <?php endif; ?>
+
+    <div class="<?php echo esc_attr($backdrop_class); ?>" id="lgl-search-backdrop" aria-hidden="true"></div>
+
+    <div class="<?php echo esc_attr($offcanvas_class); ?>"
         id="lgl-search-offcanvas"
         role="dialog"
         aria-modal="true"
         aria-label="Search filters">
 
-        <!-- Header bar (CSS hides this on desktop) -->
         <div class="lgl-offcanvas-header">
             <h3>Search Filters</h3>
             <button type="button" class="lgl-offcanvas-close" aria-label="Close search filters">
