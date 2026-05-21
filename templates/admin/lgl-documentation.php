@@ -1,4 +1,3 @@
-<!-- templates/admin/lgl-documentation.php -->
 <?php
 if (!defined('ABSPATH')) {
     exit;
@@ -69,12 +68,14 @@ if (!current_user_can('manage_options')) {
                 '[lgl_search]',
                 '[lgl_search post_type="caravan"]',
                 '[lgl_search search_type="tabs"]',
-                '[lgl_search search_type="tabs" live_search="false"]',
+                '[lgl_search layout="vertical" show_all_filters="false"]',
             ),
             'attributes'  => array(
-                array('name' => 'post_type',   'default' => '(none)',  'description' => 'Optional. Locks the form to a specific vehicle type: <code>caravan</code>, <code>motorhome</code>, or <code>campervan</code>. When omitted a vehicle-type dropdown is shown and the form redirects to the appropriate listing page set under <strong>LGL Pages</strong>.'),
-                array('name' => 'search_type', 'default' => 'default', 'description' => 'Optional. Set to <code>tabs</code> when using the <code>[lgl_type_tabs]</code> shortcode. This hides the default vehicle type dropdown and immediately renders all secondary filters.'),
-                array('name' => 'live_search', 'default' => 'true',    'description' => 'Optional. Set to <code>false</code> to disable the inline AJAX refresh and force the form to redirect the user to the correct archive page on submission.'),
+                array('name' => 'post_type',        'default' => '(none)',     'description' => 'Optional. Locks the form to a specific vehicle type: <code>caravan</code>, <code>motorhome</code>, or <code>campervan</code>. When omitted a vehicle-type dropdown is shown and the form redirects to the appropriate listing page set under <strong>LGL Pages</strong>.'),
+                array('name' => 'search_type',      'default' => 'default',    'description' => 'Optional. Set to <code>tabs</code> when using the <code>[lgl_type_tabs]</code> shortcode. This hides the default vehicle type dropdown and immediately renders all secondary filters.'),
+                array('name' => 'live_search',      'default' => 'true',       'description' => 'Optional. Set to <code>false</code> to disable the inline AJAX refresh and force the form to redirect the user to the correct archive page on submission.'),
+                array('name' => 'layout',           'default' => 'horizontal', 'description' => 'Optional. Controls the visual layout of the search form. Accepts <code>horizontal</code> or <code>vertical</code>.'),
+                array('name' => 'show_all_filters', 'default' => 'true',       'description' => 'Optional. Set to <code>false</code> to hide advanced secondary filters until the user makes a primary Make/Model selection.'),
             ),
         ),
 
@@ -328,10 +329,12 @@ if (!current_user_can('manage_options')) {
             'label'       => 'General Settings',
             'description' => 'Top-level feature toggles and global formatting options that apply site-wide.',
             'fields'      => array(
-                array('name' => 'Disable Wishlist',   'type' => 'Checkbox',    'default' => 'Off',    'description' => 'When checked, hides all wishlist buttons across the vehicle grid and single listing pages. The <code>[lgl_mini_wishlist]</code> shortcode output is also suppressed.'),
-                array('name' => 'Disable Compare',    'type' => 'Checkbox',    'default' => 'Off',    'description' => 'When checked, hides all compare buttons across the vehicle grid and single listing pages.'),
-                array('name' => 'Currency Symbol',    'type' => 'Text',        'default' => '$',      'description' => 'The currency symbol used when formatting prices across all plugin output. e.g. <code>£</code>, <code>€</code>, <code>$</code>.'),
-                array('name' => 'Currency Position',  'type' => 'Select',      'default' => 'before', 'description' => 'Controls whether the symbol appears before or after the number. <code>before</code> outputs e.g. <code>£10,000</code>; <code>after</code> outputs <code>10,000£</code>.'),
+                array('name' => 'Global Placeholder Image', 'type' => 'Image',    'default' => '(empty)', 'description' => 'Fallback image used when a vehicle does not have a featured image set.'),
+                array('name' => 'Disable Wishlist',         'type' => 'Checkbox', 'default' => 'Off',    'description' => 'When checked, hides all wishlist buttons across the vehicle grid and single listing pages. The <code>[lgl_mini_wishlist]</code> shortcode output is also suppressed.'),
+                array('name' => 'Disable Compare',          'type' => 'Checkbox', 'default' => 'Off',    'description' => 'When checked, hides all compare buttons across the vehicle grid and single listing pages.'),
+                array('name' => 'Disable Interior Image',   'type' => 'Checkbox', 'default' => 'Off',    'description' => 'When checked, hides the interior image from the vehicle gallery and single listing display.'),
+                array('name' => 'Currency Symbol',          'type' => 'Text',     'default' => '$',      'description' => 'The currency symbol used when formatting prices across all plugin output. e.g. <code>£</code>, <code>€</code>, <code>$</code>.'),
+                array('name' => 'Currency Position',        'type' => 'Select',   'default' => 'before', 'description' => 'Controls whether the symbol appears before or after the number. <code>before</code> outputs e.g. <code>£10,000</code>; <code>after</code> outputs <code>10,000£</code>.'),
             ),
         ),
 
@@ -410,6 +413,24 @@ if (!current_user_can('manage_options')) {
                 array('name' => 'Featured Campervans', 'type' => 'Multi-select (searchable)', 'default' => '(none)', 'description' => 'Select one or more published Campervans to mark as featured.'),
             ),
             'notes' => '<span>Saving this page automatically syncs the <code>is_featured</code> post meta on all affected vehicles. The star toggle in the WP admin post list and the per-post <strong>Featured Vehicle</strong> meta box also update this setting in real time.</span>',
+        ),
+
+        array(
+            'slug'        => 'search-filters',
+            'label'       => 'Search Filters',
+            'description' => 'Drag-and-drop interface to control which search filters appear on the frontend search form per vehicle type, and in what order. (Make and Model filters are fixed).',
+            'fields'      => array(
+                array('name' => 'Manage Search Filters', 'type' => 'Sortable Tabs', 'default' => '(plugin default order)', 'description' => 'Reorder search fields (Price Range, Berth, Fuel Type, etc.) independently for Caravans, Motorhomes, and Campervans. Use the checkbox to hide specific filters.'),
+            ),
+        ),
+
+        array(
+            'slug'        => 'meta-summary',
+            'label'       => 'Meta Summary',
+            'description' => 'Configure the quick-glance meta data summary shown on vehicle cards or headers. Supports custom SVG icons and full layout control per vehicle type.',
+            'fields'      => array(
+                array('name' => 'Manage Meta Summary', 'type' => 'Repeater', 'default' => '(empty)', 'description' => 'Tabbed repeater interface to add, duplicate, reorder, collapse, and delete meta summary items. Allows overriding the default icon with a custom SVG for each field.'),
+            ),
         ),
 
     );
@@ -710,9 +731,7 @@ if (!current_user_can('manage_options')) {
 
     <?php endforeach; ?>
 
-</div><!-- /.wrap.lgl-docs -->
-
-<style>
+</div><style>
     /* ---- Layout ---- */
     .lgl-docs {
         max-width: 960px;
