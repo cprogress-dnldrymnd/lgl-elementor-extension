@@ -299,20 +299,10 @@ if ($post_type) {
 
                         $options = get_option('lgl_settings', array());
                         $default_order = array_merge(array_keys($type_fields), array('price', 'listing-fuel-type', 'listing-chassis', 'listing-gearbox'));
-
-                        // When no post type is set (Global/All mode), fall back to 'caravan' for
-                        // filter order and visibility settings. This matches the rest of the code
-                        // which also defaults to caravan when $data_post_type is false.
-                        $filter_settings_type = $data_post_type ? $data_post_type : 'caravan';
-
-                        $search_order = isset($options['search_order_' . $filter_settings_type]) ? $options['search_order_' . $filter_settings_type] : $default_order;
-
-                        // Ensure any fields not in the saved order are still appended so nothing is lost
-                        $missing_keys = array_diff($default_order, $search_order);
-                        $search_order = array_merge($search_order, $missing_keys);
+                        $search_order = isset($options['search_order_' . $data_post_type]) ? $options['search_order_' . $data_post_type] : $default_order;
 
                         foreach ($search_order as $field_key) {
-                            if (!empty($options['hide_search_' . $filter_settings_type . '_' . $field_key])) continue;
+                            if (!empty($options['hide_search_' . $data_post_type . '_' . $field_key])) continue;
 
                             // Fetch global label overrides
                             $default_label = isset($type_fields[$field_key]) ? $type_fields[$field_key] : ucfirst(str_replace('-', ' ', $field_key));
