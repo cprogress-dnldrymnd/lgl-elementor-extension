@@ -73,6 +73,5 @@ $min_dep   = (float) ($fin['min_deposit'] ?? 100);
 <script>
     iFrameResize({
         log: false,
-        enablePublicMethods: true
     }, "#iframe");
 </script>
