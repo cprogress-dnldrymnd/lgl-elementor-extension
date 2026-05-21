@@ -2384,4 +2384,8 @@
     border-radius: 5px;
     border-color: var(--color-primary); }
 
+@media (min-width: 1025px) {
+  .hide--desktop {
+    display: none !important; } }
+
 /*# sourceMappingURL=main.css.map */
