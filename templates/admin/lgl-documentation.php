@@ -82,7 +82,7 @@ if (!current_user_can('manage_options')) {
                         array('name' => 'search_type',      'default' => 'default',    'description' => 'Optional. Set to <code>tabs</code> when using the <code>[lgl_type_tabs]</code> shortcode. This hides the default vehicle type dropdown and immediately renders all secondary filters.'),
                         array('name' => 'live_search',      'default' => 'true',       'description' => 'Optional. Set to <code>false</code> to disable the inline AJAX refresh and force the form to redirect the user to the correct archive page on submission.'),
                         array('name' => 'layout',           'default' => 'horizontal', 'description' => 'Optional. Controls the visual layout of the search form. Accepts <code>horizontal</code> or <code>vertical</code>.'),
-                        array('name' => 'show_all_filters', 'default' => 'false',       'description' => 'Optional. Set to <code>false</code> to hide advanced secondary filters until the user makes a primary Make/Model selection.'),
+                        array('name' => 'show_all_filters', 'default' => 'true',       'description' => 'Optional. Set to <code>false</code> to hide advanced secondary filters until the user makes a primary Make/Model selection.'),
                     ),
                 ),
 
