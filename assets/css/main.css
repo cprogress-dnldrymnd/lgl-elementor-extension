@@ -2287,6 +2287,9 @@
     @media (min-width: 768px) {
       .lgl-type-tabs-wrapper .lgl-type-tabs .lgl-tab-btn {
         min-width: 160px; } }
+    @media (max-width: 1024px) {
+      .lgl-type-tabs-wrapper .lgl-type-tabs .lgl-tab-btn {
+        border-radius: 10px; } }
     @media (max-width: 767px) {
       .lgl-type-tabs-wrapper .lgl-type-tabs .lgl-tab-btn {
         padding: 15px 15px; } }
