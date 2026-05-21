@@ -2337,22 +2337,10 @@
     @media (max-width: 767px) {
       .lgl-type-tabs-wrapper .lgl-type-tabs .lgl-tab-btn {
         padding: 15px 15px; } }
-    @media (max-width: 575px) {
-      .lgl-type-tabs-wrapper .lgl-type-tabs .lgl-tab-btn {
-        font-size: 0.75rem;
-        border-radius: 5px 5px 0 0; } }
-    @media (max-width: 440px) {
-      .lgl-type-tabs-wrapper .lgl-type-tabs .lgl-tab-btn {
-        padding: 15px 10px;
-        font-size: 10px; } }
-    @media (max-width: 320px) {
-      .lgl-type-tabs-wrapper .lgl-type-tabs .lgl-tab-btn {
-        padding: 15px 5px;
-        font-size: 8px; } }
   @media (max-width: 1024px) {
     .lgl-type-tabs-wrapper .lgl-type-tabs {
       gap: 1rem; } }
-  @media (max-width: 57) {
+  @media (max-width: 575px) {
     .lgl-type-tabs-wrapper .lgl-type-tabs {
       flex-direction: column; } }
   @media (min-width: 1025px) {

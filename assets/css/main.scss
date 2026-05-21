@@ -2950,18 +2950,6 @@ $wt-cols: 110px 1fr 120px 110px 80px 80px 50px;
             @media (max-width: 767px) {
                 padding: 15px 15px;
             }
-            @media (max-width: 575px) {
-                font-size: 0.75rem;
-                border-radius: 5px 5px 0 0;
-            }
-            @media (max-width: 440px) {
-                padding: 15px 10px;
-                font-size: 10px;
-            }
-            @media (max-width: 320px) {
-                padding: 15px 5px;
-                font-size: 8px;
-            }
         }
          @media (max-width: 1024px) {
             gap: 1rem;
