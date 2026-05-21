@@ -566,7 +566,7 @@ if (! class_exists('LGL_Shortcodes')) {
             );
         }
 
-        /**
+       /**
          * Renders the drag-and-drop sortable list for managing field visibility, order, and overrides.
          * Separates visible and hidden fields, auto-moving hidden fields to the bottom.
          *
@@ -630,7 +630,7 @@ if (! class_exists('LGL_Shortcodes')) {
                 $handle_cursor  = $is_hidden ? 'not-allowed' : 'grab';
                 $handle_opacity = $is_hidden ? '0.3' : '1';
 
-?>
+                ?>
                 <li class="lgl-repeater-row lgl-sortable-item <?php echo esc_attr($li_class); ?>" style="opacity: <?php echo esc_attr($li_opacity); ?>;">
                     <div class="lgl-repeater-header" style="display: flex; justify-content: space-between; align-items: center;">
                         <div style="display: flex; align-items: center; flex-grow: 1;">
@@ -646,7 +646,7 @@ if (! class_exists('LGL_Shortcodes')) {
                             <button type="button" class="button-link lgl-collapse-row" style="padding: 0;"><span class="dashicons dashicons-arrow-down-alt2"></span></button>
                         </div>
                     </div>
-
+                    
                     <div class="lgl-repeater-body" style="display: none; border-top: 1px solid #ccd0d4; background: #fafafa;">
                         <div>
                             <label style="font-weight:600; margin-bottom:5px; display:block;">Label Override</label>
@@ -654,10 +654,17 @@ if (! class_exists('LGL_Shortcodes')) {
                             <p class="description" style="margin-top: 4px;">Leave blank to use default.</p>
                         </div>
                         <div>
-                            <label style="font-weight:600; margin-bottom:5px; display:block;">Icon Override</label>
+                            <label style="font-weight:600; margin-bottom:5px; display:block;">Icon</label>
                             <div style="display: flex; gap: 10px; align-items: center;">
                                 <div class="lgl-icon-preview">
-                                    <?php if ($icon_url) echo '<img src="' . esc_url($icon_url) . '" />'; ?>
+                                    <?php 
+                                    if ($icon_url) {
+                                        echo '<img src="' . esc_url($icon_url) . '" />'; 
+                                    } else {
+                                        // Fallback to local hardcoded SVG if no custom image is selected
+                                        LGL_Shortcodes::render_inline_svg($key);
+                                    }
+                                    ?>
                                 </div>
                                 <input type="hidden" name="lgl_settings[icon_id_<?php echo esc_attr($key); ?>]" class="icon-id-input" value="<?php echo esc_attr($icon_id); ?>" />
                                 <input type="hidden" name="lgl_settings[icon_url_<?php echo esc_attr($key); ?>]" class="icon-url-input" value="<?php echo esc_url($icon_url); ?>" />
@@ -666,47 +673,19 @@ if (! class_exists('LGL_Shortcodes')) {
                         </div>
                     </div>
                 </li>
-            <?php
+                <?php
             }
 
             echo '</ul>';
 
             ?>
             <style>
-                .lgl-repeater-row {
-                    border: 1px solid #ccd0d4;
-                    background: #fff;
-                    margin-bottom: 10px;
-                    transition: opacity 0.2s;
-                }
-
-                .lgl-repeater-header {
-                    padding: 10px 15px;
-                    background: #fff;
-                }
-
-                .lgl-repeater-body {
-                    padding: 15px;
-                    display: flex;
-                    gap: 20px;
-                    align-items: flex-start;
-                    flex-wrap: wrap;
-                }
-
-                .lgl-icon-preview {
-                    width: 34px;
-                    height: 34px;
-                    border: 1px dashed #ccc;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    background: #fff;
-                }
-
-                .lgl-icon-preview img {
-                    max-width: 100%;
-                    max-height: 100%;
-                }
+                .lgl-repeater-row { border: 1px solid #ccd0d4; background: #fff; margin-bottom: 10px; transition: opacity 0.2s; }
+                .lgl-repeater-header { padding: 10px 15px; background: #fff; }
+                .lgl-repeater-body { padding: 15px; display: flex; gap: 20px; align-items: flex-start; flex-wrap: wrap; }
+                .lgl-icon-preview { width: 34px; height: 34px; border: 1px dashed #ccc; display: flex; align-items: center; justify-content: center; background: #fff; }
+                /* Updated CSS to ensure both uploaded images and raw SVGs fit the preview box */
+                .lgl-icon-preview img, .lgl-icon-preview svg { max-width: 20px; max-height: 20px; width: auto; height: auto; display: block; }
             </style>
             <script>
                 jQuery(document).ready(function($) {
@@ -721,24 +700,18 @@ if (! class_exists('LGL_Shortcodes')) {
                     });
 
                     $sortableList.on("change", ".lgl-hide-toggle", function() {
-                        var $listItem = $(this).closest("li");
-                        var isChecked = $(this).is(":checked");
-                        var $handle = $listItem.find(".lgl-drag-handle");
+                        var $listItem  = $(this).closest("li");
+                        var isChecked  = $(this).is(":checked");
+                        var $handle    = $listItem.find(".lgl-drag-handle");
 
                         if (isChecked) {
                             $listItem.addClass("is-hidden").css("opacity", "0.6");
-                            $handle.css({
-                                cursor: "not-allowed",
-                                opacity: "0.3"
-                            });
+                            $handle.css({ cursor: "not-allowed", opacity: "0.3" });
                             $listItem.appendTo($sortableList);
                         } else {
                             $listItem.removeClass("is-hidden").css("opacity", "1");
-                            $handle.css({
-                                cursor: "grab",
-                                opacity: "1"
-                            });
-
+                            $handle.css({ cursor: "grab", opacity: "1" });
+                            
                             var $firstHidden = $sortableList.children(".is-hidden").first();
                             if ($firstHidden.length) {
                                 $listItem.insertBefore($firstHidden);
@@ -750,7 +723,7 @@ if (! class_exists('LGL_Shortcodes')) {
                     });
                 });
             </script>
-        <?php
+            <?php
         }
 
         /**
@@ -877,7 +850,7 @@ if (! class_exists('LGL_Shortcodes')) {
 
             // Default to 'general' tab for standard UX flow
             $active_tab = isset($_GET['tab']) ? sanitize_text_field($_GET['tab']) : 'general';
-        ?>
+?>
             <div class="wrap">
                 <h1>LGL Shortcodes Settings</h1>
                 <h2 class="nav-tab-wrapper" id="lgl-settings-tabs">
