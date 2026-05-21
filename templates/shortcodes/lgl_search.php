@@ -454,11 +454,11 @@ if ($search_type === 'tabs') {
 
         </div>
 
-        <?php if ($post_type) : ?>
-  
-<?php if ($is_offcanvas) : ?>
-              </div><!-- /.lgl-offcanvas-body -->
-    </div><!-- /.lgl-search-offcanvas --><script>
+
+        <?php if ($is_offcanvas) : ?>
+        </div><!-- /.lgl-offcanvas-body -->
+    </div><!-- /.lgl-search-offcanvas -->
+    <script>
         (function() {
             var toggleBtn = document.querySelector('.lgl-search-mobile-toggle');
             var panel = document.getElementById('lgl-search-offcanvas');
