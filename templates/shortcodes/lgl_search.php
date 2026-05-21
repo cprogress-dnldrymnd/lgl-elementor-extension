@@ -158,7 +158,7 @@ if ($post_type) {
         </div>
 
         <div class="lgl-offcanvas-body">
-<?php endif; ?>
+        <?php endif; ?>
 
         <div class="lgl-search-container lgl-holder">
             <?php
@@ -176,23 +176,28 @@ if ($post_type) {
                     <input type="hidden" name="post_type" id="lgl_target_post_type" value="<?php echo esc_attr($data_post_type); ?>">
                     <input type="hidden" id="lgl_base_archive_url" value="<?php echo esc_url($base_archive_url); ?>">
 
-                    <?php if ($post_type == false) { ?>
-                        <?php
+                    <?php if ($post_type == false) {
                         $options = get_option('lgl_settings', array());
 
-                        $caravan_page   = $options['caravan_page']   ?? false;
-                        $motorhome_page = $options['motorhome_page'] ?? false;
-                        $campervan_page = $options['campervan_page'] ?? false;
+                        // Define the vehicle types you support
+                        $supported_cpts = array('caravan', 'motorhome', 'campervan');
+                        $vehicle_types  = array();
 
-                        $enable_caravan   = isset($options['enable_caravan']) ? $options['enable_caravan'] : '1';
-                        $enable_motorhome = isset($options['enable_motorhome']) ? $options['enable_motorhome'] : '1';
-                        $enable_campervan = isset($options['enable_campervan']) ? $options['enable_campervan'] : '1';
+                        foreach ($supported_cpts as $cpt) {
+                            // Dynamically get the page ID and the enable status
+                            $page_id = $options[$cpt . '_page'] ?? false;
+                            // Use '1' as default to match your existing logic
+                            $is_enabled = isset($options['enable_' . $cpt]) ? $options['enable_' . $cpt] : '1';
 
-                        $vehicle_types = array();
-                        if ($enable_caravan && $caravan_page)   $vehicle_types[] = array('url' => get_the_permalink($caravan_page),   'label' => 'Caravan',   'slug' => 'caravan');
-                        if ($enable_motorhome && $motorhome_page) $vehicle_types[] = array('url' => get_the_permalink($motorhome_page), 'label' => 'Motorhome', 'slug' => 'motorhome');
-                        if ($enable_campervan && $campervan_page) $vehicle_types[] = array('url' => get_the_permalink($campervan_page), 'label' => 'Campervan', 'slug' => 'campervan');
-                        ?>
+                            if ($is_enabled && $page_id) {
+                                $vehicle_types[] = array(
+                                    'url'   => get_the_permalink($page_id),
+                                    'label' => ucfirst($cpt),
+                                    'slug'  => $cpt
+                                );
+                            }
+                        }
+                    ?>
 
                         <?php if (!empty($vehicle_types)) : ?>
                             <div class="lgl-filter-group" <?php echo ($search_type === 'tabs') ? 'style="display: none;"' : ''; ?>>
@@ -201,8 +206,9 @@ if ($post_type) {
                                     <option value="">Leisure Vehicle Type</option>
                                     <?php foreach ($vehicle_types as $type) :
                                         $is_selected = selected($active_post_type, $type['url'], false);
-                                        // Default to caravan internally if tabs mode is active
-                                        if ($search_type === 'tabs' && empty($active_post_type) && $type['slug'] === 'caravan') {
+
+                                        // Default to the first enabled vehicle type if tabs mode is active and nothing is selected
+                                        if ($search_type === 'tabs' && empty($active_post_type) && $type['slug'] === $supported_cpts[0]) {
                                             $is_selected = 'selected="selected"';
                                         }
                                     ?>
@@ -393,8 +399,10 @@ if ($post_type) {
             </form>
         </div>
 
-<?php if ($post_type || $search_type === 'tabs') : ?>
-        </div></div><script>
+        <?php if ($post_type || $search_type === 'tabs') : ?>
+        </div>
+    </div>
+    <script>
         (function() {
             var toggleBtn = document.querySelector('.lgl-search-mobile-toggle');
             var panel = document.getElementById('lgl-search-offcanvas');
