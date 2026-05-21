@@ -2840,18 +2840,18 @@ $wt-cols: 110px 1fr 120px 110px 80px 80px 50px;
 }
 
 /* Dark Style (Default - Dark Text for Light Backgrounds) */
-.lgl-breadcrumbs-dark,
-.lgl-breadcrumbs-dark a,
-.lgl-breadcrumbs-dark .lgl-separator,
-.lgl-breadcrumbs-dark .lgl-current-page {
+.lgl-breadcrumbs-dark.lgl-breadcrumbs-dark,
+.lgl-breadcrumbs-dark.lgl-breadcrumbs-dark a,
+.lgl-breadcrumbs-dark.lgl-breadcrumbs-dark .lgl-separator,
+.lgl-breadcrumbs-dark.lgl-breadcrumbs-dark .lgl-current-page {
     color: var(--lgl-color-secondary, #001537);
 }
 
 /* Light Style (Light Text for Dark Backgrounds) */
-.lgl-breadcrumbs-light,
-.lgl-breadcrumbs-light a,
-.lgl-breadcrumbs-light .lgl-separator,
-.lgl-breadcrumbs-light .lgl-current-page {
+.lgl-breadcrumbs-light.lgl-breadcrumbs-light,
+.lgl-breadcrumbs-light.lgl-breadcrumbs-light a,
+.lgl-breadcrumbs-light.lgl-breadcrumbs-light .lgl-separator,
+.lgl-breadcrumbs-light.lgl-breadcrumbs-light .lgl-current-page {
     color: var(--lgl-color-white, #fff);
 }
 .lgl-breadcrumbs-light.lgl-breadcrumbs-light.lgl-breadcrumbs-light a {
