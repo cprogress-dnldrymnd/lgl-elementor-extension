@@ -2305,7 +2305,8 @@
   list-style: none;
   padding: 0;
   margin-bottom: 0;
-  gap: 5px; }
+  gap: 5px;
+  margin: 0; }
   .lgl-type-tabs-wrapper .lgl-type-tabs li {
     line-height: 1;
     display: flex; }
@@ -2350,7 +2351,7 @@
       padding-left: 10px; } }
   @media (min-width: 1025px) {
     .lgl-type-tabs-wrapper .lgl-type-tabs {
-      justify-content: flex-start; } }
+      padding-left: clamp(20px, 3vw, 50px); } }
 
 .lgl-filter-group select {
   font-size: 1rem;

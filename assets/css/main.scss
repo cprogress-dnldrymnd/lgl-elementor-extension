@@ -2909,9 +2909,8 @@ $wt-cols: 110px 1fr 120px 110px 80px 80px 50px;
         display: flex;
         list-style: none;
         padding: 0;
-        margin-bottom: 0;
         gap: 5px;
-
+        margin: 0;
         li {
             line-height: 1;
             display: flex;
