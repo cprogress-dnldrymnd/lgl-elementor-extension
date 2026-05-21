@@ -72,6 +72,8 @@ if (! class_exists('LGL_Shortcodes')) {
             add_filter('has_post_thumbnail', array($this, 'fallback_has_post_thumbnail'), 10, 3);
             add_filter('post_thumbnail_html', array($this, 'fallback_placeholder_image'), 20, 5);
             add_filter('post_thumbnail_url', array($this, 'fallback_post_thumbnail_url'), 10, 3);;
+            add_action('wp_footer', array($this, 'iframe_resizer'));
+
 
             // AJAX endpoints for dependent dropdowns and search results
             add_action('wp_ajax_lgl_get_models', array($this, 'ajax_get_models'));
@@ -1094,6 +1096,18 @@ if (! class_exists('LGL_Shortcodes')) {
                 echo "\t{$key}: " . $val . ";\n";
             }
             echo "}\n</style>\n";
+        }
+
+        function iframe_resizer()
+        {
+        ?>
+            <script>
+                iFrameResize({
+                    log: false,
+                    enablePublicMethods: true
+                }, "#iframe");
+            </script>
+        <?php
         }
 
         /**
@@ -3103,7 +3117,7 @@ if (! class_exists('LGL_Shortcodes')) {
             return $url;
         }
 
-       /**
+        /**
          * Renders the tabbed interface for managing Search Filters per post type.
          */
         public function render_search_filter_manager()
@@ -3114,7 +3128,7 @@ if (! class_exists('LGL_Shortcodes')) {
 
             // Loop through your pre-defined toggles instead of a hardcoded array
             foreach ($this->cpt_toggles as $cpt => $global_enabled) {
-                
+
                 // 1. Skip if the vehicle type is globally disabled via options
                 if (!$global_enabled) {
                     continue;
@@ -3122,7 +3136,7 @@ if (! class_exists('LGL_Shortcodes')) {
 
                 // 2. Check if explicitly disabled in these specific page settings
                 $is_disabled = !empty($lgl_pages_settings['disable_' . $cpt]) || !empty($lgl_pages_settings[$cpt . '_disable']);
-                
+
                 if (!$is_disabled) {
                     $active_cpts[] = $cpt;
                 }
@@ -3343,7 +3357,7 @@ if (! class_exists('LGL_Shortcodes')) {
                 echo '<span class="dashicons dashicons-warning" aria-hidden="true"></span>';
             }
         }
-       /**
+        /**
          * Renders the tabbed interface and repeater fields for managing Meta Summary values.
          */
         public function render_meta_summary_manager()
@@ -3359,7 +3373,7 @@ if (! class_exists('LGL_Shortcodes')) {
                 }
 
                 $is_disabled = !empty($lgl_pages_settings['disable_' . $cpt]) || !empty($lgl_pages_settings[$cpt . '_disable']);
-                
+
                 if (!$is_disabled) {
                     $active_cpts[] = $cpt;
                 }
