@@ -82,6 +82,7 @@
                 .lgl-filter-group {
                     flex-grow: 1;
                     --width: 10%;
+                    border-bottom: none;
                     .choices {
                         .choices__inner {
                             padding-left: 10px;
@@ -89,6 +90,12 @@
                         }
                         .choices__item {
                             padding-right: 20px !important;
+                        }
+                    }
+                    @media (max-width: 1199px) {
+                        --width: 25%;
+                        &:nth-child(4) {
+                            border-right: none;
                         }
                     }
                 }
@@ -1841,7 +1848,7 @@
             width: 20px;
             height: 20px;
         }
-       
+
         &:hover {
             background-color: var(--lgl-color-secondary);
             color: var(--lgl-color-white);
