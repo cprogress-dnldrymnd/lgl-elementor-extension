@@ -34,7 +34,7 @@ $active_type = get_query_var('post_type') ? get_query_var('post_type') : '';
             $url = get_the_permalink($caravan_page);
             $is_active = ($active_type === 'caravan' || $current_url === $url || empty($active_type)) ? 'is-active' : '';
         ?>
-            <li><button type="button" class="lgl-tab-btn lgl-btn <?php echo esc_attr($is_active); ?>" data-post-type="caravan" data-url="<?php echo esc_url($url); ?>">Caravans</button></li>
+            <li><button type="button" class="lgl-tab-btn lgl-btn <?php echo esc_attr($is_active); ?>" data-post-type="caravan" data-url="<?php echo esc_url($url); ?>"> <span class="hide-desktop">Start</span> Caravans <span class="hide-desktop">Search</span></button></li>
         <?php endif; ?>
 
         <?php if ($enable_motorhome && $motorhome_page) :
