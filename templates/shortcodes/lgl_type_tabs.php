@@ -34,21 +34,33 @@ $active_type = get_query_var('post_type') ? get_query_var('post_type') : '';
             $url = get_the_permalink($caravan_page);
             $is_active = ($active_type === 'caravan' || $current_url === $url || empty($active_type)) ? 'is-active' : '';
         ?>
-            <li><button type="button" class="lgl-tab-btn lgl-btn <?php echo esc_attr($is_active); ?>" data-post-type="caravan" data-url="<?php echo esc_url($url); ?>"> <span class="hide-desktop">Start</span> Caravans <span class="hide-desktop">Search</span></button></li>
+            <li>
+                <button type="button" class="lgl-tab-btn lgl-btn <?php echo esc_attr($is_active); ?>" data-post-type="caravan" data-url="<?php echo esc_url($url); ?>">
+                    <span><span class="hide-desktop">Start</span> Caravans <span class="hide-desktop">Search</span></span>
+                </button>
+            </li>
         <?php endif; ?>
 
         <?php if ($enable_motorhome && $motorhome_page) :
             $url = get_the_permalink($motorhome_page);
             $is_active = ($active_type === 'motorhome' || $current_url === $url) ? 'is-active' : '';
         ?>
-            <li><button type="button" class="lgl-tab-btn lgl-btn <?php echo esc_attr($is_active); ?>" data-post-type="motorhome" data-url="<?php echo esc_url($url); ?>">Motorhomes</button></li>
+            <li>
+                <button type="button" class="lgl-tab-btn lgl-btn <?php echo esc_attr($is_active); ?>" data-post-type="motorhome" data-url="<?php echo esc_url($url); ?>">
+                    <span><span class="hide-desktop">Start</span> Motorhomes <span class="hide-desktop">Search</span></span>
+                </button>
+            </li>
         <?php endif; ?>
 
         <?php if ($enable_campervan && $campervan_page) :
             $url = get_the_permalink($campervan_page);
             $is_active = ($active_type === 'campervan' || $current_url === $url) ? 'is-active' : '';
         ?>
-            <li><button type="button" class="lgl-tab-btn lgl-btn <?php echo esc_attr($is_active); ?>" data-post-type="campervan" data-url="<?php echo esc_url($url); ?>">Campervans</button></li>
+            <li>
+                <button type="button" class="lgl-tab-btn lgl-btn <?php echo esc_attr($is_active); ?>" data-post-type="campervan" data-url="<?php echo esc_url($url); ?>">
+                    <span><span class="hide-desktop">Start</span> Campervans <span class="hide-desktop">Search</span></span>
+                </button>
+            </li>
         <?php endif; ?>
 
     </ul>
