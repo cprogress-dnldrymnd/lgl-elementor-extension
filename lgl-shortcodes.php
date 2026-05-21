@@ -3103,25 +3103,34 @@ if (! class_exists('LGL_Shortcodes')) {
             return $url;
         }
 
-        /**
+       /**
          * Renders the tabbed interface for managing Search Filters per post type.
          */
         public function render_search_filter_manager()
         {
-            $options = get_option('lgl_settings', array());
+            $options            = get_option('lgl_settings', array());
             $lgl_pages_settings = get_option('lgl_pages', array());
-            $lgl_cpts = array_keys($this->cpt_toggles);
-            $active_cpts = array();
+            $active_cpts        = array();
 
-            foreach ($lgl_cpts as $cpt) {
+            // Loop through your pre-defined toggles instead of a hardcoded array
+            foreach ($this->cpt_toggles as $cpt => $global_enabled) {
+                
+                // 1. Skip if the vehicle type is globally disabled via options
+                if (!$global_enabled) {
+                    continue;
+                }
+
+                // 2. Check if explicitly disabled in these specific page settings
                 $is_disabled = !empty($lgl_pages_settings['disable_' . $cpt]) || !empty($lgl_pages_settings[$cpt . '_disable']);
+                
                 if (!$is_disabled) {
                     $active_cpts[] = $cpt;
                 }
             }
 
+            // Fallback if no vehicle types passed both checks
             if (empty($active_cpts)) {
-                echo '<p style="color:red;">All vehicle types are currently disabled in LGL Pages.</p>';
+                echo '<p style="color:red;">All vehicle types are currently disabled in LGL Pages or global options.</p>';
                 return;
             }
 
