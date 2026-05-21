@@ -103,7 +103,10 @@ $all_image_ids = array_values(array_unique(array_filter($all_image_ids)));
                                 <div class="swiper-wrapper">
                                     <?php foreach ($all_image_ids as $image_id) { ?>
                                         <div class="swiper-slide lgl-slider-item-wrap">
-                                            <a href="<?php echo esc_url(wp_get_attachment_image_url($image_id, 'full', false)); ?>" class="lgl-slider-item elementor-clickable" data-elementor-lightbox-slideshow="lgl-gallery-car">
+                                            <a href="<?php echo esc_url(wp_get_attachment_image_url($image_id, 'full', false)); ?>" 
+                                               class="lgl-slider-item elementor-clickable" 
+                                               data-fancybox="lgl-gallery-car" 
+                                               data-elementor-open-lightbox="no">
                                                 <div class="lgl-cover-image">
                                                     <?php echo wp_get_attachment_image($image_id, 'full', false, array('alt' => get_the_title($image_id))); ?>
                                                 </div>
