@@ -3343,13 +3343,33 @@ if (! class_exists('LGL_Shortcodes')) {
                 echo '<span class="dashicons dashicons-warning" aria-hidden="true"></span>';
             }
         }
-        /**
+       /**
          * Renders the tabbed interface and repeater fields for managing Meta Summary values.
          */
         public function render_meta_summary_manager()
         {
-            $options  = get_option('lgl_settings', array());
-            $lgl_cpts = array('caravan', 'motorhome', 'campervan');
+            $options            = get_option('lgl_settings', array());
+            $lgl_pages_settings = get_option('lgl_pages', array());
+            $active_cpts        = array();
+
+            // 1. Build the dynamic array of active CPTs using the unified toggles logic
+            foreach ($this->cpt_toggles as $cpt => $global_enabled) {
+                if (!$global_enabled) {
+                    continue;
+                }
+
+                $is_disabled = !empty($lgl_pages_settings['disable_' . $cpt]) || !empty($lgl_pages_settings[$cpt . '_disable']);
+                
+                if (!$is_disabled) {
+                    $active_cpts[] = $cpt;
+                }
+            }
+
+            // 2. Bail early if no CPTs are active
+            if (empty($active_cpts)) {
+                echo '<p style="color:red;">All vehicle types are currently disabled in LGL Pages or global options.</p>';
+                return;
+            }
 
             $all_fields = array();
             if (class_exists('LGL_Import_Post_Types')) {
@@ -3367,15 +3387,16 @@ if (! class_exists('LGL_Shortcodes')) {
 
             echo '<div class="lgl-inner-tabs-wrap" style="margin-top: 15px;">';
 
-            // Modern Tabs implementation
+            // Modern Tabs implementation (Now looping over $active_cpts)
             echo '<div class="lgl-modern-tabs-nav" id="lgl-meta-summary-tabs">';
-            foreach ($lgl_cpts as $index => $cpt) {
+            foreach ($active_cpts as $index => $cpt) {
                 $active = $index === 0 ? 'is-active' : '';
                 echo '<a href="#ms-tab-' . esc_attr($cpt) . '" class="lgl-modern-tab ' . esc_attr($active) . '" data-mstab="' . esc_attr($cpt) . '">' . esc_html(ucfirst($cpt)) . 's</a>';
             }
             echo '</div>';
 
-            foreach ($lgl_cpts as $index => $cpt) {
+            // Render Tab Contents (Now looping over $active_cpts)
+            foreach ($active_cpts as $index => $cpt) {
                 $display = $index === 0 ? 'block' : 'none';
                 $saved_meta = isset($options['meta_summary_' . $cpt]) ? $options['meta_summary_' . $cpt] : array();
 
@@ -3464,7 +3485,7 @@ if (! class_exists('LGL_Shortcodes')) {
                             $(this).find('input, select').each(function() {
                                 var name = $(this).attr('name');
                                 if (name) {
-                                    var regex = new RegExp('\\\[meta_summary_' + cpt + '\\\]\\\[\\d+\\\]');
+                                    var regex = new RegExp('\\[meta_summary_' + cpt + '\\]\\[\\d+\\]');
                                     $(this).attr('name', name.replace(regex, '[meta_summary_' + cpt + '][' + index + ']'));
                                 }
                             });
