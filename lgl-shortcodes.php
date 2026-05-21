@@ -3499,60 +3499,6 @@ if (! class_exists('LGL_Shortcodes')) {
                     </div>
                 </div>
             </li>
-        <?php
-        }
-
-        /**
-         * Output helper for generating a single repeater row.
-         *
-         * @param string $cpt The targeted custom post type.
-         * @param array $meta Associative array of stored row data.
-         * @param array $available_fields Array of keys/labels for the select dropdown.
-         * @param int $index The current array index for input naming.
-         * @return void
-         */
-        private function render_repeater_row_html($cpt, $meta, $available_fields = array(), $index = 0)
-        {
-            $meta_key = esc_attr($meta['meta_key'] ?? '');
-            $icon_id  = esc_attr($meta['icon_id'] ?? '');
-            $icon_url = esc_url($meta['icon_url'] ?? '');
-
-            // Replaced hardcoded '0' with dynamic `$index`
-            $base_name = 'lgl_settings[meta_summary_' . $cpt . '][' . $index . ']';
-        ?>
-            <li class="lgl-repeater-row">
-                <div class="lgl-repeater-header">
-                    <span class="dashicons dashicons-menu lgl-drag-handle"></span>
-                    <span class="title">Meta Item</span>
-                    <button type="button" class="button-link lgl-collapse-row"><span class="dashicons dashicons-arrow-down-alt2"></span></button>
-                </div>
-                <div class="lgl-repeater-body">
-                    <div>
-                        <label style="font-weight:600; margin-bottom:5px; display:block;">Select Field</label>
-                        <select name="<?php echo $base_name; ?>[meta_key]" style="min-width: 250px;">
-                            <option value="">&mdash; Select a Field &mdash;</option>
-                            <?php foreach ($available_fields as $key => $label) : ?>
-                                <option value="<?php echo esc_attr($key); ?>" <?php selected($meta_key, $key); ?>><?php echo esc_html($label); ?></option>
-                            <?php endforeach; ?>
-                        </select>
-                    </div>
-                    <div>
-                        <label style="font-weight:600; margin-bottom:5px; display:block;">Icon Override</label>
-                        <div style="display: flex; gap: 10px; align-items: center;">
-                            <div class="lgl-icon-preview">
-                                <?php if ($icon_url) echo '<img src="' . $icon_url . '" />'; ?>
-                            </div>
-                            <input type="hidden" name="<?php echo $base_name; ?>[icon_id]" class="icon-id-input" value="<?php echo $icon_id; ?>" />
-                            <input type="hidden" name="<?php echo $base_name; ?>[icon_url]" class="icon-url-input" value="<?php echo $icon_url; ?>" />
-                            <button type="button" class="button lgl-upload-svg">Select SVG</button>
-                        </div>
-                    </div>
-                    <div style="flex-basis: 100%; display: flex; gap: 10px; margin-top: 5px;">
-                        <button type="button" class="button lgl-clone-row">Duplicate</button>
-                        <button type="button" class="button button-link-delete lgl-delete-row">Delete</button>
-                    </div>
-                </div>
-            </li>
 <?php
         }
     }
