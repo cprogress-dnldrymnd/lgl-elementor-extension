@@ -1101,6 +1101,7 @@ if (! class_exists('LGL_Shortcodes')) {
         function iframe_resizer()
         {
         ?>
+            <script src="//cdnjs.cloudflare.com/ajax/libs/iframe-resizer/3.6.0/iframeResizer.min.js"></script>
             <script>
                 iFrameResize({
                     log: false,
