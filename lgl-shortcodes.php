@@ -3287,27 +3287,8 @@ if (! class_exists('LGL_Shortcodes')) {
          */
         public function render_meta_summary_manager()
         {
-          $options = get_option('lgl_settings', array());
-            $lgl_pages_settings = get_option('lgl_pages', array());
-            
-            // Define all potential CPTs
-            $all_cpts = array('caravan', 'motorhome', 'campervan');
-            $active_cpts = array();
-
-            // Filter out disabled post types
-            foreach ($all_cpts as $cpt) {
-                // Adjust this check to match your actual key in 'lgl_pages'
-                $is_disabled = !empty($lgl_pages_settings['disable_' . $cpt]) || !empty($lgl_pages_settings[$cpt . '_disable']);
-                if (!$is_disabled) {
-                    $active_cpts[] = $cpt;
-                }
-            }
-
-            // If no CPTs are active, display a notice
-            if (empty($active_cpts)) {
-                echo '<p style="margin:20px; color:#d63638; font-weight:600;">All post types are currently disabled in LGL Pages settings.</p>';
-                return;
-            }
+            $options  = get_option('lgl_settings', array());
+            $lgl_cpts = array('caravan', 'motorhome', 'campervan');
 
             $all_fields = array();
             if (class_exists('LGL_Import_Post_Types')) {
@@ -3327,13 +3308,13 @@ if (! class_exists('LGL_Shortcodes')) {
 
             // Modern Tabs implementation
             echo '<div class="lgl-modern-tabs-nav" id="lgl-meta-summary-tabs">';
-            foreach ($active_cpts as $index => $cpt) {
+            foreach ($lgl_cpts as $index => $cpt) {
                 $active = $index === 0 ? 'is-active' : '';
                 echo '<a href="#ms-tab-' . esc_attr($cpt) . '" class="lgl-modern-tab ' . esc_attr($active) . '" data-mstab="' . esc_attr($cpt) . '">' . esc_html(ucfirst($cpt)) . 's</a>';
             }
             echo '</div>';
 
-            foreach ($active_cpts as $index => $cpt) {
+            foreach ($lgl_cpts as $index => $cpt) {
                 $display = $index === 0 ? 'block' : 'none';
                 $saved_meta = isset($options['meta_summary_' . $cpt]) ? $options['meta_summary_' . $cpt] : array();
 
