@@ -18,7 +18,7 @@
 
     /**
      * Initializes the newly added Vehicle Type Tabs shortcode.
-     * Listens for clicks on the tabs, syncs the selection, and triggers the modal popup.
+     * Listens for clicks on the tabs, syncs the selection, and triggers the modal popup ONLY on mobile/tablet.
      */
     function initTypeTabs() {
         $(document).on('click', '.lgl-tab-btn', function (e) {
@@ -40,13 +40,15 @@
                 } else {
                     $select.val(url);
                 }
-
+                
                 // Trigger change to auto-update backend form states
                 $select.trigger('change');
 
-                // Trigger Modal Popup
-                if (typeof window.openLglPanel === 'function') {
-                    window.openLglPanel();
+                // Trigger Modal Popup ONLY on screens 1024px and below
+                if (window.innerWidth <= 1024) {
+                    if (typeof window.openLglPanel === 'function') {
+                        window.openLglPanel();
+                    }
                 }
             } else {
                 if (url) window.location.href = url;

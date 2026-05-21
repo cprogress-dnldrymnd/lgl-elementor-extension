@@ -121,16 +121,12 @@ if ($post_type) {
     }
 }
 
+// Evaluate if the offcanvas markup should be loaded
 $is_offcanvas = ($post_type || $search_type === 'tabs');
 $offcanvas_class = 'lgl-search-offcanvas';
 $backdrop_class = 'lgl-search-offcanvas-backdrop';
-
-// Add override classes to enforce modal behavior on all devices when in tabs mode
-if ($search_type === 'tabs') {
-    $offcanvas_class .= ' lgl-force-modal';
-    $backdrop_class .= ' lgl-force-modal';
-}
 ?>
+
 <?php if ($post_type && $search_type !== 'tabs') : ?>
     <div class="lgl-search-mobile-toggle-wrapper">
         <button type="button"
@@ -147,56 +143,6 @@ if ($search_type === 'tabs') {
 <?php endif; ?>
 
 <?php if ($is_offcanvas) : ?>
-
-    <?php if ($search_type === 'tabs') : ?>
-        <style>
-            @media (min-width: 1025px) {
-                .lgl-search-offcanvas.lgl-force-modal {
-                    position: fixed !important;
-                    top: 0 !important;
-                    left: -100% !important;
-                    width: 380px !important;
-                    max-width: 100% !important;
-                    height: 100vh !important;
-                    background: #fff !important;
-                    z-index: 99999 !important;
-                    transition: left 0.3s ease !important;
-                    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
-                    display: flex !important;
-                    flex-direction: column !important;
-                }
-
-                .lgl-search-offcanvas.lgl-force-modal.is-open {
-                    left: 0 !important;
-                }
-
-                .lgl-search-offcanvas-backdrop.lgl-force-modal {
-                    display: none;
-                    position: fixed !important;
-                    top: 0 !important;
-                    left: 0 !important;
-                    width: 100vw !important;
-                    height: 100vh !important;
-                    background: rgba(0, 0, 0, 0.5) !important;
-                    z-index: 99998 !important;
-                }
-
-                .lgl-search-offcanvas-backdrop.lgl-force-modal.is-visible {
-                    display: block !important;
-                }
-
-                .lgl-search-offcanvas.lgl-force-modal .lgl-offcanvas-header {
-                    display: flex !important;
-                }
-
-                .lgl-search-offcanvas.lgl-force-modal .lgl-offcanvas-body {
-                    overflow-y: auto !important;
-                    flex-grow: 1 !important;
-                }
-            }
-        </style>
-    <?php endif; ?>
-
     <div class="<?php echo esc_attr($backdrop_class); ?>" id="lgl-search-backdrop" aria-hidden="true"></div>
 
     <div class="<?php echo esc_attr($offcanvas_class); ?>"
@@ -216,7 +162,6 @@ if ($search_type === 'tabs') {
 
         <div class="lgl-offcanvas-body">
         <?php endif; ?>
-
         <div class="lgl-search-container lgl-holder">
             <?php
             // Evaluate string 'true' or 'false' into an actual boolean
