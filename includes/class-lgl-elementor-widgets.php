@@ -562,7 +562,7 @@ class LGL_Widget_Finance_Form extends \Elementor\Widget_Base
     }
     public function get_icon()
     {
-        return 'eicon-calculator';
+        return 'eicon-number-field';
     }
     public function get_categories()
     {
@@ -646,7 +646,7 @@ class LGL_Widget_Reserve_Form extends \Elementor\Widget_Base
     }
     public function get_icon()
     {
-        return 'eicon-calendar-check';
+        return 'eicon-calendar';
     }
     public function get_categories()
     {
