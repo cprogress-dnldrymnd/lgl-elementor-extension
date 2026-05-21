@@ -567,9 +567,8 @@ if (! class_exists('LGL_Shortcodes')) {
         }
 
         /**
-         * Renders the drag-and-drop sortable list for managing field visibility and order.
-         * Separates visible and hidden fields, auto-moving hidden fields to the bottom,
-         * disabling their sortability, and optimizing the UI layout.
+         * Renders the drag-and-drop sortable list for managing field visibility, order, and overrides.
+         * Separates visible and hidden fields, auto-moving hidden fields to the bottom.
          *
          * @return void
          */
@@ -584,33 +583,27 @@ if (! class_exists('LGL_Shortcodes')) {
 
             $listing_fields = LGL_Import_Post_Types::get_listing_detail_fields();
 
-            // Compile all possible fields (meta + taxonomies) into a single map
+            // Compile all possible fields
             $all_fields = array_merge(
                 isset($listing_fields['common']) ? $listing_fields['common'] : array(),
                 isset($listing_fields['motorhome_campervan']) ? $listing_fields['motorhome_campervan'] : array(),
                 isset($listing_fields['caravan']) ? $listing_fields['caravan'] : array()
             );
 
-            // Append explicitly used taxonomies so they can be sorted in the same stack
+            // Append explicitly used taxonomies
             $all_fields['listing-fuel-type'] = __('Fuel Type', 'lgl-shortcodes');
             $all_fields['listing-chassis']   = __('Chassis', 'lgl-shortcodes');
             $all_fields['listing-gearbox']   = __('Gearbox', 'lgl-shortcodes');
 
-            // Extract saved order or fallback to natural array keys on first load
             $saved_order = isset($options['field_order']) ? $options['field_order'] : array_keys($all_fields);
-
-            // Ensure newly added fields in future updates automatically drop to the bottom of the list
             $missing_fields = array_diff(array_keys($all_fields), $saved_order);
             $current_order  = array_merge($saved_order, $missing_fields);
 
-            // Segregate keys into visible and hidden arrays to enforce bottom-placement on load
             $visible_keys = array();
             $hidden_keys  = array();
 
             foreach ($current_order as $key) {
-                if (!isset($all_fields[$key])) {
-                    continue;
-                }
+                if (!isset($all_fields[$key])) continue;
                 if (!empty($options['hide_field_' . $key])) {
                     $hidden_keys[] = $key;
                 } else {
@@ -618,51 +611,107 @@ if (! class_exists('LGL_Shortcodes')) {
                 }
             }
 
-            // Merge arrays: visible fields first, hidden fields stacked at the bottom
             $final_render_order = array_merge($visible_keys, $hidden_keys);
 
-            echo '<ul id="lgl-field-sortable" style="max-width: 600px; padding: 0; margin: 0; list-style: none;">';
+            echo '<ul id="lgl-field-sortable" class="lgl-sortable-list" style="max-width: 800px; padding: 0; margin: 0; list-style: none;">';
 
             foreach ($final_render_order as $key) {
                 $label     = $all_fields[$key];
                 $is_hidden = !empty($options['hide_field_' . $key]);
                 $checked   = $is_hidden ? 'checked="checked"' : '';
 
-                // Dynamic CSS properties based on visibility state
+                // Fetch Overrides
+                $saved_label = isset($options['label_override_' . $key]) ? $options['label_override_' . $key] : '';
+                $icon_id     = isset($options['icon_id_' . $key]) ? $options['icon_id_' . $key] : '';
+                $icon_url    = isset($options['icon_url_' . $key]) ? $options['icon_url_' . $key] : '';
+
                 $li_class       = $is_hidden ? 'is-hidden' : '';
                 $li_opacity     = $is_hidden ? '0.6' : '1';
                 $handle_cursor  = $is_hidden ? 'not-allowed' : 'grab';
                 $handle_opacity = $is_hidden ? '0.3' : '1';
 
-                echo '<li class="lgl-sortable-item ' . esc_attr($li_class) . '" style="background: #fff; border: 1px solid #ccd0d4; padding: 10px 15px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 1px 1px rgba(0,0,0,.04); opacity: ' . esc_attr($li_opacity) . ';">';
+?>
+                <li class="lgl-repeater-row lgl-sortable-item <?php echo esc_attr($li_class); ?>" style="opacity: <?php echo esc_attr($li_opacity); ?>;">
+                    <div class="lgl-repeater-header" style="display: flex; justify-content: space-between; align-items: center;">
+                        <div style="display: flex; align-items: center; flex-grow: 1;">
+                            <span class="dashicons dashicons-menu lgl-drag-handle" style="margin-right: 15px; cursor: <?php echo esc_attr($handle_cursor); ?>; opacity: <?php echo esc_attr($handle_opacity); ?>;"></span>
+                            <strong style="font-weight: 600; font-size: 14px;"><?php echo esc_html($label); ?></strong>
+                            <span style="color: #999; margin-left: 8px; font-size: 12px; font-weight: normal;">(<?php echo esc_html($key); ?>)</span>
+                            <input type="hidden" name="lgl_settings[field_order][]" value="<?php echo esc_attr($key); ?>" />
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 15px;">
+                            <label style="cursor: pointer; color: #50575e; display: flex; align-items: center; font-weight: 500;">
+                                <input type="checkbox" class="lgl-hide-toggle" name="lgl_settings[hide_field_<?php echo esc_attr($key); ?>]" value="1" <?php echo $checked; ?> style="margin-right: 6px;" /> Hide
+                            </label>
+                            <button type="button" class="button-link lgl-collapse-row" style="padding: 0;"><span class="dashicons dashicons-arrow-down-alt2"></span></button>
+                        </div>
+                    </div>
 
-                // Left Column: Drag Handle & Target Field Name
-                echo '<div style="display: flex; align-items: center;">';
-                echo '<span class="dashicons dashicons-menu lgl-drag-handle" style="margin-right: 15px; color: #a7aaad; cursor: ' . esc_attr($handle_cursor) . '; opacity: ' . esc_attr($handle_opacity) . ';"></span>';
-                echo '<strong style="font-weight: 500;">' . esc_html($label) . '</strong>';
-                // Hidden input maintains the order payload during POST
-                echo '<input type="hidden" name="lgl_settings[field_order][]" value="' . esc_attr($key) . '" />';
-                echo '</div>';
-
-                // Right Column: Clean Checkbox Toggle
-                echo '<div>';
-                echo '<label style="display: flex; align-items: center; cursor: pointer; color: #50575e;">';
-                echo '<input type="checkbox" class="lgl-hide-toggle" name="lgl_settings[hide_field_' . esc_attr($key) . ']" value="1" ' . $checked . ' style="margin-right: 6px;" /> ';
-                echo 'Hide';
-                echo '</label>';
-                echo '</div>';
-
-                echo '</li>';
+                    <div class="lgl-repeater-body" style="display: none; border-top: 1px solid #ccd0d4; background: #fafafa;">
+                        <div>
+                            <label style="font-weight:600; margin-bottom:5px; display:block;">Label Override</label>
+                            <input type="text" name="lgl_settings[label_override_<?php echo esc_attr($key); ?>]" value="<?php echo esc_attr($saved_label); ?>" placeholder="<?php echo esc_attr($label); ?>" style="min-width: 250px;" />
+                            <p class="description" style="margin-top: 4px;">Leave blank to use default.</p>
+                        </div>
+                        <div>
+                            <label style="font-weight:600; margin-bottom:5px; display:block;">Icon Override</label>
+                            <div style="display: flex; gap: 10px; align-items: center;">
+                                <div class="lgl-icon-preview">
+                                    <?php if ($icon_url) echo '<img src="' . esc_url($icon_url) . '" />'; ?>
+                                </div>
+                                <input type="hidden" name="lgl_settings[icon_id_<?php echo esc_attr($key); ?>]" class="icon-id-input" value="<?php echo esc_attr($icon_id); ?>" />
+                                <input type="hidden" name="lgl_settings[icon_url_<?php echo esc_attr($key); ?>]" class="icon-url-input" value="<?php echo esc_url($icon_url); ?>" />
+                                <button type="button" class="button lgl-upload-svg">Select SVG</button>
+                            </div>
+                        </div>
+                    </div>
+                </li>
+            <?php
             }
 
             echo '</ul>';
 
-            // Initialize jQuery UI Sortable and attach event listeners for dynamic DOM mutations
-            echo '<script>
+            ?>
+            <style>
+                .lgl-repeater-row {
+                    border: 1px solid #ccd0d4;
+                    background: #fff;
+                    margin-bottom: 10px;
+                    transition: opacity 0.2s;
+                }
+
+                .lgl-repeater-header {
+                    padding: 10px 15px;
+                    background: #fff;
+                }
+
+                .lgl-repeater-body {
+                    padding: 15px;
+                    display: flex;
+                    gap: 20px;
+                    align-items: flex-start;
+                    flex-wrap: wrap;
+                }
+
+                .lgl-icon-preview {
+                    width: 34px;
+                    height: 34px;
+                    border: 1px dashed #ccc;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    background: #fff;
+                }
+
+                .lgl-icon-preview img {
+                    max-width: 100%;
+                    max-height: 100%;
+                }
+            </style>
+            <script>
                 jQuery(document).ready(function($) {
                     var $sortableList = $("#lgl-field-sortable");
 
-                    // Initialize sortable, targeting only visible items and using the specific handle
                     $sortableList.sortable({
                         containment: "parent",
                         handle: ".lgl-drag-handle",
@@ -671,22 +720,25 @@ if (! class_exists('LGL_Shortcodes')) {
                         opacity: 0.8
                     });
 
-                    // Listen for changes on the visibility toggle checkboxes
                     $sortableList.on("change", ".lgl-hide-toggle", function() {
-                        var $listItem  = $(this).closest("li");
-                        var isChecked  = $(this).is(":checked");
-                        var $handle    = $listItem.find(".lgl-drag-handle");
+                        var $listItem = $(this).closest("li");
+                        var isChecked = $(this).is(":checked");
+                        var $handle = $listItem.find(".lgl-drag-handle");
 
                         if (isChecked) {
-                            // Apply hidden state: dim opacity, disable drag cursor, and move to bottom
                             $listItem.addClass("is-hidden").css("opacity", "0.6");
-                            $handle.css({ cursor: "not-allowed", opacity: "0.3" });
+                            $handle.css({
+                                cursor: "not-allowed",
+                                opacity: "0.3"
+                            });
                             $listItem.appendTo($sortableList);
                         } else {
-                            // Restore visible state: reset opacity, enable drag cursor, and push to the bottom of the active stack
                             $listItem.removeClass("is-hidden").css("opacity", "1");
-                            $handle.css({ cursor: "grab", opacity: "1" });
-                            
+                            $handle.css({
+                                cursor: "grab",
+                                opacity: "1"
+                            });
+
                             var $firstHidden = $sortableList.children(".is-hidden").first();
                             if ($firstHidden.length) {
                                 $listItem.insertBefore($firstHidden);
@@ -694,12 +746,11 @@ if (! class_exists('LGL_Shortcodes')) {
                                 $listItem.appendTo($sortableList);
                             }
                         }
-                        
-                        // Refresh the sortable instance to re-evaluate the "items" exclusion parameter
                         $sortableList.sortable("refresh");
                     });
                 });
-            </script>';
+            </script>
+        <?php
         }
 
         /**
@@ -826,7 +877,7 @@ if (! class_exists('LGL_Shortcodes')) {
 
             // Default to 'general' tab for standard UX flow
             $active_tab = isset($_GET['tab']) ? sanitize_text_field($_GET['tab']) : 'general';
-?>
+        ?>
             <div class="wrap">
                 <h1>LGL Shortcodes Settings</h1>
                 <h2 class="nav-tab-wrapper" id="lgl-settings-tabs">

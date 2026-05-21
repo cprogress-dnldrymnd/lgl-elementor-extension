@@ -51,15 +51,34 @@ if (class_exists('LGL_Import_Post_Types')) {
      * @param string $label The frontend display label.
      * @param string $value The extracted value.
      */
-    $render_item = function ($key, $label, $value) {
+    $render_item = function ($key, $label, $value) use ($options) {
+        // Apply label override if configured in LGL Settings
+        $final_label = !empty($options['label_override_' . $key]) ? $options['label_override_' . $key] : $label;
+        
+        // Fetch SVG override ID
+        $icon_id = !empty($options['icon_id_' . $key]) ? (int) $options['icon_id_' . $key] : 0;
+        
+        // Flatten array structures (like multi-selects) to prevent Array-to-string conversion errors
+        $final_value = is_array($value) ? implode(', ', $value) : $value;
+
         echo "<div class='lgl-meta-item lgl-{$key}'>";
         echo "<span class='lgl-meta-icon-label'>";
 
-        echo LGL_Shortcodes::render_inline_svg($key);
+        // Priority 1: Admin-uploaded Media Library SVG
+        if ($icon_id > 0) {
+            // Wrapped in a span with standard dimensions to prevent the raw SVG from blowing out the layout
+            echo "<span class='lgl-custom-icon' style='display: inline-flex; align-items: center; justify-content: center; width: 20px; height: 20px; margin-right: 8px;'>";
+            LGL_Shortcodes::render_attachment_svg($icon_id);
+            echo "</span>";
+        } 
+        // Priority 2: Legacy local hardcoded SVG fallback
+        else {
+            echo LGL_Shortcodes::render_inline_svg($key);
+        }
 
-        echo "<span class='lgl-label'>" . esc_html($label) . "</span>";
+        echo "<span class='lgl-label'>" . esc_html($final_label) . "</span>";
         echo "</span>";
-        echo "<span class='lgl-value'>" . esc_html($value) . "</span>";
+        echo "<span class='lgl-value'>" . esc_html($final_value) . "</span>";
         echo "</div>";
     };
 
