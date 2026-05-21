@@ -99,7 +99,7 @@ $all_image_ids = array_values(array_unique(array_filter($all_image_ids)));
                                 <div class="reserved-tag"><?= $reserve_settings['reserved_button_text']  ?></div>
                             <?php } ?>
 
-                            <div class="swiper js-gallery-slider-for lgl-gallery-slider lgl-slider-for">
+                            <div class="swiper js-gallery-slider-for lgl-gallery-slider lgl-slider-for swiper-button-style">
                                 <div class="swiper-wrapper">
                                     <?php foreach ($all_image_ids as $image_id) { ?>
                                         <div class="swiper-slide lgl-slider-item-wrap">

@@ -9,7 +9,7 @@ if ($post_type) {
         is_featured: $is_featured
     );
     if ($is_carousel) {
-        echo '<div class="vehicle-slider-holder">';
+        echo '<div class="vehicle-slider-holder swiper-button-style">';
         echo '<div class="vehicle-slider-js swiper">';
         echo '<div class="swiper-wrapper">';
     } else {
