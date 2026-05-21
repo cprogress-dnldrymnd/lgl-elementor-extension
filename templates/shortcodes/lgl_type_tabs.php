@@ -36,7 +36,7 @@ $active_type = get_query_var('post_type') ? get_query_var('post_type') : '';
         ?>
             <li>
                 <button type="button" class="lgl-tab-btn lgl-btn <?php echo esc_attr($is_active); ?>" data-post-type="caravan" data-url="<?php echo esc_url($url); ?>">
-                    <span><span class="hide-desktop">Start</span> Caravans <span class="hide-desktop">Search</span></span>
+                    <span><span class="hide--desktop">Start</span> Caravans <span class="hide--desktop">Search</span></span>
                 </button>
             </li>
         <?php endif; ?>
@@ -47,7 +47,7 @@ $active_type = get_query_var('post_type') ? get_query_var('post_type') : '';
         ?>
             <li>
                 <button type="button" class="lgl-tab-btn lgl-btn <?php echo esc_attr($is_active); ?>" data-post-type="motorhome" data-url="<?php echo esc_url($url); ?>">
-                    <span><span class="hide-desktop">Start</span> Motorhomes <span class="hide-desktop">Search</span></span>
+                    <span><span class="hide--desktop">Start</span> Motorhomes <span class="hide--desktop">Search</span></span>
                 </button>
             </li>
         <?php endif; ?>
@@ -58,7 +58,7 @@ $active_type = get_query_var('post_type') ? get_query_var('post_type') : '';
         ?>
             <li>
                 <button type="button" class="lgl-tab-btn lgl-btn <?php echo esc_attr($is_active); ?>" data-post-type="campervan" data-url="<?php echo esc_url($url); ?>">
-                    <span><span class="hide-desktop">Start</span> Campervans <span class="hide-desktop">Search</span></span>
+                    <span><span class="hide--desktop">Start</span> Campervans <span class="hide--desktop">Search</span></span>
                 </button>
             </li>
         <?php endif; ?>
