@@ -2304,7 +2304,6 @@
   display: flex;
   list-style: none;
   padding: 0;
-  margin-bottom: 0;
   gap: 5px;
   margin: 0; }
   .lgl-type-tabs-wrapper .lgl-type-tabs li {
@@ -2321,12 +2320,13 @@
     .lgl-type-tabs-wrapper .lgl-type-tabs .lgl-tab-btn:hover, .lgl-type-tabs-wrapper .lgl-type-tabs .lgl-tab-btn:focus, .lgl-type-tabs-wrapper .lgl-type-tabs .lgl-tab-btn:active {
       background-color: var(--lgl-color-secondary);
       color: var(--lgl-color-white); }
-    .lgl-type-tabs-wrapper .lgl-type-tabs .lgl-tab-btn.is-active {
-      background-color: var(--lgl-color-secondary);
-      color: var(--lgl-color-white); }
     @media (min-width: 768px) {
       .lgl-type-tabs-wrapper .lgl-type-tabs .lgl-tab-btn {
         min-width: 160px; } }
+    @media (min-width: 1025px) {
+      .lgl-type-tabs-wrapper .lgl-type-tabs .lgl-tab-btn.is-active {
+        background-color: var(--lgl-color-secondary);
+        color: var(--lgl-color-white); } }
     @media (max-width: 1024px) {
       .lgl-type-tabs-wrapper .lgl-type-tabs .lgl-tab-btn {
         border-radius: 10px;
