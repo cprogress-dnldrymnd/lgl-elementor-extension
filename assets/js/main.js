@@ -1145,17 +1145,13 @@
      * overriding default Elementor lightbox behavior.
      * * @returns {void}
      */
-function initFancyboxGallery() {
+    function initFancyboxGallery() {
         if (typeof Fancybox !== 'undefined') {
             Fancybox.bind('[data-fancybox="lgl-gallery-car"]', {
+                // Switch to the static grid layout
                 Thumbs: {
-                    type: "modern", 
+                    type: "classic",
                     showOnStart: true,
-                    // Inject internal Carousel settings for the thumbnail track
-                    Carousel: {
-                        center: true, // Forces the active thumbnail to the center of the viewport
-                        friction: 0.8 // Smoother deceleration after panning
-                    }
                 },
                 Toolbar: {
                     display: {
