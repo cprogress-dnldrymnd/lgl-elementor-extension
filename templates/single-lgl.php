@@ -60,7 +60,7 @@ $warranty  = get_post_meta($post_id, 'warranty', true);
 $feature   = get_post_meta($post_id, 'feature', true);
 $sub_title = get_post_meta($post_id, 'sub_title', true);
 $interior_image = get_post_meta($post_id, '_listing_interior_image_id', true);
-$hide_interior  = !empty($lgl_options['disable_interior_image']);
+$hide_interior_single  = !empty($lgl_options['disable_interior_image_single']);
 
 /**
  * Consolidate image IDs (Featured, Interior, Gallery) to prevent duplication.
@@ -75,7 +75,7 @@ if ($featured_image_id) {
 }
 
 // 2. Fetch and merge Interior Image ID
-if (!empty($interior_image) && !$hide_interior) {
+if (!empty($interior_image) && !$hide_interior_single) {
     $all_image_ids[] = $interior_image;
 }
 
