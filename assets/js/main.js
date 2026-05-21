@@ -1145,15 +1145,18 @@
      * overriding default Elementor lightbox behavior.
      * * @returns {void}
      */
-    function initFancyboxGallery() {
+function initFancyboxGallery() {
         if (typeof Fancybox !== 'undefined') {
             Fancybox.bind('[data-fancybox="lgl-gallery-car"]', {
-                // Configures the Thumbnail Navigation Plugin
                 Thumbs: {
-                    type: "modern", // Utilizes the modern sliding track logic
+                    type: "modern", 
                     showOnStart: true,
+                    // Inject internal Carousel settings for the thumbnail track
+                    Carousel: {
+                        center: true, // Forces the active thumbnail to the center of the viewport
+                        friction: 0.8 // Smoother deceleration after panning
+                    }
                 },
-                // Explicitly maps the UI controls in the top toolbar
                 Toolbar: {
                     display: {
                         left: ["infobar"],
@@ -1167,7 +1170,6 @@
                         right: ["slideshow", "thumbs", "close"],
                     }
                 },
-                // UX enhancements for touch/pointer devices
                 dragToClose: false,
                 animated: true
             });
