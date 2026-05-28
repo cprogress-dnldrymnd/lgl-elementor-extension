@@ -232,14 +232,12 @@ class LGL_Forms
                     var $id=$r.find(".lgl-id-inp");
                     if($id.data("manual"))return;
                     
-                    // Allow simple alphanumeric characters and underscores, strip HTML
                     var cleanLabel = $("<div>").html($(this).val()).text(); 
                     $id.val(cleanLabel.toLowerCase().replace(/[^a-z0-9\s_-]/g,"").replace(/[\s-]+/g,"_").replace(/^_+|_+$/g,""));
                 });
                 
                 $(document).on("keyup",".lgl-id-inp",function(){$(this).data("manual",true)});
                 
-                // Show/hide options for select type
                 $(document).on("change",".lgl-type-sel",function(){
                     var $r=$(this).closest(".lgl-field-row");
                     $(this).val()==="select"?$r.find(".lgl-fg--opts").show():$r.find(".lgl-fg--opts").hide();
@@ -251,14 +249,12 @@ class LGL_Forms
                     val === "custom" ? $("#row_custom_code").show() : $("#row_custom_code").hide();
                     val === "afo" ? $(".row_afo_settings").show() : $(".row_afo_settings").hide();
                     
-                    // Financial Parameters and Disclaimer ONLY show for the native calculator
-                    val === "native" ? $("#section_financial_parameters, #section_disclaimer").show() : $("#section_financial_parameters, #section_disclaimer").hide();
+                    // Native features logic (added #section_field_labels to the toggle block)
+                    val === "native" ? $("#section_financial_parameters, #section_field_labels, #section_disclaimer").show() : $("#section_financial_parameters, #section_field_labels, #section_disclaimer").hide();
                     
-                    // Popup Labels show for everything except "off"
                     val === "off" ? $("#section_popup_labels").hide() : $("#section_popup_labels").show();
                 });
                 
-                // Add field
                 $(document).on("click","#lgl-add-field-btn",function(){
                     var tmpl=$("#lgl-field-tpl").html().replace(/__I__/g,fc);
                     var $r=$(tmpl);
@@ -267,12 +263,10 @@ class LGL_Forms
                     updateCount();
                     $r.find(".lgl-label-inp").focus();
                     
-                    // Force the new row to show its bottom drawer to encourage filling placeholder/options out
                     $r.find(".lgl-field-bottom").css("display", "grid");
                     $r.find(".lgl-toggle-field .dashicons").removeClass("dashicons-arrow-down-alt2").addClass("dashicons-arrow-up-alt2");
                 });
 
-                // Duplicate field
                 $(document).on("click",".lgl-clone-field",function(){
                     var $row = $(this).closest(".lgl-field-row");
                     var $clone = $row.clone();
@@ -281,7 +275,6 @@ class LGL_Forms
                     updateCount();
                 });
 
-                // Toggle/Collapse field (uses CSS Grid, so we manually fade/toggle to prevent flex/block breaking)
                 $(document).on("click",".lgl-toggle-field",function(){
                     var $row = $(this).closest(".lgl-field-row");
                     var $bottom = $row.find(".lgl-field-bottom");
@@ -290,19 +283,16 @@ class LGL_Forms
                         $bottom.slideUp(200);
                         $(this).find(".dashicons").removeClass("dashicons-arrow-up-alt2").addClass("dashicons-arrow-down-alt2");
                     } else {
-                        // Restore grid layout explicitly
                         $bottom.css("display", "grid").hide().slideDown(200);
                         $(this).find(".dashicons").removeClass("dashicons-arrow-down-alt2").addClass("dashicons-arrow-up-alt2");
                     }
                 });
                 
-                // Remove field
                 $(document).on("click",".lgl-rm-field",function(){
                     if(!confirm("Remove this field?"))return;
                     $(this).closest(".lgl-field-row").fadeOut(200,function(){$(this).remove();reindex();updateCount()});
                 });
                 
-                // Reindex on save
                 $("#lgl-fb-form").on("submit",function(){reindex()});
             });
             
@@ -487,6 +477,12 @@ class LGL_Forms
 									</td>
 								</tr>
 								<tr>
+									<th><label for="fc_loan_default"><?php _e('Default Loan Amount (£)', 'lgl-shortcodes'); ?></label></th>
+									<td>£ <input type="number" id="fc_loan_default" name="loan_default" value="<?php echo esc_attr($s['loan_default'] ?? '15000'); ?>" step="1" min="0" class="small-text">
+										<p class="description"><?php _e('Default value when calculator is used generically on non-vehicle pages.', 'lgl-shortcodes'); ?></p>
+									</td>
+								</tr>
+								<tr>
 									<th><label for="fc_def_deposit"><?php _e('Default Deposit (£)', 'lgl-shortcodes'); ?></label></th>
 									<td>£ <input type="number" id="fc_def_deposit" name="default_deposit" value="<?php echo esc_attr($s['default_deposit'] ?? '500'); ?>" step="1" min="0" class="small-text"></td>
 								</tr>
@@ -508,6 +504,28 @@ class LGL_Forms
 								</tr>
 							</table>
 						</div>
+
+						<div class="lgl-fbl-section" id="section_field_labels" style="<?php echo ($s['mode'] ?? 'native') === 'native' ? '' : 'display:none;'; ?>">
+							<h3><?php _e('Field Labels (Overrides)', 'lgl-shortcodes'); ?></h3>
+							<p class="description"><?php _e('Customize the frontend labels for the native calculator.', 'lgl-shortcodes'); ?></p>
+							<table class="form-table" style="margin:0">
+								<tr>
+									<th><label for="lbl_loan_amount"><?php _e('Loan Amount Label', 'lgl-shortcodes'); ?></label></th>
+									<td><input type="text" id="lbl_loan_amount" name="lbl_loan_amount" value="<?php echo esc_attr($s['lbl_loan_amount'] ?? 'Amount to Borrow'); ?>" class="regular-text">
+										<p class="description"><?php _e('Replaces Cash Price explicitly on non-vehicle pages.', 'lgl-shortcodes'); ?></p>
+									</td>
+								</tr>
+								<tr>
+									<th><label for="lbl_deposit"><?php _e('Deposit Label', 'lgl-shortcodes'); ?></label></th>
+									<td><input type="text" id="lbl_deposit" name="lbl_deposit" value="<?php echo esc_attr($s['lbl_deposit'] ?? 'Deposit'); ?>" class="regular-text"></td>
+								</tr>
+								<tr>
+									<th><label for="lbl_duration"><?php _e('Duration Label', 'lgl-shortcodes'); ?></label></th>
+									<td><input type="text" id="lbl_duration" name="lbl_duration" value="<?php echo esc_attr($s['lbl_duration'] ?? 'Duration'); ?>" class="regular-text"></td>
+								</tr>
+							</table>
+						</div>
+
 						<div class="lgl-fbl-section" id="section_disclaimer" style="<?php echo ($s['mode'] ?? 'native') === 'native' ? '' : 'display:none;'; ?>">
 							<h3><?php _e('Disclaimer (Legal / Compliance)', 'lgl-shortcodes'); ?></h3>
 							<textarea name="disclaimer_text" rows="4" class="large-text widefat"><?php echo esc_textarea($s['disclaimer_text'] ?? 'Finance examples are for illustration purposes only. The figures shown are based on assumptions and may not reflect the exact terms you are offered. All finance is subject to status, affordability checks, credit approval and terms & conditions.'); ?></textarea>
@@ -767,11 +785,9 @@ class LGL_Forms
 		check_admin_referer('lgl_save_finance_form');
 		if (! current_user_can('manage_options')) wp_die('Unauthorized');
 
-		// Add 'afo' to the allowed mode array during validation
 		$mode = in_array($_POST['mode'] ?? '', ['native', 'custom', 'afo', 'off'], true) ? $_POST['mode'] : 'native';
 		$calc = in_array($_POST['calculation_type'] ?? '', ['apr', 'flat'], true) ? $_POST['calculation_type'] : 'apr';
 
-		// Unfiltered HTML cap checks to ensure safe iframe storage
 		$custom_code = current_user_can('unfiltered_html') ? wp_unslash($_POST['custom_code'] ?? '') : wp_kses_post(wp_unslash($_POST['custom_code'] ?? ''));
 
 		update_option('lgl_finance_form', [
@@ -788,10 +804,14 @@ class LGL_Forms
 			'finance_provider'   => sanitize_text_field($_POST['finance_provider']   ?? ''),
 			'term_options'       => sanitize_textarea_field($_POST['term_options']   ?? ''),
 			'default_term'       => sanitize_text_field($_POST['default_term']       ?? '60'),
+			'loan_default'       => sanitize_text_field($_POST['loan_default']       ?? '15000'), // NEW: Loan Default
 			'default_deposit'    => sanitize_text_field($_POST['default_deposit']    ?? '500'),
 			'min_deposit'        => sanitize_text_field($_POST['min_deposit']        ?? '100'),
 			'purchase_fee'       => sanitize_text_field($_POST['purchase_fee']       ?? '10'),
 			'admin_fee'          => sanitize_text_field($_POST['admin_fee']          ?? '0'),
+			'lbl_loan_amount'    => sanitize_text_field($_POST['lbl_loan_amount']    ?? 'Amount to Borrow'), // NEW: Override Labels
+			'lbl_deposit'        => sanitize_text_field($_POST['lbl_deposit']        ?? 'Deposit'),
+			'lbl_duration'       => sanitize_text_field($_POST['lbl_duration']       ?? 'Duration'),
 			'disclaimer_text'    => sanitize_textarea_field($_POST['disclaimer_text'] ?? ''),
 		]);
 
@@ -847,7 +867,7 @@ class LGL_Forms
 	private function page_integrations()
 	{
 		$s = get_option('lgl_integrations_form', []);
-		?>
+	?>
 		<div class="lgl-form-builder-wrap">
 			<form method="post" action="<?php echo admin_url('admin-post.php'); ?>">
 				<?php wp_nonce_field('lgl_save_integrations_form'); ?>
@@ -884,7 +904,7 @@ class LGL_Forms
 				<?php submit_button(__('Save Integrations', 'lgl-shortcodes')); ?>
 			</form>
 		</div>
-		<?php
+	<?php
 	}
 
 	/**
@@ -894,7 +914,7 @@ class LGL_Forms
 	{
 		check_admin_referer('lgl_save_integrations_form');
 		if (! current_user_can('manage_options')) wp_die('Unauthorized');
-		
+
 		update_option('lgl_integrations_form', [
 			'recaptcha_enable'     => ! empty($_POST['recaptcha_enable']) ? '1' : '',
 			'recaptcha_site_key'   => sanitize_text_field($_POST['recaptcha_site_key'] ?? ''),
@@ -915,7 +935,7 @@ class LGL_Forms
 	{
 		$integ = get_option('lgl_integrations_form', []);
 		$recaptcha_enable = ! empty($integ['recaptcha_enable']) && ! empty($integ['recaptcha_site_key']) && ! empty($integ['recaptcha_secret_key']);
-		
+
 		if (! $recaptcha_enable) return true;
 
 		$token = $_POST['recaptcha_token'] ?? '';
@@ -935,7 +955,7 @@ class LGL_Forms
 		$result = json_decode($body, true);
 
 		if (empty($result['success'])) return false;
-		
+
 		$min_score = isset($integ['recaptcha_score']) ? (float)$integ['recaptcha_score'] : 0.5;
 		if (isset($result['score']) && $result['score'] < $min_score) return false;
 		if (isset($result['action']) && $result['action'] !== $action) return false;
@@ -1205,7 +1225,7 @@ class LGL_Forms
 		if (! wp_verify_nonce($_POST['lgl_forms_nonce'] ?? '', 'lgl_forms_nonce')) {
 			wp_send_json_error(['message' => __('Security check failed.', 'lgl-shortcodes')]);
 		}
-		
+
 		// NEW: reCAPTCHA verification trap
 		if (! $this->verify_recaptcha('enquiry')) {
 			wp_send_json_error(['message' => __('Security verification failed. Bot activity detected.', 'lgl-shortcodes')]);
@@ -1345,11 +1365,11 @@ class LGL_Forms
 			urlencode($afo_referrer)
 		);
 
-	wp_localize_script('lgl-forms-js', 'lglForms', [
+		wp_localize_script('lgl-forms-js', 'lglForms', [
 			'ajaxUrl'           => admin_url('admin-ajax.php'),
 			'nonce'             => wp_create_nonce('lgl_forms_nonce'),
 			'recaptchaEnabled'  => $recaptcha_enable,
-			'recaptchaSiteKey'  => $integ['recaptcha_site_key'] ?? '', 
+			'recaptchaSiteKey'  => $integ['recaptcha_site_key'] ?? '',
 			'productId'         => $post_id,
 			'cashPrice'         => $cash_price,
 			'reserveMode'       => $reserve_mode,
@@ -1600,6 +1620,4 @@ class LGL_Forms
 			],
 		];
 	}
-
-	
 }

@@ -1,14 +1,27 @@
 <?php
 if (!defined('ABSPATH')) exit;
 
-// Inherits: $target_post_id, $fin, $fin_mode
+/**
+ * Renders the Finance Calculator partial template.
+ * Inherits: $target_post_id, $fin, $fin_mode
+ */
 
 $dur_raw   = $fin['term_options'] ?? "24\n36\n48\n60";
 $durations = array_values(array_filter(array_map('trim', explode("\n", $dur_raw))));
 $def_term  = trim($fin['default_term'] ?? '60');
 $def_dep   = (float) ($fin['default_deposit'] ?? 500);
 $min_dep   = (float) ($fin['min_deposit'] ?? 100);
+
+// NEW: Identify if context is a Single Vehicle template
+$is_single_vehicle = is_singular(['caravan', 'motorhome', 'campervan']);
+
+// NEW: Establish string overrides (or fallbacks)
+$lbl_loan     = !empty($fin['lbl_loan_amount']) ? $fin['lbl_loan_amount'] : __('Amount to Borrow', 'lgl-shortcodes');
+$lbl_deposit  = !empty($fin['lbl_deposit']) ? $fin['lbl_deposit'] : __('Deposit', 'lgl-shortcodes');
+$lbl_duration = !empty($fin['lbl_duration']) ? $fin['lbl_duration'] : __('Duration', 'lgl-shortcodes');
+$def_loan     = (float) ($fin['loan_default'] ?? 15000);
 ?>
+
 <?php if ('custom' === $fin_mode && ! empty($fin['custom_code'])) : ?>
     <div class="lgl-fc-custom-container">
         <?php echo do_shortcode($fin['custom_code']); ?>
@@ -29,15 +42,28 @@ $min_dep   = (float) ($fin['min_deposit'] ?? 100);
     </div>
 <?php else : ?>
     <div class="lgl-fc-inputs">
+        
+        <?php 
+        // NEW: If we are not on a vehicle page, let the user define the base principal amount.
+        if (! $is_single_vehicle) : ?>
+            <div class="lgl-fc-field">
+                <label for="lgl-fc-loan-amount"><?php echo esc_html($lbl_loan); ?> <span class="lgl-form-req">(Required)</span></label>
+                <div class="lgl-fc-input-wrap">
+                    <span class="lgl-fc-prefix">£</span>
+                    <input type="number" id="lgl-fc-loan-amount" value="<?php echo esc_attr($def_loan); ?>" min="0" step="100" class="lgl-fc-input">
+                </div>
+            </div>
+        <?php endif; ?>
+
         <div class="lgl-fc-field">
-            <label for="lgl-fc-deposit"><?php _e('Deposit', 'lgl-shortcodes'); ?> <span class="lgl-form-req">(Required)</span></label>
+            <label for="lgl-fc-deposit"><?php echo esc_html($lbl_deposit); ?> <span class="lgl-form-req">(Required)</span></label>
             <div class="lgl-fc-input-wrap">
                 <span class="lgl-fc-prefix">£</span>
                 <input type="number" id="lgl-fc-deposit" value="<?php echo esc_attr($def_dep); ?>" min="<?php echo esc_attr($min_dep); ?>" step="10" class="lgl-fc-input">
             </div>
         </div>
         <div class="lgl-fc-field">
-            <label for="lgl-fc-duration"><?php _e('Duration', 'lgl-shortcodes'); ?></label>
+            <label for="lgl-fc-duration"><?php echo esc_html($lbl_duration); ?></label>
             <select id="lgl-fc-duration" class="lgl-fc-input">
                 <?php foreach ($durations as $d) : ?>
                     <option value="<?php echo esc_attr($d); ?>" <?php selected($def_term, $d); ?>><?php echo esc_html($d); ?></option>

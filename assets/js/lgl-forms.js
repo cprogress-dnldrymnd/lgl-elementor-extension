@@ -76,8 +76,8 @@
         // Run explicitly on button click (fallback)
         $(document).on('click', '#lgl-fc-calc-btn', calcFinance);
 
-        // Auto-recalculate on input changes as per spec
-        $(document).on('input change', '#lgl-fc-deposit, #lgl-fc-duration', calcFinance);
+        // Auto-recalculate on input changes as per spec (Included #lgl-fc-loan-amount)
+        $(document).on('input change', '#lgl-fc-deposit, #lgl-fc-duration, #lgl-fc-loan-amount', calcFinance);
 
         // Fallback for enter key
         $(document).on('keypress', '#lgl-modal-finance input, #lgl-modal-finance select', function (e) {
@@ -91,7 +91,16 @@
     function calcFinance() {
         $('.lgl-fc-calc-error').remove();
 
-        var cashPrice = parseFloat(F.cashPrice) || 0;
+        var cashPrice = 0;
+        var $loanInput = $('#lgl-fc-loan-amount');
+
+        // NEW: Dynamic source routing. Map user input if standard product constraint isn't active.
+        if ($loanInput.length) {
+            cashPrice = parseFloat($loanInput.val()) || 0;
+        } else {
+            cashPrice = parseFloat(F.cashPrice) || 0;
+        }
+
         var deposit = parseFloat($('#lgl-fc-deposit').val()) || 0;
         var termMonths = parseInt($('#lgl-fc-duration').val()) || parseInt(F.defaultTerm) || 60;
 
@@ -103,7 +112,8 @@
 
         // Validation constraints
         if (cashPrice <= 0) {
-            showCalcErr('Cash price is not set for this vehicle.');
+            var errMsg = $loanInput.length ? 'Please enter a valid loan amount.' : 'Cash price is not set for this vehicle.';
+            showCalcErr(errMsg);
             return;
         }
         if (deposit < minDeposit) {

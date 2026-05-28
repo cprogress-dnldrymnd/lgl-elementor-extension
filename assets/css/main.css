@@ -2117,9 +2117,6 @@
 .lgl-mini-account__logout:hover {
   opacity: 1 !important; }
 
-.lgl-mini-account--logged-out {
-  background-color: var(--lgl-color-primary, #003793); }
-
 .lgl-mini-account__login {
   display: inline-flex;
   align-items: center;
