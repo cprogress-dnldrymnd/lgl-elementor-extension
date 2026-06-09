@@ -128,6 +128,11 @@ All front-end AJAX uses the nonce action `lgl_search_nonce`, localized to JS as
 `lgl_ajax_obj` (`{ ajax_url, nonce }`). Both `wp_ajax_` and `wp_ajax_nopriv_` are registered
 for public-facing actions. Handlers:
 - Search: `lgl_get_makes`, `lgl_get_models`, `lgl_get_filter_options`, `lgl_fetch_results`.
+  `lgl_get_filter_options` uses **faceted self-exclusion**: each facet's available options
+  are computed by a query that omits that facet's own constraint, so sibling options remain
+  selectable without the user first resetting the dropdown. The shared query logic lives in
+  the private helper `build_filter_matching_ids($post_type, $form_data, $all_possible_meta,
+  $skip_meta_keys, $exclude_keys)` — pass the facet key(s) to exclude in `$exclude_keys`.
 - Wishlist: `lgl_add_to_wishlist`, `lgl_refresh_mini_wishlist`.
 - Compare: `lgl_search_vehicles_for_compare`, `lgl_get_compare_table`.
 - Account: `lgl_update_account`.

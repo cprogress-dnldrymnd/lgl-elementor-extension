@@ -1943,11 +1943,6 @@ if (! class_exists('LGL_Shortcodes')) {
             $chassis_list        = array();
             $gearboxes           = array();
 
-            // ---------------------------------------------------------
-            // 1. Build Base Meta Query (Dynamic Meta Fields)
-            // ---------------------------------------------------------
-            $base_meta_query = array('relation' => 'AND');
-
             $listing_fields = class_exists('LGL_Import_Post_Types') ? LGL_Import_Post_Types::get_listing_detail_fields() : array();
             $all_possible_meta = array_merge(
                 isset($listing_fields['common']) ? $listing_fields['common'] : array(),
@@ -1957,107 +1952,52 @@ if (! class_exists('LGL_Shortcodes')) {
 
             $skip_meta_keys = array('price', 'listing-fuel-type', 'listing-chassis', 'listing-gearbox');
 
+            // ---------------------------------------------------------
+            // Faceted self-exclusion.
+            //
+            // $base_ids = every active filter applied; used for facets the user
+            // has NOT selected yet. For a facet the user HAS selected we instead
+            // recompute a dedicated ID set that omits that facet's own constraint,
+            // so the facet's sibling options (e.g. the OTHER Bailey model) stay
+            // selectable without the user having to reset the dropdown first.
+            // ---------------------------------------------------------
+            $base_ids = $this->build_filter_matching_ids($data_post_type, $form_data, $all_possible_meta, $skip_meta_keys, array());
+
+            global $wpdb;
+
+            // A. Dynamic Meta Options — each field excludes its own value.
             foreach (array_keys($all_possible_meta) as $meta_key) {
                 if (in_array($meta_key, $skip_meta_keys)) continue;
 
-                if (!empty($form_data[$meta_key])) {
-                    $base_meta_query[] = array(
-                        'key'     => $meta_key,
-                        'value'   => sanitize_text_field($form_data[$meta_key]),
-                        'compare' => '=',
-                    );
-                }
-            }
+                $ids = !empty($form_data[$meta_key])
+                    ? $this->build_filter_matching_ids($data_post_type, $form_data, $all_possible_meta, $skip_meta_keys, array($meta_key))
+                    : $base_ids;
 
-            // Price Constraints
-            $price_min = !empty($form_data['price_min']) ? floatval($form_data['price_min']) : 0;
-            $price_max = !empty($form_data['price_max']) ? floatval($form_data['price_max']) : 0;
-
-            if ($price_min > 0 || $price_max > 0) {
-                $price_query = array('key' => 'price', 'type' => 'NUMERIC');
-                if ($price_min > 0 && $price_max > 0) {
-                    $price_query['value']   = array($price_min, $price_max);
-                    $price_query['compare'] = 'BETWEEN';
-                } elseif ($price_min > 0) {
-                    $price_query['value']   = $price_min;
-                    $price_query['compare'] = '>=';
-                } else {
-                    $price_query['value']   = $price_max;
-                    $price_query['compare'] = '<=';
-                }
-                $base_meta_query[] = $price_query;
-            }
-
-            // ---------------------------------------------------------
-            // 2. Build Base Tax Query
-            // ---------------------------------------------------------
-            $tax_query = array('relation' => 'AND');
-
-            $make_slug  = !empty($form_data['listing_make'])  ? sanitize_text_field($form_data['listing_make'])  : '';
-            $model_slug = !empty($form_data['listing_model']) ? sanitize_text_field($form_data['listing_model']) : '';
-
-            if ($model_slug) {
-                $tax_query[] = array(
-                    'taxonomy' => 'listing-make-model',
-                    'field'    => 'slug',
-                    'terms'    => $model_slug,
-                );
-            } elseif ($make_slug) {
-                $tax_query[] = array(
-                    'taxonomy' => 'listing-make-model',
-                    'field'    => 'slug',
-                    'terms'    => $make_slug,
-                );
-            }
-
-            // Apply Taxonomies regardless of Make/Model status
-            $tax_fields = array('listing-fuel-type', 'listing-chassis', 'listing-gearbox');
-            foreach ($tax_fields as $tax) {
-                if (!empty($form_data[$tax])) {
-                    $tax_query[] = array(
-                        'taxonomy' => $tax,
-                        'field'    => 'slug',
-                        'terms'    => sanitize_text_field($form_data[$tax]),
-                    );
-                }
-            }
-
-            // ---------------------------------------------------------
-            // 3. Query Matching IDs & Compile Options
-            // ---------------------------------------------------------
-            $args = array(
-                'post_type'      => $data_post_type,
-                'post_status'    => 'publish',
-                'posts_per_page' => -1,
-                'fields'         => 'ids',
-                'meta_query'     => $base_meta_query,
-                'tax_query'      => $tax_query, // Guaranteed to apply dynamically
-            );
-
-            $matching_ids = get_posts($args);
-
-            if (!empty($matching_ids)) {
-                global $wpdb;
-                $ids_in = implode(',', array_map('intval', $matching_ids));
-
-                // A. Dynamic Meta Options
-                foreach (array_keys($all_possible_meta) as $meta_key) {
-                    if (in_array($meta_key, $skip_meta_keys)) continue;
-
+                $dynamic_meta_values[$meta_key] = array();
+                if (!empty($ids)) {
+                    $ids_in = implode(',', array_map('intval', $ids));
                     $dynamic_meta_values[$meta_key] = $wpdb->get_col(
                         "SELECT DISTINCT meta_value FROM {$wpdb->postmeta}
                          WHERE post_id IN ({$ids_in}) AND meta_key = '" . esc_sql($meta_key) . "' AND meta_value != ''
                          ORDER BY meta_value ASC"
                     );
                 }
+            }
 
-                // B. Price Options
+            // B. Price Options — exclude the price constraint when one is set.
+            $price_selected = (!empty($form_data['price_min']) && floatval($form_data['price_min']) > 0)
+                || (!empty($form_data['price_max']) && floatval($form_data['price_max']) > 0);
+            $price_ids = $price_selected
+                ? $this->build_filter_matching_ids($data_post_type, $form_data, $all_possible_meta, $skip_meta_keys, array('price'))
+                : $base_ids;
+
+            if (!empty($price_ids)) {
+                $ids_in = implode(',', array_map('intval', $price_ids));
                 $prices_raw = $wpdb->get_col(
                     "SELECT DISTINCT meta_value FROM {$wpdb->postmeta}
                      WHERE post_id IN ({$ids_in}) AND meta_key = 'price' AND meta_value != ''
                      ORDER BY CAST(meta_value AS DECIMAL(15,2)) ASC"
                 );
-
                 foreach ($prices_raw as $p) {
                     if (is_numeric($p)) {
                         $prices[] = array(
@@ -2066,42 +2006,50 @@ if (! class_exists('LGL_Shortcodes')) {
                         );
                     }
                 }
+            }
 
-                // C. Dependent Taxonomies Options
-                foreach (array('listing-fuel-type' => &$fuel_types, 'listing-chassis' => &$chassis_list, 'listing-gearbox' => &$gearboxes) as $tax => &$arr) {
-                    $terms = wp_get_object_terms($matching_ids, $tax);
-                    $seen = array();
-                    if (!is_wp_error($terms)) {
-                        foreach ($terms as $t) {
-                            if (!isset($seen[$t->term_id])) {
-                                $arr[] = array('id' => $t->slug, 'text' => $t->name);
-                                $seen[$t->term_id] = true;
-                            }
+            // C. Dependent Taxonomy Options — each taxonomy excludes its own value.
+            $tax_targets = array('listing-fuel-type' => &$fuel_types, 'listing-chassis' => &$chassis_list, 'listing-gearbox' => &$gearboxes);
+            foreach ($tax_targets as $tax => &$arr) {
+                $ids = !empty($form_data[$tax])
+                    ? $this->build_filter_matching_ids($data_post_type, $form_data, $all_possible_meta, $skip_meta_keys, array($tax))
+                    : $base_ids;
+
+                if (empty($ids)) continue;
+
+                $terms = wp_get_object_terms($ids, $tax);
+                $seen = array();
+                if (!is_wp_error($terms)) {
+                    foreach ($terms as $t) {
+                        if (!isset($seen[$t->term_id])) {
+                            $arr[] = array('id' => $t->slug, 'text' => $t->name);
+                            $seen[$t->term_id] = true;
                         }
-                        usort($arr, function ($a, $b) {
-                            return strcmp($a['text'], $b['text']);
-                        });
                     }
+                    usort($arr, function ($a, $b) {
+                        return strcmp($a['text'], $b['text']);
+                    });
                 }
+            }
+            unset($arr);
 
-                // D. Makes & Models Options
-                $make_model_terms = wp_get_object_terms($matching_ids, 'listing-make-model');
+            // D. Makes — exclude make+model so the user can switch make freely.
+            $makes_ids = !empty($form_data['listing_make'])
+                ? $this->build_filter_matching_ids($data_post_type, $form_data, $all_possible_meta, $skip_meta_keys, array('listing_make', 'listing_model'))
+                : $base_ids;
+
+            if (!empty($makes_ids)) {
+                $terms = wp_get_object_terms($makes_ids, 'listing-make-model');
                 $seen_makes = array();
-                $seen_models = array();
-
-                if (!is_wp_error($make_model_terms)) {
-                    foreach ($make_model_terms as $t) {
+                if (!is_wp_error($terms)) {
+                    foreach ($terms as $t) {
                         if ($t->parent == 0) {
                             if (!isset($seen_makes[$t->term_id])) {
                                 $makes[] = array('id' => $t->slug, 'text' => $t->name);
                                 $seen_makes[$t->term_id] = true;
                             }
                         } else {
-                            if (!isset($seen_models[$t->term_id])) {
-                                $models[] = array('id' => $t->slug, 'text' => $t->name);
-                                $seen_models[$t->term_id] = true;
-                            }
-                            // Ensure parent make is also collected
+                            // Ensure the parent make of any matched model is collected.
                             if (!isset($seen_makes[$t->parent])) {
                                 $parent_term = get_term($t->parent, 'listing-make-model');
                                 if ($parent_term && !is_wp_error($parent_term)) {
@@ -2111,14 +2059,32 @@ if (! class_exists('LGL_Shortcodes')) {
                             }
                         }
                     }
+                    usort($makes, function ($a, $b) {
+                        return strcmp($a['text'], $b['text']);
+                    });
                 }
+            }
 
-                usort($makes, function ($a, $b) {
-                    return strcmp($a['text'], $b['text']);
-                });
-                usort($models, function ($a, $b) {
-                    return strcmp($a['text'], $b['text']);
-                });
+            // E. Models — exclude the model only, keep the make so its sibling
+            //    models (the whole point of this fix) remain selectable.
+            $models_ids = !empty($form_data['listing_model'])
+                ? $this->build_filter_matching_ids($data_post_type, $form_data, $all_possible_meta, $skip_meta_keys, array('listing_model'))
+                : $base_ids;
+
+            if (!empty($models_ids)) {
+                $terms = wp_get_object_terms($models_ids, 'listing-make-model');
+                $seen_models = array();
+                if (!is_wp_error($terms)) {
+                    foreach ($terms as $t) {
+                        if ($t->parent != 0 && !isset($seen_models[$t->term_id])) {
+                            $models[] = array('id' => $t->slug, 'text' => $t->name);
+                            $seen_models[$t->term_id] = true;
+                        }
+                    }
+                    usort($models, function ($a, $b) {
+                        return strcmp($a['text'], $b['text']);
+                    });
+                }
             }
 
             wp_send_json_success(array(
@@ -2130,6 +2096,109 @@ if (! class_exists('LGL_Shortcodes')) {
                 'chassis_list' => $chassis_list,
                 'gearboxes'    => $gearboxes,
             ));
+        }
+
+        /**
+         * Builds the published-post ID set for the current filter state, optionally
+         * omitting one or more facets' own constraints.
+         *
+         * Passing a facet key in $exclude_keys drops that constraint from the query.
+         * Recognised keys: a dynamic meta key, 'price', 'listing_make',
+         * 'listing_model', or a taxonomy slug ('listing-fuel-type', etc.).
+         *
+         * This powers faceted self-exclusion: a selected facet's option list is
+         * built from a query that ignores its own value, so the facet's sibling
+         * options stay selectable without the user resetting the dropdown first.
+         *
+         * @param string $data_post_type    Vehicle CPT being queried.
+         * @param array  $form_data         Parsed search form state.
+         * @param array  $all_possible_meta Meta field definitions (keys are meta keys).
+         * @param array  $skip_meta_keys    Keys handled as price/taxonomies, not plain meta.
+         * @param array  $exclude_keys      Facet keys to omit from the query.
+         * @return int[] Matching post IDs.
+         */
+        private function build_filter_matching_ids($data_post_type, $form_data, $all_possible_meta, $skip_meta_keys, $exclude_keys = array())
+        {
+            // --- Meta query ---
+            $meta_query = array('relation' => 'AND');
+
+            foreach (array_keys($all_possible_meta) as $meta_key) {
+                if (in_array($meta_key, $skip_meta_keys)) continue;
+                if (in_array($meta_key, $exclude_keys)) continue;
+
+                if (!empty($form_data[$meta_key])) {
+                    $meta_query[] = array(
+                        'key'     => $meta_key,
+                        'value'   => sanitize_text_field($form_data[$meta_key]),
+                        'compare' => '=',
+                    );
+                }
+            }
+
+            // Price constraint
+            if (!in_array('price', $exclude_keys)) {
+                $price_min = !empty($form_data['price_min']) ? floatval($form_data['price_min']) : 0;
+                $price_max = !empty($form_data['price_max']) ? floatval($form_data['price_max']) : 0;
+
+                if ($price_min > 0 || $price_max > 0) {
+                    $price_query = array('key' => 'price', 'type' => 'NUMERIC');
+                    if ($price_min > 0 && $price_max > 0) {
+                        $price_query['value']   = array($price_min, $price_max);
+                        $price_query['compare'] = 'BETWEEN';
+                    } elseif ($price_min > 0) {
+                        $price_query['value']   = $price_min;
+                        $price_query['compare'] = '>=';
+                    } else {
+                        $price_query['value']   = $price_max;
+                        $price_query['compare'] = '<=';
+                    }
+                    $meta_query[] = $price_query;
+                }
+            }
+
+            // --- Tax query ---
+            $tax_query = array('relation' => 'AND');
+
+            $make_slug  = !empty($form_data['listing_make'])  ? sanitize_text_field($form_data['listing_make'])  : '';
+            $model_slug = !empty($form_data['listing_model']) ? sanitize_text_field($form_data['listing_model']) : '';
+
+            // Model is the more specific term; it implies its make. Either may be excluded.
+            if ($model_slug && !in_array('listing_model', $exclude_keys)) {
+                $tax_query[] = array(
+                    'taxonomy' => 'listing-make-model',
+                    'field'    => 'slug',
+                    'terms'    => $model_slug,
+                );
+            } elseif ($make_slug && !in_array('listing_make', $exclude_keys)) {
+                $tax_query[] = array(
+                    'taxonomy' => 'listing-make-model',
+                    'field'    => 'slug',
+                    'terms'    => $make_slug,
+                );
+            }
+
+            $tax_fields = array('listing-fuel-type', 'listing-chassis', 'listing-gearbox');
+            foreach ($tax_fields as $tax) {
+                if (in_array($tax, $exclude_keys)) continue;
+                if (!empty($form_data[$tax])) {
+                    $tax_query[] = array(
+                        'taxonomy' => $tax,
+                        'field'    => 'slug',
+                        'terms'    => sanitize_text_field($form_data[$tax]),
+                    );
+                }
+            }
+
+            $args = array(
+                'post_type'      => $data_post_type,
+                'post_status'    => 'publish',
+                'posts_per_page' => -1,
+                'fields'         => 'ids',
+                'meta_query'     => $meta_query,
+                'tax_query'      => $tax_query,
+            );
+
+            return get_posts($args);
         }
 
         /**
