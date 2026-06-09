@@ -147,6 +147,25 @@
 
             const $form = $(this);
 
+            // Vehicle type is required in dropdown layout (global search). Without it the
+            // redirect has no destination and would just reload the current page, so block
+            // submission and prompt the user to choose a type first.
+            const $typeSelect = $form.find('#lgl_post_type');
+            if ($typeSelect.length && !$typeSelect.val()) {
+                const typeNode = $typeSelect[0];
+                $typeSelect.closest('.lgl-filter-group').addClass('lgl-field-error');
+                if (typeNode && typeNode.choicesInstance) {
+                    typeNode.choicesInstance.showDropdown();
+                } else {
+                    $typeSelect.trigger('focus');
+                }
+                // Clear the error highlight as soon as a type is picked
+                $typeSelect.one('change', function () {
+                    $(this).closest('.lgl-filter-group').removeClass('lgl-field-error');
+                });
+                return;
+            }
+
             // Try to get base URL natively, fallback to hidden input
             let destUrl = $form.find('#lgl_post_type').length ? $form.find('#lgl_post_type').val() : '';
             if (!destUrl) destUrl = $form.find('#lgl_base_archive_url').val();

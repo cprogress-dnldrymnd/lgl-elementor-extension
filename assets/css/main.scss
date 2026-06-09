@@ -3004,6 +3004,14 @@ $wt-cols: 110px 1fr 120px 110px 80px 80px 50px;
             }
         }
     }
+    // Highlight the vehicle type field when a required selection is missing
+    &.lgl-field-error {
+        select,
+        .choices .choices__inner {
+            border: 1px solid #d63638;
+            box-shadow: 0 0 0 1px #d63638;
+        }
+    }
 }
 
 .lgl-sort-field {
