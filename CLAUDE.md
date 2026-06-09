@@ -4,7 +4,7 @@ Guidance for working in the **LGL Shortcodes** WordPress plugin.
 
 ## What this is
 
-`lgl-shortcodes` is an OOP WordPress plugin (v4.6.1, by Digitally Disruptive – Donald
+`lgl-shortcodes` is an OOP WordPress plugin (v4.6.3, by Digitally Disruptive – Donald
 Raymundo) that renders front-end UI for a **leisure-vehicle dealership** site —
 caravans, motorhomes, and campervans. It provides shortcodes + Elementor widgets for
 search, listing grids, single-vehicle pages, wishlist, compare, finance/enquiry/reserve
@@ -189,4 +189,8 @@ fancybox gallery.
 - **Theme override before plugin edit**: if a site has `your-theme/lgl-shortcodes/<tag>.php`,
   that file wins over `templates/shortcodes/<tag>.php`. Check for an override before assuming
   the plugin template is what renders.
+- **`lgl_search` dropdown layout requires vehicle type before submit**: when `layout=dropdown`
+  (global/header search), `main.js` blocks form submission if `#lgl_post_type` is empty —
+  it adds `lgl-field-error` and opens the Choices.js dropdown automatically. Without a type,
+  the redirect has no destination and would just reload the current page.
 - Git history messages are terse (e.g. "css", "cs"); don't rely on them for context.

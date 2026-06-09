@@ -142,6 +142,18 @@
             }
         });
 
+        // The vehicle type select uses a data-placeholder for its closed-state label,
+        // which leaves the empty "Leisure Vehicle Type" option as a redundant row in the
+        // dropdown. Hide that row on open so only the real types are listed. (Other
+        // filters keep their empty row as a deliberate "All/Any" reset option.)
+        const typeEl = document.getElementById('lgl_post_type');
+        if (typeEl && typeEl.choicesInstance && typeEl.choicesInstance.dropdown) {
+            typeEl.addEventListener('showDropdown', function () {
+                const emptyRow = typeEl.choicesInstance.dropdown.element.querySelector('.choices__item[data-value=""]');
+                if (emptyRow) emptyRow.style.display = 'none';
+            });
+        }
+
         $('#lgl-search-form.lgl-filter-form-no-ajax').on('submit', function (e) {
             e.preventDefault();
 
