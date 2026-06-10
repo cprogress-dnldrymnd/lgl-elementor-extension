@@ -3224,7 +3224,7 @@
   opacity: 1;
 }
 
-.lgl-filter-group .choices choices__input.choices__input {
+.lgl-filter-group .choices .choices__input.choices__input {
   border-radius: 0 !important;
 }
 
