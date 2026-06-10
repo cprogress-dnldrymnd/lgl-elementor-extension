@@ -122,6 +122,7 @@
     font-weight: 500;
     min-height: 57px;
     width: 100%;
+    background-color: var(--lgl-color-white);
   }
 
   .lgl-search-container.lgl-search-container.lgl-search-container .lgl-filter-form.lgl-layout-horizontal .lgl-search-form-inner .lgl-filter-group.lgl-submit-group {
