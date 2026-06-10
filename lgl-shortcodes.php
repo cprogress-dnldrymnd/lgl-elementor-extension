@@ -448,6 +448,7 @@ if (! class_exists('LGL_Shortcodes')) {
                 'color_secondary'  => array('label' => 'Secondary Color', 'type' => 'color', 'default' => '#001537'),
                 'color_tertiary'   => array('label' => 'Tertiary Color', 'type' => 'color', 'default' => '#00e6f6'),
                 'color_quaternary' => array('label' => 'Quaternary Color', 'type' => 'color', 'default' => '#007bff'),
+                'custom_css'       => array('label' => 'Custom CSS', 'type' => 'code_css', 'default' => ''),
             );
 
             foreach ($design_fields as $id => $field) {
@@ -901,6 +902,14 @@ if (! class_exists('LGL_Shortcodes')) {
                         esc_textarea($value)
                     );
                     break;
+                case 'code_css':
+                    echo sprintf(
+                        '<textarea id="lgl_settings[%1$s]" name="lgl_settings[%1$s]" rows="15" cols="50" class="large-text code">%2$s</textarea>
+                         <p class="description">Custom CSS output on the front end inside a &lt;style&gt; tag. Do not include &lt;style&gt; tags here.</p>',
+                        esc_attr($id),
+                        esc_textarea($value)
+                    );
+                    break;
                 case 'select_page':
                     // Render a native WordPress page dropdown list
                     wp_dropdown_pages(array(
@@ -1095,6 +1104,11 @@ if (! class_exists('LGL_Shortcodes')) {
                 echo "\t{$key}: " . $val . ";\n";
             }
             echo "}\n</style>\n";
+
+            $custom_css = isset($options['custom_css']) ? trim($options['custom_css']) : '';
+            if (!empty($custom_css)) {
+                echo "<style id='lgl-custom-css'>\n" . wp_strip_all_tags($custom_css) . "\n</style>\n";
+            }
         }
 
         /**
