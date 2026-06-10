@@ -1630,6 +1630,7 @@
   position: relative;
   transition: background-color 0.3s ease;
 }
+
 @media (max-width: 767px) {
   .lgl-mini-wishlist-toggle {
     height: 40px;
@@ -3221,6 +3222,10 @@
 
 .lgl-filter-group .choices .choices__placeholder {
   opacity: 1;
+}
+
+.choices__input {
+  border-radius: 0;
 }
 
 .lgl-filter-group .choices .choices__inner {
