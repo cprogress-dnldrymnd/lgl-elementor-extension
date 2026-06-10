@@ -423,22 +423,18 @@
 /* ── Responsive ── */
 @media (max-width: 767px) {
     .lgl-modal {
-        top: auto;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        width: 100%;
-        max-width: 100%;
-        border-radius: 20px 20px 0 0;
-        /* Start completely off-screen at the bottom */
-        transform: translateY(100%);
-        transition:
-            transform 0.4s cubic-bezier(0.34, 1.1, 0.64, 1),
-            opacity 0.3s ease;
+        top: 50%;
+        left: 50%;
+        bottom: auto;
+        right: auto;
+        width: calc(100% - 32px);
+        max-width: calc(100% - 32px);
+        max-height: 90vh;
+        border-radius: 12px;
     }
 
     .lgl-modal.lgl-modal-active {
-        transform: translateY(0);
+        transform: translate(-50%, -50%);
     }
     .lgl-fc-inputs {
         grid-template-columns: 1fr;
