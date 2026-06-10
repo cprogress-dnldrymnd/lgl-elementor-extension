@@ -3230,7 +3230,8 @@
 
 .lgl-filter-group .choices .choices__button {
   background-repeat: no-repeat;
-  background-size: contain;
+  background-size: 8px;
+  background-position: center;
 }
 
 .lgl-filter-group .choices .choices__inner {

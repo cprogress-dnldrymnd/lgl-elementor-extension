@@ -3197,7 +3197,8 @@ $wt-cols: 110px 1fr 120px 110px 80px 80px 50px;
 
         .choices__button {
             background-repeat: no-repeat;
-            background-size: contain;
+            background-size: 8px;
+            background-position: center;
         }
 
         .choices__inner {
