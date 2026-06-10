@@ -1501,6 +1501,46 @@
     }
 }
 
+.lgl-feature-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+
+    li {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 14px 24px;
+        border: 1px solid var(--lgl-color-light-gray);
+        border-radius: 999px;
+        font-weight: 600;
+        font-size: 1rem;
+
+        &:before {
+            content: "";
+            flex-shrink: 0;
+            width: 16px;
+            height: 12px;
+            background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="16.028" height="11.952" viewBox="0 0 16.028 11.952"><path d="M5.444,16.295.235,11.086a.8.8,0,0,1,0-1.133L1.368,8.819a.8.8,0,0,1,1.133,0L6.01,12.328l7.516-7.516a.8.8,0,0,1,1.133,0l1.133,1.133a.8.8,0,0,1,0,1.133L6.577,16.295A.8.8,0,0,1,5.444,16.295Z" transform="translate(0 -4.577)" fill="%23001537"/></svg>');
+            background-repeat: no-repeat;
+            background-position: center;
+            background-size: contain;
+        }
+    }
+
+    @media (max-width: 767px) {
+        gap: 10px;
+
+        li {
+            padding: 10px 16px;
+            font-size: 0.875rem;
+        }
+    }
+}
+
 .lgl-related-heading {
     position: relative;
     text-transform: capitalize;
