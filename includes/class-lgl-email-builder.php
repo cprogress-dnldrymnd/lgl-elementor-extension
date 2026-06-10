@@ -1127,7 +1127,8 @@ $(document).ready(function() {
                                             <div id="lgl-custom-email-row" <?php echo in_array($rec_type, ['custom', 'both'], true) ? 'class="is-visible"' : ''; ?>>
                                                 <div class="lgl-eb-row">
                                                     <label><?php _e('Custom email address', 'lgl-shortcodes'); ?></label>
-                                                    <input type="email" name="custom_email" value="<?php echo esc_attr($custom_email); ?>" placeholder="sales@example.com">
+                                                    <input type="email" multiple name="custom_email" value="<?php echo esc_attr($custom_email); ?>" placeholder="sales@example.com, manager@example.com">
+                                                    <p class="description" style="margin-top:6px;"><?php _e('Separate multiple addresses with a comma.', 'lgl-shortcodes'); ?></p>
                                                 </div>
                                             </div>
                                         </div>
@@ -1324,7 +1325,7 @@ $(document).ready(function() {
             'subject'            => sanitize_text_field($_POST['subject']            ?? ''),
             'body'               => wp_kses_post($_POST['body']                      ?? ''),
             'recipient_type'     => in_array($rec_type, $allowed_recipients, true) ? $rec_type : 'admin',
-            'custom_email'       => sanitize_email($_POST['custom_email']            ?? ''),
+            'custom_email'       => self::sanitize_email_list($_POST['custom_email']  ?? ''),
             'from_name'          => sanitize_text_field($_POST['from_name']          ?? ''),
             'from_email'         => sanitize_email($_POST['from_email']              ?? ''),
             'auto_reply_enabled' => ! empty($_POST['auto_reply_enabled']),
@@ -1476,15 +1477,41 @@ $(document).ready(function() {
     private static function resolve_recipients(array $cfg): array
     {
         $admin  = get_option('admin_email');
-        $custom = sanitize_email($cfg['custom_email'] ?? '');
+        $custom = self::parse_email_list($cfg['custom_email'] ?? '');
         switch ($cfg['recipient_type'] ?? 'admin') {
             case 'custom':
-                return $custom ? [$custom] : [$admin];
+                return $custom ? $custom : [$admin];
             case 'both':
-                return array_filter([$admin, $custom]);
+                return array_values(array_unique(array_merge([$admin], $custom)));
             default:
                 return [$admin];
         }
+    }
+
+    /**
+     * Splits a comma-separated string into an array of valid email addresses.
+     *
+     * @param string $value Raw comma-separated email list.
+     * @return array List of sanitized, valid email addresses.
+     */
+    private static function parse_email_list(string $value): array
+    {
+        $emails = array_map('trim', explode(',', $value));
+        $emails = array_map('sanitize_email', $emails);
+        $emails = array_filter($emails, 'is_email');
+        return array_values(array_unique($emails));
+    }
+
+    /**
+     * Sanitizes a comma-separated email list back into a normalized
+     * comma-separated string of valid addresses (for storage).
+     *
+     * @param string $value Raw comma-separated email list.
+     * @return string Normalized "a@b.com, c@d.com" string.
+     */
+    private static function sanitize_email_list(string $value): string
+    {
+        return implode(', ', self::parse_email_list($value));
     }
 
     /**
