@@ -1127,8 +1127,8 @@ $(document).ready(function() {
                                             <div id="lgl-custom-email-row" <?php echo in_array($rec_type, ['custom', 'both'], true) ? 'class="is-visible"' : ''; ?>>
                                                 <div class="lgl-eb-row">
                                                     <label><?php _e('Custom email address', 'lgl-shortcodes'); ?></label>
-                                                    <input type="email" multiple name="custom_email" value="<?php echo esc_attr($custom_email); ?>" placeholder="sales@example.com, manager@example.com">
-                                                    <p class="description" style="margin-top:6px;"><?php _e('Separate multiple addresses with a comma.', 'lgl-shortcodes'); ?></p>
+                                                    <textarea name="custom_email" rows="3" placeholder="sales@example.com&#10;manager@example.com" style="width:100%;"><?php echo esc_textarea($custom_email); ?></textarea>
+                                                    <p class="description" style="margin-top:6px;"><?php _e('Enter one address per line, or separate them with commas.', 'lgl-shortcodes'); ?></p>
                                                 </div>
                                             </div>
                                         </div>
@@ -1496,8 +1496,9 @@ $(document).ready(function() {
      */
     private static function parse_email_list(string $value): array
     {
-        $emails = array_map('trim', explode(',', $value));
-        $emails = array_map('sanitize_email', $emails);
+        // Accept any mix of commas, semicolons, and whitespace/newlines as separators.
+        $parts  = preg_split('/[\s,;]+/', trim($value)) ?: [];
+        $emails = array_map('sanitize_email', $parts);
         $emails = array_filter($emails, 'is_email');
         return array_values(array_unique($emails));
     }
