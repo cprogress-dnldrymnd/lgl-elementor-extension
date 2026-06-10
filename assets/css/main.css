@@ -1634,6 +1634,7 @@
 @media (max-width: 767px) {
   .lgl-mini-wishlist-toggle {
     height: 40px;
+    width: 40px;
   }
 }
 
