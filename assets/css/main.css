@@ -1631,6 +1631,11 @@
   position: relative;
   transition: background-color 0.3s ease;
 }
+@media (max-width: 767px) {
+  .lgl-mini-wishlist-toggle {
+    height: 40px;
+  }
+}
 
 .lgl-mini-wishlist-toggle:hover {
   background-color: var(--lgl-color-medium-gray);

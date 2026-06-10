@@ -4,7 +4,7 @@
  * Plugin Name: LGL Shortcodes
  * Plugin URI: https://digitallydisruptive.co.uk/
  * Description: A robust, OOP-based plugin to output customized data via shortcodes using a dynamic template routing system.
- * Version: 4.6.3
+ * Version: 4.6.4
  * Author: Digitally Disruptive - Donald Raymundo
  * Author URI: https://digitallydisruptive.co.uk/
  * Text Domain: lgl-shortcodes
@@ -17,7 +17,7 @@ if (! defined('ABSPATH')) {
 // Define a constant for the plugin directory path to ensure reliable file inclusion.
 define('LGL_SHORTCODES_PATH', plugin_dir_path(__FILE__));
 define('LGL_SHORTCODES_URL', plugin_dir_url(__FILE__));
-define('LGL_SHORTCODES_VERSION', '4.6.3');
+define('LGL_SHORTCODES_VERSION', '4.6.4');
 // ── Load the Forms integration ──
 require_once LGL_SHORTCODES_PATH . 'includes/class-lgl-forms.php';
 require_once LGL_SHORTCODES_PATH . 'includes/class-lgl-email-builder.php';
@@ -307,6 +307,24 @@ if (! class_exists('LGL_Shortcodes')) {
             // Enqueue Select2 dependencies for the admin UI
             wp_enqueue_style('select2', LGL_SHORTCODES_URL . 'assets/libs/select2/select2.min.css');
             wp_enqueue_script('select2', LGL_SHORTCODES_URL . 'assets/libs/select2/select2.min.js', array('jquery'), '4.1.0', true);
+
+            // Power the Custom CSS field with the same CodeMirror editor used by the Customizer's "Additional CSS" panel.
+            $css_editor_settings = wp_enqueue_code_editor(array('type' => 'text/css'));
+
+            if (false !== $css_editor_settings) {
+                wp_add_inline_script(
+                    'code-editor',
+                    sprintf(
+                        'jQuery(function($){
+                            var $cssField = $("#lgl_settings\\\\[custom_css\\\\]");
+                            if ($cssField.length) {
+                                window.lglCustomCssEditor = wp.codeEditor.initialize($cssField, %s);
+                            }
+                        });',
+                        wp_json_encode($css_editor_settings)
+                    )
+                );
+            }
 
             // Inline script to initialize the color picker and Select2 instances
             wp_add_inline_script('wp-color-picker', "
@@ -1059,6 +1077,11 @@ if (! class_exists('LGL_Shortcodes')) {
                         var activeTab = $(this).data('tab');
                         $('#tab-' + activeTab).show();
 
+                        // CodeMirror renders blank if initialized while its tab is hidden, so refresh it once visible
+                        if (activeTab === 'design' && window.lglCustomCssEditor) {
+                            window.lglCustomCssEditor.codemirror.refresh();
+                        }
+
                         // Force history update to retain tab position after form reload
                         if (history.pushState) {
                             var newurl = window.location.protocol + "//" + window.location.host + window.location.pathname + '?page=lgl-settings&tab=' + activeTab;
@@ -1107,7 +1130,10 @@ if (! class_exists('LGL_Shortcodes')) {
 
             $custom_css = isset($options['custom_css']) ? trim($options['custom_css']) : '';
             if (!empty($custom_css)) {
-                echo "<style id='lgl-custom-css'>\n" . wp_strip_all_tags($custom_css) . "\n</style>\n";
+                // Only guard against breaking out of the <style> tag; wp_strip_all_tags() would
+                // mangle valid CSS syntax (e.g. the `>` child combinator or `content: "<"`).
+                $custom_css = str_ireplace('</style', '&lt;/style', $custom_css);
+                echo "<style id='lgl-custom-css'>\n" . $custom_css . "\n</style>\n";
             }
         }
 

@@ -1569,6 +1569,10 @@
     position: relative;
     transition: background-color 0.3s ease;
 
+    @media (max-width: 767px) {
+        height: 40px;
+    }
+
     &:hover {
         background-color: var(--lgl-color-medium-gray);
     }
