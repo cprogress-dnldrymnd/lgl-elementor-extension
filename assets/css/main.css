@@ -1942,6 +1942,77 @@
 }
 
 /* ==========================================================================
+   LGL Compare Page — controls bar & notices
+   ========================================================================== */
+.lgl-compare-container .lgl-notice {
+  margin-bottom: 20px;
+  padding: 12px 16px;
+  border-radius: 8px;
+  font-weight: 500;
+  font-family: var(--lgl-font-primary, sans-serif);
+}
+.lgl-compare-container .lgl-notice--error {
+  background-color: #fef2f2;
+  border: 1px solid var(--lgl-color-error, #dc3545);
+  color: var(--lgl-color-error, #dc3545);
+}
+
+.lgl-compare-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 15px;
+  margin-bottom: 20px;
+  padding: 15px;
+  background-color: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  font-family: var(--lgl-font-primary, sans-serif);
+}
+.lgl-compare-controls__group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.lgl-compare-controls__label {
+  font-weight: 600;
+  color: var(--lgl-color-secondary, #333);
+  white-space: nowrap;
+}
+.lgl-compare-controls__select {
+  min-width: 180px;
+  padding: 10px 15px;
+  border: 1px solid #ccd0d4;
+  border-radius: 6px;
+  font-family: inherit;
+}
+.lgl-compare-controls__search {
+  display: flex;
+  align-items: center;
+  flex: 1 1 260px;
+  max-width: 400px;
+}
+.lgl-compare-controls__search .select2-container {
+  width: 100% !important;
+}
+@media (max-width: 600px) {
+  .lgl-compare-controls {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .lgl-compare-controls__group,
+  .lgl-compare-controls__search {
+    max-width: none;
+  }
+  .lgl-compare-controls__select {
+    min-width: 0;
+    width: 100%;
+  }
+}
+
+/* ==========================================================================
    LGL Compare Table Styles
    ========================================================================== */
 /* Container for responsive horizontal scrolling to prevent layout breakage on mobile */
@@ -1956,11 +2027,29 @@
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
 }
 
+/* Legend explaining the "differs between vehicles" highlight */
+.lgl-compare-legend {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  padding: 12px 15px 0;
+  font-size: 0.8rem;
+  font-family: var(--lgl-font-primary, sans-serif);
+  color: var(--lgl-color-gray);
+}
+.lgl-compare-legend__swatch {
+  display: inline-block;
+  flex-shrink: 0;
+  width: 14px;
+  height: 14px;
+  border-radius: 3px;
+  background-color: rgba(246, 209, 0, 0.35);
+}
+
 /* Core table layout architecture */
 .lgl-compare-table {
   width: 100%;
-  min-width: 800px;
-  /* Enforces a strict minimum width to trigger horizontal scroll rather than squishing columns */
   border-collapse: collapse;
   font-family: var(--lgl-font-primary, sans-serif);
   text-align: left;
@@ -1977,7 +2066,7 @@
   border-bottom: 1px solid var(--lgl-color-light-gray);
   border-right: 1px solid var(--lgl-color-light-gray);
   vertical-align: top;
-  line-height: 1;
+  line-height: 1.4;
 }
 
 /* Clean up the far-right border edge */
@@ -1986,21 +2075,37 @@
   border-right: none;
 }
 
-/* First column styling for the meta field labels */
+/* First column styling for the meta field labels — frozen so it stays
+   visible while the vehicle columns scroll horizontally on smaller screens */
+.lgl-compare-table tbody th,
+.lgl-compare-table .lgl-compare-label-head {
+  position: sticky;
+  left: 0;
+  z-index: 2;
+  min-width: 140px;
+  max-width: 220px;
+  box-shadow: 2px 0 4px -2px rgba(0, 0, 0, 0.12);
+}
+
 .lgl-compare-table tbody th {
   background-color: var(--lgl-color-soft-gray);
   font-weight: 600;
   color: var(--lgl-color-secondary, #333);
-  width: 20%;
 }
 
 /* Top header row containing the vehicle cards */
 .lgl-compare-item-head {
+  position: relative;
   text-align: center;
   vertical-align: top;
-  width: 20%;
+  min-width: 200px;
   background-color: #fff;
   padding: 15px;
+}
+
+.lgl-compare-label-head {
+  z-index: 3;
+  background-color: #fff;
 }
 
 /* Wrapper to isolate thumbnail spacing */
@@ -2018,12 +2123,6 @@
   aspect-ratio: 4 / 3;
 }
 
-.lgl-compare-thumbnail .lgl-compare-remove-btn {
-  position: absolute;
-  top: 0;
-  right: 0;
-}
-
 /* Strict image constraints for uniformity across unevenly sized uploaded media */
 .lgl-compare-thumbnail img {
   max-width: 100%;
@@ -2031,6 +2130,35 @@
   border-radius: 4px;
   object-fit: cover;
   aspect-ratio: 4/3;
+}
+
+/* Compact circular "remove vehicle" button, floated over the top-right of the thumbnail */
+.lgl-compare-remove-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.9);
+  color: var(--lgl-color-secondary);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
+  cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+.lgl-compare-remove-btn svg {
+  width: 14px;
+  height: 14px;
+}
+.lgl-compare-remove-btn:hover {
+  background-color: var(--lgl-color-error);
+  color: var(--lgl-color-white);
 }
 
 /* Vehicle title typography inheriting dynamic plugin settings */
@@ -2048,6 +2176,26 @@
 
 .lgl-compare-title a:hover {
   color: var(--lgl-color-accent, var(--lgl-color-primary));
+}
+
+/* Zebra striping for readability across long spec lists */
+.lgl-compare-table tbody tr:nth-child(even) td {
+  background-color: #f8fafc;
+}
+
+/* Highlight rows where the value differs between compared vehicles */
+.lgl-compare-table tbody tr.lgl-compare-row--diff td {
+  background-color: rgba(246, 209, 0, 0.18);
+}
+
+.lgl-compare-table tbody tr.lgl-compare-row--diff th {
+  box-shadow: 2px 0 4px -2px rgba(0, 0, 0, 0.12), inset 3px 0 0 var(--lgl-color-accent);
+}
+
+/* Row hover feedback, takes priority over zebra striping and diff highlight */
+.lgl-compare-table tbody tr:hover td,
+.lgl-compare-table tbody tr:hover th {
+  background-color: var(--lgl-color-light-gray);
 }
 
 /* Feedback states for empty or error payloads injected by LocalStorage logic */

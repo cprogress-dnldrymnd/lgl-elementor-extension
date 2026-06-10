@@ -103,15 +103,15 @@ if (!empty($_GET['compare'])) {
 <div class="lgl-compare-container">
 
     <?php if ($preload_error): ?>
-        <div class="lgl-notice lgl-notice--error" style="margin-bottom: 20px; padding: 12px 16px; background: #fef2f2; border: 1px solid var(--lgl-color-error, #dc3545); border-radius: 8px; color: var(--lgl-color-error, #dc3545); font-weight: 500;">
+        <div class="lgl-notice lgl-notice--error">
             <?php echo esc_html($preload_error); ?>
         </div>
     <?php endif; ?>
 
-    <div class="lgl-compare-controls" style="margin-bottom: 20px; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 15px; background: #f8fafc; padding: 15px; border-radius: 8px; border: 1px solid #e2e8f0;">
-        <div style="display: flex; align-items: center; gap: 10px;">
-            <label for="lgl-compare-type-selector" style="font-weight: 600; color: var(--lgl-color-secondary, #333);"><?php esc_html_e('Category:', 'lgl-shortcodes'); ?></label>
-            <select id="lgl-compare-type-selector" style="padding: 10px 15px; border-radius: 6px; border: 1px solid #ccd0d4; font-family: var(--lgl-font-primary, sans-serif); min-width: 180px;">
+    <div class="lgl-compare-controls">
+        <div class="lgl-compare-controls__group">
+            <label for="lgl-compare-type-selector" class="lgl-compare-controls__label"><?php esc_html_e('Category:', 'lgl-shortcodes'); ?></label>
+            <select id="lgl-compare-type-selector" class="lgl-compare-controls__select">
                 <?php foreach ($allowed_types as $type):
                     $label_map = array(
                         'caravan'   => __('Caravans', 'lgl-shortcodes'),
@@ -127,9 +127,9 @@ if (!empty($_GET['compare'])) {
             </select>
         </div>
 
-        <div style="display: flex; align-items: center; flex-grow: 1; max-width: 400px;">
-            <select id="lgl-compare-search-input" style="width: 100%;">
-                <option value=""><?php _e('Search & Add Vehicle...', 'lgl-shortcodes'); ?></option>
+        <div class="lgl-compare-controls__search">
+            <select id="lgl-compare-search-input">
+                <option value=""><?php esc_html_e('Search & Add Vehicle...', 'lgl-shortcodes'); ?></option>
             </select>
         </div>
     </div>
@@ -219,7 +219,7 @@ jQuery(document).ready(function($) {
     // -------------------------------------------------------------------------
     if (searchSelector.length) {
         searchSelector.select2({
-            placeholder: '<?php echo _e(__('Search & Add Vehicle...', 'lgl-shortcodes')); ?>',
+            placeholder: '<?php echo esc_js(__('Search & Add Vehicle...', 'lgl-shortcodes')); ?>',
             allowClear:  true,
             ajax: {
                 url:      lgl_ajax_obj.ajax_url,

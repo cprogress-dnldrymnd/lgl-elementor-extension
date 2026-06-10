@@ -4,7 +4,7 @@
  * Plugin Name: LGL Shortcodes
  * Plugin URI: https://digitallydisruptive.co.uk/
  * Description: A robust, OOP-based plugin to output customized data via shortcodes using a dynamic template routing system.
- * Version: 4.6.4
+ * Version: 4.6.5
  * Author: Digitally Disruptive - Donald Raymundo
  * Author URI: https://digitallydisruptive.co.uk/
  * Text Domain: lgl-shortcodes
@@ -17,7 +17,7 @@ if (! defined('ABSPATH')) {
 // Define a constant for the plugin directory path to ensure reliable file inclusion.
 define('LGL_SHORTCODES_PATH', plugin_dir_path(__FILE__));
 define('LGL_SHORTCODES_URL', plugin_dir_url(__FILE__));
-define('LGL_SHORTCODES_VERSION', '4.7.2');
+define('LGL_SHORTCODES_VERSION', '4.7.3');
 // ── Load the Forms integration ──
 require_once LGL_SHORTCODES_PATH . 'includes/class-lgl-forms.php';
 require_once LGL_SHORTCODES_PATH . 'includes/class-lgl-email-builder.php';
@@ -1587,73 +1587,95 @@ if (! class_exists('LGL_Shortcodes')) {
                 }
             }
 
+            // Pre-compute every visible row's cell values so we know, before
+            // rendering, whether a row differs across vehicles and whether the
+            // table contains any differing rows at all (drives the legend).
+            $can_diff = count($posts) > 1;
+            $rows     = array();
+
+            foreach ($visible_fields as $meta_key => $label) {
+                $row_has_data = false;
+                $row_cells    = array();
+
+                foreach ($posts as $p) {
+                    // Map distinct data extractions: taxonomies vs. metadata
+                    if (in_array($meta_key, array('listing-fuel-type', 'listing-chassis', 'listing-gearbox'))) {
+                        $terms = get_the_terms($p->ID, $meta_key);
+                        $value = ($terms && !is_wp_error($terms)) ? join(', ', wp_list_pluck($terms, 'name')) : '';
+                    } else {
+                        $raw_value = get_post_meta($p->ID, $meta_key, true);
+                        // Flatten array structures like multi-selects to prevent Array-to-string conversion errors
+                        if (is_array($raw_value)) {
+                            $value = implode(', ', array_map('esc_html', $raw_value));
+                        } else {
+                            $value = trim($raw_value);
+                        }
+                    }
+
+                    // Flag row for rendering if at least one column possesses valid data
+                    if (!empty($value) && $value !== '-') {
+                        $row_has_data = true;
+                    }
+
+                    // Queue the cell output, applying the fallback hyphen for empty individual cells
+                    if (!empty($value)) {
+                        $row_cells[] = ($meta_key === 'price') ? esc_html(LGL_Shortcodes::format_price($value)) : esc_html($value);
+                    } else {
+                        $row_cells[] = '-';
+                    }
+                }
+
+                // Skip rows where every vehicle lacks data
+                if (!$row_has_data) {
+                    continue;
+                }
+
+                $rows[] = array(
+                    'label' => $label,
+                    'cells' => $row_cells,
+                    'diff'  => $can_diff && count(array_unique($row_cells)) > 1,
+                );
+            }
+
+            $has_diff_rows = (bool) array_filter($rows, fn($row) => $row['diff']);
+
             ob_start();
         ?>
-            <div class="lgl-compare-table-wrapper" style="overflow-x: auto;">
+            <div class="lgl-compare-table-wrapper">
+                <?php if ($has_diff_rows): ?>
+                    <p class="lgl-compare-legend">
+                        <span class="lgl-compare-legend__swatch" aria-hidden="true"></span>
+                        <?php esc_html_e('Highlighted rows differ between vehicles', 'lgl-shortcodes'); ?>
+                    </p>
+                <?php endif; ?>
                 <table class="lgl-compare-table">
                     <thead>
                         <tr>
-                            <th class="lgl-compare-label-head">Vehicle Specs</th>
+                            <th class="lgl-compare-label-head"><?php esc_html_e('Vehicle Specs', 'lgl-shortcodes'); ?></th>
                             <?php foreach ($posts as $p): ?>
                                 <th class="lgl-compare-item-head">
+                                    <button type="button" class="lgl-compare-remove-btn" data-post-id="<?php echo esc_attr($p->ID); ?>" data-post-type="<?php echo esc_attr($requested_type); ?>" aria-label="<?php esc_attr_e('Remove from comparison', 'lgl-shortcodes'); ?>" title="<?php esc_attr_e('Remove from comparison', 'lgl-shortcodes'); ?>">
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                                            <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
+                                        </svg>
+                                    </button>
                                     <div class="lgl-compare-thumbnail">
                                         <?php echo get_the_post_thumbnail($p->ID, 'medium'); ?>
-                                        <button class="lgl-btn lgl-btn-small lgl-btn-error lgl-compare-remove-btn" data-post-id="<?php echo esc_attr($p->ID); ?>" data-post-type="<?php echo esc_attr($requested_type); ?>">Remove</button>
                                     </div>
                                     <h4 class="lgl-compare-title"><a href="<?php echo get_permalink($p->ID); ?>"><?php echo esc_html($p->post_title); ?></a></h4>
-
                                 </th>
                             <?php endforeach; ?>
                         </tr>
                     </thead>
                     <tbody>
-                        <?php
-                        foreach ($visible_fields as $meta_key => $label):
-                            $row_has_data = false;
-                            $row_cells = array();
-
-                            // Pass 1: Extract data and evaluate row validity
-                            foreach ($posts as $p) {
-                                // Map distinct data extractions: taxonomies vs. metadata
-                                if (in_array($meta_key, array('listing-fuel-type', 'listing-chassis', 'listing-gearbox'))) {
-                                    $terms = get_the_terms($p->ID, $meta_key);
-                                    $value = ($terms && !is_wp_error($terms)) ? join(', ', wp_list_pluck($terms, 'name')) : '';
-                                } else {
-                                    $raw_value = get_post_meta($p->ID, $meta_key, true);
-                                    // Flatten array structures like multi-selects to prevent Array-to-string conversion errors
-                                    if (is_array($raw_value)) {
-                                        $value = implode(', ', array_map('esc_html', $raw_value));
-                                    } else {
-                                        $value = trim($raw_value);
-                                    }
-                                }
-
-                                // Flag row for rendering if at least one column possesses valid data
-                                if (!empty($value) && $value !== '-') {
-                                    $row_has_data = true;
-                                }
-
-                                // Queue the cell output, applying the fallback hyphen for empty individual cells
-                                if (!empty($value)) {
-                                    $row_cells[] = ($meta_key === 'price') ? esc_html(LGL_Shortcodes::format_price($value)) : esc_html($value);
-                                } else {
-                                    $row_cells[] = '-';
-                                }
-                            }
-
-                            // Pass 2: Output DOM nodes only if the row contains actionable data
-                            if ($row_has_data):
-                        ?>
-                                <tr>
-                                    <th><?php echo esc_html($label); ?></th>
-                                    <?php foreach ($row_cells as $cell_data): ?>
-                                        <td><?php echo $cell_data; ?></td>
-                                    <?php endforeach; ?>
-                                </tr>
-                        <?php
-                            endif; // End empty row check
-                        endforeach;
-                        ?>
+                        <?php foreach ($rows as $row): ?>
+                            <tr<?php echo $row['diff'] ? ' class="lgl-compare-row--diff"' : ''; ?>>
+                                <th><?php echo esc_html($row['label']); ?></th>
+                                <?php foreach ($row['cells'] as $cell_data): ?>
+                                    <td><?php echo $cell_data; ?></td>
+                                <?php endforeach; ?>
+                            </tr>
+                        <?php endforeach; ?>
                     </tbody>
                 </table>
             </div>
