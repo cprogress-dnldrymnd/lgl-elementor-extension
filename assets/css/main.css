@@ -3224,8 +3224,8 @@
   opacity: 1;
 }
 
-.choices__input {
-  border-radius: 0;
+.lgl-filter-group .choices choices__input.choices__input {
+  border-radius: 0 !important;
 }
 
 .lgl-filter-group .choices .choices__inner {
