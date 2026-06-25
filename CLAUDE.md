@@ -30,7 +30,8 @@ lgl-shortcodes.php                  # Main class LGL_Shortcodes (~3600 lines): b
 includes/
   class-lgl-forms.php               # LGL_Forms: finance/enquiry/reserve forms, form builder UI,
                                      #   submission CPTs (lgl_enquiry_sub, lgl_reserve_sub), submit AJAX
-  class-lgl-email-builder.php       # LGL_Email_Builder: templated emails + merge-tag system for form notifications
+  class-lgl-email-builder.php       # LGL_Email_Builder: templated emails + merge-tag system for form notifications;
+                                     #   custom recipient field accepts multiple addresses (comma/semicolon/newline-separated)
   class-lgl-elementor.php           # LGL_Elementor_Integration: registers the "LGL Leisure Vehicles" widget category
   class-lgl-elementor-widgets.php   # One Elementor widget class per shortcode (thin wrappers that output the shortcode)
 templates/
@@ -94,7 +95,9 @@ Notable default attributes (set in `render_shortcode`): `lgl_listing` →
   terms up to their parent to derive makes (`ajax_get_makes` / `ajax_get_models`).
 - **Display meta** (read via `get_post_meta`): `price`, `year`, `condition`, `berth`,
   `mileage`, `axles`, `warranty`, `feature`, `sub_title`, `is_featured`,
-  `_listing_gallery_ids` (comma-string of attachment IDs → `convertStringToIntArray()`),
+  `_listing_gallery_ids` (comma-string of attachment IDs → `convertStringToIntArray()`; in
+  `single-lgl.php` the resolved array is then filtered with `wp_attachment_is_image()` to
+  drop stale/deleted media — without this, a missing attachment renders a blank slider slide),
   `_listing_interior_image_id`.
 - **Reserve/enquiry meta** (written by `LGL_Forms`): `_lgl_is_reserved`, `_lgl_reserve_mode`,
   `_lgl_reserve_mode_sub`, `_lgl_reserve_status`, `_lgl_reserved_at`, `_lgl_form_data`, `_lgl_product_id`.

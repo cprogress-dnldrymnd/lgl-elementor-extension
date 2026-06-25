@@ -13,14 +13,6 @@ if (! defined('ABSPATH')) {
 
 get_header();
 
-
-if(current_user_can('administrator')) {
-    echo '<pre>';
-    var_dump(get_post_meta(get_the_ID(), '_listing_gallery_ids', true));
-    echo '</pre>';
-}
-
-
 $post_id = get_the_ID();
 $post_type = get_post_type();
 
@@ -94,6 +86,11 @@ if (!empty($gallery) && is_array($gallery)) {
 
 // 4. Sanitize: filter out empty values, enforce unique IDs, and re-index
 $all_image_ids = array_values(array_unique(array_filter($all_image_ids)));
+
+// 5. Prune IDs whose attachment no longer exists or is not an image (e.g. deleted
+//    from the Media Library). Without this, a stale gallery ID renders as a blank
+//    slide because wp_get_attachment_image() returns '' inside the slider wrapper.
+$all_image_ids = array_values(array_filter($all_image_ids, 'wp_attachment_is_image'));
 ?>
 <main id="lgl-primary" class="lgl-site-main single-lgl">
     <div class="lgl-holder">
