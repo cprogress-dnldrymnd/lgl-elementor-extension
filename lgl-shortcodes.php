@@ -4,7 +4,7 @@
  * Plugin Name: LGL Shortcodes
  * Plugin URI: https://digitallydisruptive.co.uk/
  * Description: A robust, OOP-based plugin to output customized data via shortcodes using a dynamic template routing system.
- * Version: 4.6.5
+ * Version: 4.7.5
  * Author: Digitally Disruptive - Donald Raymundo
  * Author URI: https://digitallydisruptive.co.uk/
  * Text Domain: lgl-shortcodes
@@ -17,7 +17,7 @@ if (! defined('ABSPATH')) {
 // Define a constant for the plugin directory path to ensure reliable file inclusion.
 define('LGL_SHORTCODES_PATH', plugin_dir_path(__FILE__));
 define('LGL_SHORTCODES_URL', plugin_dir_url(__FILE__));
-define('LGL_SHORTCODES_VERSION', '4.7.4');
+define('LGL_SHORTCODES_VERSION', '4.7.5');
 // ── Load the Forms integration ──
 require_once LGL_SHORTCODES_PATH . 'includes/class-lgl-forms.php';
 require_once LGL_SHORTCODES_PATH . 'includes/class-lgl-email-builder.php';
@@ -2745,6 +2745,14 @@ if (! class_exists('LGL_Shortcodes')) {
             ";
 
             wp_add_inline_script('jquery', $script);
+
+            // Constrain the fallback placeholder image to a fixed 50x50 thumbnail in the
+            // list-table column. Real attachments are sized by core/lgl-import, but the
+            // placeholder injected by fallback_placeholder_image() carries no dimensions,
+            // so without this it renders at its native size. Scoped to .lgl-placeholder-image
+            // so it never affects genuine featured thumbnails.
+            $css = '.wp-list-table img.lgl-placeholder-image { width: 50px !important; height: 50px !important; object-fit: cover; }';
+            wp_add_inline_style('wp-admin', $css);
         }
 
         /**
