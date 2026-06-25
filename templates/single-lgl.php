@@ -314,7 +314,7 @@ $all_image_ids = array_values(array_unique(array_filter($all_image_ids)));
                         <div id="lgl_panel_interior" class="lgl-panel-item lgl-panel-interior">
                             <div class="lgl-panel-item--inner">
                                 <h3 class="lgl-title-ss"><span><?php echo esc_html__('Features', 'lgl'); ?></span></h3>
-                                <div class="lgl-content-ss"><?php echo LGL_Shortcodes::render_html_list_from_string($feature); ?></div>
+                                <div class="lgl-content-ss"><?php echo LGL_Shortcodes::render_html_list_from_string($feature, 'ul', 'lgl-feature-list'); ?></div>
                             </div>
                         </div>
                     <?php } ?>
