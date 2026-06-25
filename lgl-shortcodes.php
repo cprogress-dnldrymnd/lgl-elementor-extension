@@ -124,6 +124,10 @@ if (! class_exists('LGL_Shortcodes')) {
             add_action('saved_term', array($this, 'clear_lgl_taxonomy_cache'), 10, 3);
             add_action('delete_term', array($this, 'clear_lgl_taxonomy_cache'), 10, 3);
 
+            // Data integrity: scrub deleted attachment IDs out of vehicle gallery/interior meta
+            // so stale IDs never linger to render as blank slides on the single template.
+            add_action('delete_attachment', array($this, 'scrub_deleted_attachment_from_galleries'));
+
 
             foreach ($this->cpt_toggles as $cpt => $is_enabled) {
 
@@ -2536,6 +2540,71 @@ if (! class_exists('LGL_Shortcodes')) {
 
                 // Taxonomy changes inherently alter search results, so we cascade the purge
                 $this->clear_lgl_search_cache();
+            }
+        }
+
+        /**
+         * Removes a deleted attachment's ID from vehicle gallery/interior meta.
+         *
+         * Fires on `delete_attachment` (before the attachment is removed). Vehicle
+         * galleries are stored as a comma-separated string of attachment IDs in
+         * `_listing_gallery_ids`; a single image lives in `_listing_interior_image_id`.
+         * When a Media Library item is deleted, its ID would otherwise remain in those
+         * strings and render as a blank slide on the single template. This scrubs the
+         * ID at the source so the data stays clean for every consumer.
+         *
+         * WordPress core already clears `_thumbnail_id` (featured image) references on
+         * attachment deletion, so only the plugin's own meta needs handling here.
+         *
+         * @param int $attachment_id The ID of the attachment being deleted.
+         * @return void
+         */
+        public function scrub_deleted_attachment_from_galleries($attachment_id)
+        {
+            global $wpdb;
+
+            $attachment_id = (int) $attachment_id;
+            if ($attachment_id <= 0) {
+                return;
+            }
+
+            // ── Gallery meta (comma-separated string of IDs) ──────────────────
+            // Broad LIKE pre-filter; the exact removal below guards against
+            // substring false positives (e.g. "12" matching "120").
+            $gallery_rows = $wpdb->get_results(
+                $wpdb->prepare(
+                    "SELECT post_id, meta_value FROM {$wpdb->postmeta}
+                     WHERE meta_key = '_listing_gallery_ids' AND meta_value LIKE %s",
+                    '%' . $wpdb->esc_like((string) $attachment_id) . '%'
+                )
+            );
+
+            foreach ($gallery_rows as $row) {
+                $ids = self::convertStringToIntArray($row->meta_value);
+
+                // Skip LIKE false positives where the exact ID isn't actually present.
+                if (! in_array($attachment_id, $ids, true)) {
+                    continue;
+                }
+
+                $ids = array_values(array_filter($ids, function ($id) use ($attachment_id) {
+                    return $id !== $attachment_id;
+                }));
+
+                update_post_meta($row->post_id, '_listing_gallery_ids', implode(',', $ids));
+            }
+
+            // ── Interior image meta (single ID) ───────────────────────────────
+            $interior_post_ids = $wpdb->get_col(
+                $wpdb->prepare(
+                    "SELECT post_id FROM {$wpdb->postmeta}
+                     WHERE meta_key = '_listing_interior_image_id' AND meta_value = %d",
+                    $attachment_id
+                )
+            );
+
+            foreach ($interior_post_ids as $post_id) {
+                delete_post_meta($post_id, '_listing_interior_image_id');
             }
         }
 

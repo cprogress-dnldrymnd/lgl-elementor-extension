@@ -97,7 +97,10 @@ Notable default attributes (set in `render_shortcode`): `lgl_listing` →
   `mileage`, `axles`, `warranty`, `feature`, `sub_title`, `is_featured`,
   `_listing_gallery_ids` (comma-string of attachment IDs → `convertStringToIntArray()`; in
   `single-lgl.php` the resolved array is then filtered with `wp_attachment_is_image()` to
-  drop stale/deleted media — without this, a missing attachment renders a blank slider slide),
+  drop stale/deleted media — without this, a missing attachment renders a blank slider slide.
+  The IDs are also scrubbed at the source on the `delete_attachment` hook via
+  `scrub_deleted_attachment_from_galleries()`, so deleting a Media Library item removes it
+  from every vehicle's gallery/interior meta automatically),
   `_listing_interior_image_id`.
 - **Reserve/enquiry meta** (written by `LGL_Forms`): `_lgl_is_reserved`, `_lgl_reserve_mode`,
   `_lgl_reserve_mode_sub`, `_lgl_reserve_status`, `_lgl_reserved_at`, `_lgl_form_data`, `_lgl_product_id`.
