@@ -13,6 +13,14 @@ if (! defined('ABSPATH')) {
 
 get_header();
 
+
+if(current_user_can('administrator')) {
+    echo '<pre>';
+    var_dump(get_post_meta(get_the_ID(), '_listing_gallery_ids', true));
+    echo '</pre>';
+}
+
+
 $post_id = get_the_ID();
 $post_type = get_post_type();
 
