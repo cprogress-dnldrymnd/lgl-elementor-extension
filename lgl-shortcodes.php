@@ -4,7 +4,7 @@
  * Plugin Name: LGL Shortcodes
  * Plugin URI: https://digitallydisruptive.co.uk/
  * Description: A robust, OOP-based plugin to output customized data via shortcodes using a dynamic template routing system.
- * Version: 4.7.5
+ * Version: 4.7.6
  * Author: Digitally Disruptive - Donald Raymundo
  * Author URI: https://digitallydisruptive.co.uk/
  * Text Domain: lgl-shortcodes
@@ -17,7 +17,7 @@ if (! defined('ABSPATH')) {
 // Define a constant for the plugin directory path to ensure reliable file inclusion.
 define('LGL_SHORTCODES_PATH', plugin_dir_path(__FILE__));
 define('LGL_SHORTCODES_URL', plugin_dir_url(__FILE__));
-define('LGL_SHORTCODES_VERSION', '4.7.5');
+define('LGL_SHORTCODES_VERSION', '4.7.6');
 // ── Load the Forms integration ──
 require_once LGL_SHORTCODES_PATH . 'includes/class-lgl-forms.php';
 require_once LGL_SHORTCODES_PATH . 'includes/class-lgl-email-builder.php';
@@ -488,7 +488,9 @@ if (! class_exists('LGL_Shortcodes')) {
             add_settings_section('lgl_single_page_section', 'Single Page Settings', null, 'lgl-settings-single-page');
 
             $single_page_fields = array(
+                'single_before_primary'  => array('label' => 'Content Before Vehicle (above #lgl-primary)', 'type' => 'textarea', 'default' => ''),
                 'single_vehicle_content' => array('label' => 'Single Vehicle Additional Content', 'type' => 'textarea', 'default' => ''),
+                'single_after_primary'   => array('label' => 'Content After Vehicle (below #lgl-primary)', 'type' => 'textarea', 'default' => ''),
             );
 
             foreach ($single_page_fields as $id => $field) {

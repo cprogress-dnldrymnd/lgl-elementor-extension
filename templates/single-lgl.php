@@ -92,6 +92,18 @@ $all_image_ids = array_values(array_unique(array_filter($all_image_ids)));
 //    slide because wp_get_attachment_image() returns '' inside the slider wrapper.
 $all_image_ids = array_values(array_filter($all_image_ids, 'wp_attachment_is_image'));
 ?>
+<?php
+/**
+ * Extension point + admin-defined content rendered ABOVE the #lgl-primary wrapper.
+ * Developers can hook `lgl_before_single_primary`; site admins can paste HTML/shortcodes
+ * into LGL Settings → Single Page → "Content Before Vehicle".
+ */
+do_action('lgl_before_single_primary', $post_id);
+
+if (!empty($lgl_options['single_before_primary'])) {
+    echo '<div class="lgl-before-primary">' . do_shortcode($lgl_options['single_before_primary']) . '</div>';
+}
+?>
 <main id="lgl-primary" class="lgl-site-main single-lgl">
     <div class="lgl-holder">
         <?= do_shortcode('[lgl_breadcrumbs]') ?>
@@ -346,5 +358,18 @@ $all_image_ids = array_values(array_filter($all_image_ids, 'wp_attachment_is_ima
         ?>
     </div>
 </main>
+
+<?php
+/**
+ * Admin-defined content + extension point rendered BELOW the #lgl-primary wrapper.
+ * Mirror of the "before" region: admin content first, then the `lgl_after_single_primary`
+ * hook, so a developer can wrap the whole vehicle block by pairing the before/after hooks.
+ */
+if (!empty($lgl_options['single_after_primary'])) {
+    echo '<div class="lgl-after-primary">' . do_shortcode($lgl_options['single_after_primary']) . '</div>';
+}
+
+do_action('lgl_after_single_primary', $post_id);
+?>
 
 <?php get_footer(); ?>

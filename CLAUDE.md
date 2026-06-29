@@ -4,7 +4,7 @@ Guidance for working in the **LGL Shortcodes** WordPress plugin.
 
 ## What this is
 
-`lgl-shortcodes` is an OOP WordPress plugin (v4.6.3, by Digitally Disruptive – Donald
+`lgl-shortcodes` is an OOP WordPress plugin (v4.7.6, by Digitally Disruptive – Donald
 Raymundo) that renders front-end UI for a **leisure-vehicle dealership** site —
 caravans, motorhomes, and campervans. It provides shortcodes + Elementor widgets for
 search, listing grids, single-vehicle pages, wishlist, compare, finance/enquiry/reserve
@@ -76,6 +76,13 @@ a widget in `class-lgl-elementor-widgets.php` + register it in `class-lgl-elemen
 Single-vehicle pages bypass shortcodes: `force_plugin_single_template()` (hooked at
 priority `99999`) forces `templates/single-lgl.php` for the vehicle CPTs, overriding the theme.
 
+`single-lgl.php` exposes two extension points around the `#lgl-primary` wrapper:
+- **Before**: fires `do_action('lgl_before_single_primary', $post_id)`, then renders the
+  `single_before_primary` setting (HTML/shortcodes) in a `.lgl-before-primary` div.
+- **After**: renders the `single_after_primary` setting in `.lgl-after-primary`, then fires
+  `do_action('lgl_after_single_primary', $post_id)`.
+  Pair the before/after hooks to wrap the entire vehicle block from a plugin/theme.
+
 ## Shortcodes (all routed through `render_shortcode`)
 
 `lgl_search`, `lgl_search_results`, `lgl_listing`, `lgl_type_tabs`, `lgl_related_vehicles`,
@@ -114,8 +121,9 @@ All plugin settings live in a **single option array** `lgl_settings` (registered
 
 Admin menu structure:
 - Top-level **LGL Settings** (`lgl-settings`) → tabbed settings page. Tabs: General,
-  Design (typography/colors), Single Page, Contact Information, Field Visibility & Ordering
-  (drag-sortable), LGL Pages & Active Vehicles.
+  Design (typography/colors), Single Page (`single_before_primary`, `single_vehicle_content`,
+  `single_after_primary` — all textarea, support shortcodes), Contact Information,
+  Field Visibility & Ordering (drag-sortable), LGL Pages & Active Vehicles.
 - Submenu **Documentation** (`lgl-documentation`).
 - `LGL_Forms` adds a **Form Builder** submenu + links to Enquiry/Reserve Submissions list tables.
 - `LGL_Email_Builder` adds an **Email Builder** submenu (Global / Enquiry / Reserve templates).
