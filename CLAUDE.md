@@ -117,6 +117,15 @@ Notable default attributes (set in `render_shortcode`): `lgl_listing` →
   `main.scss`); otherwise it falls back to the plain price display.
 - **Reserve/enquiry meta** (written by `LGL_Forms`): `_lgl_is_reserved`, `_lgl_reserve_mode`,
   `_lgl_reserve_mode_sub`, `_lgl_reserve_status`, `_lgl_reserved_at`, `_lgl_form_data`, `_lgl_product_id`.
+- **Reduced sticker meta** (written by `LGL_Forms::save_product_meta`, set in the
+  **Vehicle Form Settings** side meta box): `_lgl_reduced_sticker` (`'1'`/`'0'` toggle) and
+  `_lgl_reduced_sticker_id` (chosen attachment ID, picked via the WP media library —
+  `wp_enqueue_media()` is loaded on vehicle edit screens in `LGL_Forms::admin_assets`). When
+  the toggle is on and an image is set, the shared partial
+  `templates/partials/lgl-reduced-sticker.php` overlays an `<img class="lgl-reduced-sticker">`
+  on the top corner of the vehicle photo — included in `templates/partials/lgl-grid.php`
+  (grid cards) and both image layouts in `single-lgl.php`; styled via `.lgl-reduced-sticker`
+  in `main.scss`.
 - **Wishlist**: stored in user meta `lgl_wishlists` (array of post IDs).
   `get_valid_wishlist()` self-heals — it drops IDs that are no longer `publish` and persists the cleaned list.
 

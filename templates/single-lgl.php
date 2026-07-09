@@ -116,6 +116,7 @@ if (!empty($lgl_options['single_before_primary'])) {
                             <?php if ($is_reserved) { ?>
                                 <div class="reserved-tag"><?= $reserve_settings['reserved_button_text']  ?></div>
                             <?php } ?>
+                            <?php include LGL_SHORTCODES_PATH . 'templates/partials/lgl-reduced-sticker.php'; ?>
 
                             <div class="swiper js-gallery-slider-for lgl-gallery-slider lgl-slider-for swiper-button-style swiper-button-style">
                                 <div class="swiper-wrapper">
@@ -166,6 +167,7 @@ if (!empty($lgl_options['single_before_primary'])) {
                             <?php if ($is_reserved) { ?>
                                 <div class="reserved-tag"><?= $reserve_settings['reserved_button_text']  ?></div>
                             <?php } ?>
+                            <?php include LGL_SHORTCODES_PATH . 'templates/partials/lgl-reduced-sticker.php'; ?>
                             <div class="lgl-cover-image">
                                 <?php echo wp_get_attachment_image($single_image_id, 'full', false, array('alt' => get_the_title($single_image_id))); ?>
                             </div>

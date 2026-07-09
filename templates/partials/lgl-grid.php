@@ -32,6 +32,7 @@ $is_reserved       = LGL_Forms::is_reserved($post_id);
             <?php if ($is_reserved) { ?>
                 <div class="reserved-tag"><?= $reserve_settings['reserved_button_text']  ?></div>
             <?php } ?>
+            <?php include LGL_SHORTCODES_PATH . 'templates/partials/lgl-reduced-sticker.php'; ?>
             <div class="lgl-post--featured">
                 <a href="<?php echo esc_url($link); ?>">
                     <div class="lgl-cover-image">

@@ -140,8 +140,15 @@ class LGL_Forms
 	 */
 	public function admin_assets($hook)
 	{
+		$post_type = get_current_screen()->post_type ?? '';
+
+		// Vehicle edit screens need the WP media library for the Reduced Sticker picker.
+		if (in_array($hook, ['post.php', 'post-new.php'], true) && in_array($post_type, ['caravan', 'motorhome', 'campervan'], true)) {
+			wp_enqueue_media();
+		}
+
 		$is_builder = ($hook === 'lgl-settings_page_lgl-form-builder');
-		$is_submission_page = in_array(get_current_screen()->post_type ?? '', ['lgl_enquiry_sub', 'lgl_reserve_sub'], true);
+		$is_submission_page = in_array($post_type, ['lgl_enquiry_sub', 'lgl_reserve_sub'], true);
 
 		if (! $is_builder && ! $is_submission_page) return;
 
@@ -1052,6 +1059,55 @@ class LGL_Forms
 				upd();
 			})(jQuery);
 		</script>
+		<?php
+		$reduced_on  = get_post_meta($post->ID, '_lgl_reduced_sticker', true);
+		$reduced_id  = get_post_meta($post->ID, '_lgl_reduced_sticker_id', true);
+		$reduced_url = $reduced_id ? wp_get_attachment_image_url($reduced_id, 'medium', false) : '';
+		?>
+		<div style="margin-top:14px;padding-top:14px;border-top:1px solid #e0e0e0">
+			<label style="display:block;font-weight:600;margin-bottom:5px"><?php _e('Reduced Sticker', 'lgl-shortcodes'); ?></label>
+			<label style="display:flex;align-items:flex-start;gap:6px;font-size:13px;margin-bottom:10px;line-height:1.4">
+				<input type="checkbox" name="lgl_reduced_sticker" value="1" id="lgl-reduced-toggle" <?php checked($reduced_on, '1'); ?>>
+				<span><?php _e('Show a “Reduced” sticker on this vehicle', 'lgl-shortcodes'); ?></span>
+			</label>
+			<div id="lgl-reduced-preview" style="margin-bottom:8px;<?php echo $reduced_url ? '' : 'display:none'; ?>">
+				<img src="<?php echo esc_url($reduced_url); ?>" alt="" style="max-width:100%;height:auto;border:1px solid #ddd;border-radius:3px;display:block" />
+			</div>
+			<input type="hidden" name="lgl_reduced_sticker_id" id="lgl-reduced-id" value="<?php echo esc_attr($reduced_id); ?>">
+			<button type="button" class="button button-small" id="lgl-reduced-choose"><?php _e('Choose Image', 'lgl-shortcodes'); ?></button>
+			<button type="button" class="button button-small" id="lgl-reduced-remove" style="<?php echo $reduced_url ? '' : 'display:none'; ?>"><?php _e('Remove', 'lgl-shortcodes'); ?></button>
+			<p style="font-size:11px;color:#666;margin:6px 0 0"><?php _e('Overlaid on the top corner of this vehicle’s image on listing grids and the single page.', 'lgl-shortcodes'); ?></p>
+		</div>
+		<script>
+			(function($) {
+				var frame;
+				$('#lgl-reduced-choose').on('click', function(e) {
+					e.preventDefault();
+					if (frame) { frame.open(); return; }
+					frame = wp.media({
+						title: '<?php echo esc_js(__('Select Reduced Sticker', 'lgl-shortcodes')); ?>',
+						button: { text: '<?php echo esc_js(__('Use this image', 'lgl-shortcodes')); ?>' },
+						library: { type: 'image' },
+						multiple: false
+					});
+					frame.on('select', function() {
+						var att = frame.state().get('selection').first().toJSON();
+						var url = (att.sizes && att.sizes.medium) ? att.sizes.medium.url : att.url;
+						$('#lgl-reduced-id').val(att.id);
+						$('#lgl-reduced-preview').show().find('img').attr('src', url);
+						$('#lgl-reduced-remove').show();
+						$('#lgl-reduced-toggle').prop('checked', true);
+					});
+					frame.open();
+				});
+				$('#lgl-reduced-remove').on('click', function(e) {
+					e.preventDefault();
+					$('#lgl-reduced-id').val('');
+					$('#lgl-reduced-preview').hide();
+					$(this).hide();
+				});
+			})(jQuery);
+		</script>
 <?php
 	}
 
@@ -1078,6 +1134,16 @@ class LGL_Forms
 		if (! empty($_POST['lgl_clear_reservation'])) {
 			delete_post_meta($post_id, '_lgl_is_reserved');
 			delete_post_meta($post_id, '_lgl_reserved_at');
+		}
+
+		update_post_meta($post_id, '_lgl_reduced_sticker', empty($_POST['lgl_reduced_sticker']) ? '0' : '1');
+		if (isset($_POST['lgl_reduced_sticker_id'])) {
+			$sticker_id = absint($_POST['lgl_reduced_sticker_id']);
+			if ($sticker_id) {
+				update_post_meta($post_id, '_lgl_reduced_sticker_id', $sticker_id);
+			} else {
+				delete_post_meta($post_id, '_lgl_reduced_sticker_id');
+			}
 		}
 	}
 
