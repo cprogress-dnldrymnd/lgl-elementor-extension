@@ -25,7 +25,7 @@ This plugin only *reads* and *displays* that data. The constants above are refer
 ## Repository layout
 
 ```
-lgl-shortcodes.php                  # Main class LGL_Shortcodes (~3600 lines): bootstrap, shortcodes,
+lgl-shortcodes.php                  # Main class LGL_Shortcodes (~3800 lines): bootstrap, shortcodes,
                                      #   template routing, search AJAX, admin settings, single-template override
 includes/
   class-lgl-forms.php               # LGL_Forms: finance/enquiry/reserve forms, form builder UI,
@@ -56,11 +56,11 @@ boots with `new LGL_Shortcodes();` at the bottom of the main file, which in turn
 ## Core pattern: theme-overridable template routing
 
 Every shortcode is registered to the **same** callback, `render_shortcode()`
-(`lgl-shortcodes.php`, see `register_shortcodes()` ~line 1206). That method:
+(`lgl-shortcodes.php`, see `register_shortcodes()` ~line 1252). That method:
 1. Sets per-shortcode default attributes (a `$attributes_arr` switch on `$shortcode_tag`).
 2. Runs `shortcode_atts()`, then hands off to `load_template($shortcode_tag, $attributes, $content)`.
 
-`load_template()` (~line 1635) is the routing heart:
+`load_template()` (~line 1703) is the routing heart:
 - Looks for a **theme override** first: `locate_template('lgl-shortcodes/<tag>.php')`
   (i.e. a child/parent theme can override any template by dropping a file in
   `your-theme/lgl-shortcodes/`).

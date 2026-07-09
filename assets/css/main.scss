@@ -49,7 +49,6 @@
                 min-height: 57px;
                 width: 100%;
                 background-color: var(--lgl-color-white);
-
             }
 
             &.lgl-submit-group {
@@ -698,7 +697,8 @@
                             bottom: 0;
                             left: 0;
                             right: 0;
-                            background: transparent linear-gradient(180deg, #00000000 0%, var(--lgl-color-secondary) 100%) 0% 0%;
+                            background: transparent
+                                linear-gradient(180deg, #00000000 0%, var(--lgl-color-secondary) 100%) 0% 0%;
                             opacity: 1;
                             z-index: 3;
                         }
@@ -974,7 +974,6 @@
         gap: 12px;
 
         li {
-
             a,
             span {
                 display: flex;
@@ -1038,8 +1037,8 @@
         }
     }
 
-    >.lgl-holder {
-        >.lgl-post.lgl-post.lgl-post {
+    > .lgl-holder {
+        > .lgl-post.lgl-post.lgl-post {
             border: none;
             background-color: transparent;
         }
@@ -1105,7 +1104,6 @@
     }
 
     @media (max-width: 1024px) {
-
         .lgl-post--main,
         .lgl-post--sidebar {
             width: 100%;
@@ -1221,7 +1219,7 @@
     gap: 12px;
     align-items: center;
 
-    >a.lgl-icon-btn {
+    > a.lgl-icon-btn {
         width: 44px !important;
         height: 44px !important;
         min-width: 44px !important;
@@ -1247,14 +1245,14 @@
         font-size: 0.55em;
         font-weight: 400;
         text-transform: uppercase;
-        color: #8a8a8a;
+        color: var(--lgl-color-light-blue);
         letter-spacing: 0.05em;
     }
 
     .lgl-price-was {
         font-size: 0.6em;
         font-weight: 400;
-        color: #b0b0b0;
+        color: var(--lgl-color-light-blue);
 
         del {
             text-decoration: line-through;
@@ -1476,7 +1474,8 @@
         content: "";
         width: 5px;
         display: block;
-        background: transparent linear-gradient(90deg, var(--lgl-color-primary) 0%, var(--lgl-color-tertiary) 100%) 0% 0% no-repeat padding-box;
+        background: transparent linear-gradient(90deg, var(--lgl-color-primary) 0%, var(--lgl-color-tertiary) 100%) 0%
+            0% no-repeat padding-box;
     }
 }
 
@@ -2120,7 +2119,9 @@
     color: var(--lgl-color-secondary);
     box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
     cursor: pointer;
-    transition: background-color 0.2s ease, color 0.2s ease;
+    transition:
+        background-color 0.2s ease,
+        color 0.2s ease;
 
     svg {
         width: 14px;
@@ -2161,7 +2162,9 @@
 }
 
 .lgl-compare-table tbody tr.lgl-compare-row--diff th {
-    box-shadow: 2px 0 4px -2px rgba(0, 0, 0, 0.12), inset 3px 0 0 var(--lgl-color-accent);
+    box-shadow:
+        2px 0 4px -2px rgba(0, 0, 0, 0.12),
+        inset 3px 0 0 var(--lgl-color-accent);
 }
 
 /* Row hover feedback, takes priority over zebra striping and diff highlight */
@@ -2199,14 +2202,14 @@
             height: auto;
             float: none;
 
-            >div {
+            > div {
                 height: 100%;
                 width: 100%;
 
-                >div {
+                > div {
                     height: 100%;
 
-                    >.lgl-post {
+                    > .lgl-post {
                         height: 100%;
                     }
                 }
@@ -2220,7 +2223,6 @@
 }
 
 .swiper-button-style {
-
     .swiper-button-next,
     .swiper-button-prev {
         &:after {
@@ -3037,7 +3039,6 @@ $border-radius: 16px;
 }
 
 .lgl-mini-account a {
-
     &:hover,
     &:active,
     &:focus {
@@ -3058,7 +3059,6 @@ $border-radius: 16px;
 .lgl-mini-account__logout:hover {
     opacity: 1 !important;
 }
-
 
 .lgl-mini-account__login {
     display: inline-flex;
@@ -3452,7 +3452,6 @@ $wt-cols: 110px 1fr 120px 110px 80px 80px 50px;
 
     // Highlight the vehicle type field when a required selection is missing
     &.lgl-field-error {
-
         select,
         .choices .choices__inner {
             border: 1px solid #d63638;
