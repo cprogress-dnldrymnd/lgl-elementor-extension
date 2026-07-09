@@ -51,6 +51,7 @@ $location_url     = 'https://www.google.com/maps/search/?api=1&query=' . urlenco
 // Meta Fields
 $gallery   = LGL_Shortcodes::convertStringToIntArray(get_post_meta($post_id, '_listing_gallery_ids', true));
 $price     = get_post_meta($post_id, 'price', true);
+$rrp       = get_post_meta($post_id, 'rrp', true);
 $berth     = get_post_meta($post_id, 'berth', true);
 $mileage   = get_post_meta($post_id, 'mileage', true);
 $axles     = get_post_meta($post_id, 'axles', true);
@@ -204,7 +205,14 @@ if (!empty($lgl_options['single_before_primary'])) {
                                 <div class="lgl-sale-price">
                                     <?php
                                     if (!empty($price)) {
-                                        echo esc_html(LGL_Shortcodes::format_price($price));
+                                        $has_rrp = is_numeric($rrp) && is_numeric($price) && (float) $rrp > (float) $price;
+                                        if ($has_rrp) {
+                                            echo '<span class="lgl-price-prefix">' . esc_html__('Only', 'lgl') . '</span> ';
+                                        }
+                                        echo '<span class="lgl-price-current">' . esc_html(LGL_Shortcodes::format_price($price)) . '</span>';
+                                        if ($has_rrp) {
+                                            echo ' <span class="lgl-price-was">' . esc_html__('Was', 'lgl') . ' <del>' . esc_html(LGL_Shortcodes::format_price($rrp)) . '</del></span>';
+                                        }
                                     } else {
                                         echo '<span class="lgl-call-price">' . esc_html__('Call for price', 'lgl') . '</span>';
                                     }

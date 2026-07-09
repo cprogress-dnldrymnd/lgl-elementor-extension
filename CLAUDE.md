@@ -4,7 +4,7 @@ Guidance for working in the **LGL Shortcodes** WordPress plugin.
 
 ## What this is
 
-`lgl-shortcodes` is an OOP WordPress plugin (v4.7.6, by Digitally Disruptive – Donald
+`lgl-shortcodes` is an OOP WordPress plugin (v4.7.7, by Digitally Disruptive – Donald
 Raymundo) that renders front-end UI for a **leisure-vehicle dealership** site —
 caravans, motorhomes, and campervans. It provides shortcodes + Elementor widgets for
 search, listing grids, single-vehicle pages, wishlist, compare, finance/enquiry/reserve
@@ -100,7 +100,7 @@ Notable default attributes (set in `render_shortcode`): `lgl_listing` →
 - **Submission CPTs** (registered *here* in `LGL_Forms::register_post_types`): `lgl_enquiry_sub`, `lgl_reserve_sub`.
 - **Taxonomy**: `listing-make-model` — hierarchical. AJAX make/model dropdowns walk child
   terms up to their parent to derive makes (`ajax_get_makes` / `ajax_get_models`).
-- **Display meta** (read via `get_post_meta`): `price`, `year`, `condition`, `berth`,
+- **Display meta** (read via `get_post_meta`): `price`, `rrp`, `year`, `condition`, `berth`,
   `mileage`, `axles`, `warranty`, `feature`, `sub_title`, `is_featured`,
   `_listing_gallery_ids` (comma-string of attachment IDs → `convertStringToIntArray()`; in
   `single-lgl.php` the resolved array is then filtered with `wp_attachment_is_image()` to
@@ -109,6 +109,10 @@ Notable default attributes (set in `render_shortcode`): `lgl_listing` →
   `scrub_deleted_attachment_from_galleries()`, so deleting a Media Library item removes it
   from every vehicle's gallery/interior meta automatically),
   `_listing_interior_image_id`.
+  `rrp` is optional (from `lgl-import`): when numeric and greater than `price`, the
+  `.lgl-sale-price` block in `single-lgl.php` shows an "Only <price>" / "Was <del>rrp</del>"
+  treatment instead of the plain price (styled via `.lgl-price-prefix` / `.lgl-price-was` in
+  `main.scss`); otherwise it falls back to the plain price display.
 - **Reserve/enquiry meta** (written by `LGL_Forms`): `_lgl_is_reserved`, `_lgl_reserve_mode`,
   `_lgl_reserve_mode_sub`, `_lgl_reserve_status`, `_lgl_reserved_at`, `_lgl_form_data`, `_lgl_product_id`.
 - **Wishlist**: stored in user meta `lgl_wishlists` (array of post IDs).
