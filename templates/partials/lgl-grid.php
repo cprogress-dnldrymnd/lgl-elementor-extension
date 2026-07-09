@@ -11,6 +11,7 @@ $post_id = get_the_ID();
 $post_type = get_post_type();
 $condition = get_post_meta($post_id, 'condition', true);
 $price = get_post_meta($post_id, 'price', true);
+$rrp   = get_post_meta($post_id, 'rrp', true);
 $berth = get_post_meta($post_id, 'berth', true);
 $mileage = get_post_meta($post_id, 'mileage', true);
 $year = get_post_meta($post_id, 'year', true);
@@ -57,7 +58,16 @@ $is_reserved       = LGL_Forms::is_reserved($post_id);
 
             <div class="lgl-post--info-inner">
                 <div class="lgl-post--price">
-                    <?php echo esc_html(LGL_Shortcodes::format_price($price, 2)); ?>
+                    <?php
+                    $has_rrp = is_numeric($rrp) && is_numeric($price) && (float) $rrp > (float) $price;
+                    if ($has_rrp) {
+                        echo '<span class="lgl-price-prefix">' . esc_html__('Only', 'lgl') . '</span> ';
+                    }
+                    echo '<span class="lgl-price-current">' . esc_html(LGL_Shortcodes::format_price($price, 2)) . '</span>';
+                    if ($has_rrp) {
+                        echo ' <span class="lgl-price-was">' . esc_html__('Was', 'lgl') . ' <del>' . esc_html(LGL_Shortcodes::format_price($rrp, 2)) . '</del></span>';
+                    }
+                    ?>
                 </div>
                 <h3 class="lgl-post--title">
                     <a href="<?php echo esc_url($link); ?>"><?php echo esc_html($title); ?></a>
