@@ -4,7 +4,7 @@ Guidance for working in the **LGL Shortcodes** WordPress plugin.
 
 ## What this is
 
-`lgl-shortcodes` is an OOP WordPress plugin (v4.7.10, by Digitally Disruptive – Donald
+`lgl-shortcodes` is an OOP WordPress plugin (v4.7.11, by Digitally Disruptive – Donald
 Raymundo) that renders front-end UI for a **leisure-vehicle dealership** site —
 caravans, motorhomes, and campervans. It provides shortcodes + Elementor widgets for
 search, listing grids, single-vehicle pages, wishlist, compare, finance/enquiry/reserve
