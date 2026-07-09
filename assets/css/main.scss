@@ -624,14 +624,14 @@
                 font-size: 0.65em;
                 font-weight: 400;
                 text-transform: uppercase;
-                color: var(--lgl-color-light-blue);
+                color: var(--lgl-color-gray);
                 letter-spacing: 0.05em;
             }
 
             .lgl-price-was {
                 font-size: 0.7em;
                 font-weight: 400;
-                color: #b0b0b0;
+                color: var(--lgl-color-gray);
 
                 del {
                     text-decoration: line-through;

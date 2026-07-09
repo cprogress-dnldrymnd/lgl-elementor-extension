@@ -4,7 +4,7 @@ Guidance for working in the **LGL Shortcodes** WordPress plugin.
 
 ## What this is
 
-`lgl-shortcodes` is an OOP WordPress plugin (v4.7.7, by Digitally Disruptive – Donald
+`lgl-shortcodes` is an OOP WordPress plugin (v4.7.8, by Digitally Disruptive – Donald
 Raymundo) that renders front-end UI for a **leisure-vehicle dealership** site —
 caravans, motorhomes, and campervans. It provides shortcodes + Elementor widgets for
 search, listing grids, single-vehicle pages, wishlist, compare, finance/enquiry/reserve
@@ -109,9 +109,11 @@ Notable default attributes (set in `render_shortcode`): `lgl_listing` →
   `scrub_deleted_attachment_from_galleries()`, so deleting a Media Library item removes it
   from every vehicle's gallery/interior meta automatically),
   `_listing_interior_image_id`.
-  `rrp` is optional (from `lgl-import`): when numeric and greater than `price`, the
-  `.lgl-sale-price` block in `single-lgl.php` shows an "Only <price>" / "Was <del>rrp</del>"
-  treatment instead of the plain price (styled via `.lgl-price-prefix` / `.lgl-price-was` in
+  `rrp` is optional (from `lgl-import`): when numeric and greater than `price`, both the
+  `.lgl-sale-price` block in `single-lgl.php` and the `.lgl-post--price` block in
+  `templates/partials/lgl-grid.php` (listing/grid cards) show an "Only <price>" /
+  "Was <del>rrp</del>" treatment instead of the plain price (same `$has_rrp` check
+  duplicated in each template; styled via `.lgl-price-prefix` / `.lgl-price-was` in
   `main.scss`); otherwise it falls back to the plain price display.
 - **Reserve/enquiry meta** (written by `LGL_Forms`): `_lgl_is_reserved`, `_lgl_reserve_mode`,
   `_lgl_reserve_mode_sub`, `_lgl_reserve_status`, `_lgl_reserved_at`, `_lgl_form_data`, `_lgl_product_id`.
