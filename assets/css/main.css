@@ -383,9 +383,6 @@
   .lgl-post.lgl-post.lgl-post .lgl-post--thumbnail {
     position: relative;
     overflow: hidden; }
-    .lgl-post.lgl-post.lgl-post .lgl-post--thumbnail .lgl-reduced-sticker {
-      max-width: 100px;
-      height: auto; }
     .lgl-post.lgl-post.lgl-post .lgl-post--thumbnail img {
       width: 100%;
       height: 100%;
@@ -2442,7 +2439,9 @@
   max-width: 28%;
   height: auto;
   pointer-events: none;
-  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.25)); }
+  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.25));
+  max-width: 100px;
+  height: auto; }
 
 /* Dark Style (Default - Dark Text for Light Backgrounds) */
 .lgl-breadcrumbs-dark.lgl-breadcrumbs-dark,
