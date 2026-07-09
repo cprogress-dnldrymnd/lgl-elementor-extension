@@ -33,6 +33,7 @@ class LGL_Forms
 		// ── Per-product meta box ─────────────────────────────────────
 		add_action('add_meta_boxes', [$this, 'add_product_meta_box']);
 		add_action('save_post',      [$this, 'save_product_meta'], 10, 2);
+		add_action('save_post',      [$this, 'save_reduced_sticker_meta'], 10, 2);
 
 		// ── Submission list table columns ────────────────────────────
 		add_filter('manage_lgl_enquiry_sub_posts_columns',       [$this, 'enquiry_columns']);
@@ -1002,6 +1003,7 @@ class LGL_Forms
 		$types = ['caravan', 'motorhome', 'campervan'];
 		foreach ($types as $t) {
 			add_meta_box('lgl_vehicle_forms', __('Vehicle Form Settings', 'lgl-shortcodes'), [$this, 'render_product_meta_box'], $t, 'side', 'default');
+			add_meta_box('lgl_reduced_sticker', __('Reduced Sticker', 'lgl-shortcodes'), [$this, 'render_reduced_sticker_meta_box'], $t, 'side', 'default');
 		}
 	}
 
@@ -1052,24 +1054,33 @@ class LGL_Forms
 				upd();
 			})(jQuery);
 		</script>
-		<?php
-		$reduced_on       = get_post_meta($post->ID, '_lgl_reduced_sticker', true);
-		$lgl_opts         = get_option('lgl_settings', []);
-		$global_sticker   = $lgl_opts['reduced_sticker_image'] ?? '';
-		$settings_url     = admin_url('admin.php?page=lgl-settings#general');
-		?>
-		<div style="margin-top:14px;padding-top:14px;border-top:1px solid #e0e0e0">
-			<label style="display:flex;align-items:flex-start;gap:6px;font-size:13px;line-height:1.4">
-				<input type="checkbox" name="lgl_reduced_sticker" value="1" <?php checked($reduced_on, '1'); ?>>
-				<span><?php _e('Show the “Reduced” sticker on this vehicle', 'lgl-shortcodes'); ?></span>
-			</label>
-			<?php if ($global_sticker) : ?>
-				<img src="<?php echo esc_url($global_sticker); ?>" alt="" style="max-width:100px;height:auto;border:1px solid #ddd;border-radius:3px;display:block;margin:8px 0 0" />
-			<?php else : ?>
-				<p style="font-size:11px;color:#b32d2e;margin:6px 0 0"><?php printf(__('No sticker image is set. Add one under <a href="%s">LGL Settings → General → Reduced Sticker Image</a>.', 'lgl-shortcodes'), esc_url($settings_url)); ?></p>
-			<?php endif; ?>
-			<p style="font-size:11px;color:#666;margin:6px 0 0"><?php _e('Overlaid on the top corner of this vehicle’s image on listing grids and the single page. The image is set globally in LGL Settings.', 'lgl-shortcodes'); ?></p>
-		</div>
+<?php
+	}
+
+	/**
+	 * Rendering block for the standalone "Reduced Sticker" meta box.
+	 * The sticker image itself is a global LGL setting; this box only toggles
+	 * whether the sticker is shown on the current vehicle.
+	 * @param WP_Post $post Current post object scope.
+	 */
+	public function render_reduced_sticker_meta_box($post)
+	{
+		wp_nonce_field('lgl_reduced_sticker_meta', 'lgl_reduced_nonce');
+		$reduced_on     = get_post_meta($post->ID, '_lgl_reduced_sticker', true);
+		$lgl_opts       = get_option('lgl_settings', []);
+		$global_sticker = $lgl_opts['reduced_sticker_image'] ?? '';
+		$settings_url   = admin_url('admin.php?page=lgl-settings#general');
+	?>
+		<label style="display:flex;align-items:flex-start;gap:6px;font-size:13px;line-height:1.4">
+			<input type="checkbox" name="lgl_reduced_sticker" value="1" <?php checked($reduced_on, '1'); ?>>
+			<span><?php _e('Show the “Reduced” sticker on this vehicle', 'lgl-shortcodes'); ?></span>
+		</label>
+		<?php if ($global_sticker) : ?>
+			<img src="<?php echo esc_url($global_sticker); ?>" alt="" style="max-width:100px;height:auto;border:1px solid #ddd;border-radius:3px;display:block;margin:8px 0 0" />
+		<?php else : ?>
+			<p style="font-size:11px;color:#b32d2e;margin:6px 0 0"><?php printf(__('No sticker image is set. Add one under <a href="%s">LGL Settings → General → Reduced Sticker Image</a>.', 'lgl-shortcodes'), esc_url($settings_url)); ?></p>
+		<?php endif; ?>
+		<p style="font-size:11px;color:#666;margin:6px 0 0"><?php _e('Overlaid on the bottom corner of this vehicle’s image on listing grids and the single page. The image is set globally in LGL Settings.', 'lgl-shortcodes'); ?></p>
 <?php
 	}
 
@@ -1097,6 +1108,20 @@ class LGL_Forms
 			delete_post_meta($post_id, '_lgl_is_reserved');
 			delete_post_meta($post_id, '_lgl_reserved_at');
 		}
+	}
+
+	/**
+	 * Persists the per-vehicle "Reduced" sticker toggle from its standalone meta box.
+	 * @param int $post_id Evaluated current Post ID.
+	 * @param WP_Post $post Target vehicle post object reference.
+	 */
+	public function save_reduced_sticker_meta($post_id, $post)
+	{
+		if (! isset($_POST['lgl_reduced_nonce'])) return;
+		if (! wp_verify_nonce($_POST['lgl_reduced_nonce'], 'lgl_reduced_sticker_meta')) return;
+		if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) return;
+		if (! current_user_can('edit_post', $post_id)) return;
+		if (! in_array($post->post_type, ['caravan', 'motorhome', 'campervan'], true)) return;
 
 		update_post_meta($post_id, '_lgl_reduced_sticker', empty($_POST['lgl_reduced_sticker']) ? '0' : '1');
 	}

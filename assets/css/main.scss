@@ -529,7 +529,10 @@
     .lgl-post--thumbnail {
         position: relative;
         overflow: hidden;
-
+        .lgl-reduced-sticker {
+            max-width: 100px;
+            height: auto;
+        }
         img {
             width: 100%;
             height: 100%;
@@ -1130,7 +1133,9 @@
 }
 
 .lgl-post--gallery {
-    position: relative;
+    .lgl-main-gallery {
+        position: relative;
+    }
 
     .lgl-slider-nav.lgl-gallery-slider:not(.slick-initialized) {
         display: grid;
