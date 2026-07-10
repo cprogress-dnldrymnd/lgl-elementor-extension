@@ -72,6 +72,11 @@ if (! is_user_logged_in()) :
                     'last_name'  => $reg_last,
                 ));
 
+                // Send the welcome email (respects the toggle in LGL → Email Builder → Registration)
+                if (class_exists('LGL_Email_Builder')) {
+                    LGL_Email_Builder::send_welcome($new_user_id);
+                }
+
                 // Auto-login after registration
                 $credentials = array(
                     'user_login'    => $reg_username,

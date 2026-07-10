@@ -4,7 +4,7 @@ Guidance for working in the **LGL Shortcodes** WordPress plugin.
 
 ## What this is
 
-`lgl-shortcodes` is an OOP WordPress plugin (v4.7.18, by Digitally Disruptive – Donald
+`lgl-shortcodes` is an OOP WordPress plugin (v4.7.19, by Digitally Disruptive – Donald
 Raymundo) that renders front-end UI for a **leisure-vehicle dealership** site —
 caravans, motorhomes, and campervans. It provides shortcodes + Elementor widgets for
 search, listing grids, single-vehicle pages, wishlist, compare, finance/enquiry/reserve
@@ -145,7 +145,14 @@ Admin menu structure:
   Field Visibility & Ordering (drag-sortable), LGL Pages & Active Vehicles.
 - Submenu **Documentation** (`lgl-documentation`).
 - `LGL_Forms` adds a **Form Builder** submenu + links to Enquiry/Reserve Submissions list tables.
-- `LGL_Email_Builder` adds an **Email Builder** submenu (Global / Enquiry / Reserve templates).
+- `LGL_Email_Builder` adds an **Email Builder** submenu (Global / Enquiry / Reserve / Registration
+  templates). The **Registration** tab configures the welcome email sent to a new user when they
+  register via `[lgl_my_account]` — stored in the `lgl_registration_email` option (enable toggle,
+  subject, HTML body, sender override). It's sent by the static `LGL_Email_Builder::send_welcome($user_id)`,
+  called from `templates/shortcodes/lgl_my_account.php` right after `wp_create_user`/`wp_update_user`
+  (`wp_create_user` alone sends no email). Uses its own merge-tag set (`registration_tags()`:
+  `{{username}}`, `{{login_url}}` → configured My Account page or `wp_login_url()`, plus the shared
+  contact tags) and is wrapped in the global email template like every other LGL email.
 
 Two patterns worth knowing:
 - **Contact fields are a single source of truth**: `get_contact_fields_definition()` feeds

@@ -4,7 +4,7 @@
  * Plugin Name: LGL Shortcodes
  * Plugin URI: https://digitallydisruptive.co.uk/
  * Description: A robust, OOP-based plugin to output customized data via shortcodes using a dynamic template routing system.
- * Version: 4.7.18
+ * Version: 4.7.19
  * Author: Digitally Disruptive - Donald Raymundo
  * Author URI: https://digitallydisruptive.co.uk/
  * Text Domain: lgl-shortcodes
@@ -17,7 +17,7 @@ if (! defined('ABSPATH')) {
 // Define a constant for the plugin directory path to ensure reliable file inclusion.
 define('LGL_SHORTCODES_PATH', plugin_dir_path(__FILE__));
 define('LGL_SHORTCODES_URL', plugin_dir_url(__FILE__));
-define('LGL_SHORTCODES_VERSION', '4.7.18');
+define('LGL_SHORTCODES_VERSION', '4.7.19');
 // ── Load the Forms integration ──
 require_once LGL_SHORTCODES_PATH . 'includes/class-lgl-forms.php';
 require_once LGL_SHORTCODES_PATH . 'includes/class-lgl-email-builder.php';
@@ -3111,6 +3111,8 @@ if (! class_exists('LGL_Shortcodes')) {
                 'first_name' => 'John',
                 'last_name' => 'Doe',
                 'email' => $to,
+                'username'      => 'john.doe',
+                'login_url'     => home_url(),
                 'phone' => '07700 900000',
                 'product_title' => 'Bailey Autograph 75-4i',
                 'product_url'   => home_url(),
@@ -3121,6 +3123,7 @@ if (! class_exists('LGL_Shortcodes')) {
                 'admin_email'   => get_option('admin_email'),
                 'date'          => wp_date(get_option('date_format')),
                 'time'          => wp_date(get_option('time_format')),
+                'year'          => wp_date('Y'),
             ];
             $body = LGL_Email_Builder::process_tags($body, $placeholders);
             $html = LGL_Email_Builder::wrap_html($subject, $body);

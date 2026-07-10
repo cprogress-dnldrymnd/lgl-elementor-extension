@@ -29,6 +29,7 @@ class LGL_Email_Builder
         add_action('admin_post_lgl_save_enquiry_email', [$this, 'save_email_settings']);
         add_action('admin_post_lgl_save_reserve_email', [$this, 'save_email_settings']);
         add_action('admin_post_lgl_save_global_email',  [$this, 'save_global_email_settings']);
+        add_action('admin_post_lgl_save_registration_email', [$this, 'save_registration_email_settings']);
 
         // ── Global template: apply to ALL outgoing wp_mail calls when enabled ──
         // This now handles Gravity Forms too — see maybe_apply_global_template().
@@ -539,6 +540,8 @@ function getPlainTagValue(key, siteName, currentYear) {
         first_name:    "John",
         last_name:     "Doe",
         email:         "john@example.com",
+        username:      "john.doe",
+        login_url:     window.location.origin,
         phone:         "07700 900000",
         product_title: "Bailey Autograph 75-4i",
         product_url:   "#",
@@ -846,9 +849,10 @@ $(document).ready(function() {
 
         echo '<h2 class="nav-tab-wrapper">';
         $tabs = [
-            'global'  => __('Global Template', 'lgl-shortcodes'),
-            'enquiry' => __('Enquiry Emails', 'lgl-shortcodes'),
-            'reserve' => __('Reserve Emails', 'lgl-shortcodes'),
+            'global'       => __('Global Template', 'lgl-shortcodes'),
+            'enquiry'      => __('Enquiry Emails', 'lgl-shortcodes'),
+            'reserve'      => __('Reserve Emails', 'lgl-shortcodes'),
+            'registration' => __('Registration Email', 'lgl-shortcodes'),
         ];
 
         foreach ($tabs as $key => $name) {
@@ -864,6 +868,8 @@ $(document).ready(function() {
             $this->render_enquiry_email_page();
         } elseif ($active_tab === 'reserve') {
             $this->render_reserve_email_page();
+        } elseif ($active_tab === 'registration') {
+            $this->render_registration_email_page();
         }
 
         echo '</div>';
@@ -1057,6 +1063,146 @@ $(document).ready(function() {
         $form_settings  = get_option('lgl_reserve_form', []);
         $email_settings = get_option('lgl_reserve_email', $this->default_email('reserve'));
         $this->render_page('reserve', $form_settings, $email_settings);
+    }
+
+    /**
+     * Renders the Registration (welcome) email builder page. Unlike the enquiry/reserve
+     * pages there are no form fields, recipients, or auto-reply — the email always goes to
+     * the newly registered user. Reuses the shared live-preview + send-test machinery.
+     *
+     * @return void
+     */
+    private function render_registration_email_page()
+    {
+        $email_settings  = wp_parse_args(get_option('lgl_registration_email', []), self::default_registration_email());
+        $enabled         = ! empty($email_settings['enabled']);
+        $subject         = $email_settings['subject']    ?? '';
+        $body            = $email_settings['body']       ?? '';
+        $form_from_name  = $email_settings['from_name']  ?? '';
+        $form_from_email = $email_settings['from_email'] ?? '';
+        $all_tags        = self::registration_tags();
+        $global_settings = self::get_global_email_settings();
+        $test_nonce      = wp_create_nonce('lgl_email_builder');
+
+        $global_from_name  = $global_settings['from_name']  ?? '';
+        $global_from_email = $global_settings['from_email'] ?? '';
+        $ph_name  = $global_from_name  ?: get_option('blogname');
+        $ph_email = $global_from_email ?: get_option('admin_email');
+    ?>
+        <div class="lgl-eb-wrap">
+            <div class="lgl-eb-master-layout">
+
+                <div class="lgl-eb-builder-column">
+                    <form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>">
+                        <?php wp_nonce_field('lgl_save_registration_email', 'lgl_eb_form_nonce'); ?>
+                        <input type="hidden" name="action" value="lgl_save_registration_email">
+                        <input type="hidden" id="lgl-eb-nonce-value" value="<?php echo esc_attr($test_nonce); ?>">
+
+                        <input type="hidden" id="lgl-global-header-template" value="<?php echo esc_attr($global_settings['header']); ?>">
+                        <input type="hidden" id="lgl-global-footer-template" value="<?php echo esc_attr($global_settings['footer']); ?>">
+                        <input type="hidden" id="lgl-site-name" value="<?php echo esc_attr(get_option('blogname')); ?>">
+
+                        <input type="hidden" id="lgl-color-bg" value="<?php echo esc_attr($global_settings['color_bg']); ?>">
+                        <input type="hidden" id="lgl-color-body-bg" value="<?php echo esc_attr($global_settings['color_body_bg']); ?>">
+                        <input type="hidden" id="lgl-color-text" value="<?php echo esc_attr($global_settings['color_text']); ?>">
+                        <input type="hidden" id="lgl-color-header-bg" value="<?php echo esc_attr($global_settings['color_header_bg']); ?>">
+                        <input type="hidden" id="lgl-color-header-text" value="<?php echo esc_attr($global_settings['color_header_text']); ?>">
+                        <input type="hidden" id="lgl-color-link" value="<?php echo esc_attr($global_settings['color_link']); ?>">
+
+                        <div class="lgl-eb-tab-panels">
+                            <div class="lgl-eb-tab-content active">
+                                <div class="lgl-eb-layout">
+                                    <div class="lgl-eb-main">
+
+                                        <div class="lgl-eb-section">
+                                            <h3><?php _e('Welcome Email', 'lgl-shortcodes'); ?></h3>
+                                            <div class="lgl-eb-toggle-row">
+                                                <input type="checkbox" id="lgl-eb-reg-enabled" name="enabled" value="1" <?php checked($enabled); ?>>
+                                                <label for="lgl-eb-reg-enabled" style="font-weight:600;font-size:13px;cursor:pointer;"><?php _e('Send a welcome email when a user registers a new account', 'lgl-shortcodes'); ?></label>
+                                            </div>
+                                            <p class="description"><?php _e('Sent to the new account holder immediately after they register through the <code>[lgl_my_account]</code> form.', 'lgl-shortcodes'); ?></p>
+                                        </div>
+
+                                        <div class="lgl-eb-section">
+                                            <h3>✉️ <?php _e('Sender Identity', 'lgl-shortcodes'); ?></h3>
+                                            <p class="description" style="margin-bottom:14px;">
+                                                <?php _e('Override the global <strong>From Name</strong> and <strong>From Email</strong> for this email only. Leave blank to use the global setting (or the WordPress default if that is also blank).', 'lgl-shortcodes'); ?>
+                                            </p>
+                                            <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+                                                <div class="lgl-eb-row">
+                                                    <label><?php _e('From Name', 'lgl-shortcodes'); ?></label>
+                                                    <input type="text" name="from_name" value="<?php echo esc_attr($form_from_name); ?>" placeholder="<?php echo esc_attr($ph_name); ?>" class="widefat">
+                                                </div>
+                                                <div class="lgl-eb-row">
+                                                    <label><?php _e('From Email', 'lgl-shortcodes'); ?></label>
+                                                    <input type="email" name="from_email" value="<?php echo esc_attr($form_from_email); ?>" placeholder="<?php echo esc_attr($ph_email); ?>" class="widefat">
+                                                </div>
+                                            </div>
+                                            <?php if ($global_from_name || $global_from_email) : ?>
+                                                <p class="description" style="margin-top:8px;">
+                                                    <?php printf(
+                                                        esc_html__('Global defaults: %s / %s', 'lgl-shortcodes'),
+                                                        '<strong>' . esc_html($global_from_name  ?: '—') . '</strong>',
+                                                        '<strong>' . esc_html($global_from_email ?: '—') . '</strong>'
+                                                    ); ?>
+                                                </p>
+                                            <?php endif; ?>
+                                        </div>
+
+                                        <div class="lgl-eb-section">
+                                            <h3><?php _e('Subject Line', 'lgl-shortcodes'); ?></h3>
+                                            <div class="lgl-eb-subject-tags">
+                                                <?php foreach (['{{first_name}}', '{{site_name}}'] as $tag) : ?>
+                                                    <button type="button" class="lgl-eb-insert-tag" data-tag="<?php echo esc_attr($tag); ?>"><?php echo esc_html($tag); ?></button>
+                                                <?php endforeach; ?>
+                                            </div>
+                                            <div class="lgl-eb-row">
+                                                <input type="text" name="subject" id="lgl-eb-subject" class="lgl-eb-subject-input" value="<?php echo esc_attr($subject); ?>" placeholder="<?php esc_attr_e('Welcome to {{site_name}}, {{first_name}}!', 'lgl-shortcodes'); ?>">
+                                            </div>
+                                        </div>
+
+                                        <div class="lgl-eb-section">
+                                            <h3><?php _e('Email Body', 'lgl-shortcodes'); ?> <span style="font-size:11px;font-weight:400;color:#8c8f94;">(HTML supported)</span></h3>
+                                            <?php $this->render_flat_tag_toolbar($all_tags, 'lgl-eb-body'); ?>
+                                            <textarea name="body" id="lgl-eb-body" class="lgl-eb-textarea"><?php echo esc_textarea($body); ?></textarea>
+                                        </div>
+
+                                        <div class="lgl-eb-section">
+                                            <h3><?php _e('Send Test Email', 'lgl-shortcodes'); ?></h3>
+                                            <p class="description"><?php _e('Sends a preview with placeholder values substituted for merge tags.', 'lgl-shortcodes'); ?></p>
+                                            <div class="lgl-eb-test-row">
+                                                <input type="email" id="lgl-eb-test-email" placeholder="your@email.com" value="<?php echo esc_attr(get_option('admin_email')); ?>">
+                                                <button type="button" id="lgl-eb-send-test" class="button"><?php _e('Send Test', 'lgl-shortcodes'); ?></button>
+                                                <span class="lgl-eb-test-msg" id="lgl-eb-test-msg"></span>
+                                            </div>
+                                        </div>
+
+                                    </div>
+
+                                    <div class="lgl-eb-sidebar">
+                                        <?php $this->render_flat_tag_reference($all_tags); ?>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <?php submit_button(__('Save Registration Email', 'lgl-shortcodes')); ?>
+                    </form>
+                </div>
+
+                <div class="lgl-eb-preview-column">
+                    <div class="lgl-eb-section lgl-eb-preview-sticky">
+                        <div class="lgl-eb-preview-header">
+                            <h3><?php _e('Live HTML Preview', 'lgl-shortcodes'); ?></h3>
+                            <button type="button" id="lgl-eb-preview-btn" class="button button-secondary button-small"><?php _e('⟳ Refresh', 'lgl-shortcodes'); ?></button>
+                        </div>
+                        <iframe id="lgl-eb-preview-frame" title="Email Preview"></iframe>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+<?php
     }
 
     private function render_page(string $type, array $form_settings, array $email_settings)
@@ -1308,6 +1454,81 @@ $(document).ready(function() {
         echo '</div>';
     }
 
+    /**
+     * Flat (ungrouped) tag toolbar used by the Registration email page, where merge tags
+     * don't map onto the Submitter/Vehicle/Form-Field groups.
+     *
+     * @param array  $all_tags    tag => label map.
+     * @param string $textarea_id Target editor id.
+     * @return void
+     */
+    private function render_flat_tag_toolbar(array $all_tags, string $textarea_id)
+    {
+        echo '<div class="lgl-eb-tag-toolbar" data-for="' . esc_attr($textarea_id) . '">';
+        echo '<span class="lgl-tag-group-label">' . esc_html__('Available Tags', 'lgl-shortcodes') . '</span>';
+        foreach ($all_tags as $tag => $label) {
+            printf(
+                '<button type="button" class="lgl-eb-insert-tag" data-tag="%s" title="%s">%s</button>',
+                esc_attr($tag),
+                esc_attr($label),
+                esc_html($tag)
+            );
+        }
+        echo '</div>';
+    }
+
+    /**
+     * Flat (ungrouped) tag reference sidebar counterpart to render_flat_tag_toolbar().
+     *
+     * @param array $all_tags tag => label map.
+     * @return void
+     */
+    private function render_flat_tag_reference(array $all_tags)
+    {
+        echo '<div class="lgl-eb-section">';
+        echo '<h3>' . esc_html__('Merge Tag Reference', 'lgl-shortcodes') . '</h3>';
+        echo '<p class="description" style="margin-bottom:12px;font-size:11px;">' . esc_html__('Click a tag to insert it into the active editor.', 'lgl-shortcodes') . '</p>';
+        echo '<ul class="lgl-eb-tag-ref">';
+        foreach ($all_tags as $tag => $label) {
+            printf(
+                '<li><code data-tag="%s">%s</code><span class="lgl-tag-desc">%s</span></li>',
+                esc_attr($tag),
+                esc_html($tag),
+                esc_html($label)
+            );
+        }
+        echo '</ul>';
+        echo '</div>';
+    }
+
+    /**
+     * Merge tags available to the Registration (welcome) email.
+     *
+     * @return array tag => label map.
+     */
+    public static function registration_tags(): array
+    {
+        $tags = [
+            '{{first_name}}'  => __('First name', 'lgl-shortcodes'),
+            '{{last_name}}'   => __('Last name', 'lgl-shortcodes'),
+            '{{email}}'       => __('Email address', 'lgl-shortcodes'),
+            '{{username}}'    => __('Username', 'lgl-shortcodes'),
+            '{{login_url}}'   => __('Login / My Account URL', 'lgl-shortcodes'),
+            '{{site_name}}'   => __('Website name', 'lgl-shortcodes'),
+            '{{site_url}}'    => __('Website URL', 'lgl-shortcodes'),
+            '{{admin_email}}' => __('Admin email address', 'lgl-shortcodes'),
+            '{{date}}'        => __('Registration date', 'lgl-shortcodes'),
+            '{{time}}'        => __('Registration time', 'lgl-shortcodes'),
+            '{{year}}'        => __('Current year', 'lgl-shortcodes'),
+        ];
+
+        foreach (self::get_contact_tag_definitions() as $key => $label) {
+            $tags['{{' . $key . '}}'] = $label;
+        }
+
+        return $tags;
+    }
+
     /* ═══════════════════════════════════════════════════════════════
        SAVE
     ═══════════════════════════════════════════════════════════════ */
@@ -1364,6 +1585,28 @@ $(document).ready(function() {
         ]);
 
         wp_redirect(admin_url('admin.php?page=lgl-email-builder&tab=global&saved=1'));
+        exit;
+    }
+
+    /**
+     * Persists the Registration (welcome) email settings.
+     *
+     * @return void
+     */
+    public function save_registration_email_settings()
+    {
+        check_admin_referer('lgl_save_registration_email', 'lgl_eb_form_nonce');
+        if (! current_user_can('manage_options')) wp_die('Unauthorized');
+
+        update_option('lgl_registration_email', [
+            'enabled'    => ! empty($_POST['enabled']),
+            'subject'    => sanitize_text_field($_POST['subject'] ?? ''),
+            'body'       => wp_kses_post($_POST['body']           ?? ''),
+            'from_name'  => sanitize_text_field($_POST['from_name'] ?? ''),
+            'from_email' => sanitize_email($_POST['from_email']    ?? ''),
+        ]);
+
+        wp_redirect(admin_url('admin.php?page=lgl-email-builder&tab=registration&saved=1'));
         exit;
     }
 
@@ -1766,5 +2009,146 @@ HTML;
 
 <p>Kind regards,<br><strong>{{site_name}}</strong></p>
 HTML;
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       REGISTRATION / WELCOME EMAIL
+    ═══════════════════════════════════════════════════════════════ */
+
+    /**
+     * Default settings for the Registration (welcome) email. Enabled by default so the
+     * feature works as soon as the plugin is updated, but fully editable in the builder.
+     *
+     * @return array
+     */
+    public static function default_registration_email(): array
+    {
+        return [
+            'enabled'    => true,
+            'subject'    => 'Welcome to {{site_name}}, {{first_name}}!',
+            'body'       => self::default_registration_body(),
+            'from_name'  => '',
+            'from_email' => '',
+        ];
+    }
+
+    private static function default_registration_body(): string
+    {
+        return <<<HTML
+<h2>Welcome aboard, {{first_name}}!</h2>
+<p>Thanks for creating an account at <a href="{{site_url}}">{{site_name}}</a>. Your account is ready to use.</p>
+
+<p>You can sign in any time to manage your details and view the vehicles you've saved to your wishlist:</p>
+
+<p><a class="eb-button" href="{{login_url}}">Go to My Account →</a></p>
+
+<h3>Your account details</h3>
+<table>
+  <tr><th>Name</th><td>{{first_name}} {{last_name}}</td></tr>
+  <tr><th>Username</th><td>{{username}}</td></tr>
+  <tr><th>Email</th><td>{{email}}</td></tr>
+</table>
+
+<p>If you didn't create this account, please contact us and we'll put it right.</p>
+
+<p>Kind regards,<br><strong>{{site_name}}</strong></p>
+HTML;
+    }
+
+    /**
+     * Resolves the merge-tag values for a newly registered user.
+     *
+     * @param WP_User $user The registered user.
+     * @return array tag-key => value map (without the surrounding braces).
+     */
+    public static function build_registration_tag_values(WP_User $user): array
+    {
+        $lgl_options    = get_option('lgl_settings', []);
+        $contact_values = [];
+        foreach (self::get_contact_tag_definitions() as $key => $label) {
+            $contact_values[$key] = $lgl_options[$key] ?? '';
+        }
+
+        return array_merge($contact_values, [
+            'first_name'  => $user->first_name,
+            'last_name'   => $user->last_name,
+            'email'       => $user->user_email,
+            'username'    => $user->user_login,
+            'login_url'   => self::get_account_url(),
+            'site_name'   => get_option('blogname'),
+            'site_url'    => home_url(),
+            'admin_email' => get_option('admin_email'),
+            'date'        => wp_date(get_option('date_format')),
+            'time'        => wp_date(get_option('time_format')),
+            'year'        => wp_date('Y'),
+        ]);
+    }
+
+    /**
+     * URL the welcome email points users to for signing in — the configured LGL "My Account"
+     * page when set, otherwise the WordPress login screen.
+     *
+     * @return string
+     */
+    private static function get_account_url(): string
+    {
+        $lgl_options = get_option('lgl_settings', []);
+        $page_id     = isset($lgl_options['my_account_page_id']) ? intval($lgl_options['my_account_page_id']) : 0;
+        if ($page_id && get_post_status($page_id) === 'publish') {
+            return get_permalink($page_id);
+        }
+        return wp_login_url();
+    }
+
+    /**
+     * Sends the welcome email to a newly registered user, if the feature is enabled.
+     * Called from the [lgl_my_account] registration handler.
+     *
+     * @param int $user_id The new user's ID.
+     * @return void
+     */
+    public static function send_welcome(int $user_id): void
+    {
+        $cfg = wp_parse_args(get_option('lgl_registration_email', []), self::default_registration_email());
+
+        if (empty($cfg['enabled'])) {
+            return;
+        }
+
+        $user = get_user_by('id', $user_id);
+        if (! $user || ! is_email($user->user_email)) {
+            return;
+        }
+
+        $values  = self::build_registration_tag_values($user);
+        $subject = self::process_tags($cfg['subject'] ?? '', $values);
+        $body    = self::process_tags($cfg['body']    ?? '', $values);
+
+        if ($subject === '') {
+            $subject = 'Welcome to ' . get_option('blogname');
+        }
+        if (trim(wp_strip_all_tags($body)) === '') {
+            $body = self::process_tags(self::default_registration_body(), $values);
+        }
+
+        // ── Resolve sender: per-email override → global setting → WP default ──
+        $global         = self::get_global_email_settings();
+        $resolved_name  = trim($cfg['from_name'] ?? '')
+                        ?: trim($global['from_name'] ?? '')
+                        ?: get_option('blogname');
+        $resolved_email = sanitize_email($cfg['from_email'] ?? '');
+        if (! $resolved_email || ! is_email($resolved_email)) {
+            $resolved_email = sanitize_email($global['from_email'] ?? '');
+        }
+        if (! $resolved_email || ! is_email($resolved_email)) {
+            $resolved_email = get_option('admin_email');
+        }
+
+        $headers = [
+            'Content-Type: text/html; charset=UTF-8',
+            'From: ' . $resolved_name . ' <' . $resolved_email . '>',
+        ];
+
+        wp_mail($user->user_email, $subject, self::wrap_html($subject, $body), $headers);
     }
 }
