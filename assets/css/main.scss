@@ -1449,6 +1449,15 @@
         position: relative;
         transition: all 0.3s;
         text-decoration: none;
+        @media (max-width: 575px) {
+            padding: 10px 15px;
+            font-size: 1rem;
+        }
+
+        @media (max-width: 480px) {
+            padding: 7px 10px;
+            font-size: 0.75rem;
+        }
 
         span {
             position: relative;

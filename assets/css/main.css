@@ -1054,6 +1054,14 @@
     position: relative;
     transition: all 0.3s;
     text-decoration: none; }
+    @media (max-width: 575px) {
+      .lgl-tabs--tbnav.lgl-tabs--tbnav .lgl-nav-item {
+        padding: 10px 15px;
+        font-size: 1rem; } }
+    @media (max-width: 480px) {
+      .lgl-tabs--tbnav.lgl-tabs--tbnav .lgl-nav-item {
+        padding: 7px 10px;
+        font-size: 0.75rem; } }
     .lgl-tabs--tbnav.lgl-tabs--tbnav .lgl-nav-item span {
       position: relative; }
     .lgl-tabs--tbnav.lgl-tabs--tbnav .lgl-nav-item:before {
