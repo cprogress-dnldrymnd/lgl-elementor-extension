@@ -636,6 +636,15 @@
                 choicesArray.push({ value: val, label: val, selected: isSelected });
             });
 
+            // Preserve an active out-of-range value (e.g. ?condition=Used when only
+            // "New" exists for this type) so the filter is retained and keeps
+            // constraining the query — otherwise the faceted refresh would silently
+            // reset it to "Any" and surface results that don't match the URL filter.
+            if (current && !stillValid) {
+                choicesArray.push({ value: current, label: current, selected: true });
+                stillValid = true;
+            }
+
             instance.clearChoices();
             instance.removeActiveItems(); // Force UI to clear previous text
             instance.setChoices(choicesArray, 'value', 'label', true);

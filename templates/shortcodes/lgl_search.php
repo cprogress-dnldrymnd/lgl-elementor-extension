@@ -365,6 +365,15 @@ if ($post_type) {
                                     <label for="lgl_<?php echo esc_attr($field_key); ?>"><?php echo esc_html($label); ?></label>
                                     <select name="<?php echo esc_attr($field_key); ?>" id="lgl_<?php echo esc_attr($field_key); ?>" class="lgl-select2" data-placeholder="Any <?php echo esc_attr($label); ?>">
                                         <option value="">Any <?php echo esc_html($label); ?></option>
+                                        <?php
+                                        // If an active filter value arrived via the URL that isn't among the
+                                        // available meta values (e.g. ?condition=Used on motorhomes where every
+                                        // vehicle is New), still inject it as a selected option so the constraint
+                                        // is carried into the query and correctly returns zero results, rather
+                                        // than being dropped and returning everything. Mirrors the model fallback.
+                                        if ($active_val !== '' && !in_array($active_val, $meta_values, true)) : ?>
+                                            <option value="<?php echo esc_attr($active_val); ?>" selected="selected"><?php echo esc_html($active_val); ?></option>
+                                        <?php endif; ?>
                                         <?php foreach ($meta_values as $val) : ?>
                                             <option value="<?php echo esc_attr($val); ?>" <?php selected($active_val, $val); ?>><?php echo esc_html($val); ?></option>
                                         <?php endforeach; ?>

@@ -4,7 +4,7 @@ Guidance for working in the **LGL Shortcodes** WordPress plugin.
 
 ## What this is
 
-`lgl-shortcodes` is an OOP WordPress plugin (v4.7.14, by Digitally Disruptive – Donald
+`lgl-shortcodes` is an OOP WordPress plugin (v4.7.16, by Digitally Disruptive – Donald
 Raymundo) that renders front-end UI for a **leisure-vehicle dealership** site —
 caravans, motorhomes, and campervans. It provides shortcodes + Elementor widgets for
 search, listing grids, single-vehicle pages, wishlist, compare, finance/enquiry/reserve
@@ -231,4 +231,10 @@ fancybox gallery.
   `'true'`, so a `default => 'yes'`/`return_value => 'true'` mismatch makes the switch look on
   in the editor but evaluate as off (see `attr_live_search`/`attr_show_all_filters` in
   `class-lgl-elementor-widgets.php`).
+- **Out-of-range filter values must stay selected, not be dropped**: if a URL param (e.g.
+  `?condition=Used`) names a value that isn't among the current post type's available meta
+  values, both the initial render (`templates/shortcodes/lgl_search.php`) and the client-side
+  faceted refresh (`assets/js/main.js`) inject it as a synthetic selected `<option>` rather
+  than omitting it. Otherwise the dropdown silently falls back to "Any" and the query returns
+  unfiltered results instead of correctly returning zero.
 - Git history messages are terse (e.g. "css", "cs"); don't rely on them for context.
