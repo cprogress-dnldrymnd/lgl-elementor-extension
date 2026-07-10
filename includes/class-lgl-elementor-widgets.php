@@ -52,7 +52,7 @@ class LGL_Widget_Search extends \Elementor\Widget_Base
         $this->add_control('attr_live_search', [
             'label' => __('Live AJAX Refresh', 'lgl-shortcodes'),
             'type' => \Elementor\Controls_Manager::SWITCHER,
-            'default' => 'yes',
+            'default' => 'true',
             'return_value' => 'true',
         ]);
         $this->add_control('attr_layout', [
@@ -67,7 +67,7 @@ class LGL_Widget_Search extends \Elementor\Widget_Base
         $this->add_control('attr_show_all_filters', [
             'label' => __('Show All Filters', 'lgl-shortcodes'),
             'type' => \Elementor\Controls_Manager::SWITCHER,
-            'default' => 'yes',
+            'default' => 'true',
             'return_value' => 'true',
         ]);
 
