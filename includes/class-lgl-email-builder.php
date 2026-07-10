@@ -1164,7 +1164,7 @@ $(document).ready(function() {
                                         <div class="lgl-eb-section">
                                             <h3><?php _e('Email Body', 'lgl-shortcodes'); ?> <span style="font-size:11px;font-weight:400;color:#8c8f94;">(HTML supported)</span></h3>
                                             <?php $this->render_flat_tag_toolbar($all_tags, 'lgl-eb-body'); ?>
-                                            <textarea name="body" id="lgl-eb-body" class="lgl-eb-textarea"><?php echo esc_textarea($body); ?></textarea>
+                                            <textarea name="body" id="lgl-eb-body" class="lgl-eb-textarea"><?php echo esc_textarea($body ?: self::default_registration_body()); ?></textarea>
                                         </div>
 
                                         <div class="lgl-eb-section">
@@ -1543,15 +1543,15 @@ $(document).ready(function() {
         $rec_type = sanitize_text_field($_POST['recipient_type'] ?? 'admin');
 
         update_option("lgl_{$form_type}_email", [
-            'subject'            => sanitize_text_field($_POST['subject']            ?? ''),
-            'body'               => wp_kses_post($_POST['body']                      ?? ''),
+            'subject'            => sanitize_text_field(wp_unslash($_POST['subject']            ?? '')),
+            'body'               => wp_kses_post(wp_unslash($_POST['body']                      ?? '')),
             'recipient_type'     => in_array($rec_type, $allowed_recipients, true) ? $rec_type : 'admin',
-            'custom_email'       => self::sanitize_email_list($_POST['custom_email']  ?? ''),
-            'from_name'          => sanitize_text_field($_POST['from_name']          ?? ''),
-            'from_email'         => sanitize_email($_POST['from_email']              ?? ''),
+            'custom_email'       => self::sanitize_email_list(wp_unslash($_POST['custom_email']  ?? '')),
+            'from_name'          => sanitize_text_field(wp_unslash($_POST['from_name']          ?? '')),
+            'from_email'         => sanitize_email(wp_unslash($_POST['from_email']              ?? '')),
             'auto_reply_enabled' => ! empty($_POST['auto_reply_enabled']),
-            'auto_reply_subject' => sanitize_text_field($_POST['auto_reply_subject'] ?? ''),
-            'auto_reply_body'    => wp_kses_post($_POST['auto_reply_body']           ?? ''),
+            'auto_reply_subject' => sanitize_text_field(wp_unslash($_POST['auto_reply_subject'] ?? '')),
+            'auto_reply_body'    => wp_kses_post(wp_unslash($_POST['auto_reply_body']           ?? '')),
         ]);
 
         wp_redirect(admin_url("admin.php?page=lgl-email-builder&tab={$form_type}&saved=1"));
@@ -1569,8 +1569,8 @@ $(document).ready(function() {
         if (! current_user_can('manage_options')) wp_die('Unauthorized');
 
         update_option('lgl_global_email_settings', [
-            'header'              => wp_kses_post($_POST['header']       ?? ''),
-            'footer'              => wp_kses_post($_POST['footer']       ?? ''),
+            'header'              => wp_kses_post(wp_unslash($_POST['header']       ?? '')),
+            'footer'              => wp_kses_post(wp_unslash($_POST['footer']       ?? '')),
             'color_bg'            => sanitize_hex_color($_POST['color_bg']          ?? '#f5f5f5'),
             'color_body_bg'       => sanitize_hex_color($_POST['color_body_bg']     ?? '#ffffff'),
             'color_text'          => sanitize_hex_color($_POST['color_text']        ?? '#1d2327'),
@@ -1580,8 +1580,8 @@ $(document).ready(function() {
             // NEW: persist the "apply to all" checkbox
             'apply_to_all_emails' => ! empty($_POST['apply_to_all_emails']),
             // NEW: sender identity
-            'from_name'           => sanitize_text_field($_POST['from_name']  ?? ''),
-            'from_email'          => sanitize_email($_POST['from_email']      ?? ''),
+            'from_name'           => sanitize_text_field(wp_unslash($_POST['from_name']  ?? '')),
+            'from_email'          => sanitize_email(wp_unslash($_POST['from_email']      ?? '')),
         ]);
 
         wp_redirect(admin_url('admin.php?page=lgl-email-builder&tab=global&saved=1'));
@@ -1600,10 +1600,10 @@ $(document).ready(function() {
 
         update_option('lgl_registration_email', [
             'enabled'    => ! empty($_POST['enabled']),
-            'subject'    => sanitize_text_field($_POST['subject'] ?? ''),
-            'body'       => wp_kses_post($_POST['body']           ?? ''),
-            'from_name'  => sanitize_text_field($_POST['from_name'] ?? ''),
-            'from_email' => sanitize_email($_POST['from_email']    ?? ''),
+            'subject'    => sanitize_text_field(wp_unslash($_POST['subject'] ?? '')),
+            'body'       => wp_kses_post(wp_unslash($_POST['body']           ?? '')),
+            'from_name'  => sanitize_text_field(wp_unslash($_POST['from_name'] ?? '')),
+            'from_email' => sanitize_email(wp_unslash($_POST['from_email']    ?? '')),
         ]);
 
         wp_redirect(admin_url('admin.php?page=lgl-email-builder&tab=registration&saved=1'));
