@@ -111,6 +111,11 @@ if (class_exists('LGL_Import_Post_Types')) {
             $value = get_post_meta($post_id, $key, true);
 
             if (!empty($value)) {
+                // Format monetary fields with the configured currency symbol/position
+                if (in_array($key, array('price', 'rrp'), true) && is_numeric($value)) {
+                    $value = LGL_Shortcodes::format_price($value);
+                }
+
                 $render_item($key, $valid_meta_fields[$key], $value);
             }
         }

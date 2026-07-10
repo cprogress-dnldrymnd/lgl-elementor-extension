@@ -4,7 +4,7 @@ Guidance for working in the **LGL Shortcodes** WordPress plugin.
 
 ## What this is
 
-`lgl-shortcodes` is an OOP WordPress plugin (v4.7.16, by Digitally Disruptive – Donald
+`lgl-shortcodes` is an OOP WordPress plugin (v4.7.17, by Digitally Disruptive – Donald
 Raymundo) that renders front-end UI for a **leisure-vehicle dealership** site —
 caravans, motorhomes, and campervans. It provides shortcodes + Elementor widgets for
 search, listing grids, single-vehicle pages, wishlist, compare, finance/enquiry/reserve
@@ -237,4 +237,10 @@ fancybox gallery.
   faceted refresh (`assets/js/main.js`) inject it as a synthetic selected `<option>` rather
   than omitting it. Otherwise the dropdown silently falls back to "Any" and the query returns
   unfiltered results instead of correctly returning zero.
+- **Monetary fields in the generic spec-list renderer must be formatted explicitly**:
+  `templates/partials/lgl-meta.php` (the icon+label+value spec list used on single-vehicle
+  pages and grid cards) reads meta values generically via `get_post_meta()` and echoes them
+  as plain text, so `price`/`rrp` need an explicit `LGL_Shortcodes::format_price()` pass
+  (checked via `is_numeric`) before they reach `$render_item()` — otherwise they render as
+  a raw unformatted number instead of a currency string.
 - Git history messages are terse (e.g. "css", "cs"); don't rely on them for context.
