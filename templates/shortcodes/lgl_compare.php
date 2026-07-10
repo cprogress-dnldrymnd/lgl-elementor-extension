@@ -210,6 +210,30 @@ jQuery(document).ready(function($) {
             typeSelector.value = preload.type;
         }
     })();
+    <?php else: ?>
+    // -------------------------------------------------------------------------
+    // Auto-select the category that currently has staged vehicles.
+    // The comparison list lives in localStorage (per browser), so the server
+    // can't know it. If the default category (server-picked) is empty but the
+    // user has vehicles staged under another active category, switch to it so
+    // they land on their populated comparison instead of an empty table.
+    // -------------------------------------------------------------------------
+    (function () {
+        if (!typeSelector) return;
+
+        const allowedTypes = <?php echo wp_json_encode($allowed_types); ?>;
+        const allData      = JSON.parse(localStorage.getItem(STATE_KEY_DATA)) || {};
+
+        const hasVehicles = (type) => Array.isArray(allData[type]) && allData[type].length > 0;
+
+        const current = typeSelector.value;
+        if (!hasVehicles(current)) {
+            const populated = allowedTypes.find(hasVehicles);
+            if (populated) {
+                typeSelector.value = populated;
+            }
+        }
+    })();
     <?php endif; ?>
 
     // -------------------------------------------------------------------------

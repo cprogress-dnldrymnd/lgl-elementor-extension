@@ -212,10 +212,13 @@ fancybox gallery.
   `::render_html_list_from_string()`. Form/reserve state has its own helpers on `LGL_Forms`
   (`get_finance_settings`, `get_enquiry_settings`, `get_reserve_settings`,
   `get_current_reserve_mode`, `is_reserved`).
-- **Vehicle-type-gated features**: list-table "featured" columns and the LGL Pages settings
-  only appear for vehicle types whose `LGL_IMPORT_OPT_ENABLE_*` toggle is on. When adding
-  per-type admin behavior, iterate `$this->cpt_toggles` and skip disabled types, as the
-  existing code does.
+- **Vehicle-type-gated features**: list-table "featured" columns, the LGL Pages settings, and
+  the `lgl_compare` type selector only show vehicle types whose `LGL_IMPORT_OPT_ENABLE_*`
+  toggle is on. When adding per-type behavior, read `$this->cpt_toggles` (available in
+  templates too, since they're `include`d from inside the `LGL_Shortcodes` instance) and skip
+  disabled types, as the existing code does. `templates/shortcodes/lgl_compare.php` also
+  defaults its type dropdown to the first active type that has published vehicles (falling
+  back to the first active type) rather than always preselecting the first entry.
 - **Theme override before plugin edit**: if a site has `your-theme/lgl-shortcodes/<tag>.php`,
   that file wins over `templates/shortcodes/<tag>.php`. Check for an override before assuming
   the plugin template is what renders.
@@ -223,4 +226,9 @@ fancybox gallery.
   (global/header search), `main.js` blocks form submission if `#lgl_post_type` is empty —
   it adds `lgl-field-error` and opens the Choices.js dropdown automatically. Without a type,
   the redirect has no destination and would just reload the current page.
+- **Elementor `SWITCHER` controls**: `default` must equal `return_value` (both `'true'`), not
+  Elementor's stock `'yes'` — the shortcode attribute check compares the saved value against
+  `'true'`, so a `default => 'yes'`/`return_value => 'true'` mismatch makes the switch look on
+  in the editor but evaluate as off (see `attr_live_search`/`attr_show_all_filters` in
+  `class-lgl-elementor-widgets.php`).
 - Git history messages are terse (e.g. "css", "cs"); don't rely on them for context.
