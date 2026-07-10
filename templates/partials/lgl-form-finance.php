@@ -72,10 +72,6 @@ $def_loan     = (float) ($fin['loan_default'] ?? 15000);
         </div>
     </div>
 
-    <button type="button" class="lgl-btn lgl-btn-primary lgl-fc-calc-btn" id="lgl-fc-calc-btn">
-        <?php _e('CALCULATE', 'lgl-shortcodes'); ?>
-    </button>
-
     <div class="lgl-fc-outputs" id="lgl-fc-outputs">
         <div class="lgl-fc-output-grid">
             <div class="lgl-fc-output-item"><span class="lgl-fc-out-label"><?php _e('Cash Price', 'lgl-shortcodes'); ?></span><span class="lgl-fc-out-val" id="lgl-fc-cash-price">—</span></div>

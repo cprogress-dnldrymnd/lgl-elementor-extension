@@ -73,9 +73,6 @@
     ──────────────────────────────────────────────────────────── */
 
     function initFinanceCalculator() {
-        // Run explicitly on button click (fallback)
-        $(document).on('click', '#lgl-fc-calc-btn', calcFinance);
-
         // Auto-recalculate on input changes as per spec (Included #lgl-fc-loan-amount)
         $(document).on('input change', '#lgl-fc-deposit, #lgl-fc-duration, #lgl-fc-loan-amount', calcFinance);
 
@@ -178,7 +175,7 @@
     function showCalcErr(msg) {
         // Output zero defaults visually when there is an error to prevent hanging math visuals
         $('.lgl-fc-out-val').not('#lgl-fc-cash-price').text('—');
-        $('#lgl-fc-calc-btn').before('<div class="lgl-fc-calc-error" style="color:#d63638;font-size:13px;margin-bottom:12px;">' + msg + '</div>');
+        $('#lgl-fc-outputs').before('<div class="lgl-fc-calc-error" style="color:#d63638;font-size:13px;margin-bottom:12px;">' + msg + '</div>');
     }
 
     /* ────────────────────────────────────────────────────────────

@@ -167,14 +167,6 @@
     box-shadow: 0 0 0 3px rgba(0, 55, 147, 0.1);
 }
 
-.lgl-fc-calc-btn {
-    display: block;
-    width: 100%;
-    margin-bottom: 20px;
-    text-align: center;
-    letter-spacing: 1px;
-}
-
 /* ── FC Output grid ── */
 .lgl-fc-outputs {
     border: 2px solid var(--lgl-color-light-gray);
