@@ -353,7 +353,7 @@ if (isset($_GET['lgl_updated'])) {
                             <h3><?php esc_html_e('Wishlist', 'lgl-shortcodes'); ?></h3>
                             <p>
                                 <?php
-                                $wishlist_count = count((array) get_user_meta($current_user->ID, 'lgl_wishlists', true));
+                                $wishlist_count = count($this->get_valid_wishlist($current_user->ID));
                                 printf(
                                     /* translators: %d: count */
                                     esc_html(_n('%d saved vehicle', '%d saved vehicles', $wishlist_count, 'lgl-shortcodes')),

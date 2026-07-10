@@ -4,7 +4,7 @@ Guidance for working in the **LGL Shortcodes** WordPress plugin.
 
 ## What this is
 
-`lgl-shortcodes` is an OOP WordPress plugin (v4.7.17, by Digitally Disruptive – Donald
+`lgl-shortcodes` is an OOP WordPress plugin (v4.7.18, by Digitally Disruptive – Donald
 Raymundo) that renders front-end UI for a **leisure-vehicle dealership** site —
 caravans, motorhomes, and campervans. It provides shortcodes + Elementor widgets for
 search, listing grids, single-vehicle pages, wishlist, compare, finance/enquiry/reserve
@@ -129,6 +129,9 @@ Notable default attributes (set in `render_shortcode`): `lgl_listing` →
   image layouts in `single-lgl.php`; styled via `.lgl-reduced-sticker` in `main.scss`.
 - **Wishlist**: stored in user meta `lgl_wishlists` (array of post IDs).
   `get_valid_wishlist()` self-heals — it drops IDs that are no longer `publish` and persists the cleaned list.
+  Anywhere a wishlist count or listing is displayed (e.g. `lgl_my_account`), read it via
+  `$this->get_valid_wishlist($user_id)` rather than raw `get_user_meta(..., 'lgl_wishlists', true)`,
+  so stale/deleted vehicle IDs aren't counted.
 
 ## Settings & admin UI
 
