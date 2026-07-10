@@ -253,4 +253,11 @@ fancybox gallery.
   as plain text, so `price`/`rrp` need an explicit `LGL_Shortcodes::format_price()` pass
   (checked via `is_numeric`) before they reach `$render_item()` — otherwise they render as
   a raw unformatted number instead of a currency string.
+- **`wp_unslash()` before sanitizing saved `$_POST` text**: WordPress adds slashes to all
+  superglobals (`wp_magic_quotes()`), so textarea/text `$_POST` values must be run through
+  `wp_unslash()` *before* `sanitize_text_field()` / `wp_kses_post()` when persisting to an
+  option — e.g. `LGL_Email_Builder::save_template()` / `save_global_settings()` /
+  `save_registration_settings()`. Skipping it doesn't corrupt the first save, but every
+  subsequent save re-escapes the already-stored value, so apostrophes/quotes visibly
+  accumulate backslashes (`don't` → `don\'t` → `don\\\'t`) each time an admin re-saves the form.
 - Git history messages are terse (e.g. "css", "cs"); don't rely on them for context.
