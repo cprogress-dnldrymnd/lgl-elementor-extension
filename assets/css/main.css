@@ -1102,6 +1102,12 @@
   border-radius: 0 0 20px 20px;
   border: 1px solid var(--lgl-color-gray);
   border-top: none; }
+  @media (max-width: 767px) {
+    .lgl-panel-item--inner {
+      padding: 30px; } }
+  @media (max-width: 575px) {
+    .lgl-panel-item--inner {
+      padding: 30px; } }
 
 .lgl-meta-list {
   display: grid;
