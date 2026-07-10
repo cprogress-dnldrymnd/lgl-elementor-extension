@@ -25,15 +25,26 @@ if (!empty($options['disable_compare'])) {
 $preload         = null;   // Will hold { ids: [], type: '' } if valid
 $preload_error   = null;   // Will hold a user-facing error string if invalid
 
-$enable_caravan   = isset($options['enable_caravan']) ? $options['enable_caravan'] : '1';
-$enable_motorhome = isset($options['enable_motorhome']) ? $options['enable_motorhome'] : '1';
-$enable_campervan = isset($options['enable_campervan']) ? $options['enable_campervan'] : '1';
+// Determine which vehicle types are active. The real source of truth is the
+// LGL_IMPORT_OPT_ENABLE_* toggles, exposed on the class as $this->cpt_toggles.
+// (This template is included inside LGL_Shortcodes::load_template(), so $this
+// is available.) Fall back to all three if the class context is unavailable.
+$type_toggles = (isset($this) && !empty($this->cpt_toggles))
+    ? $this->cpt_toggles
+    : array('caravan' => true, 'motorhome' => true, 'campervan' => true);
 
-// Dynamically build the allowed types array based on active settings
+// Dynamically build the allowed types array, hiding types that are not active.
 $allowed_types = array();
-if ($enable_caravan) $allowed_types[] = 'caravan';
-if ($enable_motorhome) $allowed_types[] = 'motorhome';
-if ($enable_campervan) $allowed_types[] = 'campervan';
+foreach (array('caravan', 'motorhome', 'campervan') as $type) {
+    if (!empty($type_toggles[$type])) {
+        $allowed_types[] = $type;
+    }
+}
+
+if (empty($allowed_types)) {
+    echo '<p class="lgl-compare-empty">' . esc_html__('No vehicle categories are currently active for comparison.', 'lgl-shortcodes') . '</p>';
+    return;
+}
 
 if (!empty($_GET['compare'])) {
     $raw_ids = sanitize_text_field(wp_unslash($_GET['compare']));
@@ -98,6 +109,37 @@ if (!empty($_GET['compare'])) {
         }
     }
 }
+
+// ==========================================================================
+// Default category: auto-select a populated type when others are empty
+// ==========================================================================
+
+// Count published vehicles per active type so the selector defaults to a
+// category that actually has vehicles (instead of an empty first category).
+$type_counts = array();
+foreach ($allowed_types as $type) {
+    $counts             = wp_count_posts($type);
+    $type_counts[$type] = isset($counts->publish) ? (int) $counts->publish : 0;
+}
+
+// Resolve the default-selected type:
+//  - a valid ?compare= preload always wins,
+//  - otherwise the first active type that has published vehicles,
+//  - otherwise fall back to the first active type.
+$default_type = '';
+if ($preload) {
+    $default_type = $preload['type'];
+} else {
+    foreach ($allowed_types as $type) {
+        if ($type_counts[$type] > 0) {
+            $default_type = $type;
+            break;
+        }
+    }
+    if ($default_type === '') {
+        $default_type = $allowed_types[0];
+    }
+}
 ?>
 
 <div class="lgl-compare-container">
@@ -118,7 +160,7 @@ if (!empty($_GET['compare'])) {
                         'motorhome' => __('Motorhomes', 'lgl-shortcodes'),
                         'campervan' => __('Campervans', 'lgl-shortcodes'),
                     );
-                    $selected = ($preload && $preload['type'] === $type) ? 'selected' : '';
+                    $selected = ($type === $default_type) ? 'selected' : '';
                 ?>
                     <option value="<?php echo esc_attr($type); ?>" <?php echo $selected; ?>>
                         <?php echo esc_html($label_map[$type]); ?>
