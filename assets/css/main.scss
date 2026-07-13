@@ -751,6 +751,14 @@
                     color: var(--lgl-color-white);
                 }
 
+                .lgl-post--price {
+
+                    .lgl-price-prefix,
+                    .lgl-price-was {
+                        color: var(--lgl-color-white);
+                    }
+                }
+
                 .lgl-post--title a {
                     font-size: 1.375rem;
                     overflow: hidden;
